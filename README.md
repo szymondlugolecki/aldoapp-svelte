@@ -36,3 +36,43 @@ npm run build
 You can preview the production build with `npm run preview`.
 
 > To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+
+# TODO
+
+[ ] Make the user panel wider
+
+[ ] Add store page with all the products
+
+[ ] Implement cart with svelte store
+
+[ ] Add products page in admin panel
+
+[ ] Implement auth system
+
+[ ] Implement user profiles
+
+[ ] Implement user orders history
+
+[ ] Make a cool home page (with carousels mb)
+
+[ ] Add PWA
+
+[ ] Deploy on Vercel
+
+[ ] Add user settings
+
+[ ] Add push notifications
+
+[ ] Add light/dark mode switch
+
+[ ] Run tests
+
+[ ] Handle permissions (admin panel access, etc)
+
+[ ] Add support for offline mode
+
+[ ] Add custom 404 pages, etc.
+
+[ ] a11y, SEO
+
+[ ] Wyślij zapytanie mailowe do serwisów, na maila

@@ -8,7 +8,14 @@ const config = {
 	preprocess: vitePreprocess(),
 
 	kit: {
-		adapter: adapter()
+		adapter: adapter(),
+		alias: {
+			'$server/env': './src/env/server.mjs',
+			'$client/env': './src/env/client.mjs',
+			'$components/*': 'src/components',
+			$types: './src/types',
+			$prisma: './src/lib/server/prismaClient.ts'
+		}
 	}
 };
 

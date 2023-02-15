@@ -1,52 +1,52 @@
 <script lang="ts">
-	import { LayoutDashboard } from 'lucide-svelte';
+	import { List, LineChart, Users, Dna, LayoutList } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	$: activeUrl = $page.url.pathname;
 
 	const navigationLinks = [
 		{
 			name: 'Panel',
-			href: '/admin'
+			href: '/admin',
+			icon: Dna
 		},
 		{
-			name: 'Produkty',
-			href: '/admin/produkty'
+			name: 'Zamówienia',
+			href: '/admin/zamowienia',
+			icon: LayoutList
 		},
 		{
 			name: 'Analityka',
-			href: '/admin/analityka'
+			href: '/admin/analityka',
+			icon: LineChart
+		},
+		{
+			name: 'Produkty',
+			href: '/admin/produkty',
+			icon: List
 		},
 		{
 			name: 'Użytkownicy',
-			href: '/admin/uzytkownicy'
+			href: '/admin/uzytkownicy',
+			icon: Users
 		}
 	];
-
-	// {#each navigationLinks as link}
-	// 	<a
-	// 		class={`text-center ${activeUrl === link.href ? 'text-blue-700' : 'text-black'}`}
-	// 		href={link.href}>{link.name}</a
-	// 	>
-	// {/each}
-
-	// hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300
 </script>
 
-<div class="px-3">
+<div class="h-full">
 	<nav class="border-b border-gray-200 dark:border-gray-700">
 		<ul
 			class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500 dark:text-gray-400"
 		>
-			{#each navigationLinks as link}
+			{#each navigationLinks as { name, href, icon: Icon }}
 				<li class="mr-2">
 					<a
-						href={link.href}
+						{href}
 						class={`inline-flex p-4 border-b-2 border-transparent rounded-t-lg ${
-							activeUrl === link.href ? 'text-blue-700' : 'text-black'
+							activeUrl === href ? 'text-blue-700' : 'text-black'
 						} group`}
 					>
-						<LayoutDashboard class="w-5 h-5 mr-2" />
-						{link.name}
+						<Icon class="w-5 h-5 mr-2" />
+						{name}
 					</a>
 				</li>
 			{/each}

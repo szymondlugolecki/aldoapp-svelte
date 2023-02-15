@@ -1,106 +1,126 @@
-<script>
+<script lang="ts">
+	import { enhance } from '$app/forms';
 	import {
 		Button,
 		Modal,
 		Label,
 		Input,
-		Checkbox,
 		Table,
-		TableBody,
 		TableBodyCell,
 		TableBodyRow,
 		TableHead,
 		TableHeadCell,
-		Search
+		Tooltip
 	} from 'flowbite-svelte';
+	import { ExternalLink } from 'lucide-svelte';
+	import NewUserModal from '$components/Modals/NewUserModal.svelte';
+	import EditUserModal from '$components/Modals/EditUserModal.svelte';
+	import TableHeader from '$components/TableHeader.svelte';
 
-	import { PlusCircle } from 'lucide-svelte';
+	import { textCrusher } from '$lib/client/functions';
+	import { roleNames } from '$lib/client/constants';
 
-	let formModal = false;
+	let searchInput: string;
+
+	let usersList: typeof data.users;
+	$: users = data.users.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+	$: usersList = searchInput
+		? users.filter(
+				(user) =>
+					textCrusher(user.email).includes(textCrusher(searchInput)) ||
+					textCrusher(user.fullName).includes(textCrusher(searchInput))
+		  )
+		: users;
+
+	let newUserModalOpen = false;
+	let editUserModalOpen = false;
+
+	let editModalUserId: string;
+
+	const openEditModal = (id: string) => {
+		editModalUserId = id;
+		editUserModalOpen = true;
+	};
+
+	$: editUserModal = usersList.find((user) => user.id === editModalUserId);
+
+	export let data: import('./$types').PageData;
 </script>
 
 <section class="w-full h-full p-2 space-y-3">
-	<div class="flex space-x-5 items-center">
-		<Search placeholder="Szukaj" />
-		<button
-			class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 flex justify-center items-center"
-			on:click={() => (formModal = true)}><PlusCircle class="mr-2" />Nowy użytkownik</button
-		>
-	</div>
-	<Modal bind:open={formModal} size="xs" autoclose={false} class="w-full">
-		<form class="flex flex-col space-y-6" action="#">
-			<h3 class="text-xl font-medium text-gray-900 dark:text-white p-0">Sign in to our platform</h3>
-			<Label class="space-y-2">
-				<span>Email</span>
-				<Input type="email" name="email" placeholder="name@company.com" required />
-			</Label>
-			<Label class="space-y-2">
-				<span>Your password</span>
-				<Input type="password" name="password" placeholder="•••••" required />
-			</Label>
-			<div class="flex items-start">
-				<Checkbox>Remember me</Checkbox>
-				<a href="/" class="ml-auto text-sm text-blue-700 hover:underline dark:text-blue-500"
-					>Lost password?</a
-				>
-			</div>
-			<Button type="submit" class="w-full1">Login to your account</Button>
-			<div class="text-sm font-medium text-gray-500 dark:text-gray-300">
-				Not registered? <a href="/" class="text-blue-700 hover:underline dark:text-blue-500"
-					>Create account</a
-				>
-			</div>
-		</form>
-	</Modal>
+	<TableHeader bind:searchInput bind:newUserModalOpen />
+	<NewUserModal bind:newUserModalOpen />
+	<EditUserModal bind:editUserModalOpen bind:editUserModal />
 
 	<Table>
 		<TableHead>
-			<TableHeadCell>Tożsamość</TableHeadCell>
-			<TableHeadCell>Adres email</TableHeadCell>
+			<TableHeadCell>Użytkownik</TableHeadCell>
 			<TableHeadCell>Rola</TableHeadCell>
+			<TableHeadCell>Akcja</TableHeadCell>
+			<TableHeadCell>Dołączył</TableHeadCell>
 			<TableHeadCell>Profil</TableHeadCell>
 		</TableHead>
-		<TableBody tableBodyClass="divide-y">
-			<TableBodyRow>
-				<TableBodyCell>Szymon Długołęcki</TableBodyCell>
-				<TableBodyCell>szymon.dlugolecki@aldo.agro.pl</TableBodyCell>
-				<TableBodyCell>Admin</TableBodyCell>
-				<TableBodyCell>
-					<a class="hover:text-blue-700" target="_blank" href="/uzytkownik/userid">Sprawdź</a>
-				</TableBodyCell>
-			</TableBodyRow>
-			<TableBodyRow>
-				<TableBodyCell>Leszek Długołęcki</TableBodyCell>
-				<TableBodyCell>leszek.dlugolecki@aldo.agro.pl</TableBodyCell>
-				<TableBodyCell>Admin</TableBodyCell>
-				<TableBodyCell>
-					<a class="hover:text-blue-700" target="_blank" href="/uzytkownik/userid">Sprawdź</a>
-				</TableBodyCell>
-			</TableBodyRow>
-			<TableBodyRow>
-				<TableBodyCell>Andrzej Długołęcki</TableBodyCell>
-				<TableBodyCell>andrzej.dlugolecki@aldo.agro.pl</TableBodyCell>
-				<TableBodyCell>Admin</TableBodyCell>
-				<TableBodyCell>
-					<a class="hover:text-blue-700" target="_blank" href="/uzytkownik/userid">Sprawdź</a>
-				</TableBodyCell>
-			</TableBodyRow>
-			<TableBodyRow>
-				<TableBodyCell>Krystian Długołęcki</TableBodyCell>
-				<TableBodyCell>krystian.dlugolecki@aldo.agro.pl</TableBodyCell>
-				<TableBodyCell>Moderator</TableBodyCell>
-				<TableBodyCell>
-					<a class="hover:text-blue-700" target="_blank" href="/uzytkownik/userid">Sprawdź</a>
-				</TableBodyCell>
-			</TableBodyRow>
-			<TableBodyRow>
-				<TableBodyCell>Zbigniew Gąbka</TableBodyCell>
-				<TableBodyCell>zbigniew.gabka@wp.pl</TableBodyCell>
-				<TableBodyCell>Klient</TableBodyCell>
-				<TableBodyCell>
-					<a class="hover:text-blue-700" target="_blank" href="/uzytkownik/userid">Sprawdź</a>
-				</TableBodyCell>
-			</TableBodyRow>
-		</TableBody>
+		<tbody class="divide-y">
+			{#each usersList as user}
+				<TableBodyRow>
+					<TableBodyCell>
+						<span class="block">{user.fullName}</span>
+						<span class="block">{user.email}</span>
+					</TableBodyCell>
+					<TableBodyCell>
+						<span
+							class={`${user.role === 'admin' ? 'text-red-400' : ''} ${
+								user.role === 'moderator' ? 'text-green-300' : ''
+							} ${user.role === 'customer' ? 'text-blue-400' : ''}`}>{roleNames[user.role]}</span
+						>
+					</TableBodyCell>
+					<TableBodyCell>
+						<button
+							on:click={() => openEditModal(user.id)}
+							type="button"
+							class="font-medium hover:text-blue-600 dark:hover:text-blue-500">Edytuj</button
+						>
+					</TableBodyCell>
+					<TableBodyCell>
+						<div class="relative">
+							<span class="peer">
+								{user.createdAt.toLocaleDateString('pl-PL', {
+									month: 'short',
+									day: 'numeric',
+									year: 'numeric'
+								})}
+							</span>
+							<div
+								role="tooltip"
+								class="top-[-40px] left-[-40px] invisible peer-hover:visible inline-block absolute z-50 px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm tooltip dark:bg-gray-700"
+							>
+								{user.createdAt.toLocaleDateString('pl-PL', {
+									month: 'long',
+									day: 'numeric',
+									year: 'numeric',
+									hour: '2-digit',
+									minute: '2-digit',
+									second: '2-digit'
+								})}
+								<div class="tooltip-arrow" />
+							</div>
+						</div>
+					</TableBodyCell>
+					<TableBodyCell>
+						<a
+							rel="noreferrer"
+							class="hover:text-blue-700"
+							target="_blank"
+							href={`/uzytkownik/${user.id}`}><ExternalLink /></a
+						>
+					</TableBodyCell>
+				</TableBodyRow>
+			{/each}
+		</tbody>
 	</Table>
+	{#if usersList.length === 0}
+		<div class="w-full h-20 flex justify-center items-center text-center">
+			<span class="text-3xl">Brak wyników... 🧐</span>
+		</div>
+	{/if}
 </section>
