@@ -1,6 +1,5 @@
-import { NODE_ENV } from '$env/static/private';
 import { verificationCodeValidation } from '$lib/client/schemas/users';
-import { aTMaxAge, jwtName, rTMaxAge } from '$lib/server/constants/auth';
+import { dateInXMinutes, dateInXMonths, jwtName } from '$lib/server/constants/auth';
 import { createAccessToken, createRefreshToken } from '$lib/server/functions/auth';
 import { prisma } from '$prisma';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
@@ -15,6 +14,8 @@ const verificationCodeSchema = z.object({
 export const actions = {
 	default: async ({ request, cookies }) => {
 		const data = Object.fromEntries(await request.formData());
+		let success = false;
+
 		try {
 			const { code } = verificationCodeSchema.parse(data);
 			console.log('code', code);
@@ -39,23 +40,17 @@ export const actions = {
 			// Handle cookies
 			const accessToken = await createAccessToken({ email: token.email });
 			cookies.set(jwtName.access, accessToken, {
-				maxAge: aTMaxAge,
-				sameSite: 'lax',
-				httpOnly: true,
-				path: '/',
-				secure: NODE_ENV === 'development' ? false : true
+				expires: dateInXMinutes(10),
+				path: '/'
 			});
 
 			const refreshToken = await createRefreshToken({ email: token.email });
-			cookies.set(jwtName.access, refreshToken, {
-				maxAge: rTMaxAge,
-				sameSite: 'lax',
-				httpOnly: true,
-				path: '/api/auth/refresh',
-				secure: NODE_ENV === 'development' ? false : true
+			cookies.set(jwtName.refresh, refreshToken, {
+				expires: dateInXMonths(2),
+				path: '/'
 			});
 
-			throw redirect(302, '/');
+			success = true;
 		} catch (err) {
 			console.log('err', err);
 			if (err instanceof ZodError) {
@@ -71,6 +66,9 @@ export const actions = {
 			}
 
 			throw error(500, { message: 'Niespodziewany błąd. Spróbuj ponownie' });
+		}
+		if (success) {
+			throw redirect(307, '/');
 		}
 	}
 } satisfies Actions;

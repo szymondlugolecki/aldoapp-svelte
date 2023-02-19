@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { isValidObject } from '$lib/client/functions';
-	import { errorToast, successToast } from '$lib/client/functions/toasts';
+	import { errorToast, infoToast } from '$lib/client/functions/toasts';
 
 	// export let data: import('./$types').PageData;
 </script>
@@ -30,20 +30,19 @@
 					method="post"
 					use:enhance={() => {
 						return async ({ result, update }) => {
-							console.log('result', result);
 							if (result.type === 'failure') {
-								console.log('is failure');
 								if (isValidObject(result.data?.errors)) {
-									console.log('is valid obj');
 									const errorList = Object.values(result.data?.errors).flatMap((x) => x);
 									if (errorList.length) {
-										console.log('errorList length exists');
 										const formatErrors = '• ' + errorList.join('\n• ');
 										errorToast({ title: 'Wystąpił błąd', description: formatErrors });
 									}
 								}
-							} else if (result.type === 'success') {
-								successToast({ title: 'Sukces', description: 'Kod weryfikacyjny został wysłany' });
+							} else if (result.type === 'redirect') {
+								infoToast({
+									title: 'Informacja',
+									description: 'Kod weryfikacyjny został wysłany na podany adres email'
+								});
 							}
 							update();
 						};

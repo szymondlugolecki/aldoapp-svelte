@@ -2,6 +2,8 @@
 	import { enhance } from '$app/forms';
 	import { isValidObject } from '$lib/client/functions';
 	import { errorToast, successToast } from '$lib/client/functions/toasts';
+
+	import { goto } from '$app/navigation';
 </script>
 
 <section class="w-full h-full flex justify-center items-center">
@@ -38,8 +40,11 @@
 										errorToast({ title: 'Wystąpił błąd', description: formatErrors });
 									}
 								}
-							} else if (result.type === 'success') {
-								successToast({ title: 'Sukces', description: 'Zostałeś zalogowany' });
+							} else if (result.type === 'redirect') {
+								successToast({
+									title: 'Sukces',
+									description: 'Zostałeś zalogowany'
+								});
 							}
 							update();
 						};

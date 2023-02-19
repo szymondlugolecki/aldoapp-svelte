@@ -1,6 +1,7 @@
-import { SignJWT } from 'jose';
+import { jwtVerify, SignJWT } from 'jose';
 import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 import { jwtConfig } from '../constants/auth';
+import type { JWTTokenResult } from '$types';
 
 const { alg, secret, accessTokenConfig, refreshTokenConfig, audience, issuer } = jwtConfig;
 
@@ -32,3 +33,9 @@ export const createAccessToken = (payload: { email: string }) =>
 		.setAudience(audience)
 		.setExpirationTime(accessTokenConfig.expirationTime)
 		.sign(secret);
+
+export const verifyToken = (token: string): Promise<JWTTokenResult> =>
+	jwtVerify(token, secret, {
+		issuer,
+		audience
+	}) as Promise<JWTTokenResult>;

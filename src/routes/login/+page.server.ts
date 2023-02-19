@@ -25,6 +25,7 @@ const loginSchema = z.object({
 export const actions = {
 	default: async ({ request }) => {
 		const data = Object.fromEntries(await request.formData());
+		let success = false;
 		try {
 			const { email } = loginSchema.parse(data);
 			console.log('email', email);
@@ -47,11 +48,18 @@ export const actions = {
 
 			const verificationCode = createVerificationCode();
 
-			const { verificationToken } = await prisma.verificationToken.create({
-				data: {
+			const { verificationToken } = await prisma.verificationToken.upsert({
+				create: {
 					code: verificationCode,
-					email: email,
+					email,
 					expires: new Date(Date.now() + verificationKeysExpirationTime) // 12 hours from now
+				},
+				update: {
+					code: verificationCode,
+					expires: new Date(Date.now() + verificationKeysExpirationTime) // 12 hours from now
+				},
+				where: {
+					email
 				},
 				select: {
 					verificationToken: true
@@ -66,7 +74,7 @@ export const actions = {
 				link: verificationLink
 			});
 
-			throw redirect(302, '/login/weryfikacja');
+			success = true;
 		} catch (err) {
 			console.log('err', err);
 			if (err instanceof ZodError) {
@@ -82,6 +90,11 @@ export const actions = {
 			}
 
 			throw error(500, { message: 'Niespodziewany błąd. Spróbuj ponownie' });
+		}
+
+		if (success) {
+			// eslint-disable-next-line no-unsafe-finally
+			throw redirect(302, '/login/weryfikacja');
 		}
 	}
 } satisfies Actions;

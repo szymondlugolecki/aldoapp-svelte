@@ -26,7 +26,26 @@ export const successToast = ({
 		onClick,
 		onRemove,
 		uid
-		// component: BootstrapToast, // allows to override toast component/template per toast
+	});
+};
+
+export const infoToast = ({
+	title,
+	description,
+	duration = 10000,
+	uid = undefined,
+	onClick = undefined,
+	onRemove = undefined
+}: BasicToastProps) => {
+	return toasts.add({
+		title,
+		description,
+		duration,
+		type: 'info',
+		theme: 'dark',
+		onClick,
+		onRemove,
+		uid
 	});
 };
 
@@ -47,6 +66,5 @@ export const errorToast = ({
 		onClick,
 		onRemove,
 		uid
-		// component: BootstrapToast, // allows to override toast component/template per toast
 	});
 };
