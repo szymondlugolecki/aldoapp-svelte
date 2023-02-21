@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 
 export const GET = (({ locals }) => {
 	const session = locals.session;
+	console.log('locals', locals);
 	if (!session) {
 		throw error(401, { message: 'No session' });
 	}

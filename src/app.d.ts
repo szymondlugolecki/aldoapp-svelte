@@ -1,6 +1,6 @@
 // See https://kit.svelte.dev/docs/types#app
 
-import type { User } from '@prisma/client';
+import type { SessionUser } from '$types';
 
 // for information about these interfaces
 declare global {
@@ -8,7 +8,7 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			session?: {
-				user: Partial<User>;
+				user: SessionUser;
 				expires: Date;
 			} | null;
 		}

@@ -1,3 +1,4 @@
+import type { User } from '@prisma/client';
 import type { JWTPayload, JWTVerifyResult } from 'jose';
 
 export type Role = 'customer' | 'moderator' | 'admin';
@@ -17,3 +18,5 @@ interface PayloadWithUserEmail extends JWTPayload {
 export interface JWTTokenResult extends JWTVerifyResult {
 	payload: PayloadWithUserEmail;
 }
+
+export type SessionUser = Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'banned'>;

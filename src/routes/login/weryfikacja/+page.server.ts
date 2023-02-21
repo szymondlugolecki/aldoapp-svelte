@@ -12,7 +12,7 @@ const verificationCodeSchema = z.object({
 });
 
 export const actions = {
-	default: async ({ request, cookies }) => {
+	default: async ({ request, cookies, locals }) => {
 		const data = Object.fromEntries(await request.formData());
 		let success = false;
 
@@ -25,7 +25,8 @@ export const actions = {
 					code
 				},
 				select: {
-					email: true
+					email: true,
+					user: true
 				}
 			});
 
@@ -38,17 +39,31 @@ export const actions = {
 			}
 
 			// Handle cookies
-			const accessToken = await createAccessToken({ email: token.email });
+			const [accessToken, refreshToken] = await Promise.all([
+				createAccessToken({ email: token.email }),
+				createRefreshToken({ email: token.email })
+			]);
+
 			cookies.set(jwtName.access, accessToken, {
 				expires: accessTokenExpiryDate(),
 				path: '/'
 			});
 
-			const refreshToken = await createRefreshToken({ email: token.email });
 			cookies.set(jwtName.refresh, refreshToken, {
 				expires: refreshTokenExpiryDate(),
 				path: '/'
 			});
+
+			locals.session = {
+				user: {
+					id: token.user.id,
+					email: token.user.email,
+					role: token.user.role,
+					fullName: token.user.fullName,
+					banned: token.user.banned
+				},
+				expires: accessTokenExpiryDate()
+			};
 
 			success = true;
 		} catch (err) {

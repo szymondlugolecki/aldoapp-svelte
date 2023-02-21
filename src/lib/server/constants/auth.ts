@@ -14,7 +14,7 @@ export const dateInXMinutes = (x: number) => new Date(Date.now() + MINUTE * x);
 export const dateInXMonths = (x: number) => new Date(Date.now() + MONTH * x);
 
 export const accessTokenExpiryDate = () => dateInXMinutes(1);
-export const refreshTokenExpiryDate = () => dateInXMonths(3);
+export const refreshTokenExpiryDate = () => dateInXMonths(3.01);
 
 export const jwtConfig = {
 	alg: 'HS256',
@@ -38,9 +38,9 @@ export const joseErrorParser = (err: unknown) => {
 	if (err instanceof errors.JOSEError) {
 		if (err instanceof errors.JWTExpired) return 'expired';
 		if (err instanceof errors.JWTInvalid) return 'invalid';
-		if (err instanceof errors.JWTClaimValidationFailed) return 'invalidclaim';
-		if (err instanceof errors.JOSEAlgNotAllowed) return 'algnotallowed';
-		if (err instanceof errors.JOSENotSupported) return 'notsupported';
+		if (err instanceof errors.JWTClaimValidationFailed) return 'invalid_claim';
+		if (err instanceof errors.JOSEAlgNotAllowed) return 'alg_not_allowed';
+		if (err instanceof errors.JOSENotSupported) return 'not_supported';
 	}
 	return null;
 };
