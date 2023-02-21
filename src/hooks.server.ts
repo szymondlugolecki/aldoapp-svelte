@@ -1,40 +1,114 @@
-import { joseErrorParser, jwtName } from '$lib/server/constants/auth';
-import { createAccessToken, verifyToken } from '$lib/server/functions/auth';
-import type { JWTTokenResult } from '$types';
+import {
+	accessTokenExpiryDate,
+	joseErrorParser,
+	jwtName,
+	refreshTokenExpiryDate
+} from '$lib/server/constants/auth';
+import { createAccessToken, createRefreshToken, verifyToken } from '$lib/server/functions/auth';
+import { prisma } from '$prisma';
+import type { User } from '@prisma/client';
 import { error, redirect, type Handle } from '@sveltejs/kit';
 
 export const handle = (async ({ event, resolve }) => {
-	console.log('handle');
-
+	// Verify user's access token on every request
 	const accessToken = event.cookies.get(jwtName.access);
-	console.log('access token', accessToken);
+	const refreshToken = event.cookies.get(jwtName.refresh);
 
-	try {
-		if (accessToken) {
-			const {
-				payload: { email, exp }
-			}: JWTTokenResult = await verifyToken(accessToken);
+	const assignSession = ({ id, role, email, fullName }: Partial<User>, expires: Date) => {
+		event.locals.session = {
+			user: {
+				id,
+				role,
+				email,
+				fullName
+			},
+			expires
+		};
+	};
 
-			event.locals.session = {
-				user: {
-					// id: 'abc',
-					// role: 'admin',
+	const createSession = async (email: string) => {
+		const [accessToken, refreshToken, user] = await Promise.all([
+			createAccessToken({ email }),
+			createRefreshToken({ email }),
+			prisma.user.findFirst({
+				where: {
 					email
-					// fullName: 'Szymon Długokęcki'
 				},
-				expires: exp
-			};
-		}
-	} catch (error) {
-		const joseErrName = joseErrorParser(error);
-		if (joseErrName === 'expired') {
-			// Token exists but is expired
-			// Renew and continue
+				select: {
+					id: true,
+					role: true,
+					email: true,
+					fullName: true
+				}
+			})
+		]);
 
-			const aTCookie = createAccessToken({ email });
-			event.cookies.set(jwtName.access);
+		if (!user) {
+			throw error(400, { message: 'Użytkownik z tym mailem nie istnieje' });
 		}
-		console.error('jose error', error);
+
+		event.cookies.set(jwtName.access, accessToken, {
+			expires: accessTokenExpiryDate(),
+			path: '/'
+		});
+
+		event.cookies.set(jwtName.refresh, refreshToken, {
+			expires: refreshTokenExpiryDate(),
+			path: '/'
+		});
+
+		assignSession(user, accessTokenExpiryDate());
+	};
+
+	const destroySession = () => {
+		event.locals.session = null;
+	};
+
+	// ? Scenarios
+	// * 1. accessToken cookie ✅ & token is ✅ => just continue
+	// * 2. accessToken cookie ✅ & token is ❌ => refresh the tokens
+	// * 3. accessToken cookie ❌ & refreshToken cookie ❌ => no session, just continue
+	// * 4. accessToken cookie ❌ & refreshToken cookie ✅ => refresh the tokens
+
+	let userEmail: string | undefined;
+
+	// It only makes sense to try to refresh the tokens if the user has the RT cookie
+	if (refreshToken) {
+		try {
+			const [atPayload, rtPayload] = await Promise.all([
+				accessToken ? verifyToken(accessToken) : undefined,
+				refreshToken ? verifyToken(refreshToken) : undefined
+			]);
+
+			if (rtPayload?.payload.email) {
+				userEmail = rtPayload?.payload.email;
+			}
+
+			if (atPayload) {
+				const exp = atPayload.payload.exp;
+				const expires = new Date(Date.now() + exp * 1000);
+				console.log('Both tokens exist', 'expires', expires, 'exp', exp);
+			} else {
+				console.log('Refresh token exists', 'Access token does not exist');
+			}
+
+			// ! NO NEED FOR THIS I GUESS 🤔
+			// Everything ok 👍 Reassign the session
+			// assignSession({ email, fullName, id, role }, expires);
+		} catch (err) {
+			console.error('jose error abc', error);
+			const joseErrName = joseErrorParser(err);
+			// If it was the JWT expiration that caused the error => Refresh the tokens
+			if (joseErrName === 'expired') {
+				if (userEmail) {
+					createSession(userEmail);
+				} else {
+					destroySession();
+				}
+			} else {
+				destroySession();
+			}
+		}
 	}
 
 	// Add not allowed/unauthorized page which it will redirect to

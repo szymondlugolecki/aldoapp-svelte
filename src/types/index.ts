@@ -7,7 +7,11 @@ export type ShortService = 'pasze' | 'komis' | 'market' | 'paliwa' | 'maszyny' |
 export type Outlets = 'surowe' | 'myszyniec' | 'ełk' | 'wójtowo';
 
 interface PayloadWithUserEmail extends JWTPayload {
+	id: string;
 	email: string;
+	fullName: string;
+	role: Role;
+	exp: number;
 }
 
 export interface JWTTokenResult extends JWTVerifyResult {

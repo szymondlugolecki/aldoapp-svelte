@@ -9,8 +9,8 @@ declare global {
 		interface Locals {
 			session?: {
 				user: Partial<User>;
-				expires?: number;
-			};
+				expires: Date;
+			} | null;
 		}
 		// interface PageData {}
 		// interface Platform {}

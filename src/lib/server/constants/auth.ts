@@ -1,12 +1,6 @@
 import { AUTH_SECRET } from '$env/static/private';
-import {
-	JOSEAlgNotAllowed,
-	JOSEError,
-	JOSENotSupported,
-	JWTClaimValidationFailed,
-	JWTExpired,
-	JWTInvalid
-} from 'jose/dist/types/util/errors';
+import { errors } from 'jose';
+
 const secretEncoded = new TextEncoder().encode(AUTH_SECRET);
 
 const MINUTE = 1000 * 60;
@@ -19,6 +13,9 @@ export const verificationKeysExpirationTime = 12 * HOUR;
 export const dateInXMinutes = (x: number) => new Date(Date.now() + MINUTE * x);
 export const dateInXMonths = (x: number) => new Date(Date.now() + MONTH * x);
 
+export const accessTokenExpiryDate = () => dateInXMinutes(1);
+export const refreshTokenExpiryDate = () => dateInXMonths(3);
+
 export const jwtConfig = {
 	alg: 'HS256',
 	secret: secretEncoded,
@@ -26,7 +23,7 @@ export const jwtConfig = {
 		expirationTime: '1m'
 	},
 	refreshTokenConfig: {
-		expirationTime: '60d'
+		expirationTime: '90d'
 	},
 	audience: 'aldoapp-user',
 	issuer: 'aldoapp'
@@ -37,33 +34,13 @@ export const jwtName = {
 	refresh: 'refresh-token'
 };
 
-// export const refreshTokenCookieOpts = {
-// 	maxAge: rTMaxAge,
-// 	sameSite: 'lax',
-// 	httpOnly: true,
-// 	path: '/api/auth/refresh',
-// 	secure: NODE_ENV === 'development' ? false : true
-// };
-
-// export const accessTokenCookieOpts = {
-// 	maxAge: aTMaxAge,
-// 	sameSite: 'lax',
-// 	httpOnly: true,
-// 	path: '/',
-// 	secure: NODE_ENV === 'development' ? false : true
-// };
-
-export const JOSEErrors = {
-	expired: 'ERR_JWT_EXPIRED'
-};
-
 export const joseErrorParser = (err: unknown) => {
-	if (err instanceof JOSEError) {
-		if (err instanceof JWTExpired) return 'expired';
-		if (err instanceof JWTInvalid) return 'invalid';
-		if (err instanceof JWTClaimValidationFailed) return 'invalidclaim';
-		if (err instanceof JOSEAlgNotAllowed) return 'algnotallowed';
-		if (err instanceof JOSENotSupported) return 'notsupported';
+	if (err instanceof errors.JOSEError) {
+		if (err instanceof errors.JWTExpired) return 'expired';
+		if (err instanceof errors.JWTInvalid) return 'invalid';
+		if (err instanceof errors.JWTClaimValidationFailed) return 'invalidclaim';
+		if (err instanceof errors.JOSEAlgNotAllowed) return 'algnotallowed';
+		if (err instanceof errors.JOSENotSupported) return 'notsupported';
 	}
 	return null;
 };

@@ -1,5 +1,5 @@
 import { verificationCodeValidation } from '$lib/client/schemas/users';
-import { dateInXMinutes, dateInXMonths, jwtName } from '$lib/server/constants/auth';
+import { accessTokenExpiryDate, jwtName, refreshTokenExpiryDate } from '$lib/server/constants/auth';
 import { createAccessToken, createRefreshToken } from '$lib/server/functions/auth';
 import { prisma } from '$prisma';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
@@ -40,13 +40,13 @@ export const actions = {
 			// Handle cookies
 			const accessToken = await createAccessToken({ email: token.email });
 			cookies.set(jwtName.access, accessToken, {
-				expires: dateInXMinutes(10),
+				expires: accessTokenExpiryDate(),
 				path: '/'
 			});
 
 			const refreshToken = await createRefreshToken({ email: token.email });
 			cookies.set(jwtName.refresh, refreshToken, {
-				expires: dateInXMonths(2),
+				expires: refreshTokenExpiryDate(),
 				path: '/'
 			});
 
