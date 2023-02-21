@@ -9,11 +9,15 @@
 
 	// import { toasts, ToastContainer, FlatToast, BootstrapToast } from 'svelte-toasts';
 	// https://github.com/mzohaibqc/svelte-toasts
+
+	import type { LayoutData } from './$types';
+
+	export let data: LayoutData;
 </script>
 
 <div class="min-h-screen flex flex-col justify-between">
 	<div class="flex flex-col w-full h-full">
-		<Navbar userRole="admin" loggedIn={true} />
+		<Navbar user={data.user} />
 		<main class="h-[calc(100vh-164px)] sm:h-[calc(100vh-140px)] flex flex-col px-3 py-2">
 			<slot />
 		</main>

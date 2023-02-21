@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { isValidObject } from '$lib/client/functions';
 	import { handleFormResponse } from '$lib/client/functions/forms';
-	import { errorToast, successToast } from '$lib/client/functions/toasts';
 	import type { User } from '@prisma/client';
 	import { Button, Modal, Label, Input } from 'flowbite-svelte';
 
