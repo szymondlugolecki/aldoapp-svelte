@@ -21,6 +21,10 @@ export const handle = (async ({ event, resolve }) => {
 	const accessToken = event.cookies.get(jwtName.access);
 	const refreshToken = event.cookies.get(jwtName.refresh);
 
+	// if (event.locals.session?.user.banned) {
+	// 	throw error(403, 'Zostałeś zablokowany przez administrację');
+	// }
+
 	// const assignSession = ({ id, role, email, fullName, banned }: SessionUser, expires: Date) => {
 	// 	event.locals.session = {
 	// 		user: {
@@ -81,16 +85,11 @@ export const handle = (async ({ event, resolve }) => {
 				console.log('Refresh token exists', 'Access token does not exist');
 				throw new errors.JWTExpired('Expired');
 			}
-
-			// ! NO NEED FOR THIS I GUESS 🤔
 		} catch (err) {
-			console.error('jose error abc', err);
 			const joseErrName = joseErrorParser(err);
 			console.log('Jose Error Name', joseErrName);
 			// If it was the JWT expiration that caused the error => Refresh the tokens
 			if (joseErrName === 'expired' && userEmail) {
-				console.log('creating session');
-
 				const [accessToken, refreshToken, user] = await Promise.all([
 					createAccessToken({ email: userEmail }),
 					createRefreshToken({ email: userEmail }),
@@ -139,12 +138,12 @@ export const handle = (async ({ event, resolve }) => {
 		}
 	}
 
-	console.log('Session User', event.locals.session?.user);
+	// console.log('Session User', event.locals.session?.user);
 
 	// Add not allowed/unauthorized page which it will redirect to
-	console.log(event.url.pathname, event.url.pathname.startsWith('/admin'));
+	// console.log(event.url.pathname, event.url.pathname.startsWith('/admin'));
 	if (event.url.pathname.startsWith('/admin')) {
-		console.log(event.locals.session, Boolean(event.locals.session));
+		// console.log(event.locals.session, Boolean(event.locals.session));
 		if (!event.locals.session) {
 			throw error(401, { message: 'Nie jesteś zalogowany' });
 			// redirect(302, '/');
