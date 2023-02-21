@@ -43,13 +43,13 @@ You can preview the production build with `npm run preview`.
 
 [ ] Add store page with all the products
 
-[ ] Implement cart with svelte store
+[ ] Implement cart & checkout with svelte store
 
 [ ] Add products page in admin panel
 
 [ ] Implement auth system
 
-[ ] Implement user profiles
+[ ] Implement user profile
 
 [ ] Implement user orders history
 
@@ -57,22 +57,27 @@ You can preview the production build with `npm run preview`.
 
 [ ] Add PWA
 
-[ ] Deploy on Vercel
-
-[ ] Add user settings
-
 [ ] Add push notifications
 
 [ ] Add light/dark mode switch
 
-[ ] Run tests
+[ ] Write & run tests
 
 [ ] Handle permissions (admin panel access, etc)
 
 [ ] Add support for offline mode
 
-[ ] Add custom 404 pages, etc.
+[ ] Add custom error pages
 
-[ ] a11y, SEO
+[ ] A11y, SEO
 
-[ ] Wyślij zapytanie mailowe do serwisów, na maila
+[ ] Add possibility to send a request to a service
+
+[ ] Deploy on Vercel
+
+Under consideration:
+
+[ ] Add chatbot for easy user interactions (bot asks what the user wants => user can choose: buy sth, get a phone number for a service of choice, live chat with the staff)
+
+[ ] Add user settings (possibility to add permanent address for future deliveries?, ?, ?)
+
