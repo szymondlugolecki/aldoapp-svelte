@@ -1,18 +1,6 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import {
-		Button,
-		Modal,
-		Label,
-		Input,
-		Table,
-		TableBodyCell,
-		TableBodyRow,
-		TableHead,
-		TableHeadCell,
-		Tooltip
-	} from 'flowbite-svelte';
-	import { ExternalLink } from 'lucide-svelte';
+	import { Table, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
+	import { CheckCircle, ExternalLink, XCircle } from 'lucide-svelte';
 	import NewUserModal from '$components/Modals/NewUserModal.svelte';
 	import EditUserModal from '$components/Modals/EditUserModal.svelte';
 	import TableHeader from '$components/TableHeader.svelte';
@@ -57,7 +45,8 @@
 			<TableHeadCell>Użytkownik</TableHeadCell>
 			<TableHeadCell>Rola</TableHeadCell>
 			<TableHeadCell>Akcja</TableHeadCell>
-			<TableHeadCell>Dołączył</TableHeadCell>
+			<TableHeadCell>Dostęp</TableHeadCell>
+			<TableHeadCell>Dołączył(a)</TableHeadCell>
 			<TableHeadCell>Profil</TableHeadCell>
 		</TableHead>
 		<tbody class="divide-y">
@@ -80,6 +69,13 @@
 							type="button"
 							class="font-medium hover:text-blue-600 dark:hover:text-blue-500">Edytuj</button
 						>
+					</TableBodyCell>
+					<TableBodyCell>
+						{#if user.banned}
+							<XCircle color="red" aria-label="Zablokowany" />
+						{:else}
+							<CheckCircle color="green" aria-label="Brak blokady" />
+						{/if}
 					</TableBodyCell>
 					<TableBodyCell>
 						<div class="relative">

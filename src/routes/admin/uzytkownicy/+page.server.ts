@@ -2,9 +2,11 @@ import {
 	emailValidation,
 	idValidation,
 	nameValidation,
-	roleValidation
+	roleValidation,
+	bannedValidation
 } from '$lib/client/schemas/users';
 import { prisma } from '$prisma';
+import type { User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { error, fail } from '@sveltejs/kit';
 import { z, ZodError } from 'zod';
@@ -12,10 +14,10 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const load = (async () => {
 	const users = await prisma.user.findMany({});
-	console.log(
-		'users',
-		users.map((u) => u.email)
-	);
+	// console.log(
+	// 	'users',
+	// 	users.map((u) => u.email)
+	// );
 
 	return { users };
 }) satisfies PageServerLoad;
@@ -30,14 +32,22 @@ const editUserSchema = z.object({
 	id: idValidation,
 	name: nameValidation,
 	email: emailValidation,
-	role: roleValidation
+	role: roleValidation,
+	banned: bannedValidation
 });
 
 // TODO Handle permissions
 export const actions = {
-	add: async ({ request }) => {
-		console.log('add');
+	add: async ({ request, locals }) => {
 		const data = Object.fromEntries(await request.formData());
+
+		// Only moderators and admins are allowed to add a user
+		if (!locals.session) {
+			throw error(401, 'Nie jesteś zalogowany');
+		}
+		if (!['admin', 'moderator'].includes(locals.session?.user.role)) {
+			throw error(403, 'Nie masz wystarczających uprawień');
+		}
 
 		try {
 			const { email, name, role } = addUserSchema.parse(data);
@@ -71,25 +81,92 @@ export const actions = {
 			throw error(500, { message: 'Niespodziewany błąd. Spróbuj ponownie' });
 		}
 	},
-	edit: async ({ request }) => {
+	edit: async ({ request, locals }) => {
 		console.log('edit');
 		const data = Object.fromEntries(await request.formData());
 
-		try {
-			const { id, email, name, role } = editUserSchema.parse(data);
+		// Only moderators and admins are allowed to edit a user
+		if (!locals.session) {
+			throw error(401, 'Nie jesteś zalogowany');
+		}
+		if (!['admin', 'moderator'].includes(locals.session?.user.role)) {
+			throw error(403, 'Nie masz wystarczających uprawień');
+		}
 
-			console.log('email', email, 'name', name, 'role', role);
+		try {
+			const { id, email, name, role, banned } = editUserSchema.parse(data);
+
+			const userBeforeEdit = await prisma.user.findFirstOrThrow({
+				where: {
+					id
+				},
+				select: {
+					id: true,
+					email: true,
+					fullName: true,
+					role: true,
+					banned: true
+				}
+			});
+
+			const isNowBanned = banned === 'true' ? true : false;
+
+			// The edited user is someone else
+			if (userBeforeEdit.id !== locals.session.user.id) {
+				// A user is trying to edit another user that is an admin
+				if (userBeforeEdit.role === 'admin') {
+					return fail(403, {
+						errors: ['Nie możesz edytować admina']
+					});
+				}
+
+				// Non admin user is trying to edit a moderator
+				if (userBeforeEdit.role === 'moderator' && locals.session.user.role !== 'admin') {
+					return fail(403, {
+						errors: ['Nie masz wystarczających uprawień']
+					});
+				}
+			} else {
+				// A user is trying to block themself
+				if (isNowBanned) {
+					return fail(400, {
+						errors: ['Nie możesz zablokować sam siebie']
+					});
+				}
+			}
+
+			const oldUserObj = {
+				email: userBeforeEdit.email,
+				name: userBeforeEdit.fullName,
+				role: userBeforeEdit.role,
+				banned: userBeforeEdit.banned
+			};
+
+			const newUserObj: Partial<User> = {
+				email,
+				role,
+				fullName: name,
+				banned: isNowBanned
+			};
+
+			// If nothing has changed, do not call the db to save resources
+			if (
+				JSON.stringify(oldUserObj) === JSON.stringify({ email, name, role, banned: isNowBanned })
+			) {
+				return { success: true };
+			}
 
 			await prisma.user.update({
 				where: {
 					id
 				},
-				data: {
-					email,
-					role,
-					fullName: name
+				data: newUserObj,
+				select: {
+					id: true
 				}
 			});
+
+			return { success: true };
 		} catch (err) {
 			console.log('err', err);
 			if (err instanceof ZodError) {
@@ -106,8 +183,6 @@ export const actions = {
 				console.log('prisma error', err.code, err.message);
 				throw error(500, { message: 'Niespodziewany błąd. Spróbuj ponownie' });
 			}
-
-			throw error(500, { message: 'Niespodziewany błąd. Spróbuj ponownie' });
 		}
 	}
 } satisfies Actions;

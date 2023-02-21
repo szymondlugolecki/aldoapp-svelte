@@ -6,7 +6,7 @@ export const textCrusher = (text: string) => {
 	return text.replace(/ /g, '').toLowerCase();
 };
 
-export const isValidObject = (obj: unknown) => {
+export const isValidObject = (obj: unknown): obj is Record<string, unknown> => {
 	if (obj && !Array.isArray(obj) && typeof obj === 'object') return true;
 	return false;
 };

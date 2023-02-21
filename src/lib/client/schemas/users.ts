@@ -23,6 +23,8 @@ export const roleValidation = z.union(
 	}
 );
 
+export const bannedValidation = z.literal('true').optional();
+
 export const idValidation = z
 	.string({
 		required_error: 'Id jest wymagane'

@@ -39,6 +39,8 @@ You can preview the production build with `npm run preview`.
 
 # TODO
 
+[ ] Make the filters work on Użytkownicy, Produkty & Zamówienia pages
+
 [ ] Make the user panel wider
 
 [ ] Add store page with all the products
@@ -63,6 +65,8 @@ You can preview the production build with `npm run preview`.
 
 [ ] Write & run tests
 
+- - - [ ] Test the permissions on forms
+
 [ ] Handle permissions (admin panel access, etc)
 
 [ ] Add support for offline mode
@@ -80,4 +84,3 @@ Under consideration:
 [ ] Add chatbot for easy user interactions (bot asks what the user wants => user can choose: buy sth, get a phone number for a service of choice, live chat with the staff)
 
 [ ] Add user settings (possibility to add permanent address for future deliveries?, ?, ?)
-

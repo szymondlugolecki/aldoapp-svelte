@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { isValidObject } from '$lib/client/functions';
+	import { handleFormResponse } from '$lib/client/functions/forms';
 	import { errorToast, successToast } from '$lib/client/functions/toasts';
 	import type { User } from '@prisma/client';
 	import { Button, Modal, Label, Input } from 'flowbite-svelte';
@@ -17,17 +18,7 @@
 			action="?/edit"
 			use:enhance={({ form, data, action, cancel }) => {
 				return async ({ result, update }) => {
-					if (result.type === 'failure') {
-						if (isValidObject(result.data?.errors)) {
-							const errorList = Object.values(result.data?.errors).flatMap((x) => x);
-							if (errorList.length) {
-								const formatErrors = '• ' + errorList.join('\n• ');
-								errorToast({ title: 'Wystąpił błąd', description: formatErrors });
-							}
-						}
-					} else if (result.type === 'success') {
-						successToast({ title: 'Sukces', description: 'Pomyślnie edytowano użytkownika' });
-					}
+					handleFormResponse(result, 'Pomyślnie edytowano użytkownika');
 					update();
 					editUserModalOpen = false;
 				};
@@ -63,6 +54,23 @@
 					<option selected={editUserModal.role === 'admin'} value="admin">Admin</option>
 				</select>
 			</div>
+
+			{#if editUserModal.role !== 'admin'}
+				<div class="flex items-center mb-4">
+					<input
+						id="banned"
+						name="banned"
+						type="checkbox"
+						value="true"
+						checked={editUserModal.banned}
+						class="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 dark:focus:ring-red-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+					/>
+					<label for="banned" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+						>Zablokuj</label
+					>
+				</div>
+			{/if}
+
 			<Button type="submit" class="w-full">Zatwierdź</Button>
 			<input type="hidden" hidden value={editUserModal.id} name="id" />
 		</form>

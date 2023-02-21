@@ -19,7 +19,7 @@
 		</main>
 		<ToastContainer placement="bottom-right" let:data>
 			<!-- <FlatToast {data} /> -->
-			<div class="flex bg-zinc-900 p-2 rounded-md min-w-[320px] bg-opacity-90">
+			<div class="flex bg-zinc-900 p-2 rounded-md min-w-[320px] bg-opacity-95">
 				<div class="flex p-1">
 					{#if data.type === 'error'}
 						<XCircle class="text-red-500" />

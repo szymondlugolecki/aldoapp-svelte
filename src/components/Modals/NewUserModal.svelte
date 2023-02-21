@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { isValidObject } from '$lib/client/functions';
+	import { handleFormResponse } from '$lib/client/functions/forms';
 	import { errorToast, successToast } from '$lib/client/functions/toasts';
 	import { Button, Modal, Label, Input } from 'flowbite-svelte';
 
@@ -15,17 +16,7 @@
 		action="?/add"
 		use:enhance={({ form, data, action, cancel }) => {
 			return async ({ result, update }) => {
-				if (result.type === 'failure') {
-					if (isValidObject(result.data?.errors)) {
-						const errorList = Object.values(result.data?.errors).flatMap((x) => x);
-						if (errorList.length) {
-							const formatErrors = '• ' + errorList.join('\n• ');
-							errorToast({ title: 'Wystąpił błąd', description: formatErrors });
-						}
-					}
-				} else if (result.type === 'success') {
-					successToast({ title: 'Sukces', description: 'Pomyślnie dodano użytkownika' });
-				}
+				handleFormResponse(result, 'Pomyślnie dodano użytkownika');
 				update();
 				newUserModalOpen = false;
 			};
