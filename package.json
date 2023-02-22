@@ -45,6 +45,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@paralleldrive/cuid2": "^2.2.0",
 		"@prisma/client": "^4.10.1",
 		"@zerodevx/svelte-toast": "1.0.0-rc.1",
 		"date-picker-svelte": "^2.2.5",

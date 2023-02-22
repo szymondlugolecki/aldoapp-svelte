@@ -57,20 +57,19 @@
 			<Textarea {...descriptionProps} />
 		</div>
 		<div>
-			<label for="product-thumbnail" class="block text-sm font-medium text-gray-900 dark:text-white"
+			<label for="thumbnail" class="block text-sm font-medium text-gray-900 dark:text-white"
 				>Zdjęcie</label
 			>
 			<input
 				class="hidden"
-				id="product-thumbnail"
-				name="product-thumbnail"
+				name="thumbnail"
 				type="file"
 				accept=".png,.jpg,.webp"
 				bind:files
 				bind:this={fileInput}
 				on:change={() => getBase64(files[0])}
 			/>
-			<button class="upload-btn" on:click={() => fileInput.click()}>
+			<button class="upload-btn" type="button" on:click={() => fileInput.click()}>
 				{#if productImage}
 					<div class="block">
 						{#if productImage}

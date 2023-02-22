@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button, Modal, Label, Input, Checkbox } from 'flowbite-svelte';
+	import { Modal } from 'flowbite-svelte';
 	import type { ProductFilter } from '$types';
 
 	export let filterProductModalOpen: boolean;

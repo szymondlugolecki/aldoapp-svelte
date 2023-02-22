@@ -11,6 +11,8 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { error, fail } from '@sveltejs/kit';
 import { z, ZodError } from 'zod';
 import type { Actions, PageServerLoad } from './$types';
+import { writeFileSync } from 'fs';
+import { createId } from '@paralleldrive/cuid2';
 
 export const load = (async () => {
 	const products = await prisma.product.findMany({
@@ -51,6 +53,8 @@ export const actions = {
 	add: async ({ request, locals }) => {
 		const data = Object.fromEntries(await request.formData());
 
+		console.log('data', data);
+
 		// Only moderators and admins are allowed to add a product
 		if (!locals.session) {
 			throw error(401, 'Nie jesteś zalogowany');
@@ -62,16 +66,17 @@ export const actions = {
 		try {
 			const { name, symbol, description, thumbnail } = addProductSchema.parse(data);
 
-			console.log(
-				'name',
-				name,
-				'symbol',
-				symbol,
-				'description',
-				description,
-				'thumbnail',
-				thumbnail
-			);
+			// maybe add a restriction to filesize here...
+
+			const fileName = createId();
+			const fileFormat = thumbnail.type.split('/')[1];
+			const fullFile = `${fileName}.${fileFormat}`;
+
+			const thumbnailArrBuffer = await thumbnail.arrayBuffer();
+
+			writeFileSync(`static/products/${fullFile}`, Buffer.from(thumbnailArrBuffer), 'base64');
+
+			// throw fail(400, { errors: ['Wszystko ok xD'] });
 
 			await prisma.product.create({
 				data: {
@@ -79,7 +84,7 @@ export const actions = {
 					name,
 					symbol,
 					description,
-					thumbnail
+					thumbnail: fullFile
 				}
 			});
 		} catch (err) {
@@ -138,7 +143,7 @@ export const actions = {
 				name,
 				symbol,
 				description,
-				thumbnail
+				thumbnail: thumbnail.toString()
 			};
 
 			// If nothing has changed, do not call the db to save resources

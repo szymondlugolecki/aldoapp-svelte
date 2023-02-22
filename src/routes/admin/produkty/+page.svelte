@@ -8,6 +8,7 @@
 
 	import { applyProductFilters, textCrusher } from '$lib/client/functions';
 	import type { ProductFilter } from '$types';
+	import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 
 	let searchInput: string;
 
@@ -59,8 +60,7 @@
 	<Table>
 		<TableHead>
 			<TableHeadCell>Zdjęcie</TableHeadCell>
-			<TableHeadCell>Nazwa</TableHeadCell>
-			<TableHeadCell>Symbol</TableHeadCell>
+			<TableHeadCell>Nazwa i symbol</TableHeadCell>
 			<TableHeadCell>Opis</TableHeadCell>
 			<TableHeadCell>Dodał(a)</TableHeadCell>
 			<TableHeadCell>Akcja</TableHeadCell>
@@ -70,14 +70,20 @@
 			{#each productsList as product}
 				<TableBodyRow>
 					<TableBodyCell>
-						<span class="block">{product.thumbnail || ''}</span>
+						<a href={`${PUBLIC_WEBSITE_URL}/sklep/${product.symbol}`}>
+							<img
+								width="96px"
+								height="96px"
+								src={`${PUBLIC_WEBSITE_URL}/products/${product.thumbnail}`}
+								alt="Zdjęcie produktu"
+							/>
+						</a>
 					</TableBodyCell>
 					<TableBodyCell>
-						<span>{product.name}</span>
+						<span class="block">{product.name}</span>
+						<span class="block font-semibold">{product.symbol}</span>
 					</TableBodyCell>
-					<TableBodyCell>
-						<span>{product.symbol}</span>
-					</TableBodyCell>
+
 					<TableBodyCell>
 						<span>{product.description}</span>
 					</TableBodyCell>
@@ -86,18 +92,20 @@
 						<span class="block">{product.author.email}</span>
 					</TableBodyCell>
 					<TableBodyCell>
-						<button
-							on:click={() => openEditModal(product.id)}
-							type="button"
-							class="font-medium text-blue-400 hover:text-blue-500 duration-200 block"
-							><Edit class="mr-2" /> Edytuj</button
-						>
-						<button
-							on:click={() => openEditModal(product.id)}
-							type="button"
-							class="font-medium text-red-400 hover:text-red-500 duration-200 block"
-							><Trash class="mr-2" /> Usuń</button
-						>
+						<div class="flex space-y-3 flex-col justify-center items-start">
+							<button
+								on:click={() => openEditModal(product.id)}
+								type="button"
+								class="font-medium text-blue-400 hover:text-blue-500 duration-200"
+								><Edit class="mr-2" /> Edytuj</button
+							>
+							<button
+								on:click={() => openEditModal(product.id)}
+								type="button"
+								class="font-medium text-red-400 hover:text-red-500 duration-200"
+								><Trash class="mr-2" /> Usuń</button
+							>
+						</div>
 					</TableBodyCell>
 					<TableBodyCell>
 						<div class="relative">

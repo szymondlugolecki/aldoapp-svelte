@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Table, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
-	import { CheckCircle, ExternalLink, XCircle } from 'lucide-svelte';
+	import { CheckCircle, ExternalLink, XCircle, Edit } from 'lucide-svelte';
 	import NewUserModal from '$components/Modals/NewUserModal.svelte';
 	import EditUserModal from '$components/Modals/EditUserModal.svelte';
 	import TableHeader from '$components/UserTableHeader.svelte';
@@ -89,7 +89,9 @@
 						<button
 							on:click={() => openEditModal(user.id)}
 							type="button"
-							class="font-medium hover:text-blue-600 dark:hover:text-blue-500">Edytuj</button
+							class="font-medium hover:text-blue-600 dark:hover:text-blue-500 flex items-center"
+						>
+							<Edit class="mr-2" /> Edytuj</button
 						>
 					</TableBodyCell>
 					<TableBodyCell>

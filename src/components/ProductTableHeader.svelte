@@ -1,6 +1,5 @@
 <script lang="ts">
-	import type { ProductFilter } from '$types';
-	import { Plus, Filter, ChevronDown } from 'lucide-svelte';
+	import { Plus, Filter } from 'lucide-svelte';
 	export let searchInput: string = '';
 	export let newProductModalOpen: boolean;
 	export let filterProductModalOpen: boolean;
