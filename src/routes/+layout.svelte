@@ -15,7 +15,7 @@
 	export let data: LayoutData;
 </script>
 
-<div class="min-h-screen flex flex-col justify-between">
+<div class="min-h-screen flex flex-col justify-between w-screen">
 	<div class="flex flex-col w-full h-full">
 		<Navbar user={data.user} />
 		<main class="h-[calc(100vh-164px)] sm:h-[calc(100vh-140px)] flex flex-col px-3 py-2">
