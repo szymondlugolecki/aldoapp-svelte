@@ -77,6 +77,8 @@ You can preview the production build with `npm run preview`.
 
 [ ] Add possibility to send a request to a service
 
+[ ] Page transition with new Chrome API (for the shop page)
+
 [ ] Deploy on Vercel
 
 Under consideration:

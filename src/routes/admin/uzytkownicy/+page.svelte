@@ -3,15 +3,35 @@
 	import { CheckCircle, ExternalLink, XCircle } from 'lucide-svelte';
 	import NewUserModal from '$components/Modals/NewUserModal.svelte';
 	import EditUserModal from '$components/Modals/EditUserModal.svelte';
-	import TableHeader from '$components/TableHeader.svelte';
+	import TableHeader from '$components/UserTableHeader.svelte';
 
-	import { textCrusher } from '$lib/client/functions';
+	import { applyUserFilters, textCrusher } from '$lib/client/functions';
 	import { roleNames } from '$lib/client/constants';
+	import type { UserFilter } from '$types';
+	import UserFilterModal from '$components/Modals/UserFilterModal.svelte';
 
 	let searchInput: string;
 
-	let usersList: typeof data.users;
-	$: users = data.users.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+	let filter: UserFilter = {
+		blocked: true,
+		nonblocked: true,
+		roles: {
+			admin: true,
+			moderator: true,
+			customer: true
+		},
+		since: null,
+		until: new Date(new Date().setHours(23, 59, 59, 999))
+			.toLocaleDateString()
+			.split('.')
+			.reverse()
+			.join('-')
+	};
+
+	$: users = applyUserFilters(
+		data.users.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
+		filter
+	);
 	$: usersList = searchInput
 		? users.filter(
 				(user) =>
@@ -22,6 +42,7 @@
 
 	let newUserModalOpen = false;
 	let editUserModalOpen = false;
+	let filterUserModalOpen = false;
 
 	let editModalUserId: string;
 
@@ -36,9 +57,10 @@
 </script>
 
 <section class="w-full h-full p-2 space-y-3">
-	<TableHeader bind:searchInput bind:newUserModalOpen />
+	<TableHeader bind:searchInput bind:newUserModalOpen bind:filterUserModalOpen />
 	<NewUserModal bind:newUserModalOpen />
 	<EditUserModal bind:editUserModalOpen bind:editUserModal />
+	<UserFilterModal bind:filter bind:filterUserModalOpen />
 
 	<Table>
 		<TableHead>

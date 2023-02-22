@@ -1,4 +1,4 @@
-import type { User } from '@prisma/client';
+import type { Product, User } from '@prisma/client';
 import type { JWTPayload, JWTVerifyResult } from 'jose';
 
 export type Role = 'customer' | 'moderator' | 'admin';
@@ -20,3 +20,25 @@ export interface JWTTokenResult extends JWTVerifyResult {
 }
 
 export type SessionUser = Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'banned'>;
+
+export type UserFilter = {
+	blocked: boolean;
+	nonblocked: boolean;
+	roles: Record<Role, boolean>;
+	since: string | null;
+	until: string | null;
+};
+
+export type ProductFilter = {
+	author: User['id'];
+	since: string | null;
+	until: string | null;
+};
+
+export type ProductWithAuthor = Product & {
+	author: {
+		id: string;
+		email: string;
+		fullName: string;
+	};
+};
