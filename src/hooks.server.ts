@@ -87,7 +87,7 @@ export const handle = (async ({ event, resolve }) => {
 			}
 		} catch (err) {
 			const joseErrName = joseErrorParser(err);
-			console.log('Jose Error Name', joseErrName);
+			console.log('Jose Error Name', joseErrName, userEmail);
 			// If it was the JWT expiration that caused the error => Refresh the tokens
 			if (joseErrName === 'expired' && userEmail) {
 				const [accessToken, refreshToken, user] = await Promise.all([

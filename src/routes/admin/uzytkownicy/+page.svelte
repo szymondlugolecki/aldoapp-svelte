@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { Table, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
 	import { CheckCircle, ExternalLink, XCircle, Edit } from 'lucide-svelte';
-	import NewUserModal from '$components/Modals/NewUserModal.svelte';
-	import EditUserModal from '$components/Modals/EditUserModal.svelte';
+	import NewUserModal from '$components/Modals/User/NewUserModal.svelte';
+	import EditUserModal from '$components/Modals/User/EditUserModal.svelte';
 	import TableHeader from '$components/UserTableHeader.svelte';
 
 	import { applyUserFilters, textCrusher } from '$lib/client/functions';
 	import { roleNames } from '$lib/client/constants';
 	import type { UserFilter } from '$types';
-	import UserFilterModal from '$components/Modals/UserFilterModal.svelte';
+	import UserFilterModal from '$components/Modals/User/UserFilterModal.svelte';
 
-	let searchInput: string;
+	let searchInput = '';
 
 	let filter: UserFilter = {
 		blocked: true,
@@ -31,14 +31,11 @@
 	$: users = applyUserFilters(
 		data.users.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
 		filter
+	).filter(
+		(user) =>
+			textCrusher(user.email).includes(textCrusher(searchInput)) ||
+			textCrusher(user.fullName).includes(textCrusher(searchInput))
 	);
-	$: usersList = searchInput
-		? users.filter(
-				(user) =>
-					textCrusher(user.email).includes(textCrusher(searchInput)) ||
-					textCrusher(user.fullName).includes(textCrusher(searchInput))
-		  )
-		: users;
 
 	let newUserModalOpen = false;
 	let editUserModalOpen = false;
@@ -51,7 +48,7 @@
 		editUserModalOpen = true;
 	};
 
-	$: editUserModal = usersList.find((user) => user.id === editModalUserId);
+	$: editUserModal = users.find((user) => user.id === editModalUserId);
 
 	export let data: import('./$types').PageData;
 </script>
@@ -72,7 +69,7 @@
 			<TableHeadCell>Profil</TableHeadCell>
 		</TableHead>
 		<tbody class="divide-y">
-			{#each usersList as user}
+			{#each users as user}
 				<TableBodyRow>
 					<TableBodyCell>
 						<span class="block">{user.fullName}</span>
@@ -138,7 +135,7 @@
 			{/each}
 		</tbody>
 	</Table>
-	{#if usersList.length === 0}
+	{#if users.length === 0}
 		<div class="w-full h-20 flex justify-center items-center text-center">
 			<span class="text-3xl">Brak wyników... 🧐</span>
 		</div>

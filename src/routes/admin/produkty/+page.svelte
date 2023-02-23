@@ -1,20 +1,23 @@
 <script lang="ts">
-	import { P, Table, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
+	import { Table, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
 	import { Edit, Trash } from 'lucide-svelte';
-	import RemoveProductModal from '$components/Modals/RemoveProductModal.svelte';
-	import NewProductModal from '$components/Modals/NewProductModal.svelte';
-	import EditProductModal from '$components/Modals/EditProductModal.svelte';
-	import ProductFilterModal from '$components/Modals/ProductFilterModal.svelte';
+	import RemoveProductModal from '$components/Modals/Product/RemoveProductModal.svelte';
+	import NewProductModal from '$components/Modals/Product/NewProductModal.svelte';
+	import EditProductModal from '$components/Modals/Product/EditProductModal.svelte';
+	import ProductFilterModal from '$components/Modals/Product/ProductFilterModal.svelte';
 	import TableHeader from '$components/ProductTableHeader.svelte';
 
 	import { applyProductFilters, arrayUniqueByKey, textCrusher } from '$lib/client/functions';
-	import type { ProductFilter } from '$types';
+	import type { ProductAuthor, ProductFilter } from '$types';
 	import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 
-	let searchInput: string;
+	export let data: import('./$types').PageData;
+
+	let searchInput = '';
+	let authorFilterSearchInput = '';
 
 	let filter: ProductFilter = {
-		author: '',
+		excludedUserIds: [],
 		since: null,
 		until: new Date(new Date().setHours(23, 59, 59, 999))
 			.toLocaleDateString()
@@ -23,21 +26,21 @@
 			.join('-')
 	};
 
-	$: filteredProducts = applyProductFilters(
+	// List of products filtered by the input from the searchbar and
+	// other filters
+	$: products = applyProductFilters(
 		data.products.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
 		filter
+	).filter(
+		(product) =>
+			textCrusher(product.name).includes(textCrusher(searchInput)) ||
+			textCrusher(product.description).includes(textCrusher(searchInput)) ||
+			textCrusher(product.symbol).includes(textCrusher(searchInput))
 	);
-	$: productsList = searchInput
-		? filteredProducts.filter(
-				(product) =>
-					textCrusher(product.name).includes(textCrusher(searchInput)) ||
-					textCrusher(product.description).includes(textCrusher(searchInput)) ||
-					textCrusher(product.symbol).includes(textCrusher(searchInput))
-		  )
-		: filteredProducts;
 
-	$: productAuthors = arrayUniqueByKey(
-		productsList.map((product) => product.author),
+	// Unique list of users that have added at least one product
+	const productAuthors = arrayUniqueByKey(
+		data.products.map((product) => product.author),
 		'id'
 	);
 
@@ -49,6 +52,16 @@
 	let editModalProductId: string;
 	let removeModalProductId: string;
 
+	const selectAllUsers = () => {
+		const tempSelectedAuthorIds: Record<ProductAuthor['id'], boolean> = {};
+		productAuthors.forEach(({ id }) => {
+			tempSelectedAuthorIds[id] = true;
+		});
+		return tempSelectedAuthorIds;
+	};
+
+	let selectedAuthorIds: Record<ProductAuthor['id'], boolean> = selectAllUsers();
+
 	const openEditModal = (id: string) => {
 		editModalProductId = id;
 		editProductModalOpen = true;
@@ -59,17 +72,21 @@
 		removeProductModalOpen = true;
 	};
 
-	$: editProductModal = productsList.find((product) => product.id === editModalProductId);
-	$: removeProductModal = productsList.find((product) => product.id === removeModalProductId);
-
-	export let data: import('./$types').PageData;
+	$: editProductModal = products.find((product) => product.id === editModalProductId);
+	$: removeProductModal = products.find((product) => product.id === removeModalProductId);
 </script>
 
 <section class="w-full h-full p-2 space-y-3">
 	<TableHeader bind:searchInput bind:newProductModalOpen bind:filterProductModalOpen />
 	<NewProductModal bind:newProductModalOpen />
 	<EditProductModal bind:editProductModalOpen bind:editProductModal />
-	<ProductFilterModal bind:filter bind:filterProductModalOpen bind:productAuthors />
+	<ProductFilterModal
+		bind:filter
+		bind:filterProductModalOpen
+		bind:authorFilterSearchInput
+		bind:selectedAuthorIds
+		{productAuthors}
+	/>
 	<RemoveProductModal bind:removeProductModalOpen bind:removeProductModal />
 	<Table>
 		<TableHead>
@@ -81,7 +98,7 @@
 			<TableHeadCell>Dodano</TableHeadCell>
 		</TableHead>
 		<tbody class="divide-y">
-			{#each productsList as product}
+			{#each products as product}
 				<TableBodyRow>
 					<TableBodyCell>
 						<a href={`${PUBLIC_WEBSITE_URL}/sklep/${product.symbol}`}>
@@ -150,7 +167,7 @@
 			{/each}
 		</tbody>
 	</Table>
-	{#if productsList.length === 0}
+	{#if products.length === 0}
 		<div class="w-full h-20 flex justify-center items-center text-center">
 			<span class="text-3xl">Brak wyników... 🧐</span>
 		</div>

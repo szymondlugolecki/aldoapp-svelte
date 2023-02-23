@@ -30,15 +30,17 @@ export type UserFilter = {
 };
 
 export type ProductFilter = {
-	author: User['id'];
+	excludedUserIds: User['id'][];
 	since: string | null;
 	until: string | null;
 };
 
+export type ProductAuthor = {
+	id: string;
+	email: string;
+	fullName: string;
+};
+
 export type ProductWithAuthor = Product & {
-	author: {
-		id: string;
-		email: string;
-		fullName: string;
-	};
+	author: ProductAuthor;
 };

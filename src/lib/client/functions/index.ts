@@ -48,12 +48,10 @@ export function applyUserFilters(users: User[], filter: UserFilter) {
 }
 
 export function applyProductFilters(products: ProductWithAuthor[], filter: ProductFilter) {
-	// const roleFilter = (product: Product) => {
-	// 	if (filter.roles.admin && user.role === 'admin') return true;
-	// 	if (filter.roles.moderator && user.role === 'moderator') return true;
-	// 	if (filter.roles.customer && user.role === 'customer') return true;
-	// 	return false;
-	// };
+	const authorsFilter = (product: ProductWithAuthor) => {
+		if (!filter.excludedUserIds.includes(product.author.id)) return true;
+		return false;
+	};
 
 	// Since date should be the very first milisecond of the day
 	const sinceDate = filter.since ? new Date(new Date(filter.since).setHours(0, 0, 0, 1)) : null;
@@ -70,11 +68,12 @@ export function applyProductFilters(products: ProductWithAuthor[], filter: Produ
 		return false;
 	};
 
-	return products.filter(dateFilter);
+	return products.filter(dateFilter).filter(authorsFilter);
 }
 
-export const arrayUniqueByKey = <T>(arr: T, key: string) => [
-	...new Map(
-		Array.isArray(arr) ? arr.filter(Boolean).map((item) => [item[key], item]) : []
-	).values()
-];
+export const arrayUniqueByKey = <T>(arr: T, key: string) =>
+	[
+		...new Map(
+			Array.isArray(arr) ? arr.filter(Boolean).map((item) => [item[key], item]) : []
+		).values()
+	] as T;

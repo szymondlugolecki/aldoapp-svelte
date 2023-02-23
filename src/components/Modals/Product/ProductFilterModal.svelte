@@ -1,0 +1,133 @@
+<script lang="ts">
+	import { Modal } from 'flowbite-svelte';
+	import type { ProductAuthor, ProductFilter } from '$types';
+	import { textCrusher } from '$lib/client/functions';
+
+	export let filterProductModalOpen: boolean;
+	export let filter: ProductFilter;
+	export let productAuthors: ProductAuthor[];
+	export let authorFilterSearchInput: string;
+	export let selectedAuthorIds: Record<ProductAuthor['id'], boolean>;
+
+	let selectAllStatus: 'all' | 'none' | null = 'all';
+
+	const handleAllUsersSelection = (select: boolean) => {
+		if (select) selectAllStatus = 'all';
+		else selectAllStatus = 'none';
+	};
+
+	$: {
+		if (selectAllStatus === 'all') {
+			productAuthors.forEach(({ id }) => (selectedAuthorIds[id] = true));
+			selectedAuthorIds = selectedAuthorIds;
+		} else if (selectAllStatus === 'none') {
+			productAuthors.forEach(({ id }) => (selectedAuthorIds[id] = false));
+			selectedAuthorIds = selectedAuthorIds;
+		}
+	}
+
+	$: {
+		filter.excludedUserIds = Object.entries(selectedAuthorIds)
+			.filter(([userId, selected]) => selected === false && userId)
+			.map(([userId]) => userId);
+	}
+
+	$: filteredProductAuthors = productAuthors.filter(({ fullName, email }) => {
+		if (
+			textCrusher(fullName).includes(textCrusher(authorFilterSearchInput)) ||
+			textCrusher(email).includes(textCrusher(authorFilterSearchInput))
+		)
+			return true;
+		return false;
+	});
+</script>
+
+<!-- New Product Modal -->
+<Modal bind:open={filterProductModalOpen} size="xs" autoclose={false} class="w-full">
+	<div class="flex flex-col space-y-6">
+		<h3 class="text-xl font-medium 1text-gray-900 dark:text-white p-0">Filtrowanie</h3>
+		<div class="space-y-2">
+			<span class="block">Dodany przez</span>
+			<div id="dropdownSearch" class="z-10 bg-white rounded-lg shadow dark:bg-gray-700 w-full">
+				<div class="flex space-x-4">
+					<button
+						class="hover:text-blue-400 duration-100 text-sm"
+						on:click={() => handleAllUsersSelection(true)}>Zaznacz wszystkich</button
+					>
+					<button
+						class="hover:text-blue-400 duration-100 text-sm"
+						on:click={() => handleAllUsersSelection(false)}>Odznacz wszystkich</button
+					>
+				</div>
+				<div class="p-3">
+					<label for="input-group-search" class="sr-only">Search</label>
+					<div class="relative">
+						<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+							<svg
+								class="w-5 h-5 text-gray-500 dark:text-gray-400"
+								aria-hidden="true"
+								fill="currentColor"
+								viewBox="0 0 20 20"
+								xmlns="http://www.w3.org/2000/svg"
+								><path
+									fill-rule="evenodd"
+									d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+									clip-rule="evenodd"
+								/></svg
+							>
+						</div>
+						<input
+							type="text"
+							id="input-group-search"
+							class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+							placeholder="Wyszukaj użytkownika"
+							bind:value={authorFilterSearchInput}
+						/>
+					</div>
+				</div>
+				<ul
+					class="h-48 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200"
+					aria-labelledby="dropdownSearchButton"
+				>
+					{#each filteredProductAuthors as author (author.id)}
+						<li>
+							<div class="flex items-center pl-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
+								<input
+									id={`user-${author.id}`}
+									type="checkbox"
+									bind:checked={selectedAuthorIds[author.id]}
+									on:click={() => (selectAllStatus = null)}
+									class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+								/>
+								<label
+									for={`user-${author.id}`}
+									class="w-full py-2 ml-3 text-sm font-medium text-gray-900 rounded dark:text-gray-300 flex flex-col justify-center items-start"
+								>
+									<span>{author.fullName}</span>
+									<span>{author.email}</span>
+								</label>
+							</div>
+						</li>
+					{/each}
+				</ul>
+			</div>
+		</div>
+		<div>
+			<span class="block text-sm font-medium text-gray-900 dark:text-white">Okres</span>
+
+			<div class="flex space-x-4">
+				<div>
+					<label for="joined-date-from" class="block text-sm text-gray-900 dark:text-white"
+						>Od</label
+					>
+					<input type="date" name="joined-date-from" bind:value={filter.since} />
+				</div>
+
+				<div>
+					<label for="joined-date-to" class="block text-sm text-gray-900 dark:text-white">Do</label>
+					<input type="date" name="joined-date-to" bind:value={filter.until} />
+				</div>
+			</div>
+		</div>
+	</div>
+</Modal>

@@ -12,7 +12,7 @@
 <Modal bind:open={removeProductModalOpen} size="xs" autoclose={false} class="w-full">
 	{#if removeProductModal}
 		<form
-			class="flex flex-col space-y-6"
+			class="flex flex-col space-y-4"
 			method="post"
 			action="?/remove"
 			use:enhance={({ form, data, action, cancel }) => {
@@ -33,14 +33,17 @@
 				<span class="block">{removeProductModal.symbol}</span>
 			</div>
 
-			<div class="flex space-x-4">
-				<Button type="submit" color="red" class="w-full">Potwierdź <Trash class="ml-2" /></Button>
-				<Button
+			<div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 text-white">
+				<button
 					type="button"
-					color="blue"
-					class="w-full"
+					class="flex justify-center items-center w-full text-sm sm:text-base py-1.5 sm:py-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 rounded-lg"
 					on:click={() => (removeProductModalOpen = false)}
-					>Anuluj <CornerDownLeft class="ml-2" /></Button
+					>Anuluj <CornerDownLeft class="ml-2 w-4 h-4 sm:w-6 sm:h-6" /></button
+				>
+				<button
+					type="submit"
+					class="flex justify-center items-center w-full text-sm sm:text-base py-1.5 sm:py-2.5 bg-red-700 hover:bg-red-800 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800 rounded-lg"
+					>Potwierdź <Trash class="ml-2 w-4 h-4 sm:w-6 sm:h-6" /></button
 				>
 			</div>
 

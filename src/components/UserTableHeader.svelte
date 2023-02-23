@@ -1,6 +1,5 @@
 <script lang="ts">
-	import type { UserFilter } from '$types';
-	import { Plus, Filter, ChevronDown } from 'lucide-svelte';
+	import { Plus, Filter } from 'lucide-svelte';
 	export let searchInput: string = '';
 	export let newUserModalOpen: boolean;
 	export let filterUserModalOpen: boolean;
