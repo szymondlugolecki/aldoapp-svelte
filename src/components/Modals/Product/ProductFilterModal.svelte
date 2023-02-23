@@ -115,17 +115,27 @@
 		<div>
 			<span class="block text-sm font-medium text-gray-900 dark:text-white">Okres</span>
 
-			<div class="flex space-x-4">
-				<div>
+			<div class="flex space-y-2 sm:space-y-0 sm:space-x-4 flex-col sm:flex-row">
+				<div class="w-full">
 					<label for="joined-date-from" class="block text-sm text-gray-900 dark:text-white"
 						>Od</label
 					>
-					<input type="date" name="joined-date-from" bind:value={filter.since} />
+					<input
+						class="w-full sm:w-auto"
+						type="date"
+						name="joined-date-from"
+						bind:value={filter.since}
+					/>
 				</div>
 
-				<div>
+				<div class="w-full">
 					<label for="joined-date-to" class="block text-sm text-gray-900 dark:text-white">Do</label>
-					<input type="date" name="joined-date-to" bind:value={filter.until} />
+					<input
+						type="date"
+						name="joined-date-to"
+						class="w-full sm:w-auto"
+						bind:value={filter.until}
+					/>
 				</div>
 			</div>
 		</div>

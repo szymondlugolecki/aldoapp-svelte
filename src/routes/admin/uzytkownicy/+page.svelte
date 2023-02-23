@@ -78,7 +78,7 @@
 					<TableBodyCell>
 						<span
 							class={`${user.role === 'admin' ? 'text-red-400' : ''} ${
-								user.role === 'moderator' ? 'text-green-300' : ''
+								user.role === 'moderator' ? 'text-green-400' : ''
 							} ${user.role === 'customer' ? 'text-blue-400' : ''}`}>{roleNames[user.role]}</span
 						>
 					</TableBodyCell>
