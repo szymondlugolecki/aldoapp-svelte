@@ -72,3 +72,9 @@ export function applyProductFilters(products: ProductWithAuthor[], filter: Produ
 
 	return products.filter(dateFilter);
 }
+
+export const arrayUniqueByKey = <T>(arr: T, key: string) => [
+	...new Map(
+		Array.isArray(arr) ? arr.filter(Boolean).map((item) => [item[key], item]) : []
+	).values()
+];

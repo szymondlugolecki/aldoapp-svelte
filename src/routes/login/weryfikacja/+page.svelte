@@ -1,9 +1,6 @@
 <script>
 	import { enhance } from '$app/forms';
-	import { isValidObject } from '$lib/client/functions';
-	import { errorToast, successToast } from '$lib/client/functions/toasts';
-
-	import { goto } from '$app/navigation';
+	import { handleFormResponse } from '$lib/client/functions/forms';
 </script>
 
 <section class="w-full h-full flex justify-center items-center">
@@ -31,21 +28,7 @@
 					method="post"
 					use:enhance={() => {
 						return async ({ result, update }) => {
-							console.log('result', result);
-							if (result.type === 'failure') {
-								if (isValidObject(result.data?.errors)) {
-									const errorList = Object.values(result.data?.errors).flatMap((x) => x);
-									if (errorList.length) {
-										const formatErrors = '• ' + errorList.join('\n• ');
-										errorToast({ title: 'Wystąpił błąd', description: formatErrors });
-									}
-								}
-							} else if (result.type === 'redirect') {
-								successToast({
-									title: 'Sukces',
-									description: 'Zostałeś zalogowany'
-								});
-							}
+							handleFormResponse(result, 'Zostałeś zalogowany');
 							update();
 						};
 					}}

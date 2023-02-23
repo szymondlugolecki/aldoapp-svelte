@@ -49,6 +49,24 @@ const editProductSchema = z.object({
 	thumbnail: thumbnailValidation
 });
 
+const removeProductSchema = z.object({
+	id: idValidation
+});
+
+const createThumbnailFileName = (thumbnail: File) => {
+	const fileNameId = createId();
+	const fileFormat = thumbnail.type.split('/')[1];
+	const fullFile = `${fileNameId}.${fileFormat}`;
+
+	return fullFile;
+};
+
+const createNewThumbnail = async (thumbnail: File, fileName: string) => {
+	const thumbnailArrBuffer = await thumbnail.arrayBuffer();
+
+	writeFileSync(`static/products/${fileName}`, Buffer.from(thumbnailArrBuffer), 'base64');
+};
+
 export const actions = {
 	add: async ({ request, locals }) => {
 		const data = Object.fromEntries(await request.formData());
@@ -68,15 +86,12 @@ export const actions = {
 
 			// maybe add a restriction to filesize here...
 
-			const fileName = createId();
-			const fileFormat = thumbnail.type.split('/')[1];
-			const fullFile = `${fileName}.${fileFormat}`;
+			let thumbnailFilename: string | undefined;
 
-			const thumbnailArrBuffer = await thumbnail.arrayBuffer();
-
-			writeFileSync(`static/products/${fullFile}`, Buffer.from(thumbnailArrBuffer), 'base64');
-
-			// throw fail(400, { errors: ['Wszystko ok xD'] });
+			if (thumbnail) {
+				thumbnailFilename = createThumbnailFileName(thumbnail);
+				createNewThumbnail(thumbnail, thumbnailFilename);
+			}
 
 			await prisma.product.create({
 				data: {
@@ -84,7 +99,7 @@ export const actions = {
 					name,
 					symbol,
 					description,
-					thumbnail: fullFile
+					thumbnail: thumbnailFilename
 				}
 			});
 		} catch (err) {
@@ -117,7 +132,15 @@ export const actions = {
 		}
 
 		try {
-			const { id, name, symbol, description, thumbnail } = editProductSchema.parse(data);
+			const editProductData = editProductSchema.parse(data);
+			const { id, name, symbol, description } = editProductData;
+			let { thumbnail } = editProductData;
+
+			if (thumbnail?.size === 0) {
+				thumbnail = undefined;
+			}
+
+			console.log('thumbnail', thumbnail);
 
 			const productBeforeEdit = await prisma.product.findFirstOrThrow({
 				where: {
@@ -132,22 +155,33 @@ export const actions = {
 				}
 			});
 
-			const oldProductObj = {
-				name: productBeforeEdit.name,
-				symbol: productBeforeEdit.symbol,
-				description: productBeforeEdit.description,
-				thumbnail: productBeforeEdit.thumbnail
-			};
+			let thumbnailFileName: string | undefined;
+			if (thumbnail) {
+				thumbnailFileName = createThumbnailFileName(thumbnail);
+				createNewThumbnail(thumbnail, thumbnailFileName);
+			}
 
 			const newProductObj: Partial<Product> = {
 				name,
 				symbol,
 				description,
-				thumbnail: thumbnail.toString()
+				thumbnail: thumbnailFileName
 			};
 
 			// If nothing has changed, do not call the db to save resources
-			if (JSON.stringify(oldProductObj) === JSON.stringify(newProductObj)) {
+			if (
+				JSON.stringify({
+					name,
+					symbol,
+					description
+				}) ===
+					JSON.stringify({
+						name: productBeforeEdit.name,
+						symbol: productBeforeEdit.symbol,
+						description: productBeforeEdit.description
+					}) &&
+				!thumbnail
+			) {
 				return { success: true };
 			}
 
@@ -178,6 +212,44 @@ export const actions = {
 				console.log('prisma error', err.code, err.message);
 				throw error(500, { message: 'Niespodziewany błąd. Spróbuj ponownie' });
 			}
+		}
+	},
+	remove: async ({ request, locals }) => {
+		const data = Object.fromEntries(await request.formData());
+
+		console.log('data', data);
+
+		// Only moderators and admins are allowed to add a product
+		if (!locals.session) {
+			throw error(401, 'Nie jesteś zalogowany');
+		}
+		if (!['admin', 'moderator'].includes(locals.session?.user.role)) {
+			throw error(403, 'Nie masz wystarczających uprawień');
+		}
+
+		try {
+			const { id } = removeProductSchema.parse(data);
+
+			await prisma.product.delete({
+				where: {
+					id
+				}
+			});
+		} catch (err) {
+			console.log('err', err);
+			if (err instanceof ZodError) {
+				const { fieldErrors: errors } = err.flatten();
+				return fail(400, {
+					errors
+				});
+			}
+
+			if (err instanceof PrismaClientKnownRequestError) {
+				console.log('prisma error', err.code, err.message);
+				throw error(500, { message: 'Niespodziewany błąd. Spróbuj ponownie' });
+			}
+
+			throw error(500, { message: 'Niespodziewany błąd. Spróbuj ponownie' });
 		}
 	}
 } satisfies Actions;

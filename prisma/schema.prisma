@@ -63,7 +63,7 @@ model Product {
   name        String
   description String
   symbol      String
-  thumbnail   String
+  thumbnail   String?
   images      String?  @db.Text
   author      User     @relation(fields: [userId], references: [id])
   userId      String

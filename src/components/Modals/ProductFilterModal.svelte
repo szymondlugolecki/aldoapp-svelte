@@ -4,10 +4,11 @@
 
 	export let filterProductModalOpen: boolean;
 	export let filter: ProductFilter;
-
-	$: {
-		console.log('filter', filter);
-	}
+	export let productAuthors: {
+		id: string;
+		email: string;
+		fullName: string;
+	}[];
 </script>
 
 <!-- New Product Modal -->
@@ -16,8 +17,11 @@
 		<h3 class="text-xl font-medium 1text-gray-900 dark:text-white p-0">Filtrowanie</h3>
 		<div class="space-y-2">
 			<span class="block">Dodany przez</span>
-			<div class="select-none space-x-3">
-				<span>Wybór autorów tutaj...</span>
+			<div class="select-none">
+				{#each productAuthors as author}
+					<span class="block">{author.fullName}</span>
+				{/each}
+				<!-- <span>Wybór autorów tutaj...</span> -->
 			</div>
 		</div>
 		<div>

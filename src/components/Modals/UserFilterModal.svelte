@@ -4,10 +4,6 @@
 
 	export let filterUserModalOpen: boolean;
 	export let filter: UserFilter;
-
-	$: {
-		console.log('filter', filter);
-	}
 </script>
 
 <!-- New User Modal -->

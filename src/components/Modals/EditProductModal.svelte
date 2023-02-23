@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import type { Product } from '@prisma/client';
 	import { Button, Modal, Label, Input, Textarea } from 'flowbite-svelte';
+	import { Eraser } from 'lucide-svelte';
 
 	export let editProductModalOpen: boolean;
 	export let editProductModal: Product | undefined;
@@ -13,6 +15,20 @@
 		rows: 4,
 		placeholder: 'Brak opisu...'
 	};
+
+	let fileInput: HTMLInputElement;
+	let files: FileList;
+	let productImage: string | undefined;
+
+	function getBase64(image: FileList[number]) {
+		const reader = new FileReader();
+		reader.readAsDataURL(image);
+		reader.onload = (e) => {
+			if (e.target) {
+				productImage = e.target.result?.toString();
+			}
+		};
+	}
 </script>
 
 <Modal bind:open={editProductModalOpen} size="xs" autoclose={false} class="w-full">
@@ -57,7 +73,51 @@
 				<Textarea {...descriptionProps} bind:value={editProductModal.description} />
 			</div>
 
+			<div>
+				<label for="thumbnail" class="block text-sm font-medium text-gray-900 dark:text-white"
+					>Zdjęcie</label
+				>
+				<input
+					class="hidden"
+					name="thumbnail"
+					type="file"
+					accept=".png,.jpg,.webp"
+					bind:files
+					bind:this={fileInput}
+					on:change={() => getBase64(files[0])}
+				/>
+				<div class="flex justify-between items-end space-x-6">
+					<button class="upload-btn" type="button" on:click={() => fileInput.click()}>
+						{#if productImage}
+							<div class="block">
+								<img src={productImage} width="96px" height="96px" alt="Przesłane zdjęcie" />
+							</div>
+						{:else if editProductModal.thumbnail}
+							<img
+								width="96px"
+								height="96px"
+								src={`${PUBLIC_WEBSITE_URL}/products/${editProductModal.thumbnail}`}
+								alt="Dotychczasowe zdjęcie produktu"
+							/>
+						{:else}
+							{'Kliknij aby wybrać'}
+						{/if}
+					</button>
+					{#if productImage}
+						<button
+							class="px-4 py-2 font-semibold bg-orange-500 text-white rounded-lg flex hover:bg-orange-700 duration-100"
+							type="button"
+							on:click={() => {
+								productImage = undefined;
+								fileInput.value = '';
+							}}><Eraser class="mr-2" /> Reset zdjęcia</button
+						>
+					{/if}
+				</div>
+			</div>
+
 			<Button type="submit" class="w-full">Zatwierdź</Button>
+
 			<input type="hidden" hidden value={editProductModal.id} name="id" />
 		</form>
 	{:else}

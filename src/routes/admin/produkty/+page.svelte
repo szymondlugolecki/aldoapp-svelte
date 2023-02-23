@@ -1,12 +1,13 @@
 <script lang="ts">
-	import { Table, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
+	import { P, Table, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
 	import { Edit, Trash } from 'lucide-svelte';
+	import RemoveProductModal from '$components/Modals/RemoveProductModal.svelte';
 	import NewProductModal from '$components/Modals/NewProductModal.svelte';
 	import EditProductModal from '$components/Modals/EditProductModal.svelte';
 	import ProductFilterModal from '$components/Modals/ProductFilterModal.svelte';
 	import TableHeader from '$components/ProductTableHeader.svelte';
 
-	import { applyProductFilters, textCrusher } from '$lib/client/functions';
+	import { applyProductFilters, arrayUniqueByKey, textCrusher } from '$lib/client/functions';
 	import type { ProductFilter } from '$types';
 	import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 
@@ -35,18 +36,31 @@
 		  )
 		: filteredProducts;
 
+	$: productAuthors = arrayUniqueByKey(
+		productsList.map((product) => product.author),
+		'id'
+	);
+
 	let newProductModalOpen = false;
 	let editProductModalOpen = false;
 	let filterProductModalOpen = false;
+	let removeProductModalOpen = false;
 
 	let editModalProductId: string;
+	let removeModalProductId: string;
 
 	const openEditModal = (id: string) => {
 		editModalProductId = id;
 		editProductModalOpen = true;
 	};
 
+	const openRemoveModal = (id: string) => {
+		removeModalProductId = id;
+		removeProductModalOpen = true;
+	};
+
 	$: editProductModal = productsList.find((product) => product.id === editModalProductId);
+	$: removeProductModal = productsList.find((product) => product.id === removeModalProductId);
 
 	export let data: import('./$types').PageData;
 </script>
@@ -55,8 +69,8 @@
 	<TableHeader bind:searchInput bind:newProductModalOpen bind:filterProductModalOpen />
 	<NewProductModal bind:newProductModalOpen />
 	<EditProductModal bind:editProductModalOpen bind:editProductModal />
-	<ProductFilterModal bind:filter bind:filterProductModalOpen />
-
+	<ProductFilterModal bind:filter bind:filterProductModalOpen bind:productAuthors />
+	<RemoveProductModal bind:removeProductModalOpen bind:removeProductModal />
 	<Table>
 		<TableHead>
 			<TableHeadCell>Zdjęcie</TableHeadCell>
@@ -100,7 +114,7 @@
 								><Edit class="mr-2" /> Edytuj</button
 							>
 							<button
-								on:click={() => openEditModal(product.id)}
+								on:click={() => openRemoveModal(product.id)}
 								type="button"
 								class="font-medium text-red-400 hover:text-red-500 duration-200"
 								><Trash class="mr-2" /> Usuń</button

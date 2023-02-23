@@ -1,11 +1,12 @@
 import type { ActionResult } from '@sveltejs/kit';
 import { isValidObject } from '.';
-import { errorToast, successToast } from './toasts';
+import { errorToast, infoToast, successToast } from './toasts';
 
 export const handleFormResponse = (
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	result: ActionResult<Record<string, any>, Record<string, any>>,
-	successMessage: string
+	successMessage: string,
+	useInfoInstead = false
 ) => {
 	console.log('result', result.type);
 	try {
@@ -29,6 +30,9 @@ export const handleFormResponse = (
 				}
 				break;
 			case 'success':
+				if (useInfoInstead) {
+					infoToast({ title: 'Informacja', description: successMessage });
+				}
 				successToast({ title: 'Sukces', description: successMessage });
 				break;
 			default:

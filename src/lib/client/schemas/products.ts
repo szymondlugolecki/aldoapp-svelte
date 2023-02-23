@@ -25,4 +25,4 @@ export const descriptionValidation = z
 	.max(256, { message: 'Zbyt długi opis, maksymalnie 256 znaków' })
 	.trim();
 
-export const thumbnailValidation = z.instanceof(File);
+export const thumbnailValidation = z.instanceof(File).optional();

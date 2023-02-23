@@ -72,11 +72,7 @@
 			<button class="upload-btn" type="button" on:click={() => fileInput.click()}>
 				{#if productImage}
 					<div class="block">
-						{#if productImage}
-							<img src={productImage} width="96px" height="96px" alt="Przesłane zdjęcie" />
-						{:else}
-							<span>Brak zdjęcia...</span>
-						{/if}
+						<img src={productImage} width="96px" height="96px" alt="Przesłane zdjęcie" />
 					</div>
 				{:else}
 					{'Kliknij aby wybrać'}
