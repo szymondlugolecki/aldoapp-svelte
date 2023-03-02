@@ -9,6 +9,7 @@
 	import { roleNames } from '$lib/client/constants';
 	import type { UserFilter } from '$types';
 	import UserFilterModal from '$components/Modals/User/UserFilterModal.svelte';
+	import { page } from '$app/stores';
 
 	let searchInput = '';
 
@@ -83,13 +84,17 @@
 						>
 					</TableBodyCell>
 					<TableBodyCell>
-						<button
-							on:click={() => openEditModal(user.id)}
-							type="button"
-							class="font-medium hover:text-blue-600 dark:hover:text-blue-500 flex items-center"
-						>
-							<Edit class="mr-2" /> Edytuj</button
-						>
+						{#if user.role !== 'admin' || user.id === $page.data.user?.id}
+							<button
+								on:click={() => openEditModal(user.id)}
+								type="button"
+								class="font-medium hover:text-blue-600 dark:hover:text-blue-500 flex items-center"
+							>
+								<Edit class="mr-2" /> Edytuj</button
+							>
+						{:else}
+							<span>🚫</span>
+						{/if}
 					</TableBodyCell>
 					<TableBodyCell>
 						{#if user.banned}

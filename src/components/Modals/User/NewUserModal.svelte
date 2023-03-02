@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { page } from '$app/stores';
 	import { isValidObject } from '$lib/client/functions';
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import { errorToast, successToast } from '$lib/client/functions/toasts';
@@ -42,7 +43,9 @@
 			>
 				<option selected value="customer">Klient</option>
 				<option value="moderator">Moderator</option>
-				<option value="admin">Admin</option>
+				{#if $page.data.user?.role === 'admin'}
+					<option value="admin">Admin</option>
+				{/if}
 			</select>
 		</div>
 		<Button type="submit" class="w-full">Dodaj</Button>

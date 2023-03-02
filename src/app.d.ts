@@ -12,7 +12,9 @@ declare global {
 				expires: Date;
 			} | null;
 		}
-		// interface PageData {}
+		interface PageData {
+			user: SessionUser | undefined;
+		}
 		// interface Platform {}
 	}
 

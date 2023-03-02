@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import type { User } from '@prisma/client';
@@ -14,7 +15,7 @@
 			class="flex flex-col space-y-6"
 			method="post"
 			action="?/edit"
-			use:enhance={({ form, data, action, cancel }) => {
+			use:enhance={() => {
 				return async ({ result, update }) => {
 					handleFormResponse(result, 'Pomyślnie edytowano użytkownika');
 					update();
@@ -49,11 +50,13 @@
 				>
 					<option selected={editUserModal.role === 'customer'} value="customer">Klient</option>
 					<option selected={editUserModal.role === 'moderator'} value="moderator">Moderator</option>
-					<option selected={editUserModal.role === 'admin'} value="admin">Admin</option>
+					{#if $page.data.user?.role === 'admin'}
+						<option selected={editUserModal.role === 'admin'} value="admin">Admin</option>
+					{/if}
 				</select>
 			</div>
 
-			{#if editUserModal.role !== 'admin'}
+			{#if editUserModal.role !== 'admin' && (editUserModal.role !== 'moderator' || $page.data.user?.role === 'admin')}
 				<div class="flex items-center mb-4">
 					<input
 						id="banned"
