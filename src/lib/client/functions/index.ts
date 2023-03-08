@@ -1,5 +1,11 @@
-import type { ProductFilter, ProductWithAuthor, UserFilter } from '$types';
+import { PUBLIC_WEBSITE_URL } from '$env/static/public';
+import type { ProductAuthor, ProductFilter, ProductWithAuthor, UserFilter } from '$types';
 import type { User } from '@prisma/client';
+
+export const getProductImageURL = (image: string | null) => {
+	if (!image) return null;
+	return `${PUBLIC_WEBSITE_URL}/products/${image}`;
+};
 
 export const capitalize = (text: string) => {
 	return text.charAt(0).toUpperCase() + text.slice(1);
@@ -14,7 +20,19 @@ export const isValidObject = (obj: unknown): obj is Record<string, unknown> => {
 	return false;
 };
 
-export function applyUserFilters(users: User[], filter: UserFilter) {
+export const userFilterSearchInputFilter = (
+	{ fullName, email }: ProductAuthor,
+	searchInput: string
+) => {
+	if (
+		textCrusher(fullName).includes(textCrusher(searchInput)) ||
+		textCrusher(email).includes(textCrusher(searchInput))
+	)
+		return true;
+	return false;
+};
+
+export const applyUserFilters = (users: User[], filter: UserFilter) => {
 	const bannedFilter = (user: User) => {
 		if (filter.blocked && filter.nonblocked) return true;
 		else if (user.banned && filter.blocked) return true;
@@ -45,9 +63,13 @@ export function applyUserFilters(users: User[], filter: UserFilter) {
 	};
 
 	return users.filter(bannedFilter).filter(roleFilter).filter(dateFilter);
-}
+};
 
-export function applyProductFilters(products: ProductWithAuthor[], filter: ProductFilter) {
+export const applyProductFilters = (
+	products: ProductWithAuthor[],
+	filter: ProductFilter,
+	searchInput: string
+) => {
 	const authorsFilter = (product: ProductWithAuthor) => {
 		if (!filter.excludedUserIds.includes(product.author.id)) return true;
 		return false;
@@ -68,8 +90,13 @@ export function applyProductFilters(products: ProductWithAuthor[], filter: Produ
 		return false;
 	};
 
-	return products.filter(dateFilter).filter(authorsFilter);
-}
+	const productSearchFilter = (product: ProductWithAuthor) =>
+		textCrusher(product.name).includes(textCrusher(searchInput)) ||
+		textCrusher(product.description).includes(textCrusher(searchInput)) ||
+		textCrusher(product.symbol).includes(textCrusher(searchInput));
+
+	return products.filter(dateFilter).filter(authorsFilter).filter(productSearchFilter);
+};
 
 export const arrayUniqueByKey = <T>(arr: T, key: string) =>
 	[

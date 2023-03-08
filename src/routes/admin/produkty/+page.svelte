@@ -7,7 +7,7 @@
 	import ProductFilterModal from '$components/Modals/Product/ProductFilterModal.svelte';
 	import TableHeader from '$components/ProductTableHeader.svelte';
 
-	import { applyProductFilters, arrayUniqueByKey, textCrusher } from '$lib/client/functions';
+	import { applyProductFilters, arrayUniqueByKey } from '$lib/client/functions';
 	import type { ProductAuthor, ProductFilter } from '$types';
 	import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 
@@ -15,6 +15,14 @@
 
 	let searchInput = '';
 	let authorFilterSearchInput = '';
+
+	let newProductModalOpen = false;
+	let editProductModalOpen = false;
+	let filterProductModalOpen = false;
+	let removeProductModalOpen = false;
+
+	let editModalProductId: string;
+	let removeModalProductId: string;
 
 	let filter: ProductFilter = {
 		excludedUserIds: [],
@@ -26,41 +34,11 @@
 			.join('-')
 	};
 
-	// List of products filtered by the input from the searchbar and
-	// other filters
-	$: products = applyProductFilters(
-		data.products.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
-		filter
-	).filter(
-		(product) =>
-			textCrusher(product.name).includes(textCrusher(searchInput)) ||
-			textCrusher(product.description).includes(textCrusher(searchInput)) ||
-			textCrusher(product.symbol).includes(textCrusher(searchInput))
-	);
-
 	// Unique list of users that have added at least one product
 	const productAuthors = arrayUniqueByKey(
 		data.products.map((product) => product.author),
 		'id'
 	);
-
-	let newProductModalOpen = false;
-	let editProductModalOpen = false;
-	let filterProductModalOpen = false;
-	let removeProductModalOpen = false;
-
-	let editModalProductId: string;
-	let removeModalProductId: string;
-
-	const selectAllUsers = () => {
-		const tempSelectedAuthorIds: Record<ProductAuthor['id'], boolean> = {};
-		productAuthors.forEach(({ id }) => {
-			tempSelectedAuthorIds[id] = true;
-		});
-		return tempSelectedAuthorIds;
-	};
-
-	let selectedAuthorIds: Record<ProductAuthor['id'], boolean> = selectAllUsers();
 
 	const openEditModal = (id: string) => {
 		editModalProductId = id;
@@ -71,6 +49,13 @@
 		removeModalProductId = id;
 		removeProductModalOpen = true;
 	};
+
+	// Final list of products filtered by the input from the searchbar, etc.
+	$: products = applyProductFilters(
+		data.products.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
+		filter,
+		searchInput
+	);
 
 	$: editProductModal = products.find((product) => product.id === editModalProductId);
 	$: removeProductModal = products.find((product) => product.id === removeModalProductId);
@@ -84,7 +69,6 @@
 		bind:filter
 		bind:filterProductModalOpen
 		bind:authorFilterSearchInput
-		bind:selectedAuthorIds
 		{productAuthors}
 	/>
 	<RemoveProductModal bind:removeProductModalOpen bind:removeProductModal />

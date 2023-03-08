@@ -39,9 +39,11 @@ You can preview the production build with `npm run preview`.
 
 # TODO
 
-[ ] Make the filters work on Użytkownicy, Produkty & Zamówienia pages
+[ ] Use the modal from Flowbite instead of the modal from Flowbite-svelte
 
-[ ] Make the user panel wider
+[✅] Make the filters work on Użytkownicy, Produkty & Zamówienia pages
+
+[✅] Make the user panel wider
 
 [ ] Add store page with all the products
 
@@ -49,7 +51,7 @@ You can preview the production build with `npm run preview`.
 
 [ ] Add products page in admin panel
 
-[ ] Implement auth system
+[✅] Implement auth system
 
 [ ] Implement user profile
 
@@ -86,3 +88,5 @@ Under consideration:
 [ ] Add chatbot for easy user interactions (bot asks what the user wants => user can choose: buy sth, get a phone number for a service of choice, live chat with the staff)
 
 [ ] Add user settings (possibility to add permanent address for future deliveries?, ?, ?)
+
+[ ] Train chatgpt for indefinite interactions with users
