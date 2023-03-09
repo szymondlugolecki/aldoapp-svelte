@@ -1,10 +1,8 @@
 <script lang="ts">
-	// let selectAllStatus: 'all' | 'none' | null = 'all';
-
-	// const handleAllUsersSelection = (select: boolean) => {
-	// 	if (select) selectAllStatus = 'all';
-	// 	else selectAllStatus = 'none';
-	// };
+	// Object.entries(selectedAuthorIds)
+	// 	.filter(([userId, selected]) => selected === true && userId)
+	// 	.map(([userId]) => productAuthors.find((productAuthor) => productAuthor.id === userId))
+	// 	.filter(Boolean) as ProductAuthor[];
 
 	// $: {
 	// 	if (selectAllStatus === 'all') {
@@ -18,18 +16,14 @@
 
 	import type { ProductAuthor, ProductFilter } from '$types';
 	import { userFilterSearchInputFilter } from '$lib/client/functions';
-	import Modal from '$components/Reusable/Modal.svelte';
-	// import { Modal } from 'flowbite-svelte';
+	import { Modal } from 'flowbite-svelte';
 
 	export let filterProductModalOpen: boolean;
 	export let filter: ProductFilter;
 	export let productAuthors: ProductAuthor[];
 	export let authorFilterSearchInput: string;
-	// export let selectedAuthorIds: Record<ProductAuthor['id'], boolean>;
-	// export let selectAll: () => void;
-	// export let deselectAll: () => void;
 
-	const selectedAuthorIds: Record<ProductAuthor['id'], boolean> = Object.fromEntries(
+	let selectedAuthorIds: Record<ProductAuthor['id'], boolean> = Object.fromEntries(
 		productAuthors.map(({ id }) => {
 			return [id, true];
 		})
@@ -52,20 +46,15 @@
 	$: filteredProductAuthors = productAuthors.filter((author) =>
 		userFilterSearchInputFilter(author, authorFilterSearchInput)
 	);
-	// Object.entries(selectedAuthorIds)
-	// 	.filter(([userId, selected]) => selected === true && userId)
-	// 	.map(([userId]) => productAuthors.find((productAuthor) => productAuthor.id === userId))
-	// 	.filter(Boolean) as ProductAuthor[];
 
 	$: {
 		console.log('filteredProductAuthors', filteredProductAuthors);
 		console.log('selectedAuthorIds', selectedAuthorIds);
-		console.log('productAuthors', productAuthors);
 	}
 </script>
 
 <!-- New Product Modal -->
-<Modal bind:open={filterProductModalOpen} size="xs" autoclose={true} class="w-full">
+<Modal bind:open={filterProductModalOpen} size="xs" autoclose={false} class="w-full">
 	<!-- {#if filterProductModalOpen} -->
 	<div class="w-full">
 		<div class="flex flex-col space-y-6">
@@ -111,8 +100,7 @@
 						class="h-48 px-3 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200"
 						aria-labelledby="dropdownSearchButton"
 					>
-						{#each productAuthors as author (author.id)}
-							{console.log('checked', selectedAuthorIds[author.id])}
+						{#each filteredProductAuthors as author (author.id)}
 							<li>
 								<div
 									class="flex items-center pl-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600"

@@ -1,18 +1,32 @@
 import { prisma } from '$prisma';
 import type { LayoutServerLoad } from './$types';
 
-export const load = (async () => {
-	const products = await prisma.product.findMany({
-		select: {
-			id: true,
-			name: true,
-			symbol: true,
-			thumbnail: true,
-			description: true,
-			images: true
+export const load = (() => {
+	return {
+		products: prisma.product.findMany({
+			select: {
+				id: true,
+				name: true,
+				symbol: true,
+				thumbnail: true,
+				description: true,
+				images: true
+			},
+			skip: 0,
+			take: 10
+		}),
+		lazy: {
+			products: prisma.product.findMany({
+				select: {
+					id: true,
+					name: true,
+					symbol: true,
+					thumbnail: true,
+					description: true,
+					images: true
+				},
+				skip: 10
+			})
 		}
-	});
-	console.table(products.map((u) => [u.name, u.symbol]));
-
-	return { products };
+	};
 }) satisfies LayoutServerLoad;

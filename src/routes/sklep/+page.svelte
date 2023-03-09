@@ -3,7 +3,17 @@
 	import { Search } from 'lucide-svelte';
 
 	export let data: import('./$types').LayoutData;
+
+	// $: console.log(data);
 </script>
+
+<svelte:head>
+	<title>Sklep • Twoje ALDO</title>
+	<meta
+		name="description"
+		content="Strona sklepu Twoje ALDO. Znajdź produkty, które Cię interesują."
+	/>
+</svelte:head>
 
 <section class="w-full h-full flex flex-row-reverse">
 	<div class="w-full h-full px-4">
@@ -21,7 +31,7 @@
 		</div>
 		<div>
 			<h1 class="text-2xl">Lista produktów</h1>
-			<div class="grid grid-flow-col auto-cols-max gap-10">
+			<div class="grid lg:grid-cols-4 grid-cols-3 gap-10">
 				{#each data.products as product}
 					<a
 						class="flex flex-col max-w-[256px] hover:opacity-90 duration-100 outline-blue-700 rounded-md outline-offset-2 p-1"
@@ -30,8 +40,8 @@
 						<img
 							src={getProductImageURL(product.thumbnail)}
 							alt={product.name}
-							width="256px"
-							height="256px"
+							width="160px"
+							height="160px"
 						/>
 						<h2 class="font-semibold">{product.name}</h2>
 						<div class="flex justify-between items-center">
@@ -41,6 +51,31 @@
 						</div>
 					</a>
 				{/each}
+				{#await data.lazy.products}
+					<h1>Wczytywanie reszty produktów...</h1>
+				{:then products}
+					{#each products as product}
+						<a
+							class="flex flex-col max-w-[256px] hover:opacity-90 duration-100 outline-blue-700 rounded-md outline-offset-2 p-1"
+							href="/#"
+						>
+							<img
+								src={getProductImageURL(product.thumbnail)}
+								alt={product.name}
+								width="160px"
+								height="160px"
+							/>
+							<h2 class="font-semibold">{product.name}</h2>
+							<div class="flex justify-between items-center">
+								<span>{product.symbol}</span>
+								<!-- <span>•</span> -->
+								<span>50.00 PLN</span>
+							</div>
+						</a>
+					{/each}
+				{:catch error}
+					<h1>{error}</h1>
+				{/await}
 			</div>
 		</div>
 	</div>

@@ -7,19 +7,18 @@ import {
 } from '$lib/client/schemas/users';
 import { prisma } from '$prisma';
 import type { User } from '@prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { error, fail } from '@sveltejs/kit';
 import { z, ZodError } from 'zod';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load = (async () => {
-	const users = await prisma.user.findMany({});
+export const load = (() => {
 	// console.log(
 	// 	'users',
 	// 	users.map((u) => u.email)
 	// );
 
-	return { users };
+	return { users: prisma.user.findMany({}) };
 }) satisfies PageServerLoad;
 
 const addUserSchema = z.object({
@@ -36,7 +35,6 @@ const editUserSchema = z.object({
 	banned: bannedValidation
 });
 
-// TODO Handle permissions
 export const actions = {
 	add: async ({ request, locals }) => {
 		const data = Object.fromEntries(await request.formData());

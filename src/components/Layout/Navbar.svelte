@@ -95,7 +95,7 @@
 		>
 		<MegaMenu items={salesmenMenu} let:item>
 			<a
-				href={`/sprzedawcy/${item.href}`}
+				href={`/kontakty/${item.href}`}
 				class="block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 h-full"
 			>
 				<div class="font-semibold dark:text-white">{item.name}</div>

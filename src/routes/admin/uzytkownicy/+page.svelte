@@ -11,6 +11,8 @@
 	import UserFilterModal from '$components/Modals/User/UserFilterModal.svelte';
 	import { page } from '$app/stores';
 
+	export let data: import('./$types').PageData;
+
 	let searchInput = '';
 
 	let filter: UserFilter = {
@@ -50,9 +52,15 @@
 	};
 
 	$: editUserModal = users.find((user) => user.id === editModalUserId);
-
-	export let data: import('./$types').PageData;
 </script>
+
+<svelte:head>
+	<title>Użytkownicy • Panel administracyjny</title>
+	<meta
+		name="description"
+		content="Lista użytkowników zarejestrowanych w Twoje ALDO. Dodaj, edytuj lub zablokuj."
+	/>
+</svelte:head>
 
 <section class="w-full h-full p-2 space-y-3">
 	<TableHeader bind:searchInput bind:newUserModalOpen bind:filterUserModalOpen />

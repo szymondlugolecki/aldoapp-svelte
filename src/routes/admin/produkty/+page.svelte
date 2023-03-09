@@ -8,7 +8,7 @@
 	import TableHeader from '$components/ProductTableHeader.svelte';
 
 	import { applyProductFilters, arrayUniqueByKey } from '$lib/client/functions';
-	import type { ProductAuthor, ProductFilter } from '$types';
+	import type { ProductFilter } from '$types';
 	import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 
 	export let data: import('./$types').PageData;
@@ -35,7 +35,7 @@
 	};
 
 	// Unique list of users that have added at least one product
-	const productAuthors = arrayUniqueByKey(
+	let productAuthors = arrayUniqueByKey(
 		data.products.map((product) => product.author),
 		'id'
 	);
@@ -61,6 +61,14 @@
 	$: removeProductModal = products.find((product) => product.id === removeModalProductId);
 </script>
 
+<svelte:head>
+	<title>Produkty • Panel administracyjny</title>
+	<meta
+		name="description"
+		content="Lista produktów dostępnych w Twoje ALDO. Dodaj, edytuj lub usuń."
+	/>
+</svelte:head>
+
 <section class="w-full h-full p-2 space-y-3">
 	<TableHeader bind:searchInput bind:newProductModalOpen bind:filterProductModalOpen />
 	<NewProductModal bind:newProductModalOpen />
@@ -69,7 +77,7 @@
 		bind:filter
 		bind:filterProductModalOpen
 		bind:authorFilterSearchInput
-		{productAuthors}
+		bind:productAuthors
 	/>
 	<RemoveProductModal bind:removeProductModalOpen bind:removeProductModal />
 	<Table>

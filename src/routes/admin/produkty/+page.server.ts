@@ -14,24 +14,20 @@ import type { Actions, PageServerLoad } from './$types';
 import { writeFileSync } from 'fs';
 import { createId } from '@paralleldrive/cuid2';
 
-export const load = (async () => {
-	const products = await prisma.product.findMany({
-		include: {
-			author: {
-				select: {
-					id: true,
-					fullName: true,
-					email: true
+export const load = (() => {
+	return {
+		products: prisma.product.findMany({
+			include: {
+				author: {
+					select: {
+						id: true,
+						fullName: true,
+						email: true
+					}
 				}
 			}
-		}
-	});
-	console.log(
-		'products',
-		products.map((u) => u.symbol)
-	);
-
-	return { products };
+		})
+	};
 }) satisfies PageServerLoad;
 
 const addProductSchema = z.object({

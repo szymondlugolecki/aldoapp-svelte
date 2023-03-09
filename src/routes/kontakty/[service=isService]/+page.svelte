@@ -7,6 +7,14 @@
 	$: contact = contactInfo[service];
 </script>
 
+<svelte:head>
+	<title>Kontakty • Twoje ALDO</title>
+	<meta
+		name="description"
+		content="Lista produktów dostępnych w Twoje ALDO. Dodaj, edytuj lub usuń."
+	/>
+</svelte:head>
+
 <section class="h-full space-y-6">
 	<header class="w-full text-center">
 		<h1 class="text-4xl font-semibold">{capitalize(service)}</h1>
