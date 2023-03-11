@@ -2,10 +2,9 @@ import { verificationCodeValidation } from '$lib/client/schemas/users';
 import { accessTokenExpiryDate, jwtName, refreshTokenExpiryDate } from '$lib/server/constants/auth';
 import { createAccessToken, createRefreshToken } from '$lib/server/functions/auth';
 import { prisma } from '$prisma';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { z, ZodError } from 'zod';
-import type { Actions } from './$types';
 
 const verificationCodeSchema = z.object({
 	code: verificationCodeValidation
@@ -86,4 +85,4 @@ export const actions = {
 			throw redirect(307, '/');
 		}
 	}
-} satisfies Actions;
+};

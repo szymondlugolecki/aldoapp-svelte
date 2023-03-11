@@ -3,12 +3,11 @@ import { verificationKeysExpirationTime } from '$lib/server/constants/auth';
 import { createVerificationCode, createVerificationLink } from '$lib/server/functions/auth';
 import { sendVerificationEmail } from '$lib/server/sendGridClient';
 import { prisma } from '$prisma';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { z, ZodError } from 'zod';
-import type { Actions } from './$types';
 
-// export const load = (async () => {
+// export const load = async () => {
 // 	const users = await prisma.user.findMany({});
 // 	console.log(
 // 		'users',
@@ -16,7 +15,7 @@ import type { Actions } from './$types';
 // 	);
 
 // 	return { users };
-// }) satisfies PageServerLoad;
+// }
 
 const loginSchema = z.object({
 	email: emailValidation
@@ -97,4 +96,4 @@ export const actions = {
 			throw redirect(302, '/login/weryfikacja');
 		}
 	}
-} satisfies Actions;
+};

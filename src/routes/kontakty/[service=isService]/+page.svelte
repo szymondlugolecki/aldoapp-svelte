@@ -11,7 +11,7 @@
 	<title>Kontakty • Twoje ALDO</title>
 	<meta
 		name="description"
-		content="Lista produktów dostępnych w Twoje ALDO. Dodaj, edytuj lub usuń."
+		content="Kontakt do różnych działów ALDO. Dział pasz. Market. Dział maszyn. Komis maszyn. Serwis. Stacja paliw."
 	/>
 </svelte:head>
 

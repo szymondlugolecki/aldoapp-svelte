@@ -26,3 +26,22 @@ export const descriptionValidation = z
 	.trim();
 
 export const thumbnailValidation = z.instanceof(File).optional();
+
+export const addProductSchema = z.object({
+	name: nameValidation,
+	symbol: symbolValidation,
+	description: descriptionValidation,
+	thumbnail: thumbnailValidation
+});
+
+export const editProductSchema = z.object({
+	id: idValidation,
+	name: nameValidation,
+	symbol: symbolValidation,
+	description: descriptionValidation,
+	thumbnail: thumbnailValidation
+});
+
+export const removeProductSchema = z.object({
+	id: idValidation
+});

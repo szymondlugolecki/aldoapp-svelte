@@ -11,7 +11,7 @@
 	import UserFilterModal from '$components/Modals/User/UserFilterModal.svelte';
 	import { page } from '$app/stores';
 
-	export let data: import('./$types').PageData;
+	export let data;
 
 	let searchInput = '';
 
@@ -55,10 +55,10 @@
 </script>
 
 <svelte:head>
-	<title>Użytkownicy • Panel administracyjny</title>
+	<title>Użytkownicy • Panel Administracyjny</title>
 	<meta
 		name="description"
-		content="Lista użytkowników zarejestrowanych w Twoje ALDO. Dodaj, edytuj lub zablokuj."
+		content="Panel Administracyjny. Lista użytkowników zarejestrowanych w Twoje ALDO. Dodaj, edytuj lub zablokuj."
 	/>
 </svelte:head>
 

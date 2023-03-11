@@ -1,6 +1,13 @@
 import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 import type { ProductAuthor, ProductFilter, ProductWithAuthor, UserFilter } from '$types';
 import type { User } from '@prisma/client';
+import type { Thing, WithContext } from 'schema-dts';
+
+export type Schema = Thing | WithContext<Thing>;
+
+export const serializeSchema = (thing: Schema) => {
+	return `<script type="application/ld+json">${JSON.stringify(thing, null, 2)}</script>`;
+};
 
 export const getProductImageURL = (image: string | null) => {
 	if (!image) return null;

@@ -1,7 +1,7 @@
 <svelte:head>
-	<title>Panel administracyjny</title>
+	<title>Panel Administracyjny</title>
 	<meta
 		name="description"
-		content="Lista produktów dostępnych w Twoje ALDO. Dodaj, edytuj lub usuń."
+		content="Panel Administracyjny. Statystyki i zarządzanie aplikacją Twoje ALDO."
 	/>
 </svelte:head>

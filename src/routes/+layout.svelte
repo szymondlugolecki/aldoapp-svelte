@@ -7,12 +7,7 @@
 	import Navbar from '../components/Layout/Navbar.svelte';
 	import Footer from '../components/Layout/Footer.svelte';
 
-	// import { toasts, ToastContainer, FlatToast, BootstrapToast } from 'svelte-toasts';
-	// https://github.com/mzohaibqc/svelte-toasts
-
-	import type { LayoutData } from './$types';
-
-	export let data: LayoutData;
+	export let data;
 </script>
 
 <div class="min-h-screen flex flex-col justify-between w-screen">

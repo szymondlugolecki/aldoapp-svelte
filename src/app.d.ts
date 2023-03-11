@@ -1,9 +1,12 @@
 // See https://kit.svelte.dev/docs/types#app
-
+// import type { ILazyLoadInstance } from 'vanilla-lazyload';
 import type { SessionUser } from '$types';
 
 // for information about these interfaces
 declare global {
+	// interface Document {
+	// 	lazyloadInstance?: ILazyLoadInstance;
+	// }
 	namespace App {
 		// interface Error {}
 		interface Locals {
@@ -24,5 +27,3 @@ declare global {
 		}
 	}
 }
-
-export {};

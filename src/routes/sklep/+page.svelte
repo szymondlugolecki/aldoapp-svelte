@@ -2,16 +2,14 @@
 	import { getProductImageURL } from '$lib/client/functions';
 	import { Search } from 'lucide-svelte';
 
-	export let data: import('./$types').LayoutData;
-
-	// $: console.log(data);
+	export let data;
 </script>
 
 <svelte:head>
 	<title>Sklep • Twoje ALDO</title>
 	<meta
 		name="description"
-		content="Strona sklepu Twoje ALDO. Znajdź produkty, które Cię interesują."
+		content="Strona sklepu Twoje ALDO. Znajdź produkty, które Cię interesują. Zamów online."
 	/>
 </svelte:head>
 

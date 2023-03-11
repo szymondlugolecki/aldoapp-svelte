@@ -42,7 +42,16 @@ export const verificationCodeValidation = z
 	})
 	.length(4, { message: 'Nieprawidłowy kod' });
 
-// z.boolean({
-// 	required_error: "Brak wartości dla 'Zapamiętaj mnie'",
-// 	invalid_type_error: "Niepoprawna wartość dla 'Zapamiętaj mnie'"
-// });
+export const addUserSchema = z.object({
+	name: nameValidation,
+	email: emailValidation,
+	role: roleValidation
+});
+
+export const editUserSchema = z.object({
+	id: idValidation,
+	name: nameValidation,
+	email: emailValidation,
+	role: roleValidation,
+	banned: bannedValidation
+});

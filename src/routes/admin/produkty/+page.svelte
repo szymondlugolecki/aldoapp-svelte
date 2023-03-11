@@ -11,7 +11,7 @@
 	import type { ProductFilter } from '$types';
 	import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 
-	export let data: import('./$types').PageData;
+	export let data;
 
 	let searchInput = '';
 	let authorFilterSearchInput = '';
@@ -62,10 +62,10 @@
 </script>
 
 <svelte:head>
-	<title>Produkty • Panel administracyjny</title>
+	<title>Produkty • Panel Administracyjny</title>
 	<meta
 		name="description"
-		content="Lista produktów dostępnych w Twoje ALDO. Dodaj, edytuj lub usuń."
+		content="Panel Administracyjny. Lista produktów dostępnych w Twoje ALDO. Dodaj, edytuj lub usuń."
 	/>
 </svelte:head>
 

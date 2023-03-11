@@ -1,14 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { roleColors, roleNames, salesmenMenu, shopMenu } from '$lib/client/constants';
-	import { capitalize } from '$lib/client/functions';
-	import { clickOutside } from '$lib/client/functions/clickOutside';
 	import { Avatar, Badge, Button, MegaMenu } from 'flowbite-svelte';
 	import { LogOut, User, Lock } from 'lucide-svelte';
 	import type { SessionUser } from '../../types';
-
-	$: activeUrl = $page.url.pathname.toLowerCase();
-
+	import Img from '@zerodevx/svelte-img';
 	import {
 		Navbar,
 		NavBrand,
@@ -22,10 +18,14 @@
 		DropdownDivider
 	} from 'flowbite-svelte';
 
+	import logo from '$lib/assets/logo.png?run&width=68&height=50&format=webp';
+
 	export let user: SessionUser | undefined;
 
-	let menuMenuHidden: boolean = true;
-	let userMenuHidden: boolean = true;
+	$: activeUrl = $page.url.pathname.toLowerCase();
+
+	// let menuMenuHidden: boolean = true;
+	let userMenuHidden = true;
 </script>
 
 <Navbar let:hidden let:toggle>
@@ -34,7 +34,9 @@
 			class="ml-1 sm:ml-0 self-center whitespace-nowrap text-xl font-semibold dark:text-white mr-1 sm:mr-2"
 			>Twoje</span
 		>
-		<img src="/logo.png" class="h-9 sm:h-11" alt="Logo ALDO" />
+		<Img src={logo} alt="Logo ALDO" />
+
+		<!-- <img src="/logo.png" class="h-9 sm:h-11" width="60px" alt="Logo ALDO" /> -->
 	</NavBrand>
 	<div class="flex items-center md:order-2">
 		{#if user}

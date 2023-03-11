@@ -1,7 +1,6 @@
 import { prisma } from '$prisma';
-import type { LayoutServerLoad } from './$types';
 
-export const load = (() => {
+export const load = () => {
 	return {
 		products: prisma.product.findMany({
 			select: {
@@ -29,4 +28,4 @@ export const load = (() => {
 			})
 		}
 	};
-}) satisfies LayoutServerLoad;
+};

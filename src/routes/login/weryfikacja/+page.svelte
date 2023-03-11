@@ -3,6 +3,14 @@
 	import { handleFormResponse } from '$lib/client/functions/forms';
 </script>
 
+<svelte:head>
+	<title>Weryfikacja logowania • Twoje ALDO</title>
+	<meta
+		name="description"
+		content="Weryfikacja logowania do aplikacji Twoje ALDO. Przepisz kod z maila lub kliknij w link aktywacyjny."
+	/>
+</svelte:head>
+
 <section class="w-full h-full flex justify-center items-center">
 	<div class="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-0 w-96 shadow-2xl">
 		<a

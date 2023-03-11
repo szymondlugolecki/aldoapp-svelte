@@ -1,11 +1,17 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { isValidObject } from '$lib/client/functions';
 	import { handleFormResponse } from '$lib/client/functions/forms';
-	import { errorToast, infoToast } from '$lib/client/functions/toasts';
 
-	// export let data: import('./$types').PageData;
+	// export let data
 </script>
+
+<svelte:head>
+	<title>Zaloguj się • Twoje ALDO</title>
+	<meta
+		name="description"
+		content="Zaloguj się do aplikacji Twoje ALDO. Po zalogowaniu możesz składać zamówienia, śledzić historię zamówień oraz zarządzać swoim kontem."
+	/>
+</svelte:head>
 
 <section class="w-full h-full flex justify-center items-center">
 	<div class="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-0 w-96 shadow-2xl">
