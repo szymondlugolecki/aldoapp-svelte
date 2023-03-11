@@ -7,7 +7,6 @@ export const load = () => {
 				id: true,
 				name: true,
 				symbol: true,
-				thumbnail: true,
 				description: true,
 				images: true
 			},
@@ -20,7 +19,6 @@ export const load = () => {
 					id: true,
 					name: true,
 					symbol: true,
-					thumbnail: true,
 					description: true,
 					images: true
 				},

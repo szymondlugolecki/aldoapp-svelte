@@ -35,12 +35,7 @@
 						class="flex flex-col max-w-[256px] hover:opacity-90 duration-100 outline-blue-700 rounded-md outline-offset-2 p-1"
 						href="/#"
 					>
-						<img
-							src={getProductImageURL(product.thumbnail)}
-							alt={product.name}
-							width="160px"
-							height="160px"
-						/>
+						<img src={product.images[0].url} alt={product.name} width="160px" height="160px" />
 						<h2 class="font-semibold">{product.name}</h2>
 						<div class="flex justify-between items-center">
 							<span>{product.symbol}</span>
@@ -57,12 +52,7 @@
 							class="flex flex-col max-w-[256px] hover:opacity-90 duration-100 outline-blue-700 rounded-md outline-offset-2 p-1"
 							href="/#"
 						>
-							<img
-								src={getProductImageURL(product.thumbnail)}
-								alt={product.name}
-								width="160px"
-								height="160px"
-							/>
+							<img src={product.images[0].url} alt={product.name} width="160px" height="160px" />
 							<h2 class="font-semibold">{product.name}</h2>
 							<div class="flex justify-between items-center">
 								<span>{product.symbol}</span>
