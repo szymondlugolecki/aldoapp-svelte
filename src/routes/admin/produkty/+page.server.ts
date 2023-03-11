@@ -1,4 +1,4 @@
-import { prisma } from '$prisma';
+import { prisma } from '$lib/server/clients/prismaClient';
 
 import add from '$lib/server/actions/product/add';
 import edit from '$lib/server/actions/product/edit';

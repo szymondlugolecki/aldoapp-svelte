@@ -1,7 +1,7 @@
 import { verificationCodeValidation } from '$lib/client/schemas/users';
 import { accessTokenExpiryDate, jwtName, refreshTokenExpiryDate } from '$lib/server/constants/auth';
 import { createAccessToken, createRefreshToken } from '$lib/server/functions/auth';
-import { prisma } from '$prisma';
+import { prisma } from '$lib/server/clients/prismaClient';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { z, ZodError } from 'zod';

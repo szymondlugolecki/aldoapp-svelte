@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 
 export function GET({ locals }) {
 	const session = locals.session;
@@ -7,5 +7,5 @@ export function GET({ locals }) {
 		throw error(401, { message: 'No session' });
 	}
 
-	return new Response(JSON.stringify({ session }));
+	return json(session);
 }

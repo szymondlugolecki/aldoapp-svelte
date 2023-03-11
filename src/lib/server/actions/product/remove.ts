@@ -1,4 +1,4 @@
-import { prisma } from '$prisma';
+import { prisma } from '$lib/server/clients/prismaClient';
 import { error, fail, type Action } from '@sveltejs/kit';
 import { trytm } from '@bdsqqq/try';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';

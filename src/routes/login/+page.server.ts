@@ -1,8 +1,8 @@
 import { emailValidation } from '$lib/client/schemas/users';
 import { verificationKeysExpirationTime } from '$lib/server/constants/auth';
 import { createVerificationCode, createVerificationLink } from '$lib/server/functions/auth';
-import { sendVerificationEmail } from '$lib/server/sendGridClient';
-import { prisma } from '$prisma';
+import { sendVerificationEmail } from '$lib/server/clients/sendGridClient';
+import { prisma } from '$lib/server/clients/prismaClient';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { z, ZodError } from 'zod';

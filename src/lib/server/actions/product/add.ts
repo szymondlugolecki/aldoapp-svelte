@@ -1,7 +1,7 @@
 import { addProductSchema } from '$lib/client/schemas/products';
-import { prisma } from '$prisma';
+import { prisma } from '$lib/server/clients/prismaClient';
 import { error, fail, type Action } from '@sveltejs/kit';
-import { cloudinary } from '$lib/server/cloudinaryClient';
+import { cloudinary } from '$lib/server/clients/cloudinaryClient';
 import { trytm } from '@bdsqqq/try';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { errorResponses } from '$lib/server/constants/errorResponses';
@@ -43,7 +43,7 @@ const add: Action = async ({ request, locals }) => {
 		const base64Image = Buffer.from(thumbnailArrBuffer).toString('base64');
 
 		const [result, productThumbnailUploadError] = await trytm(
-			cloudinary.uploader.upload(base64Image)
+			cloudinary.uploader.upload(base64Image, { public_id: `produkty/${symbol}` })
 		);
 		if (productThumbnailUploadError) {
 			return fail(400, {
@@ -51,28 +51,32 @@ const add: Action = async ({ request, locals }) => {
 			});
 		}
 
-		console.log(result.url);
-		thumbnailUrl = result.url;
+		console.log(result.secure_url);
+		thumbnailUrl = result.secure_url;
 	}
 
 	// Add the product to the database
-	const [, addProductError] = await trytm(
-		prisma.product.create({
-			data: {
-				userId: locals.session.user.id,
-				name,
-				symbol,
-				description,
-				thumbnail: thumbnailUrl
-			}
-		})
-	);
+	// const [, addProductError] = await trytm(
+	// 	prisma.product.create({
+	// 		data: {
+	// 			userId: locals.session.user.id,
+	// 			name,
+	// 			symbol,
+	// 			description
+	// 			// images: {
+	// 			// 	create: {
+	// 			// 		url: thumbnailUrl || ''
+	// 			// 	}
+	// 			// },
+	// 		}
+	// 	})
+	// );
 
-	if (addProductError) {
-		return fail(500, {
-			errors: ['Nie udało się dodać produktu']
-		});
-	}
+	// if (addProductError) {
+	// 	return fail(500, {
+	// 		errors: ['Nie udało się dodać produktu']
+	// 	});
+	// }
 
 	return { success: true, message: 'Pomyślnie dodano produkt' };
 };

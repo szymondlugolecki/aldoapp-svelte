@@ -1,5 +1,5 @@
 import type { RoleColor, ShortService, Outlets } from '$types';
-import type { Role } from '@prisma/client';
+import { MainCategories, type Role } from '@prisma/client';
 
 type SalesmenMenuType = {
 	name: string;
@@ -7,6 +7,38 @@ type SalesmenMenuType = {
 	locations: Outlets[];
 	href: ShortService;
 };
+
+export const fodderCategories = {
+	[MainCategories['cattle']]: [
+		{
+			name: 'Pasze dla krów mlecznych',
+			id: 'cow-feed'
+		},
+		{
+			name: 'Mieszanki paszowe dla bydła',
+			id: 'cow-mixes'
+		},
+		{
+			name: 'Koncentraty dla krów mlecznych i opasów',
+			id: 'cow-concentrates'
+		},
+		{
+			name: 'Pasze dla cieląt',
+			id: 'calf-feed'
+		},
+		{
+			name: 'Preparaty mlekozastępcze dla cieląt / mleko dla cieląt',
+			id: 'calf-milk'
+		}
+	],
+	[MainCategories['poultry']]: [
+		{
+			name: 'Pasze dla niosek',
+			id: 'chick-feed'
+		}
+	],
+	[MainCategories['backyard']]: []
+} as const;
 
 // export const appData = {
 //     "title": "Navillus: Jamstack developers for hire",

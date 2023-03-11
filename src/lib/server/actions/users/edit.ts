@@ -1,7 +1,7 @@
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { editUserSchema } from '$lib/client/schemas/users';
 import { compareObjects } from '$lib/server/functions/utils';
-import { prisma } from '$prisma';
+import { prisma } from '$lib/server/clients/prismaClient';
 import { trytm } from '@bdsqqq/try';
 import type { User } from '@prisma/client';
 import { error, fail, type Action } from '@sveltejs/kit';

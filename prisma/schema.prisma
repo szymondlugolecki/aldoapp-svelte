@@ -18,6 +18,12 @@ enum Role {
   admin
 }
 
+enum MainCategories {
+  cattle
+  poultry
+  backyard
+}
+
 model User {
   id                String             @id @default(uuid())
   email             String             @unique
@@ -59,16 +65,29 @@ model Order {
 }
 
 model Product {
-  id          String   @id @default(uuid())
+  id          String         @id @default(uuid())
   name        String
   description String
   symbol      String
-  thumbnail   String?
-  images      String?  @db.Text
-  author      User     @relation(fields: [userId], references: [id])
+  category    MainCategories
+  subcategory String
+  images      Image[]
+  author      User           @relation(fields: [userId], references: [id])
   userId      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 
-  @@index([userId])
+  @@index([userId, category])
+}
+
+model Image {
+  id        String   @id @default(uuid())
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+
+  @@unique([id, url])
+  @@index([productId])
 }

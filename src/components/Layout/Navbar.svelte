@@ -19,6 +19,7 @@
 	} from 'flowbite-svelte';
 
 	import logo from '$lib/assets/logo.png?run&width=68&height=50&format=webp';
+	import { invalidate } from '$app/navigation';
 
 	export let user: SessionUser | undefined;
 
@@ -45,7 +46,7 @@
 				<Avatar id="avatar-menu" border />
 			</button>
 		{:else}
-			<Button gradient color="pinkToOrange">Zaloguj się</Button>
+			<Button href="/login" gradient color="pinkToOrange">Zaloguj się</Button>
 		{/if}
 		<NavHamburger on:click={toggle} class1="w-full md:flex md:w-auto md:order-1" />
 	</div>
@@ -72,6 +73,19 @@
 			>
 			<DropdownDivider />
 			<DropdownItem
+				on:click={() => {
+					fetch('/api/logout', {
+						method: 'POST',
+						credentials: 'include'
+					})
+						.then((response) => response.json())
+						.then((data) => {
+							console.log('data', data);
+						})
+						.finally(() => {
+							invalidate('session');
+						});
+				}}
 				defaultClass="flex justify-start p-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
 				><LogOut class="mr-2" /> Wyloguj</DropdownItem
 			>

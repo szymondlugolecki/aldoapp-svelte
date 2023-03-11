@@ -22,7 +22,7 @@
 			Twoje
 			<img class="h-12 ml-2" src="/logo.png" alt="Logo ALDO" />
 		</a>
-		<div class="h-0 w-full border-t border-dashed border-gray-300" />
+		<!-- <div class="h-0 w-full border-t border-dashed border-gray-300" /> -->
 		<div
 			class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700"
 		>

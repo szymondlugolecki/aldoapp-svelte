@@ -1,7 +1,7 @@
 import { editProductSchema } from '$lib/client/schemas/products';
-import { prisma } from '$prisma';
+import { prisma } from '$lib/server/clients/prismaClient';
 import { error, fail, type Action } from '@sveltejs/kit';
-import { cloudinary } from '$lib/server/cloudinaryClient';
+import { cloudinary } from '$lib/server/clients/cloudinaryClient';
 import { trytm } from '@bdsqqq/try';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { errorResponses } from '$lib/server/constants/errorResponses';
