@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import type { Product } from '@prisma/client';
 	import { Button, Modal } from 'flowbite-svelte';
@@ -16,8 +17,9 @@
 			method="post"
 			action="?/remove"
 			use:enhance={({ form, data, action, cancel }) => {
+				const toastId = createLoadingToast('please-wait');
 				return async ({ result, update }) => {
-					handleFormResponse(result, 'Pomyślnie usunięto produkt');
+					handleFormResponse(result, toastId);
 					update();
 					removeProductModalOpen = false;
 				};

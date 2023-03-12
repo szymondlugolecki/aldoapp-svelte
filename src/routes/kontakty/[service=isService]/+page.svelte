@@ -15,15 +15,15 @@
 	/>
 </svelte:head>
 
-<section class="h-full space-y-6">
-	<header class="w-full text-center">
+<section class="h-full space-y-10">
+	<header class="w-full text-center mt-4">
 		<h1 class="text-4xl font-semibold">{capitalize(service)}</h1>
 		<h2 class="text-2xl">Numery telefonów</h2>
 	</header>
 
 	<div class="relative overflow-x-auto flex justify-center">
-		<table class="w-full lg:w-3/4 text-sm text-left text-gray-500 dark:text-gray-400">
-			<thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+		<table class="w-full lg:w-3/4 text-sm text-left text-base-content bg-base-100">
+			<thead class="text-xs uppercase">
 				<tr>
 					<th scope="col" class="px-3 sm:px-6 py-3"> Punkt sprzedaży </th>
 					<th scope="col" class="px-3 sm:px-6 py-3"> Numer telefonu </th>
@@ -32,11 +32,8 @@
 			</thead>
 			<tbody>
 				{#each Object.entries(contact) as data}
-					<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-						<th
-							scope="row"
-							class="px-3 sm:px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-						>
+					<tr class="last:border-0 border-b border-base-content">
+						<th scope="row" class="px-3 sm:px-6 py-4 font-medium whitespace-nowrap">
 							{capitalize(data[0])}
 						</th>
 						<td class="px-3 sm:px-6 py-4 space-y-4 whitespace-nowrap">
@@ -46,7 +43,7 @@
 						</td>
 						<td class="px-3 sm:px-6 py-4 space-y-4 whitespace-nowrap">
 							{#each data[1] as number}
-								<a class="block hover:text-blue-700" href={`tel:+48${number}`}>Zadzwoń 📞</a>
+								<a class="block hover:text-primary" href={`tel:+48${number}`}>Zadzwoń 📞</a>
 							{/each}
 						</td>
 					</tr>

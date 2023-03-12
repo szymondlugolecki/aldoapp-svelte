@@ -14,6 +14,11 @@ export const load = () => {
 						fullName: true,
 						email: true
 					}
+				},
+				images: {
+					select: {
+						url: true
+					}
 				}
 			}
 		})

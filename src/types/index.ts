@@ -1,3 +1,4 @@
+import type customErrors from '$lib/client/constants/customErrors';
 import type { Product, User } from '@prisma/client';
 import type { JWTPayload, JWTVerifyResult } from 'jose';
 
@@ -6,6 +7,9 @@ export type RoleColor = 'blue' | 'green' | 'red';
 
 export type ShortService = 'pasze' | 'komis' | 'market' | 'paliwa' | 'maszyny' | 'serwis';
 export type Outlets = 'surowe' | 'myszyniec' | 'ełk' | 'wójtowo';
+
+export type CustomError = keyof typeof customErrors;
+export type ErrorLocation = `/error/${CustomError}`;
 
 interface PayloadWithUserEmail extends JWTPayload {
 	id: string;
@@ -41,6 +45,11 @@ export type ProductAuthor = {
 	fullName: string;
 };
 
-export type ProductWithAuthor = Product & {
+type ProductImage = {
+	url: string;
+};
+
+export type ProductWithAuthorAndImage = Product & {
 	author: ProductAuthor;
+	images: ProductImage[];
 };

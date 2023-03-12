@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 	import { handleFormResponse } from '$lib/client/functions/forms';
-
-	// export let data
+	import logo from '$lib/assets/logo.png?run&width=68&height=50&format=webp';
+	import Img from '@zerodevx/svelte-img';
+	import Danger from '$components/Alerts/Danger.svelte';
 </script>
 
 <svelte:head>
@@ -15,33 +17,34 @@
 
 <section class="w-full h-full flex justify-center items-center">
 	<div class="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-0 w-96 shadow-2xl">
+		<!-- <h1
+			class="text-xl font-semibold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white text-center"
+		>
+			Logowanie
+
+		</h1> -->
 		<a
 			href="/#"
-			class="flex items-center mb-6 mt-6 text-2xl font-semibold text-gray-900 dark:text-white"
+			class="flex items-center mt-6 text-2xl font-semibold text-gray-900 dark:text-white"
 		>
 			Twoje
-			<img class="h-12 ml-2" src="/logo.png" alt="Logo ALDO" />
+			<Img class="h-12 ml-2" src={logo} alt="Logo ALDO" />
 		</a>
+
+		<Danger />
+
 		<!-- <div class="h-0 w-full border-t border-dashed border-gray-300" /> -->
 		<div
 			class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700"
 		>
 			<div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-				<h1
-					class="text-xl font-semibold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white text-center"
-				>
-					Logowanie
-				</h1>
 				<form
 					class="space-y-4"
 					method="post"
 					use:enhance={() => {
+						const toastId = createLoadingToast('redirecting');
 						return async ({ result, update }) => {
-							handleFormResponse(
-								result,
-								'Kod weryfikacyjny został wysłany na podany adres email',
-								true
-							);
+							handleFormResponse(result, toastId);
 							update();
 						};
 					}}

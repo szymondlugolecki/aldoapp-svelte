@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import { Button, Modal, Label, Input, Textarea } from 'flowbite-svelte';
+	import toast from 'svelte-french-toast';
 
 	export let newProductModalOpen: boolean;
 
@@ -33,9 +35,10 @@
 		class="flex flex-col space-y-6"
 		method="post"
 		action="?/add"
-		use:enhance={({ form, data, action, cancel }) => {
+		use:enhance={() => {
+			const toastId = createLoadingToast('please-wait');
 			return async ({ result, update }) => {
-				handleFormResponse(result, 'Pomyślnie dodano produkt');
+				handleFormResponse(result, toastId);
 				update();
 				newProductModalOpen = false;
 			};

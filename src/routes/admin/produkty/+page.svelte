@@ -97,7 +97,7 @@
 							<img
 								width="96px"
 								height="96px"
-								src={`${PUBLIC_WEBSITE_URL}/products/${product.thumbnail}`}
+								src={`${PUBLIC_WEBSITE_URL}/products/${product.images[0]}`}
 								alt="Zdjęcie produktu"
 							/>
 						</a>

@@ -1,4 +1,7 @@
 <script lang="ts">
+	import toast from 'svelte-french-toast';
+	import { onMount } from 'svelte';
+
 	let sessionData: import('./$types').PageData['user'] | undefined = undefined;
 
 	async function session() {
@@ -10,6 +13,10 @@
 		});
 
 		sessionData = await response.json();
+	}
+
+	function showToast() {
+		toast.success('Poggerson XD');
 	}
 </script>
 
@@ -25,5 +32,6 @@
 	<h1 class="text-3xl">Strona główna</h1>
 	<h2 class="text-xl">Na razie nic tu nie ma... 😌</h2>
 	<button on:click={session} class="px-3 py-2 bg-gray-800 text-white text-lg">Get session</button>
+	<button on:click={showToast} class="px-3 py-2 bg-gray-800 text-white text-lg">Poggers xD</button>
 	{JSON.stringify(sessionData)}
 </section>

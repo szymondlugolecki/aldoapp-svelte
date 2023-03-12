@@ -1,6 +1,6 @@
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { addUserSchema } from '$lib/client/schemas/users';
-import { errorResponses } from '$lib/server/constants/errorResponses';
+import { errorResponses } from '$lib/client/constants/errorResponses';
 import { prisma } from '$lib/server/clients/prismaClient';
 import { trytm } from '@bdsqqq/try';
 import { error, fail, type Action } from '@sveltejs/kit';

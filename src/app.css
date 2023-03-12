@@ -10,6 +10,12 @@
 @tailwind utilities;
 
 :root {
-	--date-picker-background: #1b1e27;
-	--date-picker-foreground: #f7f7f7;
+	--my-color: white;
+	background-color: var(--my-color);
+}
+[data-theme='dark'] {
+	--my-color: #121212;
+}
+[data-theme='light'] {
+	--my-color: white;
 }

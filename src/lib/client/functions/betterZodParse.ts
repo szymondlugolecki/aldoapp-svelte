@@ -1,11 +1,13 @@
-import { ZodError } from 'zod';
+import { z, ZodError } from 'zod';
 
-export const betterZodParse = <T>(fakePromise: T): [T, null] | [null, string[]] => {
+export const betterZodParse = <T extends z.ZodTypeAny>(
+	schema: T,
+	data: unknown
+): [z.output<T>, null] | [null, string[]] => {
 	try {
-		const data = fakePromise;
+		schema.parse(data);
 		return [data, null];
 	} catch (throwable) {
-		console.log('Parsing Error', throwable);
 		if (throwable instanceof ZodError) {
 			const { fieldErrors: errors } = throwable.flatten();
 			const errorList = Object.values(errors)

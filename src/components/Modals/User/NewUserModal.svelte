@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import { isValidObject } from '$lib/client/functions';
+	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import { errorToast, successToast } from '$lib/client/functions/toasts';
 	import { Button, Modal, Label, Input } from 'flowbite-svelte';
@@ -16,8 +17,9 @@
 		method="post"
 		action="?/add"
 		use:enhance={({ form, data, action, cancel }) => {
+			const toastId = createLoadingToast('please-wait');
 			return async ({ result, update }) => {
-				handleFormResponse(result, 'Pomyślnie dodano użytkownika');
+				handleFormResponse(result, toastId);
 				update();
 				newUserModalOpen = false;
 			};

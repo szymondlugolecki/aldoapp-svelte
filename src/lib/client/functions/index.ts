@@ -1,5 +1,5 @@
 import { PUBLIC_WEBSITE_URL } from '$env/static/public';
-import type { ProductAuthor, ProductFilter, ProductWithAuthor, UserFilter } from '$types';
+import type { ProductAuthor, ProductFilter, ProductWithAuthorAndImage, UserFilter } from '$types';
 import type { User } from '@prisma/client';
 import type { Thing, WithContext } from 'schema-dts';
 
@@ -73,11 +73,11 @@ export const applyUserFilters = (users: User[], filter: UserFilter) => {
 };
 
 export const applyProductFilters = (
-	products: ProductWithAuthor[],
+	products: ProductWithAuthorAndImage[],
 	filter: ProductFilter,
 	searchInput: string
 ) => {
-	const authorsFilter = (product: ProductWithAuthor) => {
+	const authorsFilter = (product: ProductWithAuthorAndImage) => {
 		if (!filter.excludedUserIds.includes(product.author.id)) return true;
 		return false;
 	};
@@ -89,7 +89,7 @@ export const applyProductFilters = (
 		? new Date(new Date(filter.until).setHours(23, 59, 59, 999))
 		: new Date(new Date().setHours(23, 59, 59, 999));
 
-	const dateFilter = (product: ProductWithAuthor) => {
+	const dateFilter = (product: ProductWithAuthorAndImage) => {
 		if (!sinceDate) return true;
 		// Since date was provided
 		// Check if user is in the right range
@@ -97,7 +97,7 @@ export const applyProductFilters = (
 		return false;
 	};
 
-	const productSearchFilter = (product: ProductWithAuthor) =>
+	const productSearchFilter = (product: ProductWithAuthorAndImage) =>
 		textCrusher(product.name).includes(textCrusher(searchInput)) ||
 		textCrusher(product.description).includes(textCrusher(searchInput)) ||
 		textCrusher(product.symbol).includes(textCrusher(searchInput));

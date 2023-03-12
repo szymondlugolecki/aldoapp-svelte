@@ -4,6 +4,7 @@
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import type { User } from '@prisma/client';
 	import { Button, Modal, Label, Input } from 'flowbite-svelte';
+	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 
 	export let editUserModalOpen: boolean;
 	export let editUserModal: User | undefined;
@@ -16,8 +17,9 @@
 			method="post"
 			action="?/edit"
 			use:enhance={() => {
+				const toastId = createLoadingToast('please-wait');
 				return async ({ result, update }) => {
-					handleFormResponse(result, 'Pomyślnie edytowano użytkownika');
+					handleFormResponse(result, toastId);
 					update();
 					editUserModalOpen = false;
 				};

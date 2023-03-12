@@ -1,13 +1,15 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { PUBLIC_WEBSITE_URL } from '$env/static/public';
+	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 	import { handleFormResponse } from '$lib/client/functions/forms';
-	import type { Product } from '@prisma/client';
+	import type { ProductWithAuthorAndImage } from '$types';
 	import { Button, Modal, Label, Input, Textarea } from 'flowbite-svelte';
 	import { Eraser } from 'lucide-svelte';
+	import toast from 'svelte-french-toast';
 
 	export let editProductModalOpen: boolean;
-	export let editProductModal: Product | undefined;
+	export let editProductModal: ProductWithAuthorAndImage | undefined;
 
 	let descriptionProps = {
 		id: 'description',
@@ -37,9 +39,10 @@
 			class="flex flex-col space-y-6"
 			method="post"
 			action="?/edit"
-			use:enhance={({ form, data, action, cancel }) => {
+			use:enhance={() => {
+				const toastId = createLoadingToast('please-wait');
 				return async ({ result, update }) => {
-					handleFormResponse(result, 'Pomyślnie edytowano produkt');
+					handleFormResponse(result, toastId);
 					update();
 					editProductModalOpen = false;
 				};
@@ -92,11 +95,11 @@
 							<div class="block">
 								<img src={productImage} width="96px" height="96px" alt="Przesłane zdjęcie" />
 							</div>
-						{:else if editProductModal.thumbnail}
+						{:else if editProductModal}
 							<img
 								width="96px"
 								height="96px"
-								src={`${PUBLIC_WEBSITE_URL}/products/${editProductModal.thumbnail}`}
+								src={`${PUBLIC_WEBSITE_URL}/products/${editProductModal.images[0]}`}
 								alt="Dotychczasowe zdjęcie produktu"
 							/>
 						{:else}

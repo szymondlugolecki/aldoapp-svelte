@@ -4,7 +4,7 @@ import { error, fail, type Action } from '@sveltejs/kit';
 import { cloudinary } from '$lib/server/clients/cloudinaryClient';
 import { trytm } from '@bdsqqq/try';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
-import { errorResponses } from '$lib/server/constants/errorResponses';
+import { errorResponses } from '$lib/client/constants/errorResponses';
 
 const add: Action = async ({ request, locals }) => {
 	// Only moderators and admins are allowed to add a product

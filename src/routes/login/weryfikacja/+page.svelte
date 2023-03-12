@@ -1,5 +1,6 @@
 <script>
 	import { enhance } from '$app/forms';
+	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 	import { handleFormResponse } from '$lib/client/functions/forms';
 </script>
 
@@ -35,8 +36,9 @@
 					class="space-y-4"
 					method="post"
 					use:enhance={() => {
+						const toastId = createLoadingToast('redirecting');
 						return async ({ result, update }) => {
-							handleFormResponse(result, 'Zostałeś zalogowany');
+							handleFormResponse(result, toastId);
 							update();
 						};
 					}}
