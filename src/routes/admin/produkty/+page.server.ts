@@ -12,7 +12,8 @@ export const load = () => {
 					select: {
 						id: true,
 						fullName: true,
-						email: true
+						email: true,
+						role: true
 					}
 				},
 				images: {
@@ -24,14 +25,6 @@ export const load = () => {
 		})
 	};
 };
-
-// const createThumbnailFileName = (thumbnail: File) => {
-// 	const fileNameId = createId();
-// 	const fileFormat = thumbnail.type.split('/')[1];
-// 	const fullFile = `${fileNameId}.${fileFormat}`;
-
-// 	return fullFile;
-// };
 
 export const actions = {
 	add,

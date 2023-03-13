@@ -8,6 +8,30 @@ type SalesmenMenuType = {
 	href: ShortService;
 };
 
+export const productTable = {
+	image: 'Zdjęcie',
+	name: 'Nazwa i symbol',
+	description: 'Opis',
+	author: 'Dodał(a)',
+	action: 'Akcja',
+	addedAt: 'Dodano'
+} as const;
+
+export const userTable = {
+	user: 'Użytkownik',
+	role: 'Rola',
+	action: 'Akcja',
+	access: 'Dostęp',
+	joined: 'Dołączył(a)',
+	profile: 'Profil'
+} as const;
+
+export const fodderNames: Record<(typeof MainCategories)[keyof typeof MainCategories], string> = {
+	cattle: 'Bydło',
+	poultry: 'Drób',
+	backyard: 'Hodowla przydomowa'
+} as const;
+
 export const fodderCategories = {
 	[MainCategories['cattle']]: [
 		{

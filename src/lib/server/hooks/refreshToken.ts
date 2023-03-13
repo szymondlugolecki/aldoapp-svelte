@@ -38,7 +38,10 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 	if (verifyError) {
 		const joseErrName = joseErrorParser(verifyError);
 		console.log('Jose Error Name', joseErrName, userEmail);
-		if (joseErrName !== 'expired' || !userEmail) return resolve(event);
+		if (joseErrName !== 'expired' || !userEmail) {
+			console.log('UNEXPECTED ERROR!!!', joseErrName, userEmail);
+			return resolve(event);
+		}
 
 		const [result, promiseError] = await trytm(
 			Promise.all([
@@ -79,12 +82,14 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 
 		event.cookies.set(jwtName.access, accessToken, {
 			expires: accessTokenExpirationDate,
-			path: '/'
+			path: '/',
+			secure: false
 		});
 
 		event.cookies.set(jwtName.refresh, refreshToken, {
 			expires: refreshTokenExpiryDate(),
-			path: '/'
+			path: '/',
+			secure: false
 		});
 
 		event.locals.session = {
@@ -109,7 +114,7 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 
 	const exp = atPayload.payload.exp;
 	const expires = new Date(exp * 1000);
-	console.log('AT ✅ RT ✅\nSession expires', expires);
+	console.log('AT ✅ RT ✅');
 
 	if (event.locals.session) return resolve(event);
 	const [dbUser] = await trytm(

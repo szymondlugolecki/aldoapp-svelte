@@ -74,12 +74,19 @@
 			</div>
 		</div>
 		<div class="flex-none flex items-center">
+			<!-- <label class="swap swap-rotate">
+				<input type="checkbox" on:click={nextTheme} />
+
+				<Sun class="swap-on text-amber-500" />
+
+				<Moon class="swap-off text-sky-500" />
+			</label> -->
 			<button on:click={nextTheme} tabindex="0" class="btn btn-ghost btn-circle">
 				<div class="w-10 rounded-full flex justify-center items-center">
 					{#if $theme === 'light'}
-						<Sun class="text-amber-500" />
+						<Sun class="swap-on text-amber-500" />
 					{:else}
-						<Moon class="text-sky-500" />
+						<Moon class="swap-off text-sky-500" />
 					{/if}
 				</div>
 			</button>
@@ -170,15 +177,16 @@
 	</div>
 	{#if menuOpen}
 		<div class="w-full flex flex-col justify-center items-start md:hidden mt-2 text-base-content">
-			<a
-				class="border-b rounded-none border-base-content p-2 w-full {activeUrl.startsWith('/login')
-					? 'bg-primary'
-					: ''}"
-				href="/login"
-				on:click={() => (menuOpen = false)}
-			>
-				<span class="flex"><LogIn class="mr-2" /> Zaloguj się </span></a
-			>
+			{#if !user}
+				<a
+					class="p-2 w-full rounded {activeUrl === '/login' ? 'bg-primary' : ''}"
+					href="/login"
+					on:click={() => (menuOpen = false)}
+				>
+					<span class="flex"><LogIn class="mr-2" /> Zaloguj się</span></a
+				>
+			{/if}
+
 			<a
 				class="p-2 w-full rounded {activeUrl === '/' ? 'bg-primary' : ''}"
 				href="/"

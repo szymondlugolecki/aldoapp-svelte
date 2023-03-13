@@ -11,6 +11,21 @@ export type Outlets = 'surowe' | 'myszyniec' | 'ełk' | 'wójtowo';
 export type CustomError = keyof typeof customErrors;
 export type ErrorLocation = `/error/${CustomError}`;
 
+export type ProductRowType = 'image' | 'name' | 'description' | 'author' | 'action' | 'addedAt';
+
+export type UserRowType = 'user' | 'role' | 'action' | 'access' | 'joined' | 'profile';
+
+export type DrawerStore =
+	| {
+			type: 'user' | 'product';
+			action: 'add' | 'filter';
+	  }
+	| {
+			id: string;
+			type: 'user' | 'product';
+			action: 'edit' | 'remove';
+	  };
+
 interface PayloadWithUserEmail extends JWTPayload {
 	id: string;
 	email: string;
@@ -43,6 +58,7 @@ export type ProductAuthor = {
 	id: string;
 	email: string;
 	fullName: string;
+	role: Role;
 };
 
 type ProductImage = {

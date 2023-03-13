@@ -5,6 +5,7 @@ import { cloudinary } from '$lib/server/clients/cloudinaryClient';
 import { trytm } from '@bdsqqq/try';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { errorResponses } from '$lib/client/constants/errorResponses';
+import type { UploadApiResponse } from 'cloudinary';
 
 const add: Action = async ({ request, locals }) => {
 	// Only moderators and admins are allowed to add a product
@@ -25,58 +26,75 @@ const add: Action = async ({ request, locals }) => {
 			errors: ['Niepoprawne dane']
 		});
 	}
-	const { name, symbol, description, thumbnail } = addProductObj;
+	const { name, symbol, description, images, category, subcategory } = addProductObj;
 
 	// Handle the thumbnail
-	let thumbnailUrl: string | undefined;
+	let imagesURL: string[] = [];
 
-	if (thumbnail && thumbnail.size > 0) {
-		const fileSize = thumbnail.size / 1024 / 1024; // in MiB
+	if (images && images.length) {
+		const totalImagesSize = images.reduce((acc, curr) => acc + curr.size, 0) / 1024 / 1024; // in MiB
 
-		if (fileSize > 3) {
+		if (totalImagesSize > 3) {
 			return fail(400, {
-				errors: ['Plik jest zbyt duży. Maksymalny rozmiar to 3MB']
+				errors: ['Maxymalny rozmiar zdjęć to 3MB']
 			});
 		}
 
-		const thumbnailArrBuffer = await thumbnail.arrayBuffer();
-		const base64Image = Buffer.from(thumbnailArrBuffer).toString('base64');
+		const uploadPromises: Promise<UploadApiResponse>[] = [];
 
-		const [result, productThumbnailUploadError] = await trytm(
-			cloudinary.uploader.upload(base64Image, { public_id: `produkty/${symbol}` })
-		);
+		images.forEach(async (image, index) => {
+			if (image.size === 0) {
+				return;
+			}
+
+			const imageArrBuffer = await image.arrayBuffer();
+			const base64Image = Buffer.from(imageArrBuffer).toString('base64');
+
+			uploadPromises.push(
+				cloudinary.uploader.upload(base64Image, {
+					public_id: `produkty/${symbol}/${index}`,
+					overwrite: true
+				})
+			);
+		});
+
+		const [result, productThumbnailUploadError] = await trytm(Promise.all(uploadPromises));
+
 		if (productThumbnailUploadError) {
 			return fail(400, {
-				errors: ['Nie udało się przesłać zdjęcia']
+				errors: ['Wystąpił błąd poczas przesyłania zdjęć']
 			});
 		}
 
-		console.log(result.secure_url);
-		thumbnailUrl = result.secure_url;
+		imagesURL = result.map((image) => image.secure_url);
 	}
 
 	// Add the product to the database
-	// const [, addProductError] = await trytm(
-	// 	prisma.product.create({
-	// 		data: {
-	// 			userId: locals.session.user.id,
-	// 			name,
-	// 			symbol,
-	// 			description
-	// 			// images: {
-	// 			// 	create: {
-	// 			// 		url: thumbnailUrl || ''
-	// 			// 	}
-	// 			// },
-	// 		}
-	// 	})
-	// );
+	const [, addProductError] = await trytm(
+		prisma.product.create({
+			data: {
+				userId: locals.session.user.id,
+				name,
+				symbol,
+				description,
+				images: {
+					createMany: {
+						data: imagesURL.map((url) => ({
+							url
+						}))
+					}
+				},
+				category,
+				subcategory
+			}
+		})
+	);
 
-	// if (addProductError) {
-	// 	return fail(500, {
-	// 		errors: ['Nie udało się dodać produktu']
-	// 	});
-	// }
+	if (addProductError) {
+		return fail(500, {
+			errors: ['Nie udało się dodać produktu']
+		});
+	}
 
 	return { success: true, message: 'Pomyślnie dodano produkt' };
 };

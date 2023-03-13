@@ -15,6 +15,7 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 			errors: codeParsingError
 		});
 	}
+
 	const { code } = codeParsed;
 
 	// Check if the token exists & is not expired
@@ -47,19 +48,32 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 	}
 
 	// Create a new session
-	const [accessToken, refreshToken] = await Promise.all([
-		createAccessToken({ email: token.email }),
-		createRefreshToken({ email: token.email })
-	]);
+	const [createTokens, createTokensError] = await trytm(
+		Promise.all([
+			createAccessToken({ email: token.email }),
+			createRefreshToken({ email: token.email })
+		])
+	);
+
+	if (createTokensError) {
+		// Unexpected-error
+		return fail(500, {
+			errors: ['Niespodziewany błąd']
+		});
+	}
+
+	const [accessToken, refreshToken] = createTokens;
 
 	cookies.set(jwtName.access, accessToken, {
 		expires: accessTokenExpiryDate(),
-		path: '/'
+		path: '/',
+		secure: false
 	});
 
 	cookies.set(jwtName.refresh, refreshToken, {
 		expires: refreshTokenExpiryDate(),
-		path: '/'
+		path: '/',
+		secure: false
 	});
 
 	locals.session = {
@@ -72,6 +86,8 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 		},
 		expires: accessTokenExpiryDate()
 	};
+
+	console.log('locals.session', locals.session);
 
 	throw redirect(303, '/');
 };
