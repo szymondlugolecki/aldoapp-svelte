@@ -18,7 +18,7 @@ const edit: Action = async ({ request, locals }) => {
 	// Validate the user input
 	const data = Object.fromEntries(await request.formData());
 
-	const [editUserObj, editUserObjParseError] = betterZodParse(editUserSchema.parse(data));
+	const [editUserObj, editUserObjParseError] = betterZodParse(editUserSchema, data);
 	if (editUserObjParseError) {
 		return fail(400, {
 			errors: ['Niepoprawne dane']

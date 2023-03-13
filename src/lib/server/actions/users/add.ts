@@ -16,7 +16,7 @@ const add: Action = async ({ request, locals }) => {
 
 	// Validate the user input
 	const data = Object.fromEntries(await request.formData());
-	const [addUserObj, addUserObjParseError] = betterZodParse(addUserSchema.parse(data));
+	const [addUserObj, addUserObjParseError] = betterZodParse(addUserSchema, data);
 	if (addUserObjParseError) {
 		return fail(400, {
 			errors: ['Niepoprawne dane']

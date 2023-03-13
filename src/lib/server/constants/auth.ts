@@ -42,5 +42,7 @@ export const joseErrorParser = (err: unknown) => {
 		if (err instanceof errors.JOSEAlgNotAllowed) return 'alg_not_allowed';
 		if (err instanceof errors.JOSENotSupported) return 'not_supported';
 	}
+	// Unexpected-error
+	console.log('UNEXPECTED ERROR HERE!', err);
 	return null;
 };

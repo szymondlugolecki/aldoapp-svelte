@@ -22,10 +22,16 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 	// Check if the Refresh Token cookie exists & is valid
 	if (!refreshToken) return resolve(event);
 	const [payloads, verifyError] = await trytm(
-		Promise.all([verifyToken(accessToken || ''), verifyToken(refreshToken)])
+		Promise.all([verifyToken(refreshToken), verifyToken(accessToken || '')])
 	);
 
-	let userEmail: string | undefined;
+	let userEmail = event.locals.session?.user.email;
+
+	// Rare case when the user has the RT token, no AT token and no session in the locals
+	if (!userEmail) {
+		const { payload } = await verifyToken(refreshToken);
+		userEmail = payload.email;
+	}
 
 	// One or both of the tokens failed the verification
 	// If it was due to expiration, renew both tokens and move on

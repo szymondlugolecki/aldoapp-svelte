@@ -1,4 +1,4 @@
-import { jwtVerify, SignJWT } from 'jose';
+import { errors, jwtVerify, SignJWT } from 'jose';
 import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 import { jwtConfig } from '../constants/auth';
 import type { JWTTokenResult } from '$types';
@@ -34,8 +34,10 @@ export const createAccessToken = (payload: { email: string }) =>
 		.setExpirationTime(accessTokenConfig.expirationTime)
 		.sign(secret);
 
-export const verifyToken = (token: string): Promise<JWTTokenResult> =>
-	jwtVerify(token, secret, {
+export const verifyToken = async (token: string): Promise<JWTTokenResult> => {
+	if (!token) throw new errors.JWTExpired('Token is expired');
+	return jwtVerify(token, secret, {
 		issuer,
 		audience
 	}) as Promise<JWTTokenResult>;
+};

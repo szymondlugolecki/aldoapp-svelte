@@ -20,7 +20,7 @@ const edit: Action = async ({ request, locals }) => {
 	// Validate the user input
 	const data = Object.fromEntries(await request.formData());
 
-	const [editProductObj, addProductParseError] = betterZodParse(editProductSchema.parse(data));
+	const [editProductObj, addProductParseError] = betterZodParse(editProductSchema, data);
 	if (addProductParseError) {
 		return fail(400, {
 			errors: ['Niepoprawne dane']
@@ -43,8 +43,19 @@ const edit: Action = async ({ request, locals }) => {
 				name: true,
 				symbol: true,
 				description: true,
-				thumbnail: true
+				images: {
+					select: {
+						url: true
+					}
+				}
 			}
+			// include: {
+			// 	images: {
+			// 		select: {
+			// 			url: true,
+			// 		}
+			// 	}
+			// }
 		})
 	);
 
@@ -58,7 +69,7 @@ const edit: Action = async ({ request, locals }) => {
 		name,
 		symbol,
 		description,
-		thumbnail: thumbnailFileName
+		images: thumbnail
 	};
 
 	const { name: bName, symbol: bSymbol, description: bDescription } = productBeforeEdit;

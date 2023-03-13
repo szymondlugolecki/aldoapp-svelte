@@ -18,9 +18,7 @@ const remove: Action = async ({ request, locals }) => {
 	console.log('data', data);
 
 	// Validate the user input
-	const [removeProductObj, removeProductSchemaError] = betterZodParse(
-		removeProductSchema.parse(data)
-	);
+	const [removeProductObj, removeProductSchemaError] = betterZodParse(removeProductSchema, data);
 	if (removeProductSchemaError) {
 		return fail(400, {
 			errors: ['Niepoprawne dane']

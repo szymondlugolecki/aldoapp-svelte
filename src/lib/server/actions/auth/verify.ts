@@ -9,7 +9,7 @@ import { createAccessToken, createRefreshToken } from '$lib/server/functions/aut
 const handleVerification: Action = async ({ request, cookies, locals }) => {
 	// Validate the user input
 	const data = Object.fromEntries(await request.formData());
-	const [codeParsed, codeParsingError] = betterZodParse(verificationCodeSchema.parse(data));
+	const [codeParsed, codeParsingError] = betterZodParse(verificationCodeSchema, data);
 	if (codeParsingError) {
 		return fail(400, {
 			errors: codeParsingError

@@ -19,7 +19,7 @@ const add: Action = async ({ request, locals }) => {
 	const data = Object.fromEntries(await request.formData());
 	console.log('data', data);
 
-	const [addProductObj, addProductParseError] = betterZodParse(addProductSchema.parse(data));
+	const [addProductObj, addProductParseError] = betterZodParse(addProductSchema, data);
 	if (addProductParseError) {
 		return fail(400, {
 			errors: ['Niepoprawne dane']
