@@ -13,8 +13,10 @@
 	}
 
 	let files: UniqueFile[] = [];
+	// Files that will be sent to the server
+	let realImagesInput: HTMLInputElement;
 
-	function getBase64(image: UniqueFile) {
+	function addBase64ToFile(image: UniqueFile) {
 		const reader = new FileReader();
 		reader.readAsDataURL(image);
 		reader.onload = (e) => {
@@ -36,20 +38,35 @@
 			currentTarget: EventTarget & HTMLInputElement;
 		}
 	) {
+		// A new image was added/removed
 		const uploadedFiles = e.currentTarget.files;
-		if (uploadedFiles) {
+		if (uploadedFiles && uploadedFiles.length > 0) {
+			// Loop through all the files
+			// And manually add them to the files array
 			for (let q = 0; q < uploadedFiles.length; q++) {
 				const uploadedFile = uploadedFiles[q];
 				const uuid = crypto.randomUUID();
 				const fileWithId: UniqueFile = Object.assign(uploadedFile, { id: uuid });
 				files = arrayUniqueByKey([...files, fileWithId], 'id');
-				getBase64(fileWithId);
+
+				// Covert the file to base64 and write it after its done
+				addBase64ToFile(fileWithId);
 			}
+
+			// Add the images to "realImagesInput" which is
+			// binded to the images file input (which is sent to the server)
+			const dataTransfer = new DataTransfer();
+			files.forEach((file) => {
+				dataTransfer.items.add(file);
+			});
+			realImagesInput.files = dataTransfer.files;
+
+			console.log('realImagesInputRef', realImagesInput.files);
 		}
 	}
 
 	$: {
-		console.log(files);
+		console.log(realImagesInput);
 	}
 
 	type Category = (typeof MainCategories)[keyof typeof MainCategories];
@@ -140,7 +157,6 @@
 			id="subcategory-selection"
 			name="subcategory"
 			class="select select-bordered w-full"
-			required
 			bind:value={selectedSubcategory}
 		>
 			{#each subcategoriesList as secondCategory}
@@ -152,12 +168,19 @@
 	<div>
 		<label for="images" class="label label-text">Zdjęcie</label>
 		<input
-			name="images"
 			multiple
 			type="file"
 			accept="image/*"
 			class="file-input file-input-bordered file-input-secondary w-full"
 			on:change={onAddImages}
+		/>
+		<input
+			name="images"
+			multiple
+			type="file"
+			accept="image/*"
+			class="w-0 h-0"
+			bind:this={realImagesInput}
 		/>
 		<div class="grid grid-cols-2 sm:grid-cols-3 gap-2 py-2">
 			{#each files as image, index}
@@ -184,9 +207,9 @@
 						class="cursor-pointer p-1 indicator group h-full"
 					>
 						<div class="indicator h-full">
-							<!-- {#if index === 0}
+							{#if index === 0}
 								<span class="indicator-item indicator-center badge badge-accent">Miniaturka</span>
-							{/if} -->
+							{/if}
 							<img
 								src={image['base64']}
 								width="96px"
@@ -199,8 +222,9 @@
 								<button
 									class="hidden group-hover:flex bg-transparent rounded-full border border-base-content p-0.5 h-auto min-h-0"
 									type="button"
-									on:click={() => {
+									on:click={(e) => {
 										files = files.filter((file) => file.id !== image.id);
+										e.preventDefault();
 									}}><X /></button
 								>
 							</div>
