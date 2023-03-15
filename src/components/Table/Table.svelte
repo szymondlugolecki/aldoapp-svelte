@@ -89,9 +89,9 @@
 			</tfoot>
 		{/if}
 	</table>
-	{#if items && !items.length}
-		<div class="w-full h-20 flex justify-center items-center text-center">
-			<span class="text-3xl">Brak wyników... 🧐</span>
-		</div>
-	{/if}
 </div>
+{#if items && !items.length}
+	<div class="w-full h-20 flex justify-center items-center text-center mb-8">
+		<span class="text-2xl sm:text-3xl">Brak wyników... 🧐</span>
+	</div>
+{/if}

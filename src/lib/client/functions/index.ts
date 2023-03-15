@@ -105,9 +105,9 @@ export const applyProductFilters = (
 	return products.filter(dateFilter).filter(authorsFilter).filter(productSearchFilter);
 };
 
-export const arrayUniqueByKey = <T>(arr: T, key: string) =>
+export const arrayUniqueByKey = <T>(arr: T[], key: keyof T) =>
 	[
 		...new Map(
 			Array.isArray(arr) ? arr.filter(Boolean).map((item) => [item[key], item]) : []
 		).values()
-	] as T;
+	] as T[];

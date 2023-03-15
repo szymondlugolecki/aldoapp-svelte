@@ -26,8 +26,10 @@
 	>
 {:else if rowType === 'action'}
 	{#if user.role !== 'admin' || user.id === $page.data.user?.id}
+		<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 		<label
 			for="admin-drawer"
+			tabindex="0"
 			class="btn btn-ghost btn-sm"
 			on:keypress={(e) => {
 				if (e.key === 'Enter') {

@@ -50,8 +50,10 @@
 			</form>
 		</div>
 		<div class="flex items-center space-x-2 w-full md:w-auto">
+			<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 			<label
 				for="admin-drawer"
+				tabindex="0"
 				class="btn btn-primary flex-1 w-auto md:min-w-[220px] text-[0px] sm:text-sm"
 				on:keypress={(e) => {
 					if (e.key === 'Enter') {
@@ -72,8 +74,10 @@
 				<Plus class="mr-1" />
 				{addNewItemText}
 			</label>
+			<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 			<label
 				id="filterDropdownButton"
+				tabindex="0"
 				for="admin-drawer"
 				class="drawer-button btn btn-accent flex-1 w-auto md:min-w-[220px] text-[0px] sm:text-sm"
 				on:keypress={(e) => {

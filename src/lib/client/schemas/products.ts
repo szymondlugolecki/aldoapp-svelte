@@ -63,13 +63,20 @@ export const imagesValidation = z
 	.optional();
 // type Images = z.infer<typeof imagesValidation>;
 
+export const priceValidation = z
+	.number({
+		required_error: 'Cena jest wymagana'
+	})
+	.min(0, { message: 'Niepoprawna cena' });
+
 export const addProductSchema = z.object({
 	name: nameValidation,
 	symbol: symbolValidation,
 	description: descriptionValidation,
 	images: imagesValidation,
 	category: categoryValidation,
-	subcategory: subcategoryValidation
+	subcategory: subcategoryValidation,
+	price: priceValidation
 });
 
 export const editProductSchema = z.object({
@@ -79,7 +86,8 @@ export const editProductSchema = z.object({
 	description: descriptionValidation,
 	images: imagesValidation,
 	category: categoryValidation,
-	subcategory: subcategoryValidation
+	subcategory: subcategoryValidation,
+	price: priceValidation
 });
 
 export const removeProductSchema = z.object({
