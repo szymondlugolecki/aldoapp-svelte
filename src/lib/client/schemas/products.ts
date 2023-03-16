@@ -1,11 +1,17 @@
 import { z } from 'zod';
 import {
 	MainCategories as MainCategoriesObj,
-	type MainCategories as MainCategoriesType
+	Producent as ProducentObj,
+	type MainCategories as MainCategoriesType,
+	type Producent as ProducentType
 } from '@prisma/client';
 import { fodderCategories } from '../constants';
 
 type SubCategories = (typeof fodderCategories)[keyof typeof fodderCategories][number]['id'];
+
+const producentsList = Object.keys(ProducentObj) as ProducentType[];
+
+const PRODUCENTS: [ProducentType, ...ProducentType[]] = ['deheus', ...producentsList.slice(1)];
 
 const CATEGORIES: [MainCategoriesType, ...MainCategoriesType[]] = [
 	MainCategoriesObj['cattle'],
@@ -77,9 +83,10 @@ export const symbolValidation = z
 	.trim();
 
 export const descriptionValidation = z
-	.string({ required_error: 'Opis jest wymagany', invalid_type_error: 'Nieprawidłowy opis' })
-	.max(256, { message: 'Zbyt długi opis, maksymalnie 256 znaków' })
-	.trim();
+	.string({ invalid_type_error: 'Nieprawidłowy opis' })
+	.max(512, { message: 'Zbyt długi opis, maksymalnie 512 znaków' })
+	.trim()
+	.optional();
 
 export const imagesValidation = z
 	.array(z.instanceof(File, { message: 'Nieprawidłowy plik' }), {
@@ -94,6 +101,29 @@ export const priceValidation = z
 	})
 	.min(0, { message: 'Niepoprawna cena' });
 
+export const weightValidation = z
+	.number({
+		required_error: 'Waga jest wymagana',
+		invalid_type_error: 'Nieprawidłowa waga'
+	})
+	.min(0, { message: 'Niepoprawna waga' });
+
+export const producentValidation = z.enum(PRODUCENTS, {
+	errorMap(issue) {
+		switch (issue.code) {
+			case 'invalid_type':
+				return { message: 'Nieprawidłowy producent' };
+				break;
+			case 'invalid_enum_value':
+				return { message: 'Nieprawidłowy producent' };
+				break;
+			default:
+				return { message: 'Niespodziewany błąd: producent' };
+				break;
+		}
+	}
+});
+
 export const addProductSchema = z.object({
 	name: nameValidation,
 	symbol: symbolValidation,
@@ -101,7 +131,9 @@ export const addProductSchema = z.object({
 	images: imagesValidation,
 	category: categoryValidation,
 	subcategory: subcategoryValidation,
-	price: priceValidation
+	price: priceValidation,
+	weight: weightValidation,
+	producent: producentValidation
 });
 
 export const editProductSchema = z.object({

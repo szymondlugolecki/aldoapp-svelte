@@ -24,6 +24,11 @@ enum MainCategories {
   backyard
 }
 
+enum Producent {
+  deheus
+  unknown
+}
+
 model User {
   id                String             @id @default(uuid())
   email             String             @unique
@@ -67,11 +72,13 @@ model Order {
 model Product {
   id          String         @id @default(uuid())
   name        String
-  description String
+  description String?
   symbol      String
   category    MainCategories
   subcategory String
   price       Float
+  weight      Float
+  producent   Producent
   images      Image[]
   author      User           @relation(fields: [userId], references: [id])
   userId      String

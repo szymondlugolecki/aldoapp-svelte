@@ -30,7 +30,7 @@
 </script>
 
 <div class="overflow-x-auto w-full">
-	<table class="table table-zebra w-full">
+	<table class="table w-full">
 		<!-- head -->
 		<thead>
 			<tr>
@@ -48,7 +48,7 @@
 		<tbody>
 			{#if items}
 				{#each items as item (item.id)}
-					<tr>
+					<tr class="hover">
 						{#if isProductItem(type, item) && productHeaders}
 							{#each productHeaders as header}
 								<td>

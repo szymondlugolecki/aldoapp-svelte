@@ -19,7 +19,14 @@ export type ProductFilter = {
 	until: string | null;
 };
 
-export type ProductRowType = 'image' | 'name' | 'description' | 'author' | 'action' | 'addedAt';
+export type ProductRowType =
+	| 'image'
+	| 'name'
+	| 'description'
+	| 'author'
+	| 'action'
+	| 'category'
+	| 'extra';
 
 export interface FileWithBase64 extends File {
 	base64?: string;

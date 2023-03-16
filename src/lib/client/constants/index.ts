@@ -8,13 +8,20 @@ type SalesmenMenuType = {
 	href: ShortService;
 };
 
+export const producentsList = {
+	deheus: 'De Heus',
+	unknown: 'Nieznany'
+} as const;
+
 export const productTable = {
 	image: 'Zdjęcie',
 	name: 'Nazwa i symbol',
 	description: 'Opis',
 	author: 'Dodał(a)',
 	action: 'Akcja',
-	addedAt: 'Dodano'
+	addedAt: 'Dodano',
+	extra: 'Dodatkowe informacje',
+	category: 'Kategoria'
 } as const;
 
 export const userTable = {

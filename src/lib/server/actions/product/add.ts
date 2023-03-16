@@ -23,7 +23,8 @@ const add: Action = async ({ request, locals }) => {
 
 	const data = {
 		...Object.fromEntries(formData),
-		price: Number(formData.get('price')),
+		weight: Number(formData.get('weight')?.toString().replace(',', '.')),
+		price: Number(formData.get('price')?.toString().replace(',', '.')),
 		images: imageArray
 	};
 
@@ -35,7 +36,8 @@ const add: Action = async ({ request, locals }) => {
 			errors: addProductParseError
 		});
 	}
-	const { name, symbol, description, images, category, subcategory } = addProductObj;
+	const { name, symbol, description, images, category, subcategory, price, weight, producent } =
+		addProductObj;
 
 	// Handle the thumbnail
 	let imagesURL: string[] = [];
@@ -98,12 +100,16 @@ const add: Action = async ({ request, locals }) => {
 					}
 				},
 				category,
-				subcategory: subcategory ?? ''
+				subcategory: subcategory ?? '',
+				price,
+				weight,
+				producent
 			}
 		})
 	);
 
 	if (addProductError) {
+		console.log('addProductError', addProductError);
 		return fail(500, {
 			errors: ['Nie udało się dodać produktu']
 		});

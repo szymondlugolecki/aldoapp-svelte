@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { enhance } from '$app/forms';
-	import { fodderCategories, fodderNames } from '$lib/client/constants';
+	import { fodderCategories, fodderNames, producentsList } from '$lib/client/constants';
 	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import { drawer } from '$lib/client/stores/adminDrawer';
 	import type { Category, FileInputEvent, FileWithBase64, ImagesList } from '$types';
-	import { MainCategories } from '@prisma/client';
+	import { MainCategories, Producent } from '@prisma/client';
 	import { Edit, PlusCircle, Trash2, X } from 'lucide-svelte';
 
 	let images: ImagesList = {};
@@ -69,6 +69,10 @@
 	let selectedCategory: Category = 'cattle';
 	let selectedSubcategory: (typeof fodderCategories)[keyof typeof fodderCategories][number]['id'];
 
+	let selectedProducent: Producent = 'deheus';
+
+	let producentsListTyped = Object.keys(producentsList) as Producent[];
+
 	$: subcategoriesList = fodderCategories[selectedCategory];
 </script>
 
@@ -123,7 +127,7 @@
 		>
 	</div>
 	<div>
-		<label for="name" class="label label-text"> Nazwa </label>
+		<label for="name" class="label label-text"> Nazwa* </label>
 		<input
 			type="text"
 			name="name"
@@ -132,28 +136,61 @@
 			required
 		/>
 	</div>
+
+	<div>
+		<label for="name" class="label label-text"> Symbol* </label>
+		<input
+			type="text"
+			name="symbol"
+			placeholder="np. 100004775"
+			class="input input-bordered w-full text-base-content"
+			required
+		/>
+	</div>
+
 	<div class="flex space-x-4">
 		<div class="flex-1">
-			<label for="name" class="label label-text"> Symbol </label>
-			<input
-				type="text"
-				name="symbol"
-				placeholder="np. 100004775"
-				class="input input-bordered w-full text-base-content"
-				required
-			/>
-		</div>
-		<div class="w-28 sm:w-36">
-			<label for="price" class="label label-text"> Cena </label>
+			<label for="price" class="label label-text"> Cena* </label>
 			<input
 				type="number"
+				step="0.01"
+				min="0"
 				name="price"
 				placeholder="np. 49,99"
 				class="input input-bordered w-full text-base-content"
 				required
 			/>
 		</div>
+
+		<div class="flex-1">
+			<label for="producent" class="label label-text"> Producent* </label>
+			<select
+				id="producent"
+				name="producent"
+				class="select select-bordered w-full"
+				required
+				bind:value={selectedProducent}
+			>
+				{#each producentsListTyped as producent}
+					<option value={producent}>{producentsList[producent]}</option>
+				{/each}
+			</select>
+		</div>
+
+		<div class="flex-1">
+			<label for="weight" class="label label-text"> Waga (kg)* </label>
+			<input
+				name="weight"
+				placeholder="np. 25kg"
+				type="number"
+				step="0.01"
+				min="0"
+				class="input input-bordered w-full text-base-content"
+				required
+			/>
+		</div>
 	</div>
+
 	<div>
 		<label for="description" class="label label-text">Opis</label>
 		<textarea
@@ -166,7 +203,7 @@
 
 	<div class="flex justify-between items-center space-x-2">
 		<div class="flex-1 max-w-[190px]">
-			<label for="name" class="label label-text"> Kategoria </label>
+			<label for="name" class="label label-text"> Kategoria* </label>
 			<select
 				id="category"
 				name="category"
@@ -186,7 +223,7 @@
 		</div>
 
 		<div class="flex-1">
-			<label for="name" class="label label-text"> Podkategoria </label>
+			<label for="name" class="label label-text"> Podkategoria* </label>
 			<select
 				id="subcategory"
 				name="subcategory"
@@ -202,6 +239,9 @@
 
 	<div>
 		<label for="images" class="label label-text">Zdjęcie</label>
+		<span class="label label-text text-xs py-0"
+			>Pierwsze zdjęcie będzie traktowane jako główne (miniaturka)</span
+		>
 		<div class="grid grid-cols-2 sm:grid-cols-3 gap-2 py-2">
 			{#each Object.entries(images) as [id, imageFile] (id)}
 				<div class="w-fit flex-col">

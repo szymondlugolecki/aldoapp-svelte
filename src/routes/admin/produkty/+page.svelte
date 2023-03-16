@@ -1,6 +1,4 @@
 <script lang="ts">
-	import EditProductModal from '$components/Modals/Product/EditProduct.svelte';
-	import ProductFilterModal from '$components/Modals/Product/RemoveProduct.svelte';
 	import TableHeader from '$components/Table/TableHeader.svelte';
 	import Drawer from '$components/AdminDrawer.svelte';
 
@@ -64,7 +62,7 @@
 
 	<Table
 		type="products"
-		productHeaders={['image', 'name', 'description', 'author', 'action', 'addedAt']}
+		productHeaders={['image', 'name', 'category', 'author', 'extra', 'action', 'description']}
 		items={products}
 	/>
 
