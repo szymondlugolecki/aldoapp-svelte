@@ -21,7 +21,16 @@ module.exports = {
 					'base-100': '#121212'
 				}
 			},
-			'light'
+			{
+				light: {
+					...require('daisyui/src/colors/themes')['[data-theme=light]'],
+					primary: '#51cf66',
+					secondary: '#94d82d',
+					accent: '#fab005',
+					neutral: '#1c1917',
+					'base-100': '#f8f9fa'
+				}
+			}
 		]
 	}
 };
