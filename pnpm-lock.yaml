@@ -20,7 +20,6 @@ specifiers:
   eslint: ^8.35.0
   eslint-config-prettier: ^8.7.0
   eslint-plugin-svelte3: ^4.0.0
-  flowbite-svelte: ^0.29.13
   jose: ^4.13.1
   lucide-svelte: ^0.113.0
   postcss: ^8.4.21
@@ -71,7 +70,6 @@ devDependencies:
   eslint: 8.35.0
   eslint-config-prettier: 8.7.0_eslint@8.35.0
   eslint-plugin-svelte3: 4.0.0_edkhwr7m6j5c643qin6znnpg6e
-  flowbite-svelte: 0.29.13
   postcss: 8.4.21
   prettier: 2.8.4
   prettier-plugin-svelte: 2.9.0_gan2xfhhcbz3kbkivttwsjndea
@@ -2388,10 +2386,6 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /classnames/2.3.2:
-    resolution: {integrity: sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw==}
-    dev: true
-
   /cloudinary-core/2.13.0_lodash@4.17.21:
     resolution: {integrity: sha512-Nt0Q5I2FtenmJghtC4YZ3MZZbGg1wLm84SsxcuVwZ83OyJqG9CNIGp86CiI6iDv3QobaqBUpOT7vg+HqY5HxEA==}
     peerDependencies:
@@ -3026,22 +3020,6 @@ packages:
 
   /flatted/3.2.7:
     resolution: {integrity: sha512-5nqDSxl8nn5BSNxyR3n4I6eDmbolI6WT+QqR547RwxQapgjQBmtktdP+HTBb/a/zLsbzERTONyUB5pefh5TtjQ==}
-    dev: true
-
-  /flowbite-svelte/0.29.13:
-    resolution: {integrity: sha512-9MnJzdPyooPm4Gp6Fl+NrozNiL6eQiLQ7BdraKkH6Gh34VR4G6mFkJcG4CUptFQ84zSa0YHhF9MYcnsrK8nLsg==}
-    engines: {node: '>=16.0.0', npm: '>=7.0.0'}
-    dependencies:
-      '@popperjs/core': 2.11.6
-      classnames: 2.3.2
-      flowbite: 1.6.3
-    dev: true
-
-  /flowbite/1.6.3:
-    resolution: {integrity: sha512-wTtAzZBLrUYqUBoTSNcMAeJrZNAcdx04EDgXWnkQ7gkKoAPFvLaq/H/Zw0JKZLVKFpKxqJ7PlvocfDApSHjhvw==}
-    dependencies:
-      '@popperjs/core': 2.11.6
-      mini-svg-data-uri: 1.4.4
     dev: true
 
   /for-each/0.3.3:
@@ -3808,11 +3786,6 @@ packages:
   /mimic-response/3.1.0:
     resolution: {integrity: sha512-z0yWI+4FDrrweS8Zmt4Ej5HdJmky15+L2e6Wgn3+iK5fWzb6T3fhNFq2+MeTRb064c6Wr4N/wv0DzQTjNzHNGQ==}
     engines: {node: '>=10'}
-    dev: true
-
-  /mini-svg-data-uri/1.4.4:
-    resolution: {integrity: sha512-r9deDe9p5FJUPZAk3A59wGH7Ii9YrjjWw0jmw/liSbHl2CHiyXj6FcDXDu2K3TjVAXqiJdaw3xxwlZZr9E6nHg==}
-    hasBin: true
     dev: true
 
   /minimatch/3.1.2:

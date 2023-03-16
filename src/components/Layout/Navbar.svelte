@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { roleColors, roleNames, salesmenMenu } from '$lib/client/constants';
+	import { roleNames, salesmenMenu } from '$lib/client/constants';
 	import {
 		LogOut,
 		User,

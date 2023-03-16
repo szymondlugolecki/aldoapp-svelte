@@ -4,6 +4,8 @@
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import type { User } from '@prisma/client';
 	import createLoadingToast from '$lib/client/functions/createLoadingToast';
+	import { X } from 'lucide-svelte';
+	import { drawer } from '$lib/client/stores/adminDrawer';
 
 	export let user: User | undefined;
 </script>
@@ -13,15 +15,39 @@
 		class="flex flex-col space-y-4"
 		method="post"
 		action="?/edit"
+		on:submit={() => {
+			drawer.update((value) => {
+				if (!value) return undefined;
+				return {
+					...value,
+					open: false
+				};
+			});
+		}}
 		use:enhance={() => {
 			const toastId = createLoadingToast('please-wait');
 			return async ({ result, update }) => {
 				handleFormResponse(result, toastId);
+				drawer.set(undefined);
 				update();
 			};
 		}}
 	>
-		<h3 class="text-xl font-medium text-base-content p-0">Edytuj użytkownika</h3>
+		<div class="flex justify-between items-center">
+			<h3 class="text-xl font-medium text-base-content p-0">Edytuj użytkownika</h3>
+			<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+			<label
+				tabindex="0"
+				for="admin-drawer"
+				class="btn btn-ghost rounded-full px-3"
+				on:keypress={function (event) {
+					if (event.key === 'Enter') {
+						event.currentTarget.click();
+					}
+				}}><X /></label
+			>
+		</div>
+
 		<div>
 			<label for="name" class="label label-text"> Imię i nazwisko </label>
 			<input

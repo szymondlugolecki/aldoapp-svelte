@@ -9,14 +9,6 @@
 	export let productHeaders: ProductRowType[] | undefined = undefined;
 	export let userHeaders: UserRowType[] | undefined = undefined;
 
-	function openEditDrawer(id: string) {
-		return;
-	}
-
-	function openRemoveDrawer(id: string) {
-		return;
-	}
-
 	export let items: ProductWithAuthorAndImage[] | User[];
 
 	const isProductItem = (
@@ -38,7 +30,7 @@
 </script>
 
 <div class="overflow-x-auto w-full">
-	<table class="table w-full">
+	<table class="table table-zebra w-full">
 		<!-- head -->
 		<thead>
 			<tr>
@@ -55,25 +47,27 @@
 		</thead>
 		<tbody>
 			{#if items}
-				{#each items as item, i}
-					{#if isProductItem(type, item) && productHeaders}
-						{#each productHeaders as header}
-							<td>
-								<ProductCell product={item} rowType={productHeaders[i]} />
-							</td>
-						{/each}
-					{:else if isUserItem(type, item) && userHeaders}
-						{#each userHeaders as header}
-							<td>
-								<UserCell user={item} rowType={header} />
-							</td>
-						{/each}
-					{/if}
+				{#each items as item (item.id)}
+					<tr>
+						{#if isProductItem(type, item) && productHeaders}
+							{#each productHeaders as header}
+								<td>
+									<ProductCell product={item} rowType={header} />
+								</td>
+							{/each}
+						{:else if isUserItem(type, item) && userHeaders}
+							{#each userHeaders as header}
+								<td>
+									<UserCell user={item} rowType={header} />
+								</td>
+							{/each}
+						{/if}
+					</tr>
 				{/each}
 			{/if}
 		</tbody>
 		<!-- foot -->
-		{#if items && items.length > 1}
+		{#if items && items.length > 4}
 			<tfoot>
 				<tr>
 					{#if productHeaders}

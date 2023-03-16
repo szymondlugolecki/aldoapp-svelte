@@ -20,39 +20,64 @@ const SUBCATEGORIES: [SubCategories, ...SubCategories[]] = [
 ];
 
 export const categoryValidation = z.enum(CATEGORIES, {
-	required_error: 'Kategoria jest wymagana',
-	invalid_type_error: 'Nieprawidłowa kategoria'
+	errorMap(issue) {
+		switch (issue.code) {
+			case 'invalid_type':
+				return { message: 'Nieprawidłowa kategoria' };
+				break;
+			case 'invalid_enum_value':
+				return { message: 'Nieprawidłowa kategoria' };
+				break;
+			default:
+				return { message: 'Niespodziewany błąd: kategoria' };
+				break;
+		}
+	}
 });
 
-// console.log('XD', categoryValidation.safeParse('cattle'));
-
-export const subcategoryValidation = z.enum(SUBCATEGORIES, {
-	required_error: 'Podkategoria jest wymagana',
-	invalid_type_error: 'Nieprawidłowa podkategoria'
-});
+export const subcategoryValidation = z
+	.enum(SUBCATEGORIES, {
+		errorMap(issue) {
+			switch (issue.code) {
+				case 'invalid_type':
+					return { message: 'Nieprawidłowa podkategoria' };
+					break;
+				case 'invalid_enum_value':
+					return { message: 'Nieprawidłowa podkategoria' };
+					break;
+				default:
+					return { message: 'Niespodziewany błąd: podkategoria' };
+					break;
+			}
+		}
+	})
+	.optional();
 
 export const idValidation = z
 	.string({
-		required_error: 'Id jest wymagane'
+		required_error: 'Id jest wymagane',
+		invalid_type_error: 'Nieprawidłowe id'
 	})
 	.uuid({ message: 'Nieprawidłowe id' });
 
 export const nameValidation = z
 	.string({
-		required_error: 'Nazwa produktu jest wymagana'
+		required_error: 'Nazwa produktu jest wymagana',
+		invalid_type_error: 'Nieprawidłowa nazwa produktu'
 	})
 	.min(1, { message: 'Niepoprawna nazwa produktu' })
 	.trim();
 
 export const symbolValidation = z
 	.string({
-		required_error: 'Symbol produktu jest wymagany'
+		required_error: 'Symbol produktu jest wymagany',
+		invalid_type_error: 'Nieprawidłowy symbol produktu'
 	})
 	.min(1, { message: 'Niepoprawny symbol produktu' })
 	.trim();
 
 export const descriptionValidation = z
-	.string()
+	.string({ required_error: 'Opis jest wymagany', invalid_type_error: 'Nieprawidłowy opis' })
 	.max(256, { message: 'Zbyt długi opis, maksymalnie 256 znaków' })
 	.trim();
 
@@ -61,11 +86,11 @@ export const imagesValidation = z
 		invalid_type_error: 'Nieprawidłowe zdjęcia'
 	})
 	.optional();
-// type Images = z.infer<typeof imagesValidation>;
 
 export const priceValidation = z
 	.number({
-		required_error: 'Cena jest wymagana'
+		required_error: 'Cena jest wymagana',
+		invalid_type_error: 'Nieprawidłowa cena'
 	})
 	.min(0, { message: 'Niepoprawna cena' });
 

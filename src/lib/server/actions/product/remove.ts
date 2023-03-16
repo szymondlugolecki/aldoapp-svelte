@@ -35,6 +35,7 @@ const remove: Action = async ({ request, locals }) => {
 	);
 
 	if (removeProductError) {
+		console.log('removeProductError', removeProductError);
 		return fail(500, {
 			errors: ['Nie udało się usunąć produktu']
 		});

@@ -1,45 +1,81 @@
 <script lang="ts">
 	import { PUBLIC_WEBSITE_URL } from '$env/static/public';
+	import { roleNames } from '$lib/client/constants';
+	import { drawer } from '$lib/client/stores/adminDrawer';
 	import type { ProductRowType, ProductWithAuthorAndImage } from '$types';
 
-	export let openEditDrawer: ((id: string) => void) | undefined = undefined;
-	export let openRemoveDrawer: ((id: string) => void) | undefined = undefined;
 	export let product: ProductWithAuthorAndImage;
 	export let rowType: ProductRowType;
 </script>
 
 {#if rowType === 'image'}
 	<a href={`${PUBLIC_WEBSITE_URL}/sklep/${product.symbol}`}>
-		<img width="96px" height="96px" src={product.images[0].url} alt="Zdjęcie produktu" />
+		<img
+			class="max-h-24"
+			width="96px"
+			height="96px"
+			src={product.images[0] && product.images[0].url}
+			alt="Zdjęcie produktu"
+		/>
 	</a>
 {:else if rowType === 'name'}
 	<span class="block">{product.name}</span>
 	<span class="block font-semibold">{product.symbol}</span>
 {:else if rowType === 'description'}
-	{product.description}
+	<span class="whitespace-pre-line">{product.description}</span>
 {:else if rowType === 'author'}
 	<div>
-		<span class="block">{product.author.fullName}</span>
-		<br />
+		<div class="flex justify-start items-center">
+			<span>{product.author.fullName}</span>
+			<span
+				class="ml-2 badge badge-sm {product.author.role === 'admin'
+					? 'badge-error'
+					: product.author.role === 'moderator'
+					? 'badge-success'
+					: 'badge-info'}">{roleNames[product.author.role]}</span
+			>
+		</div>
+
 		<span class="block">{product.author.email}</span>
-		<br />
-		<span class="badge badge-ghost badge-sm">{product.author.role}</span>
 	</div>
 {:else if rowType === 'action'}
 	<div class="flex space-y-3 flex-col justify-center items-start">
-		<button
-			on:click={() => openEditDrawer && openEditDrawer(product.id)}
-			type="button"
-			class="font-medium text-blue-400 hover:text-blue-500 duration-200">Edytuj</button
+		<button type="button" class="font-medium text-blue-400 hover:text-blue-500 duration-200"
+			>Edytuj</button
 		>
-		<button
-			on:click={() => openRemoveDrawer && openRemoveDrawer(product.id)}
-			type="button"
-			class="font-medium text-red-400 hover:text-red-500 duration-200">Usuń</button
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<label
+			for="admin-drawer"
+			on:click={() => {
+				console.log(product.symbol);
+				drawer.set({
+					open: true,
+					id: product.id,
+					type: 'product',
+					action: 'remove'
+				});
+			}}
+			class="cursor-pointer font-medium text-red-400 hover:text-red-500 duration-200">Usuń</label
 		>
 	</div>
 {:else if rowType === 'addedAt'}
-	<div class="text-sm text-gray-500" title={new Date(product.createdAt).toLocaleString()}>
-		{new Date(product.createdAt).toLocaleDateString()}
+	<div
+		class="tooltip"
+		data-tip={product.createdAt.toLocaleDateString('pl-PL', {
+			month: 'long',
+			day: 'numeric',
+			year: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit',
+			second: '2-digit'
+		})}
+	>
+		<span
+			>{product.createdAt.toLocaleDateString('pl-PL', {
+				month: 'short',
+				day: 'numeric',
+				year: 'numeric'
+			})}</span
+		>
 	</div>
 {/if}

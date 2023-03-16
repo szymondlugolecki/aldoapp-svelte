@@ -1,4 +1,4 @@
-import type { RoleColor, ShortService, Outlets } from '$types';
+import type { ShortService, Outlets } from '$types';
 import { MainCategories, type Role } from '@prisma/client';
 
 type SalesmenMenuType = {
@@ -190,10 +190,10 @@ export const shopMenu = [
 	}
 ];
 
-export const roleColors: Record<Role, RoleColor> = {
-	customer: 'blue',
-	moderator: 'green',
-	admin: 'red'
+export const badgeRoleColors = {
+	customer: 'badge-info',
+	moderator: 'badge-success',
+	admin: 'badge-error'
 };
 
 export const roleNames: Record<Role, string> = {

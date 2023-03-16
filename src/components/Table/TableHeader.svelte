@@ -58,14 +58,15 @@
 				on:keypress={(e) => {
 					if (e.key === 'Enter') {
 						drawer.set({
+							open: true,
 							action: 'add',
 							type
 						});
 					}
 				}}
 				on:click={() => {
-					console.log('action: add, type: ', type);
 					drawer.set({
+						open: true,
 						action: 'add',
 						type
 					});
@@ -83,6 +84,7 @@
 				on:keypress={(e) => {
 					if (e.key === 'Enter') {
 						drawer.set({
+							open: true,
 							action: 'filter',
 							type
 						});
@@ -90,6 +92,7 @@
 				}}
 				on:click={() =>
 					drawer.set({
+						open: true,
 						action: 'filter',
 						type
 					})}

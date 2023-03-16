@@ -4,7 +4,7 @@ import add from '$lib/server/actions/product/add';
 import edit from '$lib/server/actions/product/edit';
 import remove from '$lib/server/actions/product/remove';
 
-export const load = () => {
+export const load = async () => {
 	return {
 		products: prisma.product.findMany({
 			include: {

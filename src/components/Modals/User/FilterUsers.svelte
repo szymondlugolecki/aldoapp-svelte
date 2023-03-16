@@ -1,11 +1,25 @@
 <script lang="ts">
-	import { Modal, Checkbox } from 'flowbite-svelte';
 	import type { UserFilter } from '$types';
+	import { X } from 'lucide-svelte';
 	export let filter: UserFilter;
 </script>
 
 <div class="flex flex-col space-y-4">
-	<h3 class="text-xl font-medium text-base-content p-0">Filtrowanie</h3>
+	<div class="flex justify-between items-center">
+		<h3 class="text-xl font-medium text-base-content p-0">Filtrowanie</h3>
+		<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+		<label
+			tabindex="0"
+			for="admin-drawer"
+			class="btn btn-ghost rounded-full px-3"
+			on:keypress={function (event) {
+				if (event.key === 'Enter') {
+					event.currentTarget.click();
+				}
+			}}><X /></label
+		>
+	</div>
+
 	<div class="space-y-0.5">
 		<span class="block">Rola</span>
 

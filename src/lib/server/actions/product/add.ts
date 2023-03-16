@@ -5,7 +5,6 @@ import { cloudinary } from '$lib/server/clients/cloudinaryClient';
 import { trytm } from '@bdsqqq/try';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { errorResponses } from '$lib/client/constants/errorResponses';
-import type { UploadApiResponse } from 'cloudinary';
 
 const add: Action = async ({ request, locals }) => {
 	// Only moderators and admins are allowed to add a product
@@ -17,13 +16,23 @@ const add: Action = async ({ request, locals }) => {
 	}
 
 	// Validate the user input
-	const data = Object.fromEntries(await request.formData());
+	const formData = await request.formData();
+	// Need to extract the images from the formData before using Object.fromEntries
+	// Because then the images overwrite each other
+	const imageArray = formData.getAll('images');
+
+	const data = {
+		...Object.fromEntries(formData),
+		price: Number(formData.get('price')),
+		images: imageArray
+	};
+
 	console.log('data', data);
 
 	const [addProductObj, addProductParseError] = betterZodParse(addProductSchema, data);
 	if (addProductParseError) {
 		return fail(400, {
-			errors: ['Niepoprawne dane']
+			errors: addProductParseError
 		});
 	}
 	const { name, symbol, description, images, category, subcategory } = addProductObj;
@@ -34,40 +43,44 @@ const add: Action = async ({ request, locals }) => {
 	if (images && images.length) {
 		const totalImagesSize = images.reduce((acc, curr) => acc + curr.size, 0) / 1024 / 1024; // in MiB
 
-		if (totalImagesSize > 3) {
+		console.log('totalImagesSize', totalImagesSize);
+
+		if (totalImagesSize > 10) {
 			return fail(400, {
-				errors: ['Maxymalny rozmiar zdjęć to 3MB']
+				errors: ['Maxymalny rozmiar zdjęć to 10MB']
 			});
 		}
 
-		const uploadPromises: Promise<UploadApiResponse>[] = [];
+		try {
+			const uploadPromises = images
+				.filter((img) => img.size > 0)
+				.map(async (image, index) => {
+					console.log('poggers', index);
+					const imageArrayBuffer = await image.arrayBuffer();
+					const imageBuffer = Buffer.from(imageArrayBuffer).toString('base64');
+					console.log('imageBuffer', imageBuffer.slice(0, 125));
+					const result = await cloudinary.uploader.upload(
+						`data:${image.type};base64,${imageBuffer}`,
+						{
+							public_id: `products/${symbol}/${index}`,
+							overwrite: true
+						}
+					);
+					return result;
+				});
 
-		images.forEach(async (image, index) => {
-			if (image.size === 0) {
-				return;
-			}
+			const result = await Promise.all(uploadPromises);
 
-			const imageArrBuffer = await image.arrayBuffer();
-			const base64Image = Buffer.from(imageArrBuffer).toString('base64');
-
-			uploadPromises.push(
-				cloudinary.uploader.upload(base64Image, {
-					public_id: `produkty/${symbol}/${index}`,
-					overwrite: true
-				})
-			);
-		});
-
-		const [result, productThumbnailUploadError] = await trytm(Promise.all(uploadPromises));
-
-		if (productThumbnailUploadError) {
+			imagesURL = result.map((image) => image.secure_url);
+		} catch (error) {
+			// console.error(error);
 			return fail(400, {
 				errors: ['Wystąpił błąd poczas przesyłania zdjęć']
 			});
 		}
-
-		imagesURL = result.map((image) => image.secure_url);
 	}
+
+	console.log('imagesURL', imagesURL);
 
 	// Add the product to the database
 	const [, addProductError] = await trytm(
@@ -85,7 +98,7 @@ const add: Action = async ({ request, locals }) => {
 					}
 				},
 				category,
-				subcategory
+				subcategory: subcategory ?? ''
 			}
 		})
 	);

@@ -1,30 +1,22 @@
 <script lang="ts">
-	import RemoveProductModal from '$components/Modals/Product/RemoveProductModal.svelte';
 	import EditProductModal from '$components/Modals/Product/EditProduct.svelte';
-	import ProductFilterModal from '$components/Modals/Product/ProductFilterModal.svelte';
+	import ProductFilterModal from '$components/Modals/Product/RemoveProduct.svelte';
 	import TableHeader from '$components/Table/TableHeader.svelte';
 	import Drawer from '$components/AdminDrawer.svelte';
 
 	import { applyProductFilters, arrayUniqueByKey } from '$lib/client/functions';
-	import type { ProductFilter } from '$types';
+	import type { ProductFilter, ProductWithAuthorAndImage } from '$types';
 	import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 	import Table from '$components/Table/Table.svelte';
 	import { drawer } from '$lib/client/stores/adminDrawer';
 	import NewProduct from '$components/Modals/Product/NewProduct.svelte';
 	import EditProduct from '$components/Modals/Product/EditProduct.svelte';
+	import RemoveProduct from '$components/Modals/Product/RemoveProduct.svelte';
 
 	export let data;
 
 	let searchInput = '';
 	let authorFilterSearchInput = '';
-
-	let newProductModalOpen = false;
-	let editProductModalOpen = false;
-	let filterProductModalOpen = false;
-	let removeProductModalOpen = false;
-
-	let editModalProductId: string;
-	let removeModalProductId: string;
 
 	let filter: ProductFilter = {
 		excludedUserIds: [],
@@ -42,16 +34,6 @@
 		'id'
 	);
 
-	const openEditModal = (id: string) => {
-		editModalProductId = id;
-		editProductModalOpen = true;
-	};
-
-	const openRemoveModal = (id: string) => {
-		removeModalProductId = id;
-		removeProductModalOpen = true;
-	};
-
 	// Final list of products filtered by the input from the searchbar, etc.
 	$: products = applyProductFilters(
 		data.products.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
@@ -59,20 +41,14 @@
 		searchInput
 	);
 
-	$: editProductModal = products.find((product) => product.id === editModalProductId);
-	$: removeProductModal = products.find((product) => product.id === removeModalProductId);
+	let product: ProductWithAuthorAndImage | undefined;
 
-	const getProductFromDrawer = () => {
-		const drawerS = $drawer;
-		if (
-			drawerS &&
-			(drawerS.action === 'edit' || drawerS.action === 'remove') &&
-			drawerS.type === 'product'
-		) {
-			const user = data.products.find((user) => user.id === drawerS.id);
-			return user;
+	drawer.subscribe((value) => {
+		if (!value || value.type !== 'product') return;
+		if (value.action === 'edit' || value.action === 'remove') {
+			product = data.products.find((product) => product.id === value.id);
 		}
-	};
+	});
 </script>
 
 <svelte:head>
@@ -97,9 +73,12 @@
 			{#if $drawer.action === 'add'}
 				<NewProduct />
 			{:else if $drawer.action === 'edit'}
-				<EditProduct product={getProductFromDrawer()} />
+				<EditProduct bind:product />
 			{:else if $drawer.action === 'filter'}
 				<!-- <FilterUsers bind:filter /> -->
+			{:else if $drawer.action === 'remove'}
+				<!-- <FilterUsers bind:filter /> -->
+				<RemoveProduct bind:product />
 			{/if}
 		{/if}
 	</Drawer>

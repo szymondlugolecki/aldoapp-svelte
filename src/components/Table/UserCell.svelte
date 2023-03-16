@@ -34,6 +34,7 @@
 			on:keypress={(e) => {
 				if (e.key === 'Enter') {
 					drawer.set({
+						open: true,
 						id: user.id,
 						action: 'edit',
 						type: 'user'
@@ -42,6 +43,7 @@
 			}}
 			on:click={() =>
 				drawer.set({
+					open: true,
 					id: user.id,
 					action: 'edit',
 					type: 'user'

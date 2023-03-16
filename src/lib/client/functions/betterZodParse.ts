@@ -9,10 +9,12 @@ export const betterZodParse = <T extends z.ZodTypeAny>(
 		return [data, null];
 	} catch (throwable) {
 		if (throwable instanceof ZodError) {
+			console.log(throwable.formErrors);
 			const { fieldErrors: errors } = throwable.flatten();
 			const errorList = Object.values(errors)
 				.flatMap((x) => x)
 				.filter(Boolean) as string[];
+			console.log(errors);
 			return [null, errorList];
 		}
 
