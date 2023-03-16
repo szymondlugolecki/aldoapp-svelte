@@ -50,19 +50,19 @@
 		>{product.description ? product.description.slice(60) : 'Brak opisu...'}</span
 	>
 {:else if rowType === 'author'}
-	<div>
+	<div class="flex flex-col justify-center items-start">
+		<span
+			class="badge badge-sm {product.author.role === 'admin'
+				? 'badge-error'
+				: product.author.role === 'moderator'
+				? 'badge-success'
+				: 'badge-info'}">{roleNames[product.author.role]}</span
+		>
 		<div class="flex justify-start items-center">
-			<span>{product.author.fullName}</span>
-			<span
-				class="ml-2 badge badge-sm {product.author.role === 'admin'
-					? 'badge-error'
-					: product.author.role === 'moderator'
-					? 'badge-success'
-					: 'badge-info'}">{roleNames[product.author.role]}</span
-			>
+			<div class="tooltip mt-2" data-tip={product.author.email}>
+				<span>{product.author.fullName}</span>
+			</div>
 		</div>
-
-		<span class="block">{product.author.email}</span>
 
 		<div
 			class="tooltip mt-2"
