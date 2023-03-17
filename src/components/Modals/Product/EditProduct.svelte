@@ -15,6 +15,7 @@
 	} from '$types';
 	import { MainCategories } from '@prisma/client';
 	import { Edit, PlusCircle, Trash2, X } from 'lucide-svelte';
+	import ModalHeader from '../ModalHeader.svelte';
 
 	export let product: ProductWithAuthorAndImage | undefined;
 
@@ -110,20 +111,8 @@
 			};
 		}}
 	>
-		<div class="flex justify-between items-center">
-			<h3 class="text-xl font-medium p-0 text-base-content">Dodaj nowy produkt</h3>
-			<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-			<label
-				tabindex="0"
-				for="admin-drawer"
-				class="btn btn-ghost rounded-full px-3"
-				on:keypress={function (event) {
-					if (event.key === 'Enter') {
-						event.currentTarget.click();
-					}
-				}}><X /></label
-			>
-		</div>
+		<ModalHeader title="Edytuj produkt" />
+
 		<div>
 			<label for="name" class="label label-text"> Nazwa </label>
 			<input

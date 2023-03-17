@@ -8,6 +8,7 @@
 	import type { Category, FileInputEvent, FileWithBase64, ImagesList } from '$types';
 	import { MainCategories, Producent } from '@prisma/client';
 	import { Edit, PlusCircle, Trash2, X } from 'lucide-svelte';
+	import ModalHeader from '../ModalHeader.svelte';
 
 	let images: ImagesList = {};
 
@@ -112,20 +113,7 @@
 		};
 	}}
 >
-	<div class="flex justify-between items-center">
-		<h3 class="text-xl font-medium p-0 text-base-content">Dodaj nowy produkt</h3>
-		<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-		<label
-			tabindex="0"
-			for="admin-drawer"
-			class="btn btn-ghost rounded-full px-3"
-			on:keypress={function (event) {
-				if (event.key === 'Enter') {
-					event.currentTarget.click();
-				}
-			}}><X /></label
-		>
-	</div>
+	<ModalHeader title="Dodaj nowy produkt" />
 	<div>
 		<label for="name" class="label label-text"> Nazwa* </label>
 		<input
@@ -148,21 +136,36 @@
 		/>
 	</div>
 
-	<div class="flex space-x-4">
-		<div class="flex-1">
-			<label for="price" class="label label-text"> Cena* </label>
-			<input
-				type="number"
-				step="0.01"
-				min="0"
-				name="price"
-				placeholder="np. 49,99"
-				class="input input-bordered w-full text-base-content"
-				required
-			/>
+	<div class="flex flex-col">
+		<div class="flex flex-row space-x-4">
+			<div class="flex-1">
+				<label for="price" class="label label-text"> Cena* </label>
+				<input
+					type="number"
+					step="0.01"
+					min="0"
+					name="price"
+					placeholder="np. 49,99"
+					class="input input-bordered w-full text-base-content"
+					required
+				/>
+			</div>
+
+			<div class="flex-1">
+				<label for="weight" class="label label-text"> Waga (kg)* </label>
+				<input
+					name="weight"
+					placeholder="np. 25kg"
+					type="number"
+					step="0.01"
+					min="0"
+					class="input input-bordered w-full text-base-content"
+					required
+				/>
+			</div>
 		</div>
 
-		<div class="flex-1">
+		<div>
 			<label for="producent" class="label label-text"> Producent* </label>
 			<select
 				id="producent"
@@ -175,19 +178,6 @@
 					<option value={producent}>{producentsList[producent]}</option>
 				{/each}
 			</select>
-		</div>
-
-		<div class="flex-1">
-			<label for="weight" class="label label-text"> Waga (kg)* </label>
-			<input
-				name="weight"
-				placeholder="np. 25kg"
-				type="number"
-				step="0.01"
-				min="0"
-				class="input input-bordered w-full text-base-content"
-				required
-			/>
 		</div>
 	</div>
 

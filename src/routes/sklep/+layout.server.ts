@@ -8,7 +8,12 @@ export const load = () => {
 				name: true,
 				symbol: true,
 				description: true,
-				images: true
+				images: true,
+				weight: true,
+				price: true,
+				category: true,
+				subcategory: true,
+				producent: true
 			},
 			skip: 0,
 			take: 10

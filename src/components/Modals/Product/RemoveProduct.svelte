@@ -5,6 +5,7 @@
 	import { drawer } from '$lib/client/stores/adminDrawer';
 	import type { ProductWithAuthorAndImage } from '$types';
 	import { X } from 'lucide-svelte';
+	import ModalHeader from '../ModalHeader.svelte';
 
 	export let product: ProductWithAuthorAndImage | undefined;
 </script>
@@ -33,20 +34,7 @@
 			};
 		}}
 	>
-		<div class="flex justify-between items-center">
-			<h3 class="text-xl font-medium p-0 text-base-content">Usuń produkt</h3>
-			<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-			<label
-				tabindex="0"
-				on:keypress={function (event) {
-					if (event.key === 'Enter') {
-						event.currentTarget.click();
-					}
-				}}
-				for="admin-drawer"
-				class="btn btn-ghost rounded-full px-3"><X /></label
-			>
-		</div>
+		<ModalHeader title="Usuń produkt" />
 
 		<h4>Czy na pewno chcesz usunąć produkt?</h4>
 
@@ -55,9 +43,18 @@
 		</p>
 
 		<div class="w-full flex space-x-4">
-			<button type="submit" class="btn btn-error flex-1">Tak, usuń ⚠️</button>
 			<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-			<label tabindex="0" for="admin-drawer" class="btn btn-info flex-1">Nie, cofnij 😮‍💨</label>
+			<label
+				on:keypress={function (event) {
+					if (event.key === 'Enter') {
+						event.currentTarget.click();
+					}
+				}}
+				tabindex="0"
+				for="admin-drawer"
+				class="btn btn-info flex-1">Nie, cofnij 😮‍💨</label
+			>
+			<button type="submit" class="btn btn-error flex-1">Tak, usuń ⚠️</button>
 		</div>
 
 		<input hidden value={product.id} name="id" id="id" />

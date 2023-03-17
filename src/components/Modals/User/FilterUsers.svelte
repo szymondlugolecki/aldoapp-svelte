@@ -1,24 +1,12 @@
 <script lang="ts">
 	import type { UserFilter } from '$types';
 	import { X } from 'lucide-svelte';
+	import ModalHeader from '../ModalHeader.svelte';
 	export let filter: UserFilter;
 </script>
 
 <div class="flex flex-col space-y-4">
-	<div class="flex justify-between items-center">
-		<h3 class="text-xl font-medium text-base-content p-0">Filtrowanie</h3>
-		<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-		<label
-			tabindex="0"
-			for="admin-drawer"
-			class="btn btn-ghost rounded-full px-3"
-			on:keypress={function (event) {
-				if (event.key === 'Enter') {
-					event.currentTarget.click();
-				}
-			}}><X /></label
-		>
-	</div>
+	<ModalHeader title="Filtrowanie" />
 
 	<div class="space-y-0.5">
 		<span class="block">Rola</span>

@@ -21,7 +21,6 @@
 	import logout from '$lib/client/functions/logout';
 	import { nextTheme, theme } from '$lib/client/stores/theme';
 	import MegaMenu from './MegaMenu.svelte';
-	import { capitalize } from '$lib/client/functions';
 	export let user: SessionUser | undefined;
 
 	$: activeUrl = $page.url.pathname.toLowerCase();
@@ -74,13 +73,6 @@
 			</div>
 		</div>
 		<div class="flex-none flex items-center">
-			<!-- <label class="swap swap-rotate">
-				<input type="checkbox" on:click={nextTheme} />
-
-				<Sun class="swap-on text-amber-500" />
-
-				<Moon class="swap-off text-sky-500" />
-			</label> -->
 			<button on:click={nextTheme} tabindex="0" class="btn btn-ghost btn-circle">
 				<div class="w-10 rounded-full flex justify-center items-center">
 					{#if $theme === 'light'}

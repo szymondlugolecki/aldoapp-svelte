@@ -1,7 +1,8 @@
-export const load = ({ locals, depends }) => {
+export const load = ({ locals, depends, url }) => {
 	depends('session');
 
 	return {
-		user: locals.session?.user
+		user: locals.session?.user,
+		url: url.href
 	};
 };

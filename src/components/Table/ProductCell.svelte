@@ -47,7 +47,7 @@
 	</div>
 {:else if rowType === 'description'}
 	<span class="whitespace-normal"
-		>{product.description ? product.description.slice(60) : 'Brak opisu...'}</span
+		>{product.description ? product.description.slice(0, 60) : 'Brak opisu...'}</span
 	>
 {:else if rowType === 'author'}
 	<div class="flex flex-col justify-center items-start">

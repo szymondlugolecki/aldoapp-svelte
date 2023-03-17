@@ -23,9 +23,10 @@
 	data-theme={$theme}
 >
 	<Toaster position="bottom-right" />
+
 	<div class="flex flex-col w-full h-full">
 		<Navbar user={data.user} />
-		<main class="min-h-[calc(100vh-65px)] flex flex-col px-3 py-2">
+		<main class="min-h-[calc(100vh-65px)] flex flex-col px-1 sm:px-3 py-1 sm:py-2 ">
 			<slot />
 		</main>
 	</div>

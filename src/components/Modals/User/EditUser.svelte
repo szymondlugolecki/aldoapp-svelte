@@ -6,6 +6,7 @@
 	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 	import { X } from 'lucide-svelte';
 	import { drawer } from '$lib/client/stores/adminDrawer';
+	import ModalHeader from '../ModalHeader.svelte';
 
 	export let user: User | undefined;
 </script>
@@ -33,20 +34,7 @@
 			};
 		}}
 	>
-		<div class="flex justify-between items-center">
-			<h3 class="text-xl font-medium text-base-content p-0">Edytuj użytkownika</h3>
-			<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-			<label
-				tabindex="0"
-				for="admin-drawer"
-				class="btn btn-ghost rounded-full px-3"
-				on:keypress={function (event) {
-					if (event.key === 'Enter') {
-						event.currentTarget.click();
-					}
-				}}><X /></label
-			>
-		</div>
+		<ModalHeader title="Edytuj użytkownika" />
 
 		<div>
 			<label for="name" class="label label-text"> Imię i nazwisko </label>
