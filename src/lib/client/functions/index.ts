@@ -1,7 +1,14 @@
 import { PUBLIC_WEBSITE_URL } from '$env/static/public';
-import type { ProductAuthor, ProductFilter, ProductWithAuthorAndImage, UserFilter } from '$types';
-import type { User } from '@prisma/client';
+import type {
+	Category,
+	ProductAuthor,
+	ProductFilter,
+	ProductWithAuthorAndImage,
+	UserFilter
+} from '$types';
+import type { Product, User } from '@prisma/client';
 import type { Thing, WithContext } from 'schema-dts';
+import { fodderCategories } from '../constants';
 
 export type Schema = Thing | WithContext<Thing>;
 
@@ -19,7 +26,7 @@ export const capitalize = (text: string) => {
 };
 
 export const textCrusher = (text: string) => {
-	return text.replace(/ /g, '').toLowerCase();
+	return text.replace(/ /g, '').toLowerCase().trim();
 };
 
 export const isValidObject = (obj: unknown): obj is Record<string, unknown> => {
@@ -99,7 +106,7 @@ export const applyProductFilters = (
 
 	const productSearchFilter = (product: ProductWithAuthorAndImage) =>
 		textCrusher(product.name).includes(textCrusher(searchInput)) ||
-		textCrusher(product.description).includes(textCrusher(searchInput)) ||
+		textCrusher(product.description || '').includes(textCrusher(searchInput)) ||
 		textCrusher(product.symbol).includes(textCrusher(searchInput));
 
 	return products.filter(dateFilter).filter(authorsFilter).filter(productSearchFilter);

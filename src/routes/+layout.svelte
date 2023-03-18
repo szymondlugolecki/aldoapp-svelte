@@ -2,7 +2,7 @@
 	import '../app.css';
 	import Navbar from '../components/Layout/Navbar.svelte';
 	import Footer from '../components/Layout/Footer.svelte';
-
+	import { fade, fly } from 'svelte/transition';
 	import { Toaster } from 'svelte-french-toast';
 
 	import { onMount } from 'svelte';
@@ -16,6 +16,8 @@
 	});
 
 	export let data;
+
+	console.log('url', data.url);
 </script>
 
 <div
@@ -26,9 +28,23 @@
 
 	<div class="flex flex-col w-full h-full">
 		<Navbar user={data.user} />
-		<main class="min-h-[calc(100vh-65px)] flex flex-col px-1 sm:px-3 py-1 sm:py-2 ">
-			<slot />
-		</main>
+		{#if data.url.includes('/admin')}
+			<main
+				in:fade
+				class="min-h-[calc(100vh-65px)] flex flex-col px-1.5 xxs:px-2 sm:px-3 py-1 sm:py-2 relative"
+			>
+				<slot />
+			</main>
+		{:else}
+			{#key data.url}
+				<main
+					in:fade
+					class="min-h-[calc(100vh-65px)] flex flex-col px-1.5 xxs:px-2  sm:px-3 py-1 sm:py-2 relative"
+				>
+					<slot />
+				</main>
+			{/key}
+		{/if}
 	</div>
 	<Footer />
 </div>

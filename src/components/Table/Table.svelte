@@ -2,6 +2,7 @@
 	import { productTable, userTable } from '$lib/client/constants';
 	import type { ProductRowType, ProductWithAuthorAndImage, UserRowType } from '$types';
 	import type { User } from '@prisma/client';
+	import { fly, slide } from 'svelte/transition';
 	import ProductCell from './ProductCell.svelte';
 	import UserCell from './UserCell.svelte';
 
@@ -89,3 +90,9 @@
 		<span class="text-2xl sm:text-3xl">Brak wyników... 🧐</span>
 	</div>
 {/if}
+
+<style>
+	.table th:first-child {
+		position: static;
+	}
+</style>

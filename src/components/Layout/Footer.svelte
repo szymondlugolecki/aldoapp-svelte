@@ -9,7 +9,7 @@
 	</div>
 	<div>
 		<div class="grid grid-flow-col gap-4">
-			<a href="/twitter"
+			<a href="/" aria-label="Profil Twitter ALDO"
 				><svg
 					xmlns="http://www.w3.org/2000/svg"
 					width="24"
@@ -21,7 +21,7 @@
 					/></svg
 				></a
 			>
-			<a href="/youtube"
+			<a href="/" aria-label="Kanał Youtube ALDO"
 				><svg
 					xmlns="http://www.w3.org/2000/svg"
 					width="24"
@@ -33,7 +33,7 @@
 					/></svg
 				></a
 			>
-			<a href="/facebook"
+			<a href="/" aria-label="Profil Facebook ALDO"
 				><svg
 					xmlns="http://www.w3.org/2000/svg"
 					width="24"

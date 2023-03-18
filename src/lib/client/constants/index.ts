@@ -1,5 +1,8 @@
 import type { ShortService, Outlets } from '$types';
-import { MainCategories, type Role } from '@prisma/client';
+import type { MainCategories, Role } from '@prisma/client';
+
+export const mainCategories = ['cattle', 'poultry', 'backyard'] as const;
+export const producents = ['deheus', 'unknown'] as const;
 
 type SalesmenMenuType = {
 	name: string;
@@ -33,14 +36,14 @@ export const userTable = {
 	profile: 'Profil'
 } as const;
 
-export const fodderNames: Record<(typeof MainCategories)[keyof typeof MainCategories], string> = {
+export const fodderNames: Record<MainCategories, string> = {
 	cattle: 'Bydło',
 	poultry: 'Drób',
 	backyard: 'Hodowla przydomowa'
 } as const;
 
 export const fodderCategories = {
-	[MainCategories['cattle']]: [
+	cattle: [
 		{
 			name: 'Pasze dla krów mlecznych',
 			id: 'cow-feed'
@@ -62,13 +65,13 @@ export const fodderCategories = {
 			id: 'calf-milk'
 		}
 	],
-	[MainCategories['poultry']]: [
+	poultry: [
 		{
 			name: 'Pasze dla niosek',
 			id: 'chick-feed'
 		}
 	],
-	[MainCategories['backyard']]: []
+	backyard: []
 } as const;
 
 // export const appData = {

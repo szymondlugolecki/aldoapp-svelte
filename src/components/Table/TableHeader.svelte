@@ -15,7 +15,7 @@
 	export let type: 'user' | 'product';
 </script>
 
-<div class="relative bg-base-100 shadow-md sm:rounded-lg">
+<div class="relative bg-base-100 shadow-md sm:rounded-lg px-2">
 	<div
 		class="flex flex-col items-center justify-between py-4 space-y-3 md:flex-row md:space-y-0 md:space-x-4"
 	>
@@ -97,7 +97,7 @@
 						type
 					})}
 				><Filter class="mr-2 w-5 h-5" />
-				Filtrowanie</label
+				Filtry</label
 			>
 		</div>
 	</div>

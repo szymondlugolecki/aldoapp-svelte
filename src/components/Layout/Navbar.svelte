@@ -17,10 +17,11 @@
 	} from 'lucide-svelte';
 	import type { Role, SessionUser } from '../../types';
 	import Img from '@zerodevx/svelte-img';
-	import logo from '$lib/assets/logo.png?run&width=55&height=40&format=webp';
+	import logo from '$lib/assets/logo.png?run&width=110&height=80&format=webp';
 	import logout from '$lib/client/functions/logout';
 	import { nextTheme, theme } from '$lib/client/stores/theme';
 	import MegaMenu from './MegaMenu.svelte';
+	import { fade, slide } from 'svelte/transition';
 	export let user: SessionUser | undefined;
 
 	$: activeUrl = $page.url.pathname.toLowerCase();
@@ -45,7 +46,8 @@
 	<div class="w-full h-full flex justify-between items-center">
 		<div class="flex">
 			<a href="/" class="btn btn-ghost normal-case text-lg sm:text-xl"
-				><span class="mr-2">Twoje</span> <Img src={logo} /></a
+				><span class="mr-2">Twoje</span>
+				<Img src={logo} height={40} width={55} alt="Logo ALDO" /></a
 			>
 		</div>
 		<div class="hidden space-x-6 md:flex justify-center items-center">
@@ -73,7 +75,12 @@
 			</div>
 		</div>
 		<div class="flex-none flex items-center">
-			<button on:click={nextTheme} tabindex="0" class="btn btn-ghost btn-circle">
+			<button
+				aria-label="Zmień szatę graficzną"
+				on:click={nextTheme}
+				tabindex="0"
+				class="btn btn-ghost btn-circle"
+			>
 				<div class="w-10 rounded-full flex justify-center items-center">
 					{#if $theme === 'light'}
 						<Sun class="swap-on text-amber-500" />
@@ -160,6 +167,7 @@
 				on:click={() => (menuOpen = !menuOpen)}
 				tabindex="0"
 				class="btn btn-ghost btn-circle md:hidden"
+				aria-label="Otwórz menu"
 			>
 				<div class="w-10 rounded-full flex justify-center items-center">
 					<Menu />
@@ -168,10 +176,16 @@
 		</div>
 	</div>
 	{#if menuOpen}
-		<div class="w-full flex flex-col justify-center items-start md:hidden mt-2 text-base-content">
+		<div
+			in:slide={{ duration: 200 }}
+			out:slide={{ duration: 100 }}
+			class="w-full flex flex-col justify-center items-start md:hidden mt-2 text-base-content"
+		>
 			{#if !user}
 				<a
-					class="p-2 w-full rounded {activeUrl === '/login' ? 'bg-primary' : ''}"
+					class="p-2 w-full rounded {activeUrl === '/login'
+						? 'bg-primary text-primary-content'
+						: ''}"
 					href="/login"
 					on:click={() => (menuOpen = false)}
 				>
@@ -180,20 +194,22 @@
 			{/if}
 
 			<a
-				class="p-2 w-full rounded {activeUrl === '/' ? 'bg-primary' : ''}"
+				class="p-2 w-full rounded {activeUrl === '/' ? 'bg-primary text-primary-content' : ''}"
 				href="/"
 				on:click={() => (menuOpen = false)}
 			>
 				<span class="flex"><Home class="mr-2" /> Strona główna</span></a
 			>
 			<a
-				class="p-2 w-full rounded {activeUrl.startsWith('/sklep') ? 'bg-primary' : ''}"
+				class="p-2 w-full rounded {activeUrl.startsWith('/sklep')
+					? 'bg-primary text-primary-content'
+					: ''}"
 				on:click={() => (menuOpen = false)}
 				href="/sklep"><span class="flex"><ShoppingCart class="mr-2" /> Sklep</span></a
 			>
 			<button
 				class="p-2 w-full rounded text-left {activeUrl.startsWith('/kontakty/')
-					? 'bg-primary text-base-content'
+					? 'bg-primary text-primary-content'
 					: ''}"
 				on:click={() => (miniMenuExpanded = !miniMenuExpanded)}
 				><span class="flex">
@@ -208,11 +224,11 @@
 						<a
 							href="/kontakty/{element.href}"
 							class="{activeUrl === `/kontakty/${element.href}`
-								? 'bg-secondary'
+								? 'bg-secondary text-secondary-content'
 								: ''} w-full rounded border-b border-gray-700 pb-2 px-2 duration-150 py-1 last:mb-2"
 							on:click={() => (menuOpen = false)}
 						>
-							<h3 class="text-base leading-6 font-medium text-base-content">{element.name}</h3>
+							<h3 class="text-base leading-6 font-medium">{element.name}</h3>
 							<p class="text-sm">{element.description}</p>
 						</a>
 					{/each}

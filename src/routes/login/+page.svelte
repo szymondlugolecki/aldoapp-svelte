@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 	import { handleFormResponse } from '$lib/client/functions/forms';
-	import logo from '$lib/assets/logo.png?run&width=68&height=50&format=webp';
+	import logo from '$lib/assets/logo.png?run&width=110&height=80&format=webp';
 	import Img from '@zerodevx/svelte-img';
 	import Danger from '$components/Alerts/Danger.svelte';
 	import Success from '$components/Alerts/Alert.svelte';
@@ -16,7 +16,7 @@
 	/>
 </svelte:head>
 
-<section class="w-full h-full flex justify-center items-center">
+<section class="w-full h-full flex justify-center items-center flex-1">
 	<div
 		class="flex flex-col items-center justify-center px-6 py-8 mx-auto w-96 shadow-2xl space-y-2"
 	>
@@ -26,10 +26,10 @@
 			Logowanie
 
 		</h1> -->
-		<a href="/#" class="flex items-center mt-6 text-2xl font-semibold text-base-content">
+		<div class="flex items-center mt-6 text-2xl font-semibold text-base-content select-none">
 			Twoje
-			<Img class="h-12 ml-2" src={logo} alt="Logo ALDO" />
-		</a>
+			<Img class="ml-2" src={logo} width={55} height={40} alt="Logo ALDO" />
+		</div>
 
 		<!-- <div class="h-0 w-full border-t border-dashed border-gray-300" /> -->
 		<div
@@ -49,7 +49,7 @@
 				>
 					<div>
 						<label for="email" class="block mb-2 text-sm font-medium text-base-content"
-							>Adres email</label
+							>Adres email*</label
 						>
 						<input
 							type="email"

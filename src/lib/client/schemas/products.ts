@@ -1,22 +1,13 @@
 import { z } from 'zod';
-import {
-	MainCategories as MainCategoriesObj,
-	Producent as ProducentObj,
-	type MainCategories as MainCategoriesType,
-	type Producent as ProducentType
-} from '@prisma/client';
-import { fodderCategories } from '../constants';
+import { fodderCategories, mainCategories, producents } from '../constants';
+import type { Category } from '$types';
 
 type SubCategories = (typeof fodderCategories)[keyof typeof fodderCategories][number]['id'];
+type Producent = (typeof producents)[number];
 
-const producentsList = Object.keys(ProducentObj) as ProducentType[];
+const PRODUCENTS: [Producent, ...Producent[]] = [producents[0], ...producents.slice(1)];
 
-const PRODUCENTS: [ProducentType, ...ProducentType[]] = ['deheus', ...producentsList.slice(1)];
-
-const CATEGORIES: [MainCategoriesType, ...MainCategoriesType[]] = [
-	MainCategoriesObj['cattle'],
-	...Object.values(MainCategoriesObj).slice(1)
-];
+const CATEGORIES: [Category, ...Category[]] = [mainCategories[0], ...mainCategories.slice(1)];
 
 const SUBCATEGORIES: [SubCategories, ...SubCategories[]] = [
 	fodderCategories['poultry'][0]['id'],

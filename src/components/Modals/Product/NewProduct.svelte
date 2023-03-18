@@ -6,9 +6,11 @@
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import { drawer } from '$lib/client/stores/adminDrawer';
 	import type { Category, FileInputEvent, FileWithBase64, ImagesList } from '$types';
-	import { MainCategories, Producent } from '@prisma/client';
+	import { mainCategories, producents } from '$lib/client/constants';
 	import { Edit, PlusCircle, Trash2, X } from 'lucide-svelte';
 	import ModalHeader from '../ModalHeader.svelte';
+
+	type Producent = (typeof producents)[number];
 
 	let images: ImagesList = {};
 
@@ -206,7 +208,7 @@
 					}
 				}}
 			>
-				{#each Object.values(MainCategories) as mainCategory}
+				{#each mainCategories as mainCategory}
 					<option value={mainCategory}>{fodderNames[mainCategory]}</option>
 				{/each}
 			</select>

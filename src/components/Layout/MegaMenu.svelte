@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { salesmenMenu } from '$lib/client/constants';
+	import { fly } from 'svelte/transition';
 </script>
 
 <div
@@ -12,7 +13,7 @@
 				{#each salesmenMenu as element}
 					<a
 						href="/kontakty/{element.href}"
-						class="rounded border-b border-gray-700 pb-4 px-2 duration-150 hover:bg-primary-focus py-1 hover:bg-opacity-20"
+						class="text-base-content rounded border-b border-gray-700 pb-4 px-2 duration-150 hover:bg-primary-focus py-1 hover:bg-opacity-20"
 					>
 						<h3 class="text-lg leading-6 font-medium">{element.name}</h3>
 						<p>{element.description}</p>

@@ -13,7 +13,7 @@
 		ImagesList,
 		ProductWithAuthorAndImage
 	} from '$types';
-	import { MainCategories } from '@prisma/client';
+	import { mainCategories } from '$lib/client/constants';
 	import { Edit, PlusCircle, Trash2, X } from 'lucide-svelte';
 	import ModalHeader from '../ModalHeader.svelte';
 
@@ -169,7 +169,7 @@
 					}
 				}}
 			>
-				{#each Object.values(MainCategories) as mainCategory}
+				{#each mainCategories as mainCategory}
 					<option value={mainCategory}>{fodderNames[mainCategory]}</option>
 				{/each}
 			</select>

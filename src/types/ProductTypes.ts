@@ -1,8 +1,9 @@
-import type { MainCategories, Product } from '@prisma/client';
+import type { Product } from '@prisma/client';
 import type { ProductAuthor } from './UserTypes';
 import type { User } from './UserTypes';
+import type { mainCategories } from '$lib/client/constants';
 
-export type Category = (typeof MainCategories)[keyof typeof MainCategories];
+export type Category = (typeof mainCategories)[number];
 
 export type ProductWithAuthorAndImage = Product & {
 	author: ProductAuthor;
