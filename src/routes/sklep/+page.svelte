@@ -113,8 +113,13 @@
 </svelte:head>
 
 <section class="w-full h-full flex flex-row-reverse">
-	<div class="drawer">
-		<input id="my-drawer" type="checkbox" class="drawer-toggle" bind:this={productsFilterDrawer} />
+	<div class="drawer drawer-mobile">
+		<input
+			id="categories-drawer"
+			type="checkbox"
+			class="drawer-toggle"
+			bind:this={productsFilterDrawer}
+		/>
 		<div class="drawer-content">
 			<!-- Page content here -->
 			<div class="w-full h-full sm:px-4">
@@ -130,7 +135,7 @@
 							placeholder="Szukaj produktów..."
 						/>
 					</div>
-					<!-- <label for="my-drawer" class="btn btn-primary drawer-button">Open drawer</label> -->
+					<!-- <label for="categories-drawer" class="btn btn-primary drawer-button">Open drawer</label> -->
 				</div>
 				<div class="py-2 px-1 mb-3">
 					<div class="flex justify-between items-center px-1 pb-2.5">
@@ -140,8 +145,8 @@
 						<label
 							id="filterDropdownButton"
 							tabindex="0"
-							for="my-drawer"
-							class="inline-flex justify-center sm:hidden btn btn-accent btn-xs h-7 xxs:h-[40px] w-full flex-1 sm:text-sm px-0 max-w-[125px] xs:max-w-[140px]"
+							for="categories-drawer"
+							class="inline-flex justify-center md:hidden btn btn-accent btn-xs h-7 xxs:h-[40px] w-full flex-1 sm:text-sm px-0 max-w-[125px] xs:max-w-[140px]"
 							on:keypress={(event) => {
 								if (event.key === 'Enter') {
 									event.currentTarget.click();
@@ -159,7 +164,7 @@
 								class="flex flex-col justify-between max-w-[300px] w-full shadow-sm sm:shadow-md shadow-base-content border border-base-content border-opacity-10 p-1 xxs:p-2 sm:p-3 pt-4 group/product duration-100 rounded-md outline-primary outline-offset-2"
 							>
 								<a
-									class="flex flex-col justify-start items-center lg:text-base text-xs md:text-sm p-2"
+									class="flex flex-col justify-start items-center text-xs xxs:text-sm sm:text-base p-2"
 									href="/#"
 								>
 									<img
@@ -212,16 +217,16 @@
 				{/if}
 			</div>
 		</div>
-		<div class="drawer-side h-full bg-base-100 bg-opacity-95 w-80">
-			<label for="my-drawer" class="drawer-overlay" />
-			<div class="flex flex-col px-2 py-1 bg-base-100 categories-menu sticky top-0">
+		<div class="drawer-side h-full bg-base-100 bg-opacity-95 w-80 md:w-64 lg:w-80">
+			<label for="categories-drawer" class="drawer-overlay" />
+			<div class="flex flex-col px-2 py-1 bg-base-100 sticky top-0">
 				<div class="flex justify-between items-center">
 					<h2 class=" text-xl font-medium p-0 text-base-content">Kategorie</h2>
 					<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 					<label
 						tabindex="0"
-						for="my-drawer"
-						class="btn btn-ghost btn-sm rounded-full px-1"
+						for="categories-drawer"
+						class="btn btn-ghost btn-sm rounded-full px-1 flex md:hidden"
 						on:keypress={function (event) {
 							if (event.key === 'Enter') {
 								event.currentTarget.click();
@@ -271,11 +276,11 @@
 											{fodderNames[category]}
 											<ChevronUp class="ml-2 group-checked/subcategories:first:rotate-180" />
 										</div>
-										<div class="collapse-content flex flex-col items-start space-y-2">
+										<div class="collapse-content flex flex-col items-start space-y-0.5">
 											{#each subcategories as subcategory}
 												<button
 													tabindex="0"
-													class="btn btn-ghost hover:text-primary text-sm text-left w-full justify-start px-0 {selectedCategories.sub &&
+													class="btn btn-ghost h-fit p-1 hover:text-primary text-sm text-left w-full justify-start {selectedCategories.sub &&
 													selectedCategories.sub === subcategory.id
 														? 'text-primary'
 														: ''}"
@@ -296,7 +301,7 @@
 					{/each}
 				</ul>
 
-				<label for="my-drawer" class="btn btn-secondary bg-opacity-95">
+				<label for="categories-drawer" class="btn btn-secondary bg-opacity-95 flex md:hidden">
 					<CornerUpLeft class="mr-1" /> Powrót</label
 				>
 			</div>
@@ -317,5 +322,26 @@
 	.drawer-toggle ~ .drawer-side {
 		max-height: unset;
 		overflow: visible;
+	}
+
+	@media (min-width: 768px) {
+		.drawer-mobile > .drawer-toggle ~ .drawer-side > .drawer-overlay + * {
+			--tw-translate-x: 0px;
+			transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate))
+				skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x))
+				scaleY(var(--tw-scale-y));
+		}
+
+		.drawer-mobile > .drawer-toggle ~ .drawer-side > .drawer-overlay {
+			visibility: visible;
+		}
+
+		.drawer-mobile {
+			grid-auto-columns: max-content auto;
+		}
+
+		.drawer-mobile > .drawer-toggle ~ .drawer-content {
+			grid-column-start: 2;
+		}
 	}
 </style>
