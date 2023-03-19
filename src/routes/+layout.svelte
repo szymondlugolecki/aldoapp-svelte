@@ -31,7 +31,7 @@
 		{#if data.url.includes('/admin')}
 			<main
 				in:fade
-				class="min-h-[calc(100vh-65px)] flex flex-col px-1.5 xxs:px-2 sm:px-3 py-1 sm:py-2 relative"
+				class="min-h-[calc(100vh-65px)]  flex flex-col px-1.5 xxs:px-2 sm:px-3 py-1 sm:py-2 relative"
 			>
 				<slot />
 			</main>
@@ -39,7 +39,7 @@
 			{#key data.url}
 				<main
 					in:fade
-					class="min-h-[calc(100vh-65px)] flex flex-col px-1.5 xxs:px-2  sm:px-3 py-1 sm:py-2 relative"
+					class="min-h-[calc(100vh-65px)] flex flex-col px-1.5 xxs:px-2 sm:px-3 py-1 sm:py-2 relative"
 				>
 					<slot />
 				</main>

@@ -37,9 +37,9 @@ export const userTable = {
 } as const;
 
 export const fodderNames: Record<MainCategories, string> = {
-	cattle: 'Bydło',
-	poultry: 'Drób',
-	backyard: 'Hodowla przydomowa'
+	cattle: '🐮 Bydło',
+	poultry: '🐣 Drób',
+	backyard: '🐶 Hodowla przydomowa'
 } as const;
 
 export const fodderCategories = {
