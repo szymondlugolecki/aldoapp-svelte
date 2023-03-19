@@ -1,10 +1,9 @@
 <script lang="ts">
-	import ModalHeader from '$components/Modals/ModalHeader.svelte';
 	import { fodderCategories, fodderNames, producentsList } from '$lib/client/constants';
 	import { textCrusher } from '$lib/client/functions';
-	import type { Category } from '$types';
-	import type { Product } from '@prisma/client';
-	import { ChevronDown, ChevronUp, CornerUpLeft, List, Search, X } from 'lucide-svelte';
+	import { addProduct } from '$lib/client/stores/cart';
+	import type { Category, StoreProduct, Subcategory } from '$types';
+	import { ChevronUp, CornerUpLeft, List, Search, X } from 'lucide-svelte';
 	import { slide } from 'svelte/transition';
 
 	export let data;
@@ -23,9 +22,6 @@
 	};
 
 	let searchInput = '';
-
-	type StoreProduct = (typeof data.products)[number];
-	type Subcategory = (typeof fodderCategories)[Category][number]['id'];
 
 	$: console.log('selectedCategories', selectedCategories);
 
@@ -139,7 +135,7 @@
 				</div>
 				<div class="py-2 px-1 mb-3">
 					<div class="flex justify-between items-center px-1 pb-2.5">
-						<h1 class="text-xl xxs:text-2xl">Lista produktów</h1>
+						<h1 class="text-xl xs:text-2xl">Lista produktów</h1>
 
 						<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 						<label
@@ -183,7 +179,10 @@
 									</div>
 								</a>
 								<div class="flex justify-end items-center w-full pt-2">
-									<button class="btn btn-secondary btn-sm text-xs sm:text-sm">Do koszyka</button>
+									<button
+										class="btn btn-secondary btn-sm text-xs sm:text-sm"
+										on:click={() => addProduct(product)}>Do koszyka</button
+									>
 								</div>
 							</div>
 						{/each}
@@ -211,13 +210,13 @@
 				</div>
 				{#if !productsFiltered.length}
 					<div class="flex flex-col justify-center items-center pb-3 mb-3" in:slide={{ axis: 'y' }}>
-						<h2 class="text-2xl">Brak wyników... 🤔</h2>
-						<h3 class="text-xl">Spróbuj wybrać inną kategorię 💡</h3>
+						<h2 class="text-2xl text-center">Brak wyników... 🤔</h2>
+						<h3 class="text-lg text-center">Spróbuj wybrać inną kategorię 💡</h3>
 					</div>
 				{/if}
 			</div>
 		</div>
-		<div class="drawer-side h-full bg-base-100 bg-opacity-95 w-80 md:w-64 lg:w-80">
+		<div class="drawer-side h-full bg-base-100 bg-opacity-95 w-72 xxs:w-80 md:w-64 lg:w-80">
 			<label for="categories-drawer" class="drawer-overlay" />
 			<div class="flex flex-col px-2 py-1 bg-base-100 sticky top-0">
 				<div class="flex justify-between items-center">
@@ -322,6 +321,10 @@
 	.drawer-toggle ~ .drawer-side {
 		max-height: unset;
 		overflow: visible;
+	}
+
+	.drawer-toggle:checked ~ .drawer-content {
+		--tw-translate-x: 0.25rem /* 8px */;
 	}
 
 	@media (min-width: 768px) {

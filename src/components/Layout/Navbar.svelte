@@ -22,6 +22,7 @@
 	import { nextTheme, theme } from '$lib/client/stores/theme';
 	import MegaMenu from './MegaMenu.svelte';
 	import { fade, slide } from 'svelte/transition';
+	import { cart } from '$lib/client/stores/cart';
 	export let user: SessionUser | undefined;
 
 	$: activeUrl = $page.url.pathname.toLowerCase();
@@ -40,6 +41,26 @@
 
 	let menuOpen = false;
 	let miniMenuExpanded = false;
+	$: productsCountTitle =
+		$cart.length > 0
+			? $cart.length === 1
+				? '1 produkt'
+				: $cart.length < 5
+				? `${$cart.length} produkty`
+				: `${$cart.length} produktów`
+			: 'Pusty koszyk';
+
+	function shortProductName(name: string) {
+		// const words = name.split(/\/|-/g);
+		if (name.length <= 21) {
+			return name;
+		}
+		// else if (words[0].length > 20) {
+		// 	return words[0].slice(0, 20) + '...';
+		// }
+
+		return name.slice(0, 21) + '...';
+	}
 </script>
 
 <nav class="navbar bg-base-100 border-b border-base-content rounded flex flex-col relative">
@@ -106,19 +127,34 @@
 									d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
 								/></svg
 							>
-							<span class="badge badge-sm indicator-item">8</span>
+							<span class="badge badge-sm indicator-item">{$cart.length}</span>
 						</div>
 					</label>
 					<div
 						id="cart"
 						tabindex="-1"
-						class="mt-3 card card-compact dropdown-content w-52 bg-base-100 shadow"
+						class="mt-3 card card-compact dropdown-content w-64 bg-base-100 shadow left-[-128px] sm:left-auto"
 					>
 						<div class="card-body">
-							<span class="font-bold text-lg">8 Items</span>
-							<span class="text-info">Subtotal: $999</span>
+							<span class="font-bold text-lg">{productsCountTitle}</span>
+							{#each $cart as cartProduct}
+								<div class="flex flex-grow">
+									<div class="flex flex-col items-start flex-1">
+										<span class="text-xs">{shortProductName(cartProduct.name)}</span>
+										<span class="text-xs">{cartProduct.price} PLN / szt.</span>
+									</div>
+									<div class="">
+										<span class="text-xs">{cartProduct.quantity} szt.</span>
+									</div>
+								</div>
+							{/each}
+							<span class="text-info"
+								>Suma: {$cart
+									.map(({ price, quantity }) => [price, quantity])
+									.reduce((prev, [price, quantity]) => prev + price * quantity, 0)} PLN</span
+							>
 							<div class="card-actions">
-								<button class="btn btn-primary btn-block">View cart</button>
+								<button class="btn btn-primary btn-block">Przejdź do koszyka</button>
 							</div>
 						</div>
 					</div>
