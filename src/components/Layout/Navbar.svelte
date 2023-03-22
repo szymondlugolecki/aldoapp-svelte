@@ -43,12 +43,12 @@
 	let menuOpen = false;
 	let miniMenuExpanded = false;
 	$: productsCountTitle =
-		$cart && $cart.length > 0
-			? $cart.length === 1
+		$cart.products && $cart.products.length > 0
+			? $cart.products.length === 1
 				? '1 produkt'
-				: $cart.length < 5
-				? `${$cart.length} produkty`
-				: `${$cart.length} produktów`
+				: $cart.products.length < 5
+				? `${$cart.products.length} produkty`
+				: `${$cart.products.length} produktów`
 			: 'Pusty koszyk';
 
 	function shortProductName(name: string) {
@@ -128,7 +128,9 @@
 									d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
 								/></svg
 							>
-							<span class="badge badge-sm indicator-item">{($cart && $cart.length) || 0}</span>
+							<span class="badge badge-sm indicator-item"
+								>{($cart.products && $cart.products.length) || 0}</span
+							>
 						</div>
 					</label>
 					<div
@@ -138,18 +140,18 @@
 					>
 						<div class="card-body">
 							<span class="font-bold text-lg">{productsCountTitle}</span>
-							{#each $cart.slice(0, 7) as product}
+							{#each $cart.products && $cart.products.slice(0, 7) as product}
 								<div class="flex flex-grow">
 									<div class="flex items-start flex-1 space-x-2">
 										<a
 											href="/sklep/{productURLParser(product.name, product.symbol)}"
 											class="h-full flex items-center"
 										>
-											<img src={product.image} width="32px" height="32px" alt={product.name} />
+											<img src={product.images[0]} width="32px" height="32px" alt={product.name} />
 										</a>
 										<div class="flex flex-col items-start">
-											<span class="text-xs">{shortProductName(product.name)}</span>
-											<span class="text-xs">{product.price} PLN / szt.</span>
+											<span class="text-xs truncate max-w-[144px]">{product.name}</span>
+											<span class="text-xs truncate max-w-[144px]">{product.price} PLN / szt.</span>
 										</div>
 									</div>
 									<div class="">
@@ -157,19 +159,22 @@
 									</div>
 								</div>
 							{/each}
-							{#if $cart.length && $cart.length > 7}
+							{#if $cart.products && $cart.products.length && $cart.products.length > 7}
 								<div class="flex flex-col justify-center items-center text-center">
-									<span>...+{$cart.length - 7} więcej 🛒</span>
+									<span>...+{$cart.products.length - 7} więcej 🛒</span>
 								</div>
 							{/if}
 							<span class="text-info"
-								>Suma: {$cart
-									.map(({ price, quantity }) => [price, quantity])
-									.reduce((prev, [price, quantity]) => prev + price * quantity, 0)
-									.toFixed(2)} PLN</span
+								>Suma: {$cart.products
+									? $cart.products
+											.map(({ price, quantity }) => [price, quantity])
+											.reduce((prev, [price, quantity]) => prev + price * quantity, 0)
+											.toFixed(2)
+									: 0} PLN</span
 							>
 							<div class="card-actions">
-								<a href="/koszyk" class="btn btn-primary btn-block">Przejdź do koszyka</a>
+								<a href="/zamowienie/koszyk" class="btn btn-primary btn-block">Przejdź do koszyka</a
+								>
 							</div>
 						</div>
 					</div>

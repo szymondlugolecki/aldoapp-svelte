@@ -32,7 +32,7 @@
 	];
 </script>
 
-<div class="h-full">
+<div class="h-full w-full">
 	<nav class="tabs py-1">
 		{#each navigationLinks as { name, href, icon: Icon }}
 			<a {href} class="tab tab-lifted {activeUrl === href ? 'tab-active' : ''}"

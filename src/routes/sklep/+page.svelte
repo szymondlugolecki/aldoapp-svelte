@@ -81,6 +81,7 @@
 	};
 
 	$: productsFiltered = data.products
+		.map((product) => ({ ...product, images: product.images.map(({ url }) => url) }))
 		.filter((product) => {
 			if (!searchInput.length) return true;
 
@@ -95,6 +96,8 @@
 		.filter((product) => categoryFilter(selectedCategories, product));
 
 	let productsFilterDrawer: HTMLInputElement;
+
+	$: console.log(productsFiltered);
 </script>
 
 <svelte:head>
@@ -157,11 +160,11 @@
 							>
 								<a
 									class="flex flex-col justify-start items-center text-xs xxs:text-sm sm:text-base p-2"
-									href="/#"
+									href={`/sklep/${product.encodedURL}`}
 								>
 									<img
 										class="group-hover/product:opacity-90"
-										src={product.images[0].url}
+										src={product.images[0]}
 										alt={product.name}
 										width="160px"
 										height="160px"

@@ -1,4 +1,4 @@
-import type { MainCategories, Producent, Product, Image } from '@prisma/client';
+import type { Product } from '@prisma/client';
 import type { ProductAuthor } from './UserTypes';
 import type { User } from './UserTypes';
 import type { fodderCategories, mainCategories } from '$lib/client/constants';
@@ -42,24 +42,26 @@ export type ImagesList = {
 	[id: string]: FileWithBase64;
 };
 
-export type StoreProduct = {
-	symbol: string;
-	id: string;
-	images: Image[];
-	name: string;
-	description: string | null;
-	category: MainCategories;
-	subcategory: string;
-	price: number;
-	weight: number;
-	producent: Producent;
+type ProductWithStringImage = Product & {
+	images: string[];
 };
 
-export type CartProductWithQuantity = {
-	id: string;
-	name: string;
-	symbol: string;
-	price: number;
-	quantity: number;
-	image: string;
-};
+export type StoreProduct = Pick<
+	ProductWithStringImage,
+	| 'symbol'
+	| 'id'
+	| 'images'
+	| 'name'
+	| 'description'
+	| 'category'
+	| 'subcategory'
+	| 'price'
+	| 'weight'
+	| 'producent'
+	| 'amountLeft'
+>;
+
+export type CartProductWithQuantity = Pick<
+	ProductWithStringImage,
+	'symbol' | 'id' | 'images' | 'name' | 'price' | 'amountLeft'
+> & { quantity: number };

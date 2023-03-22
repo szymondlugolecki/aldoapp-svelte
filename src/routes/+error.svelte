@@ -3,4 +3,4 @@
 </script>
 
 <h1>{$page.error?.message}</h1>
-<h2>Jebac disa :P</h2>
+<h2>poggers :P</h2>
