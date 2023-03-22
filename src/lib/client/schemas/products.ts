@@ -115,6 +115,11 @@ export const producentValidation = z.enum(PRODUCENTS, {
 	}
 });
 
+export const thumnbnailIndexValidation = z.number({
+	required_error: 'Nieprawidłowy indeks miniaturki',
+	invalid_type_error: 'Nieprawidłowy indeks miniaturki'
+});
+
 export const addProductSchema = z.object({
 	name: nameValidation,
 	symbol: symbolValidation,

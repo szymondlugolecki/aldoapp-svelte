@@ -6,6 +6,7 @@ import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { errorResponses } from '$lib/client/constants/errorResponses';
 import type { Product } from '@prisma/client';
 import { compareObjects } from '$lib/server/functions/utils';
+import { productURLParser } from '$lib/client/functions';
 
 const edit: Action = async ({ request, locals }) => {
 	// Only moderators and admins are allowed to edit a product
@@ -25,9 +26,7 @@ const edit: Action = async ({ request, locals }) => {
 			errors: ['Niepoprawne dane']
 		});
 	}
-	const { id, name, symbol, description, thumbnail: thumbnailFile } = editProductObj;
-	const thumbnail = thumbnailFile && thumbnailFile.size > 0 ? thumbnailFile : undefined;
-	console.log('thumbnail', thumbnail);
+	const { id, name, symbol, description, images, category, price, subcategory } = editProductObj;
 
 	// Fetch the previous product data (current, before the edit)
 	// 1. To see if the product even exists
@@ -64,33 +63,35 @@ const edit: Action = async ({ request, locals }) => {
 		});
 	}
 
+	const encodedURL = productURLParser(name, symbol);
+
 	const newProductObj: Partial<Product> = {
 		name,
 		symbol,
 		description,
-		images: thumbnail
+		encodedURL
 	};
 
 	const { name: bName, symbol: bSymbol, description: bDescription } = productBeforeEdit;
 
 	// If nothing has changed, do not call the db to save resources
-	if (!thumbnail) {
-		const nothingChanged = compareObjects(
-			{
-				name,
-				symbol,
-				description
-			},
-			{
-				name: bName,
-				symbol: bSymbol,
-				description: bDescription
-			}
-		);
-		if (nothingChanged) {
-			return { success: true, message: 'Pomyślnie edytowano produkt' };
-		}
-	}
+	// if (!thumbnail) {
+	// 	const nothingChanged = compareObjects(
+	// 		{
+	// 			name,
+	// 			symbol,
+	// 			description
+	// 		},
+	// 		{
+	// 			name: bName,
+	// 			symbol: bSymbol,
+	// 			description: bDescription
+	// 		}
+	// 	);
+	// 	if (nothingChanged) {
+	// 		return { success: true, message: 'Pomyślnie edytowano produkt' };
+	// 	}
+	// }
 
 	// Edit the product in the database
 	const [, editProductError] = await trytm(
@@ -98,7 +99,12 @@ const edit: Action = async ({ request, locals }) => {
 			where: {
 				id
 			},
-			data: newProductObj,
+			data: {
+				...newProductObj
+				// images: {
+				// 	set: images ? images?.map(({  }) => ({ url })) : []
+				// }
+			},
 			select: {
 				id: true
 			}

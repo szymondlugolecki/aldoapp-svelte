@@ -4,7 +4,7 @@
 	import { addProduct } from '$lib/client/stores/cart';
 	import type { Category, StoreProduct, Subcategory } from '$types';
 	import { ChevronUp, CornerUpLeft, List, Search, X } from 'lucide-svelte';
-	import { slide } from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 
 	export let data;
 
@@ -23,10 +23,7 @@
 
 	let searchInput = '';
 
-	$: console.log('selectedCategories', selectedCategories);
-
 	const categoryFilter = (selectedCategories: CategoryChoice, product: StoreProduct) => {
-		console.log('filtering', product.category, product.subcategory);
 		// no category selected
 		if (!selectedCategories.main) {
 			return true;
@@ -108,8 +105,8 @@
 	/>
 </svelte:head>
 
-<section class="w-full h-full flex flex-row-reverse">
-	<div class="drawer drawer-mobile">
+<section class="w-full h-full flex flex-col flex-1">
+	<div class="drawer drawer-mobile flex-1">
 		<input
 			id="categories-drawer"
 			type="checkbox"
@@ -156,7 +153,6 @@
 					<div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-10">
 						{#each productsFiltered as product}
 							<div
-								in:slide
 								class="flex flex-col justify-between max-w-[300px] w-full shadow-sm sm:shadow-md shadow-base-content border border-base-content border-opacity-10 p-1 xxs:p-2 sm:p-3 pt-4 group/product duration-100 rounded-md outline-primary outline-offset-2"
 							>
 								<a
@@ -312,6 +308,7 @@
 	.drawer {
 		height: 100%;
 		overflow: visible;
+		max-height: none;
 	}
 
 	.drawer-toggle ~ .drawer-content {
@@ -319,7 +316,7 @@
 	}
 
 	.drawer-toggle ~ .drawer-side {
-		max-height: unset;
+		max-height: none;
 		overflow: visible;
 	}
 

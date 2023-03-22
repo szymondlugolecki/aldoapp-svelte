@@ -14,10 +14,8 @@
 </script>
 
 {#if rowType === 'user'}
-	<td>
-		<span class="block">{user.fullName}</span>
-		<span class="block">{user.email}</span>
-	</td>
+	<span class="block">{user.fullName}</span>
+	<span class="block">{user.email}</span>
 {:else if rowType === 'role'}
 	<span
 		class={`${user.role === 'admin' ? 'text-error' : ''} ${

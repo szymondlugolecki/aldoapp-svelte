@@ -30,7 +30,7 @@ enum Producent {
 }
 
 model User {
-  id                String             @id @default(uuid())
+  id                String             @id
   email             String             @unique
   fullName          String
   role              Role               @default(customer)
@@ -42,35 +42,42 @@ model User {
   products          Product[]
 
   @@unique([id, email])
+  @@index([id])
+  @@index([email])
 }
 
 model VerificationToken {
   id                String   @id @default(uuid())
   verificationToken String   @default(uuid())
   code              String   @unique @db.Char(4)
-  // device     String
+  userAgent         String
   expires           DateTime
   user              User     @relation(fields: [email], references: [email])
   email             String   @unique
 
   @@unique([verificationToken, code, email])
   @@index([email])
+  @@index([code])
+  @@index([verificationToken])
 }
 
 model Order {
-  id        String   @id @default(uuid())
-  products  Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
+  id         String    @id @default(uuid())
+  status     String
+  products   Json // this includes products and quantity
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  customer   User      @relation(fields: [customerId], references: [id])
+  customerId String
+  address    Json
+  Product    Product[]
 
   @@unique([id])
-  @@index([userId])
+  @@index([customerId])
 }
 
 model Product {
-  id          String         @id @default(uuid())
+  id          String         @id
   name        String
   description String?
   symbol      String
@@ -78,14 +85,21 @@ model Product {
   subcategory String
   price       Float
   weight      Float
+  amountLeft  Int
   producent   Producent
+  encodedURL  String
   images      Image[]
   author      User           @relation(fields: [userId], references: [id])
   userId      String
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
+  orderId     String?
+  Order       Order?         @relation(fields: [orderId], references: [id])
 
-  @@index([userId, category])
+  @@unique([id])
+  @@index([userId])
+  @@index([category])
+  @@index([orderId])
 }
 
 model Image {

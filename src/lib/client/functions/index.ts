@@ -9,6 +9,12 @@ export const serializeSchema = (thing: Schema) => {
 	return `<script type="application/ld+json">${JSON.stringify(thing, null, 2)}</script>`;
 };
 
+export const productURLParser = (name: string, symbol: string) => {
+	return encodeURIComponent(
+		`${name}-${symbol}`.replaceAll('  ', ' ').replaceAll(' ', '-').toLowerCase().trim()
+	);
+};
+
 export const getProductImageURL = (image: string | null) => {
 	if (!image) return null;
 	return `${PUBLIC_WEBSITE_URL}/products/${image}`;

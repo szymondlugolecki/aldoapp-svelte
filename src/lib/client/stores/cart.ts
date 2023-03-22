@@ -1,23 +1,34 @@
-import type { StoreProduct } from '$types';
-import { writable } from 'svelte/store';
+import type { CartProductWithQuantity, StoreProduct } from '$types';
+import { persisted } from 'svelte-local-storage-store';
 
-type StoreProductWithQuantity = StoreProduct & {
-	quantity: number;
+export const cart = persisted<CartProductWithQuantity[]>('cart', []);
+// export const cart = writable<StoreProductWithQuantity[]>([]);
+
+const cartProductParser = (product: StoreProduct, quantity: number) => {
+	return {
+		id: product.id,
+		name: product.name,
+		symbol: product.symbol,
+		price: product.price,
+		quantity,
+		image: product.images[0].url
+	};
 };
-
-export const cart = writable<StoreProductWithQuantity[]>([]);
 
 export const addProduct = (product: StoreProduct) => {
 	cart.update((products) => {
+		// if already exists, just increment quantity
 		if (products.find((p) => p.id === product.id)) {
 			return products.map((p) => {
 				if (p.id === product.id) {
-					return { ...p, quantity: p.quantity + 1 };
+					return cartProductParser(product, p.quantity + 1);
 				}
 				return p;
 			});
-		} else {
-			return [...products, { ...product, quantity: 1 }];
+		}
+		// if not, add to cart
+		else {
+			return [...products, cartProductParser(product, 1)];
 		}
 	});
 };
@@ -39,4 +50,8 @@ export const removeProduct = (productId: string) => {
 	cart.update((products) => {
 		return products.filter((product) => product.id !== productId);
 	});
+};
+
+export const clearCart = () => {
+	cart.set([]);
 };

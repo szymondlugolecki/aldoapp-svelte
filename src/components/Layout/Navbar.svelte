@@ -23,6 +23,7 @@
 	import MegaMenu from './MegaMenu.svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { cart } from '$lib/client/stores/cart';
+	import { productURLParser } from '$lib/client/functions';
 	export let user: SessionUser | undefined;
 
 	$: activeUrl = $page.url.pathname.toLowerCase();
@@ -42,7 +43,7 @@
 	let menuOpen = false;
 	let miniMenuExpanded = false;
 	$: productsCountTitle =
-		$cart.length > 0
+		$cart && $cart.length > 0
 			? $cart.length === 1
 				? '1 produkt'
 				: $cart.length < 5
@@ -127,7 +128,7 @@
 									d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
 								/></svg
 							>
-							<span class="badge badge-sm indicator-item">{$cart.length}</span>
+							<span class="badge badge-sm indicator-item">{($cart && $cart.length) || 0}</span>
 						</div>
 					</label>
 					<div
@@ -137,24 +138,38 @@
 					>
 						<div class="card-body">
 							<span class="font-bold text-lg">{productsCountTitle}</span>
-							{#each $cart as cartProduct}
+							{#each $cart.slice(0, 7) as product}
 								<div class="flex flex-grow">
-									<div class="flex flex-col items-start flex-1">
-										<span class="text-xs">{shortProductName(cartProduct.name)}</span>
-										<span class="text-xs">{cartProduct.price} PLN / szt.</span>
+									<div class="flex items-start flex-1 space-x-2">
+										<a
+											href="/sklep/{productURLParser(product.name, product.symbol)}"
+											class="h-full flex items-center"
+										>
+											<img src={product.image} width="32px" height="32px" alt={product.name} />
+										</a>
+										<div class="flex flex-col items-start">
+											<span class="text-xs">{shortProductName(product.name)}</span>
+											<span class="text-xs">{product.price} PLN / szt.</span>
+										</div>
 									</div>
 									<div class="">
-										<span class="text-xs">{cartProduct.quantity} szt.</span>
+										<span class="text-xs">{product.quantity} szt.</span>
 									</div>
 								</div>
 							{/each}
+							{#if $cart.length && $cart.length > 7}
+								<div class="flex flex-col justify-center items-center text-center">
+									<span>...+{$cart.length - 7} więcej 🛒</span>
+								</div>
+							{/if}
 							<span class="text-info"
 								>Suma: {$cart
 									.map(({ price, quantity }) => [price, quantity])
-									.reduce((prev, [price, quantity]) => prev + price * quantity, 0)} PLN</span
+									.reduce((prev, [price, quantity]) => prev + price * quantity, 0)
+									.toFixed(2)} PLN</span
 							>
 							<div class="card-actions">
-								<button class="btn btn-primary btn-block">Przejdź do koszyka</button>
+								<a href="/koszyk" class="btn btn-primary btn-block">Przejdź do koszyka</a>
 							</div>
 						</div>
 					</div>

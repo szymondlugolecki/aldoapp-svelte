@@ -54,3 +54,12 @@ export type StoreProduct = {
 	weight: number;
 	producent: Producent;
 };
+
+export type CartProductWithQuantity = {
+	id: string;
+	name: string;
+	symbol: string;
+	price: number;
+	quantity: number;
+	image: string;
+};

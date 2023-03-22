@@ -5,6 +5,8 @@ import { cloudinary } from '$lib/server/clients/cloudinaryClient';
 import { trytm } from '@bdsqqq/try';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { errorResponses } from '$lib/client/constants/errorResponses';
+import { productURLParser } from '$lib/client/functions';
+import { createId } from '@paralleldrive/cuid2';
 
 const add: Action = async ({ request, locals }) => {
 	// Only moderators and admins are allowed to add a product
@@ -45,37 +47,45 @@ const add: Action = async ({ request, locals }) => {
 	if (images && images.length) {
 		const totalImagesSize = images.reduce((acc, curr) => acc + curr.size, 0) / 1024 / 1024; // in MiB
 
-		console.log('totalImagesSize', totalImagesSize);
+		console.log('Total Images Size', totalImagesSize);
 
 		if (totalImagesSize > 10) {
 			return fail(400, {
-				errors: ['Maxymalny rozmiar zdjęć to 10MB']
+				errors: ['Maksymalny rozmiar zdjęć to 10MB']
 			});
 		}
 
+		// Move the thumbnail to the first position
+		// images.unshift(images.splice(thumbnail, 1)[0]);
+
 		try {
 			const uploadPromises = images
-				.filter((img) => img.size > 0)
+				.filter((image) => image.size > 0)
 				.map(async (image, index) => {
-					console.log('poggers', index);
+					console.log('Image nr', index, ':', image.name, image.size, image.type);
 					const imageArrayBuffer = await image.arrayBuffer();
 					const imageBuffer = Buffer.from(imageArrayBuffer).toString('base64');
-					console.log('imageBuffer', imageBuffer.slice(0, 125));
-					const result = await cloudinary.uploader.upload(
-						`data:${image.type};base64,${imageBuffer}`,
-						{
-							public_id: `products/${symbol}/${index}`,
-							overwrite: true
-						}
-					);
-					return result;
+					return await cloudinary.uploader.upload(`data:${image.type};base64,${imageBuffer}`, {
+						public_id: `products/${symbol}/${index}`,
+						overwrite: true
+					});
 				});
 
 			const result = await Promise.all(uploadPromises);
 
+			// Sort the images by their index
+			result.sort(
+				(a, b) => Number(a.public_id.split('/').pop()) - Number(b.public_id.split('/').pop())
+			);
+
+			console.log(
+				'after sort result',
+				result.map((image) => image.public_id)
+			);
+
 			imagesURL = result.map((image) => image.secure_url);
 		} catch (error) {
-			// console.error(error);
+			console.error('image upload error', error);
 			return fail(400, {
 				errors: ['Wystąpił błąd poczas przesyłania zdjęć']
 			});
@@ -84,10 +94,14 @@ const add: Action = async ({ request, locals }) => {
 
 	console.log('imagesURL', imagesURL);
 
+	const encodedURL = productURLParser(name, symbol);
+	const productId = createId();
+
 	// Add the product to the database
 	const [, addProductError] = await trytm(
 		prisma.product.create({
 			data: {
+				id: productId,
 				userId: locals.session.user.id,
 				name,
 				symbol,
@@ -103,7 +117,9 @@ const add: Action = async ({ request, locals }) => {
 				subcategory: subcategory ?? '',
 				price,
 				weight,
-				producent
+				producent,
+				encodedURL,
+				amountLeft: Math.floor(Math.random() * 5) // 0 - 5
 			}
 		})
 	);

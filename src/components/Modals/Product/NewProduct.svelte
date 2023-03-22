@@ -96,10 +96,12 @@
 		const toastId = createLoadingToast('please-wait');
 
 		// Add images to form data
-		Object.entries(images).forEach(([, image]) => {
-			delete image.base64;
-			data.append(`images`, image, image['name']);
-		});
+		Object.entries(images)
+			.filter(([, image]) => image.size > 0)
+			.forEach(([, image]) => {
+				delete image.base64;
+				data.append(`images`, image, image['name']);
+			});
 
 		// Remove unnecessary fields
 		// As all images are already appended to the form data
