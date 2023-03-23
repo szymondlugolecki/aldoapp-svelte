@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { fodderCategories, fodderNames, producentsList } from '$lib/client/constants';
 	import { textCrusher } from '$lib/client/functions';
+	import { imagesSorting } from '$lib/client/functions/sorting';
 	import { addProduct } from '$lib/client/stores/cart';
 	import type { Category, StoreProduct, Subcategory } from '$types';
 	import { ChevronUp, CornerUpLeft, List, Search, X } from 'lucide-svelte';
-	import { fade, slide } from 'svelte/transition';
+	import { slide } from 'svelte/transition';
 
 	export let data;
 
@@ -81,7 +82,10 @@
 	};
 
 	$: productsFiltered = data.products
-		.map((product) => ({ ...product, images: product.images.map(({ url }) => url) }))
+		.map((product) => ({
+			...product,
+			images: product.images.map(({ url }) => url).sort(imagesSorting)
+		}))
 		.filter((product) => {
 			if (!searchInput.length) return true;
 
@@ -94,6 +98,7 @@
 			);
 		})
 		.filter((product) => categoryFilter(selectedCategories, product));
+	// Sort the images by their index
 
 	let productsFilterDrawer: HTMLInputElement;
 

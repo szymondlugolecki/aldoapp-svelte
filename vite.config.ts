@@ -10,7 +10,17 @@ export default defineConfig({
 
 	plugins: [
 		sveltekit(),
-		// SvelteKitPWA(),
+		// SvelteKitPWA({
+		// 	strategies: 'injectManifest',
+		// 	srcDir: 'src',
+		// 	filename: 'service-worker.ts',
+		// 	devOptions: {
+		// 		enabled: true,
+		// 		type: 'module'
+		// 	},
+		// 	mode: 'development'
+		// }),
+
 		// {
 		// 	srcDir: './src',
 		// 	mode: 'development',

@@ -62,18 +62,38 @@ model VerificationToken {
 }
 
 model Order {
-  id         String    @id @default(uuid())
+  id         String     @id @default(uuid())
   status     String
   products   Json // this includes products and quantity
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  customer   User      @relation(fields: [customerId], references: [id])
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  customer   User       @relation(fields: [customerId], references: [id])
   customerId String
   address    Json
+  PromoCode  PromoCode? @relation(fields: [promoCode], references: [code])
+  promoCode  String?
   Product    Product[]
 
   @@unique([id])
   @@index([customerId])
+  @@index([promoCode])
+}
+
+model PromoCode {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  code       String   @unique
+  discount   Float
+  validUntil DateTime
+  useCount   Int      @default(0)
+  useLimit   Int
+  onePerUser Boolean
+
+  Order Order[]
+
+  @@unique([id, code])
 }
 
 model Product {

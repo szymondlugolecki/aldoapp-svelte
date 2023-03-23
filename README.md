@@ -39,7 +39,7 @@ You can preview the production build with `npm run preview`.
 
 # TODO
 
-[] Add toasts (also fix toasts stopped showing when logging in)
+[✅] Add toasts (also fix toasts stopped showing when logging in)
 
 [] Add animations for smoother and nicer user experience (SvelteKit has many built-in)
 
@@ -50,13 +50,15 @@ You can preview the production build with `npm run preview`.
 [ ] Add a secure and httpOnly (with restriced path: '/login/weryfikacja')
 cookie that would prevent logging in with someone else's verification code. > User wants to login > Enters their email > It's written into the cookie & verification email is sent > Under the verification API route it is checked whether the account email is the same as in the cookie
 
-[ ] Add store page with all the products
+[✅] Add store page with all the products
 
-[ ] Implement cart & checkout with svelte store
+[✅] Implement cart & checkout with svelte store
 
 [✅] Add products page in admin panel
 
 [✅] Implement auth system
+
+[ ] Add promo codes
 
 [ ] Implement user profile
 
@@ -89,8 +91,6 @@ cookie that would prevent logging in with someone else's verification code. > Us
 [ ] Deploy on Vercel
 
 Under consideration:
-
-[ ] Use the modal from Flowbite instead of the modal from Flowbite-svelte
 
 [ ] Add chatbot for easy user interactions (bot asks what the user wants => user can choose: buy sth, get a phone number for a service of choice, live chat with the staff)
 

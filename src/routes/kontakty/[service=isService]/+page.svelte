@@ -15,7 +15,7 @@
 	/>
 </svelte:head>
 
-<section class="h-full space-y-10">
+<section class="h-full space-y-10 w-full">
 	<header class="w-full text-center mt-4">
 		<h1 class="text-4xl font-semibold">{capitalize(service)}</h1>
 		<h2 class="text-2xl">Numery telefonów</h2>

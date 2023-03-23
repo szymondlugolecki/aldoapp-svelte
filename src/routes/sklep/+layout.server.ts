@@ -1,5 +1,4 @@
 import { prisma } from '$lib/server/clients/prismaClient';
-// import type { StoreProduct } from '$types';
 
 export const load = () => {
 	// : { products: Promise<StoreProduct[]> }

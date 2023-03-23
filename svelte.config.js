@@ -28,6 +28,9 @@ const config = {
 		adapter: adapter({
 			runtime: 'nodejs18.x'
 		}),
+		// serviceWorker: {
+		// 	register: false
+		// },
 		alias: {
 			'$components/*': 'src/components',
 			$types: './src/types',

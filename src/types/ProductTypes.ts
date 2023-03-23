@@ -59,9 +59,10 @@ export type StoreProduct = Pick<
 	| 'weight'
 	| 'producent'
 	| 'amountLeft'
+	| 'encodedURL'
 >;
 
 export type CartProductWithQuantity = Pick<
 	ProductWithStringImage,
-	'symbol' | 'id' | 'images' | 'name' | 'price' | 'amountLeft'
+	'symbol' | 'id' | 'images' | 'name' | 'price' | 'amountLeft' | 'encodedURL'
 > & { quantity: number };

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { roleNames, salesmenMenu } from '$lib/client/constants';
-	import { ArrowRight, LogOut } from 'lucide-svelte';
+	import { ArrowLeft, ArrowRight, LogOut } from 'lucide-svelte';
 	import type { CartProductWithQuantity, Role, SessionUser } from '../../types';
 	import { fade, slide } from 'svelte/transition';
 	import { cart, changeCartState, removeProduct } from '$lib/client/stores/cart';
@@ -10,21 +10,22 @@
 	import toast from 'svelte-french-toast';
 	import { error } from '@sveltejs/kit';
 	import type { Product } from '@prisma/client';
-	import { dataset_dev } from 'svelte/internal';
+	import { imagesSorting } from '$lib/client/functions/sorting';
 
 	export let data;
 
-	onMount(async () => {
+	const synchronizeCart = async () => {
 		const productIds = $cart.products.map((product) => product.id);
 
 		console.log('urlXD', data.url);
 
-		if (!data.url.toLowerCase().endsWith('/zamowienie/koszyk')) return;
+		if (!data.url.toLowerCase().endsWith('/zamowienie/koszyk') || $cart.status === 'verified')
+			return;
 
 		try {
 			changeCartState('loading');
 
-			const data = await wretch(`/api/mycart?cart=${productIds.join(',')}`)
+			const syncCartPromise = wretch(`/api/mycart?cart=${productIds.join(',')}`)
 				.get()
 				.json<{
 					success: true;
@@ -35,20 +36,35 @@
 						name: string;
 						price: number;
 						amountLeft: number;
+						encodedURL: string;
 					}[];
 				}>();
+
+			toast.promise(syncCartPromise, {
+				error: 'Nie udało się zsynchronizować koszyka',
+				success: 'Koszyk zsynchronizowany',
+				loading: 'Synchronizowanie koszyka...'
+			});
+
+			const data = await syncCartPromise;
 
 			console.log('data', data);
 
 			const cartLocalProducts = data.products.map((product) => {
 				return {
 					...product,
+					images: product.images.sort(imagesSorting),
 					quantity: $cart.products.find((p) => p.id === product.id)?.quantity || 1
 				};
 			});
 
 			cart.update((cartObj) => {
-				return { ...cartObj, status: 'verified', products: cartLocalProducts };
+				return {
+					...cartObj,
+					lastVerified: new Date(),
+					status: 'verified',
+					products: cartLocalProducts
+				};
 			});
 		} catch (error) {
 			let errorMessage = 'Wystąpił błąd podczas pobierania koszyka';
@@ -60,6 +76,10 @@
 				return { ...cartObj, status: 'error' };
 			});
 		}
+	};
+
+	onMount(() => {
+		synchronizeCart();
 	});
 
 	$: subtotal = $cart.products
@@ -67,34 +87,33 @@
 		: 0;
 
 	const stageNames = ['Koszyk', 'Dostawa', 'Płatność', 'Potwierdzenie'];
-	const stages = ['cart', 'delivery', 'payment', 'confirmation'] as const;
+	const stages = ['koszyk', 'dostawa', 'platnosc', 'potwierdzenie'] as const;
 	let stageIndex: number = 0;
 
 	// export let data
 
+	$: {
+		const urlSplit = data.url.split('/').reverse();
+		const [stage, route] = urlSplit;
+		if (route === 'zamowienie') {
+			if (stage === 'koszyk') {
+				stageIndex = 0;
+			} else if (stage === 'dostawa') {
+				stageIndex = 1;
+			} else if (stage === 'platnosc') {
+				stageIndex = 2;
+			} else if (stage === 'potwierdzenie') {
+				stageIndex = 3;
+			}
+		}
+	}
+
 	$: console.log('cart', $cart);
 </script>
 
-<section class="w-full flex flex-col items-center">
-	<ul class="steps py-2">
-		<li data-content="🛒" class="step {stageIndex >= 0 ? 'step-primary' : 'step-neutral'}">
-			{stageNames[0]}
-		</li>
-		<li data-content="🚚" class="step {stageIndex >= 1 ? 'step-primary' : 'step-neutral'}">
-			{stageNames[1]}
-		</li>
-		<li data-content="💵" class="step {stageIndex >= 2 ? 'step-primary' : 'step-neutral'}">
-			{stageNames[2]}
-		</li>
-		<li data-content="👍" class="step {stageIndex >= 3 ? 'step-primary' : 'step-neutral'}">
-			{stageNames[3]}
-		</li>
-	</ul>
-
-	<div class="divider" />
-
+<section class="w-full flex flex-col items-center justify-center">
 	{#if $cart.products && $cart.products.length === 0}
-		<div class="text-center">
+		<div class="text-center mt-7">
 			<h1 class="text-2xl xxs:text-3xl sm:text-5xl font-bold mb-1 xxs:mb-1.5 sm:mb-2">
 				Koszyk jest pusty 😔
 			</h1>
@@ -104,32 +123,92 @@
 			>
 		</div>
 	{:else}
-		<div class="w-full h-full flex">
-			<slot />
-			<div class="divider divider-horizontal" />
-			<div class="min-w-[300px] h-full flex flex-col space-y-6 sticky top-0">
+		<ul class="steps py-2">
+			<li data-content="🛒" class="step {stageIndex >= 0 ? 'step-primary' : 'step-neutral'}">
+				{stageNames[0]}
+			</li>
+			<li data-content="🚚" class="step {stageIndex >= 1 ? 'step-primary' : 'step-neutral'}">
+				{stageNames[1]}
+			</li>
+			<li data-content="💵" class="step {stageIndex >= 2 ? 'step-primary' : 'step-neutral'}">
+				{stageNames[2]}
+			</li>
+			<li data-content="👍" class="step {stageIndex >= 3 ? 'step-primary' : 'step-neutral'}">
+				{stageNames[3]}
+			</li>
+		</ul>
+
+		<div class="divider" />
+
+		<div class="w-full h-full flex lg:flex-row flex-col items-center justify-center">
+			<div
+				class="text-left h-full flex flex-col p-2 space-y-6 w-full lg:max-w-[700px] xl:max-w-[900px]"
+			>
+				<slot />
+			</div>
+
+			<div class="divider hidden md:flex md:divider-horizontal" />
+			<div
+				class="xl:max-w-[340px] lg:max-w-[270px] px-1 sm:px-0 w-full h-full flex flex-col space-y-4 sm:space-y-6 sticky top-0"
+			>
 				<h2 class="text-2xl font-bold">Podsumowanie 📒</h2>
-				<div class="flex flex-col space-y-2">
+				<div class="flex flex-col space-y-2 lg:text-base md:text-sm">
 					<div class="flex justify-between items-center">
-						<span>Suma częściowa</span>
-						<bold class="font-semibold">{subtotal.toFixed(2)} PLN</bold>
+						<span class="text-sm xs:text-base">Suma częściowa</span>
+						<bold class="font-semibold text-sm xs:text-base">{subtotal.toFixed(2)} PLN</bold>
 					</div>
 					<div class="flex justify-between items-center">
-						<span>Przesyłka</span>
-						<bold class="font-semibold">{(10).toFixed(2)} PLN</bold>
+						<span class="text-sm xs:text-base">Przesyłka</span>
+						<bold class="font-semibold text-sm xs:text-base">{(10).toFixed(2)} PLN</bold>
 					</div>
 					<div class="flex justify-between items-center">
-						<span>VAT</span>
-						<bold class="font-semibold">{(subtotal * 0.23).toFixed(2)} PLN</bold>
+						<span class="text-sm xs:text-base">VAT</span>
+						<bold class="font-semibold text-sm xs:text-base"
+							>{(subtotal * 0.23).toFixed(2)} PLN</bold
+						>
 					</div>
 					<div class="flex justify-between items-center">
-						<bold class="font-bold">Suma całkowita</bold>
-						<bold class="font-bold">{(subtotal + 10 + subtotal * 0.23).toFixed(2)} PLN</bold>
+						<span class="text-sm xs:text-base">Rabat</span>
+						<bold class="font-semibold text-sm xs:text-base">{0} PLN</bold>
+					</div>
+					<div class="flex justify-between items-center">
+						<bold class="font-bold text-sm xs:text-base">Suma całkowita</bold>
+						<bold class="font-bold text-sm xs:text-base"
+							>{(subtotal + 10 + subtotal * 0.23).toFixed(2)} PLN</bold
+						>
 					</div>
 				</div>
-				<a href="/zamowienie/dostawa" class="btn btn-primary"
-					>{stageNames[stageIndex + 1]} <ArrowRight /></a
-				>
+
+				{#if data.url.endsWith('/koszyk')}
+					<div class="w-full form-control">
+						<label for="promo-code" class="label">
+							<span class="label-text">Kod rabatowy</span>
+						</label>
+						<div class="w-full flex space-x-2">
+							<input
+								name="promo-code"
+								type="text"
+								placeholder="Wpisz tutaj..."
+								class="input input-bordered w-full"
+								disabled
+							/>
+							<button class="btn btn-secondary md:px-2 lg:px-4" disabled>Potwierdź</button>
+						</div>
+					</div>
+				{/if}
+
+				<div class="flex space-x-3">
+					{#if stageIndex > 0}
+						<a href="/zamowienie/{stages[stageIndex - 1]}" class="btn btn-accent flex-1">
+							<ArrowLeft class="mr-1" /> Wstecz</a
+						>
+					{/if}
+					{#if stageIndex < stages.length - 1}
+						<a href="/zamowienie/{stages[stageIndex + 1]}" class="btn btn-primary flex-1"
+							>Dalej <ArrowRight class="ml-1" /></a
+						>
+					{/if}
+				</div>
 			</div>
 		</div>
 	{/if}

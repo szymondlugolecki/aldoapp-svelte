@@ -31,7 +31,8 @@ export async function GET({ url }) {
 						url: true
 					}
 				},
-				amountLeft: true
+				amountLeft: true,
+				encodedURL: true
 			}
 		})
 	);
@@ -50,7 +51,7 @@ export async function GET({ url }) {
 		return { ...product, images: product.images.map((img) => img.url) };
 	});
 
-	await sleep(15);
+	await sleep(5);
 
 	return json({
 		success: true,
