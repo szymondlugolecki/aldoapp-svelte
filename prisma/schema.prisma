@@ -40,6 +40,7 @@ model User {
   verificationToken VerificationToken?
   orders            Order[]
   products          Product[]
+  Subscription      Subscription[]
 
   @@unique([id, email])
   @@index([id])
@@ -79,17 +80,36 @@ model Order {
   @@index([promoCode])
 }
 
+model Subscription {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  endpoint     String
+  subscription Json
+  user         User?   @relation(fields: [userId], references: [id])
+  userId       String?
+
+  @@unique([id])
+  @@unique([endpoint])
+  @@index([userId])
+  @@index([endpoint])
+}
+
 model PromoCode {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  code       String   @unique
-  discount   Float
-  validUntil DateTime
-  useCount   Int      @default(0)
-  useLimit   Int
-  onePerUser Boolean
+  code         String    @unique
+  discount     Float // discount value
+  isFixedValue Boolean // whether its a fixed value or a percentage
+  validSince   DateTime
+  validUntil   DateTime
+  useCount     Int       @default(0) // how many times the code has been used
+  useLimit     Int // how many times the code can be used
+  onePerUser   Boolean // whether the code can be used only once per user
+  products     Product[]
 
   Order Order[]
 
@@ -115,18 +135,20 @@ model Product {
   updatedAt   DateTime       @updatedAt
   orderId     String?
   Order       Order?         @relation(fields: [orderId], references: [id])
+  PromoCode   PromoCode?     @relation(fields: [promoCodeId], references: [id])
+  promoCodeId String?
 
   @@unique([id])
   @@index([userId])
   @@index([category])
   @@index([orderId])
+  @@index([promoCodeId])
 }
 
 model Image {
   id        String   @id @default(uuid())
   url       String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
 

@@ -19,7 +19,7 @@
 	import Img from '@zerodevx/svelte-img';
 	import logo from '$lib/assets/logo.png?run&width=110&height=80&format=webp';
 	import logout from '$lib/client/functions/logout';
-	import { nextTheme, theme } from '$lib/client/stores/theme';
+	import { nextTheme, settings } from '$lib/client/stores/settings';
 	import MegaMenu from './MegaMenu.svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { cart } from '$lib/client/stores/cart';
@@ -104,7 +104,7 @@
 				class="btn btn-ghost btn-circle"
 			>
 				<div class="w-10 rounded-full flex justify-center items-center">
-					{#if $theme === 'light'}
+					{#if $settings.theme === 'light'}
 						<Sun class="swap-on text-amber-500" />
 					{:else}
 						<Moon class="swap-off text-sky-500" />
@@ -208,7 +208,7 @@
 						<li>
 							<a href="/uzytkownik/ja"><User /> Mój profil </a>
 						</li>
-						<li><a href="/settings"><Settings />Ustawienia</a></li>
+						<li><a href="/ustawienia"><Settings />Ustawienia</a></li>
 						<li>
 							<button class="text-error" on:click={() => logout()}><LogOut />Wyloguj</button>
 						</li>

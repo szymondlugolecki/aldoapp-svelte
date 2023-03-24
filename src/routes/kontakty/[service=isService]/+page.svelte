@@ -11,7 +11,7 @@
 	<title>Kontakty • Twoje ALDO</title>
 	<meta
 		name="description"
-		content="Kontakt do różnych działów ALDO. Dział pasz. Market. Dział maszyn. Komis maszyn. Serwis. Stacja paliw."
+		content="Dział pasz. Market. Dział maszyn. Komis maszyn. Serwis. Stacja paliw."
 	/>
 </svelte:head>
 

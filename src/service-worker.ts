@@ -7,6 +7,13 @@ import { build, files, version } from '$service-worker';
 
 const sw = self as unknown as ServiceWorkerGlobalScope;
 
+type NotificationContent = {
+	title: string;
+	options: {
+		body: string;
+	};
+};
+
 // Create a unique cache name for this deployment
 const CACHE = `cache-${version}`;
 
@@ -46,7 +53,11 @@ sw.addEventListener('fetch', (event) => {
 
 		// `build`/`files` can always be served from the cache
 		if (ASSETS.includes(url.pathname)) {
-			return cache.match(event.request);
+			const cachedResponse = await cache.match(event.request);
+			if (cachedResponse) {
+				return cachedResponse;
+			}
+			// if the request is not found in cache, return a 404 response
 		}
 
 		// for everything else, try the network first, but
@@ -60,9 +71,25 @@ sw.addEventListener('fetch', (event) => {
 
 			return response;
 		} catch {
-			return cache.match(event.request);
+			const cachedResponse = await cache.match(event.request);
+			if (cachedResponse) {
+				return cachedResponse;
+			}
+			// if the request is not found in cache, return a 404 response
+			return new Response(null, { status: 404 });
 		}
 	}
 
 	event.respondWith(respond());
+});
+
+sw.addEventListener('push', (event) => {
+	const data: NotificationContent = event.data?.json();
+	console.log('event', event, 'data', data);
+
+	const options = {
+		body: data.options.body
+	};
+
+	sw.registration.showNotification(data.title, options);
 });

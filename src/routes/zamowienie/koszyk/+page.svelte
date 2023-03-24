@@ -12,10 +12,7 @@
 
 <svelte:head>
 	<title>Koszyk {$cart.products.length ? `(${$cart.products.length}) ` : ''}• Twoje ALDO</title>
-	<meta
-		name="description"
-		content="Strona sklepu Twoje ALDO. Znajdź produkty, które Cię interesują. Zamów online."
-	/>
+	<meta name="description" content="Twój koszyk. Dokończ zamówienie." />
 </svelte:head>
 
 <h1 class="text-3xl font-bold">Twój koszyk 🛒</h1>

@@ -3,14 +3,16 @@
 	import Navbar from '../components/Layout/Navbar.svelte';
 	import Footer from '../components/Layout/Footer.svelte';
 	import { fade, fly } from 'svelte/transition';
-	import { Toaster } from 'svelte-french-toast';
+	import toast, { Toaster } from 'svelte-french-toast';
 
 	import { onMount } from 'svelte';
 	import { themeChange } from 'theme-change';
-	import { theme } from '$lib/client/stores/theme';
+	import { settings } from '$lib/client/stores/settings';
+	import { base64StringToUint8Arr } from '$lib/client/functions/base64StringToUint8Arr';
+	import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public';
 
 	// NOTE: the element that is using one of the theme attributes must be in the DOM on mount
-	onMount(() => {
+	onMount(async () => {
 		themeChange(false);
 		// 👆 false parameter is required for svelte
 	});
@@ -22,7 +24,7 @@
 
 <div
 	class="min-h-screen flex flex-col justify-between max-w-screen bg-base-100"
-	data-theme={$theme}
+	data-theme={$settings.theme}
 >
 	<Toaster position="bottom-right" />
 

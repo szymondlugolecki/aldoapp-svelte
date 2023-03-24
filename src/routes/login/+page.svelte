@@ -10,10 +10,7 @@
 
 <svelte:head>
 	<title>Zaloguj się • Twoje ALDO</title>
-	<meta
-		name="description"
-		content="Zaloguj się do aplikacji Twoje ALDO. Po zalogowaniu możesz składać zamówienia, śledzić historię zamówień oraz zarządzać swoim kontem."
-	/>
+	<meta name="description" content="Zaloguj się do aplikacji Twoje ALDO." />
 </svelte:head>
 
 <section class="w-full h-full flex justify-center items-center flex-1">

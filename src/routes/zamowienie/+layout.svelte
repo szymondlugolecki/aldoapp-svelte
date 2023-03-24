@@ -19,6 +19,8 @@
 
 		console.log('urlXD', data.url);
 
+		if (!productIds.length) return;
+
 		if (!data.url.toLowerCase().endsWith('/zamowienie/koszyk') || $cart.status === 'verified')
 			return;
 

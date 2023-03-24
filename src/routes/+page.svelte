@@ -1,6 +1,7 @@
 <script lang="ts">
 	import toast from 'svelte-french-toast';
 	import { onMount } from 'svelte';
+	import { subscribe, unsubscribe } from '$lib/client/functions/push';
 
 	let sessionData: import('./$types').PageData['user'] | undefined = undefined;
 
@@ -34,4 +35,17 @@
 	<button on:click={session} class="px-3 py-2 bg-gray-800 text-white text-lg">Get session</button>
 	<button on:click={showToast} class="px-3 py-2 bg-gray-800 text-white text-lg">Poggers xD</button>
 	{JSON.stringify(sessionData)}
+	<button
+		on:click={() => {
+			subscribe();
+		}}
+		class="px-3 py-2 bg-gray-800 text-white text-lg">Chcę otrzymywać powiadomienia</button
+	>
+
+	<button
+		on:click={() => {
+			unsubscribe();
+		}}
+		class="px-3 py-2 bg-gray-800 text-white text-lg">Nie chcę już otrzymywać powiadomień</button
+	>
 </section>

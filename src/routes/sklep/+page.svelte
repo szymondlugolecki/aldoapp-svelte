@@ -109,7 +109,7 @@
 	<title>Sklep • Twoje ALDO</title>
 	<meta
 		name="description"
-		content="Strona sklepu Twoje ALDO. Znajdź produkty, które Cię interesują. Zamów online."
+		content="Sklep internetowy. Znajdź produkty, które Cię interesują. Zamów online."
 	/>
 </svelte:head>
 

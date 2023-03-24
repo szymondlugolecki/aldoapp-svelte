@@ -1,4 +1,6 @@
-export const load = ({ locals, depends, url }) => {
+// import { prisma } from '$lib/server/clients/prismaClient';
+
+export const load = async ({ locals, depends, url }) => {
 	depends('session');
 
 	return {

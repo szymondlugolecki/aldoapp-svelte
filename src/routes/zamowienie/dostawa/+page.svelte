@@ -16,6 +16,7 @@
 
 <svelte:head>
 	<title>Koszyk {$cart.products ? `(${$cart.products.length}) ` : ''}• Twoje ALDO</title>
+	<meta name="description" content="Wybierz metodę dostawy. Dokończ zamówienie." />
 </svelte:head>
 
 <div class="text-left container h-full flex flex-col p-2 space-y-4">

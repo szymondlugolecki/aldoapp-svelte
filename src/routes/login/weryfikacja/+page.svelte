@@ -9,10 +9,7 @@
 
 <svelte:head>
 	<title>Weryfikacja logowania • Twoje ALDO</title>
-	<meta
-		name="description"
-		content="Weryfikacja logowania do aplikacji Twoje ALDO. Przepisz kod z maila lub kliknij w link aktywacyjny."
-	/>
+	<meta name="description" content="Weryfikacja logowania. Sprawdź swoją pocztę." />
 </svelte:head>
 
 <section class="w-full h-full flex justify-center items-center flex-1">

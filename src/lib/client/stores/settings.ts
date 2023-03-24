@@ -1,20 +1,25 @@
 import { persisted } from 'svelte-local-storage-store';
-import { browser } from '$app/environment';
+// import { browser } from '$app/environment';
 import { get } from 'svelte/store';
 
 type Theme = (typeof themes)[number];
 
 const themes = ['light', 'dark'] as const;
+export const themeNames = {
+	light: 'Jasny 🌞',
+	dark: 'Ciemny 🌜'
+} as const;
 
-const defaultValue: Theme = 'light';
-const initialValue = browser
-	? ((window.localStorage.getItem('theme') ?? defaultValue) as Theme)
-	: (defaultValue as Theme);
+type Settings = {
+	theme: Theme;
+};
 
-export const theme = persisted('preferences', initialValue);
+export const settings = persisted<Settings>('preferences', {
+	theme: 'light'
+});
 
 export const nextTheme = () => {
-	const currentTheme = get(theme);
+	const currentTheme = get(settings).theme;
 	let themeIndex = themes.indexOf(currentTheme);
 
 	// If last theme, go back to first theme
@@ -24,5 +29,8 @@ export const nextTheme = () => {
 		themeIndex++;
 	}
 
-	theme.set(themes[themeIndex]);
+	settings.update((oldSettings) => ({
+		...oldSettings,
+		theme: themes[themeIndex]
+	}));
 };
