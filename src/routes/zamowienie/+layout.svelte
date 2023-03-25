@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { roleNames, salesmenMenu } from '$lib/client/constants';
-	import { ArrowLeft, ArrowRight, LogOut } from 'lucide-svelte';
+	import { ArrowLeft, ArrowRight, LogOut, RefreshCcw } from 'lucide-svelte';
 	import type { CartProductWithQuantity, Role, SessionUser } from '../../types';
 	import { fade, slide } from 'svelte/transition';
 	import { cart, changeCartState, removeProduct } from '$lib/client/stores/cart';
@@ -206,11 +206,41 @@
 						>
 					{/if}
 					{#if stageIndex < stages.length - 1}
-						<a href="/zamowienie/{stages[stageIndex + 1]}" class="btn btn-primary flex-1"
-							>Dalej <ArrowRight class="ml-1" /></a
+						<!-- class:btn-disabled={$cart.status === 'loading'} -->
+						<a
+							class:btn-disabled={(stageIndex === 1 && !$cart.deliveryMethod) ||
+								(stageIndex === 2 && !$cart.paymentMethod)}
+							href="/zamowienie/{stages[stageIndex + 1]}"
+							class="btn btn-primary flex-1">Dalej <ArrowRight class="ml-1" /></a
 						>
 					{/if}
 				</div>
+
+				<!-- <button
+					class="btn btn-ghost"
+					on:click={() => {
+						cart.update((oldCart) => ({
+							...oldCart,
+							deliveryMethod: null,
+							paymentMethod: null
+						}));
+					}}>Reset delivery and payment methods</button
+				> -->
+
+				<!-- {#if stageIndex === 0 && ($cart.status !== 'verified' || ($cart.lastVerified || new Date()) < new Date(Date.now() - 1000 * 60 * 5))}
+					<div class="flex flex-col">
+						<button
+							disabled={$cart.status === 'loading'}
+							name="verify-cart"
+							on:click={() => synchronizeCart()}
+							class="btn btn-primary">Synchronizuj koszyk <RefreshCcw class="ml-2" /></button
+						>
+
+						<label for="verify-cart" class="label text-sm">
+							Opcjonalne: Synchronizacja koszyka pobiera najnowszą wersję produktów w koszyku.
+						</label>
+					</div>
+				{/if} -->
 			</div>
 		</div>
 	{/if}

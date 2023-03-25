@@ -93,7 +93,7 @@
 		<label
 			for="admin-drawer"
 			on:click={() => {
-				console.log(product.symbol);
+				// console.log(product.symbol);
 				drawer.set({
 					open: true,
 					id: product.id,

@@ -23,12 +23,3 @@ export const pushNotificationRequest = z.object({
 			.min(1, { message: 'Wiadomość musi zawierać przynajmniej jeden znak' })
 	})
 });
-
-// data {
-//     endpoint: 'https://fcm.googleapis.com/fcm/send/dvnhGX84Wq4:APA91bFJVTu_E3vFFBa18DpoDBFcnbmlWOTsaePrpkNdBMBKfdP--2KeBlIvFiEwexusXy0cmSnzOmR2Zo_EwCET8c4HTfivUzUXlTllVe5avBRP529lh1dpC4NZNn94zLXX6GtCHKuU',
-//     expirationTime: null,
-//     keys: {
-//       p256dh: 'BAjDgRH8pH91nC0tqLyQS26tGYrZMm3pPQsfJqaxuowxgCZXBhugrRyXt-UzG3v8JzyIKkp5eKhbnF6aK9wWwzo',
-//       auth: 'v1fzyc70GXXQDFGAB9m4iQ'
-//     }
-//   }

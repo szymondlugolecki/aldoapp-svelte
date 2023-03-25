@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { roleNames, salesmenMenu } from '$lib/client/constants';
-	import { ArrowRight, LogOut } from 'lucide-svelte';
+	import { ArrowRight, Box, LogOut, ShoppingBag } from 'lucide-svelte';
 	import type { CartProductWithQuantity, Role, SessionUser } from '../../../types';
 	import { fade, slide } from 'svelte/transition';
 	import { cart, removeProduct } from '$lib/client/stores/cart';
@@ -10,8 +10,13 @@
 	import toast from 'svelte-french-toast';
 	import { error } from '@sveltejs/kit';
 	import type { Product } from '@prisma/client';
+	import dpdLogo from '$lib/assets/dpd_logo.png?run&width=225&height=100&format=webp';
+	import Img from '@zerodevx/svelte-img';
+	import DeliveryMethod from '$components/DeliveryMethod.svelte';
 
 	let cartLocalProducts: CartProductWithQuantity[] = $cart.products || [];
+
+	export let data;
 </script>
 
 <svelte:head>
@@ -19,6 +24,121 @@
 	<meta name="description" content="Wybierz metodę dostawy. Dokończ zamówienie." />
 </svelte:head>
 
-<div class="text-left container h-full flex flex-col p-2 space-y-4">
-	<h1 class="text-3xl font-bold">Poggers 🛒</h1>
+<div class="text-left h-full flex flex-col xs:p-2 space-y-4 flex-1">
+	<h1 class="text-3xl font-bold">Dostawa 🚚</h1>
+
+	<h2 class="mb-5 text-lg font-medium">Wybierz metodę dostawy</h2>
+	<ul class="flex flex-col w-full max-w-[500px] md:max-w-none xl:max-w-[700px] space-y-4">
+		<li>
+			<DeliveryMethod
+				name="Odbiór osobisty"
+				description="Gotowe do odbioru w ciągu 3 dni"
+				id="personal-pickup"
+				price="Gratis!"
+			>
+				<ShoppingBag size={50} />
+			</DeliveryMethod>
+		</li>
+		<li>
+			<DeliveryMethod name="DPD" description="Transport zajmie 3 dni" id="dpd" price="167 PLN">
+				<Img src={dpdLogo} height={50} width={112} alt="Logo DPD" />
+			</DeliveryMethod>
+		</li>
+	</ul>
+
+	{#if $cart.deliveryMethod !== 'personal-pickup'}
+		<div class="flex flex-col space-y-2">
+			<h3 class="text-lg font-medium">Dane do wysyłki</h3>
+			<div class="form-control w-full">
+				<label class="label" for="first-name">
+					<span class="label-text">Imię i nazwisko</span>
+				</label>
+				<input
+					type="text"
+					placeholder="Wpisz tu imię i nazwisko odbiorcy..."
+					name="first-name"
+					class="input input-bordered w-full"
+					value={data.user?.fullName}
+					required
+					maxlength="100"
+					minlength="3"
+				/>
+			</div>
+			<div class="form-control w-full">
+				<label class="label" for="first-name">
+					<span class="label-text">Ulica i numer</span>
+				</label>
+				<input
+					type="text"
+					placeholder="Wpisz tu ulicę i numer..."
+					name="first-name"
+					class="input input-bordered w-full"
+					required
+					maxlength="120"
+					minlength="3"
+				/>
+			</div>
+			<div class="flex space-x-3">
+				<div class="form-control w-full">
+					<label class="label" for="first-name">
+						<span class="label-text">Kod pocztowy</span>
+					</label>
+					<input
+						type="text"
+						placeholder="Wpisz tu kod pocztowy..."
+						name="address-zip-code"
+						class="input input-bordered w-full max-w-xs"
+						required
+						maxlength="50"
+						minlength="3"
+					/>
+				</div>
+				<div class="form-control w-full">
+					<label class="label" for="first-name">
+						<span class="label-text">Miasto</span>
+					</label>
+					<input
+						type="text"
+						placeholder="Wpisz tu miasto..."
+						name="address-city"
+						class="input input-bordered w-full max-w-xs"
+						required
+						maxlength="100"
+						minlength="2"
+					/>
+				</div>
+			</div>
+			<div class="flex space-x-3">
+				<div class="form-control w-full">
+					<label class="label" for="first-name">
+						<span class="label-text">Telefon</span>
+					</label>
+					<input
+						type="tel"
+						placeholder="Wpisz tu numer telefonu do odbiorcy..."
+						name="address-phone-number"
+						class="input input-bordered w-full max-w-xs"
+						required
+						maxlength="20"
+						minlength="3"
+					/>
+				</div>
+				<div class="form-control w-full">
+					<label class="label" for="first-name">
+						<span class="label-text">Adres email</span>
+					</label>
+					<input
+						type="email"
+						placeholder="Wpisz tu adres email odbiorcy..."
+						name="address-email"
+						class="input input-bordered w-full max-w-xs"
+						required
+						maxlength="200"
+						minlength="2"
+						value={data.user?.email}
+					/>
+				</div>
+			</div>
+		</div>
+	{/if}
 </div>

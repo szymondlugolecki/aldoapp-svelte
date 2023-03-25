@@ -17,7 +17,7 @@ import { vitePreprocess } from '@sveltejs/kit/vite';
 
 const shortServices = ['pasze', 'komis', 'market', 'paliwa', 'maszyny', 'serwis'];
 
-console.log(shortServices.map((service) => `/kontakty/${service}`));
+// console.log(shortServices.map((service) => `/kontakty/${service}`));
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {

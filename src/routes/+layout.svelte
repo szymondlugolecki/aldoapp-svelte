@@ -18,8 +18,6 @@
 	});
 
 	export let data;
-
-	console.log('url', data.url);
 </script>
 
 <div

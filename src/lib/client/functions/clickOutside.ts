@@ -6,7 +6,7 @@ export function clickOutside(node: Node) {
 	function handleClick(e: MouseEvent) {
 		if (!node.contains(e.target as Node)) {
 			node.dispatchEvent(new CustomEvent('outside_click'));
-			console.log('outside click');
+			// console.log('outside click');
 		}
 	}
 

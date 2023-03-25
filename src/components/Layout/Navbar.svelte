@@ -21,7 +21,7 @@
 	import logout from '$lib/client/functions/logout';
 	import { nextTheme, settings } from '$lib/client/stores/settings';
 	import MegaMenu from './MegaMenu.svelte';
-	import { fade, slide } from 'svelte/transition';
+	import { slide } from 'svelte/transition';
 	import { cart } from '$lib/client/stores/cart';
 	import { productURLParser } from '$lib/client/functions';
 	export let user: SessionUser | undefined;
@@ -50,18 +50,6 @@
 				? `${$cart.products.length} produkty`
 				: `${$cart.products.length} produktów`
 			: 'Pusty koszyk';
-
-	function shortProductName(name: string) {
-		// const words = name.split(/\/|-/g);
-		if (name.length <= 21) {
-			return name;
-		}
-		// else if (words[0].length > 20) {
-		// 	return words[0].slice(0, 20) + '...';
-		// }
-
-		return name.slice(0, 21) + '...';
-	}
 </script>
 
 <nav class="navbar bg-base-100 border-b border-base-content rounded flex flex-col relative">

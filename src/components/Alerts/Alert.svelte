@@ -29,6 +29,6 @@
 	</div>
 	<div class="h-full w-full flex flex-col items-start justify-center">
 		<h3 class="font-bold text-lg">{alertTitle[type]}</h3>
-		<span class="text-xs">{message}</span>
+		<span class="text-sm">{message}</span>
 	</div>
 </div>

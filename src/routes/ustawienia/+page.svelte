@@ -68,13 +68,13 @@
 					<th>Powiadomienia</th>
 					<td>{subscribed ? 'Włączone 🟢' : 'Wyłączone 🔴'}</td>
 					<td>
-						{#if subscribed}
-							<button class="btn btn-error text-white" on:click={() => unsubscribe()}
-								>Wyłącz 😟</button
-							>
-						{:else}
-							<button class="btn btn-success" on:click={() => subscribe()}>Włącz 🙂</button>
-						{/if}
+						<button
+							class="btn btn-secondary text-white"
+							on:click={() => {
+								if (subscribed) unsubscribe();
+								else subscribe();
+							}}>{subscribed ? 'Wyłącz 😟' : 'Włącz 🙂'}</button
+						>
 					</td>
 				</tr>
 				<!-- row 2 -->

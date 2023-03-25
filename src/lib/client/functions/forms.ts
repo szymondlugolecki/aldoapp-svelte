@@ -8,7 +8,7 @@ export const handleFormResponse = (
 	id: string,
 	customMessage?: string
 ) => {
-	console.log('result', result.type);
+	// console.log('result', result.type);
 
 	switch (result.type) {
 		case 'failure':

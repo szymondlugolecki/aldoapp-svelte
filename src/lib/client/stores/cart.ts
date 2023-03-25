@@ -1,19 +1,28 @@
 import type { CartProductWithQuantity, StoreProduct } from '$types';
 import { persisted } from 'svelte-local-storage-store';
 
+type DeliveryMethods = 'personal-pickup' | 'dpd';
+type PaymentMethods = 'cash';
+
 type CartStore = {
 	products: CartProductWithQuantity[];
 	status: 'verified' | 'loading' | 'error' | 'not-verified';
 	lastVerified: Date | null;
 	promoCode: string | null;
+	deliveryMethod: DeliveryMethods | null;
+	paymentMethod: PaymentMethods | null;
 };
 
-export const cart = persisted<CartStore>('cart', {
+const initialCart: CartStore = {
 	products: [],
 	status: 'not-verified',
 	lastVerified: null,
-	promoCode: null
-});
+	promoCode: null,
+	deliveryMethod: null,
+	paymentMethod: null
+};
+
+export const cart = persisted<CartStore>('cart', initialCart);
 
 // when a new product is added to the cart/cart is cleared, change status to not-verified
 // when a product is removed/its quantity is decremented, check if cart is empty
@@ -48,7 +57,7 @@ export const addProduct = (product: StoreProduct) => {
 		if (products.find((p) => p.id === product.id)) {
 			return {
 				...cartObj,
-				// status: 'not-verified',
+				status: 'not-verified',
 				products: products.map((p) => {
 					if (p.id === product.id) {
 						return cartProductParser(product, p.quantity + 1);
@@ -61,7 +70,7 @@ export const addProduct = (product: StoreProduct) => {
 		else {
 			return {
 				...cartObj,
-				// status: 'not-verified',
+				status: 'not-verified',
 				products: [...products, cartProductParser(product, 1)]
 			};
 		}
@@ -79,7 +88,7 @@ export const incrementProduct = (productId: string) => {
 
 		return {
 			...cartObj,
-			// status: 'not-verified',
+			status: 'not-verified',
 			products
 		};
 	});
@@ -116,10 +125,5 @@ export const removeProduct = (productId: string) => {
 };
 
 export const clearCart = () => {
-	cart.set({
-		lastVerified: null,
-		status: 'not-verified',
-		products: [],
-		promoCode: null
-	});
+	cart.set(initialCart);
 };
