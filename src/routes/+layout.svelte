@@ -15,6 +15,10 @@
 	onMount(async () => {
 		themeChange(false);
 		// 👆 false parameter is required for svelte
+
+		setInterval(() => {
+			toast('Jaroslaw wlasnie kupil Pasze ALDO Premium', { icon: '🔔' });
+		}, 1000 * 30);
 	});
 
 	export let data;

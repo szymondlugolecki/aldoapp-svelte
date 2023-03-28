@@ -11,6 +11,9 @@ type SalesmenMenuType = {
 	href: ShortService;
 };
 
+export const paymentMethods = ['cash'] as const;
+export const deliveryMethods = ['personal-pickup', 'dpd'] as const;
+
 export const producentsList = {
 	deheus: 'De Heus',
 	unknown: 'Nieznany'

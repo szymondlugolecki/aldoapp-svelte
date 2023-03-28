@@ -4,7 +4,7 @@
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import logo from '$lib/assets/logo.png?run&width=110&height=80&format=webp';
 	import Img from '@zerodevx/svelte-img';
-	import Danger from '$components/Alerts/Danger.svelte';
+	// import Danger from '$components/Alerts/Danger.svelte';
 	import Success from '$components/Alerts/Alert.svelte';
 </script>
 

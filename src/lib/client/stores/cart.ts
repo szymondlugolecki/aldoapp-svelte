@@ -1,8 +1,9 @@
 import type { CartProductWithQuantity, StoreProduct } from '$types';
 import { persisted } from 'svelte-local-storage-store';
+import type { deliveryMethods, paymentMethods } from '../constants';
 
-type DeliveryMethods = 'personal-pickup' | 'dpd';
-type PaymentMethods = 'cash';
+type DeliveryMethods = (typeof deliveryMethods)[number];
+type PaymentMethods = (typeof paymentMethods)[number];
 
 type CartStore = {
 	products: CartProductWithQuantity[];
@@ -11,18 +12,42 @@ type CartStore = {
 	promoCode: string | null;
 	deliveryMethod: DeliveryMethods | null;
 	paymentMethod: PaymentMethods | null;
+	rememberAddress: boolean;
+	isAddressValid: boolean;
+	customerName: string;
+	address: {
+		street: string;
+		zipCode: string;
+		city: string;
+		phone: string;
+		email: string;
+	};
 };
 
-const initialCart: CartStore = {
+const emptyDeliveryAddress = {
+	street: '',
+	zipCode: '',
+	city: '',
+	phone: '',
+	email: ''
+};
+
+const initialCart: Omit<CartStore, 'address'> = {
 	products: [],
 	status: 'not-verified',
 	lastVerified: null,
 	promoCode: null,
 	deliveryMethod: null,
-	paymentMethod: null
+	paymentMethod: null,
+	rememberAddress: false,
+	isAddressValid: false,
+	customerName: ''
 };
 
-export const cart = persisted<CartStore>('cart', initialCart);
+export const cart = persisted<CartStore>('cart', {
+	...initialCart,
+	address: emptyDeliveryAddress
+});
 
 // when a new product is added to the cart/cart is cleared, change status to not-verified
 // when a product is removed/its quantity is decremented, check if cart is empty
@@ -125,5 +150,11 @@ export const removeProduct = (productId: string) => {
 };
 
 export const clearCart = () => {
-	cart.set(initialCart);
+	cart.update((oldCart) => {
+		return {
+			...initialCart,
+			status: 'not-verified',
+			address: oldCart.rememberAddress ? oldCart.address : emptyDeliveryAddress
+		};
+	});
 };

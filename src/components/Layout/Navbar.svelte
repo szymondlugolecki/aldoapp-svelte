@@ -128,7 +128,7 @@
 					>
 						<div class="card-body">
 							<span class="font-bold text-lg">{productsCountTitle}</span>
-							{#each $cart.products && $cart.products.slice(0, 7) as product}
+							{#each $cart.products ? $cart.products.slice(0, 7) : [] as product}
 								<div class="flex flex-grow">
 									<div class="flex items-start flex-1 space-x-2">
 										<a

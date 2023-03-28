@@ -1,22 +1,36 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { roleNames, salesmenMenu } from '$lib/client/constants';
-	import { ArrowRight, Box, LogOut, ShoppingBag } from 'lucide-svelte';
-	import type { CartProductWithQuantity, Role, SessionUser } from '../../../types';
-	import { fade, slide } from 'svelte/transition';
-	import { cart, removeProduct } from '$lib/client/stores/cart';
+	import { ShoppingBag } from 'lucide-svelte';
+	import { cart } from '$lib/client/stores/cart';
 	import { onMount } from 'svelte';
-	import wretch from 'wretch';
-	import toast from 'svelte-french-toast';
-	import { error } from '@sveltejs/kit';
-	import type { Product } from '@prisma/client';
 	import dpdLogo from '$lib/assets/dpd_logo.png?run&width=225&height=100&format=webp';
 	import Img from '@zerodevx/svelte-img';
 	import DeliveryMethod from '$components/DeliveryMethod.svelte';
+	import {
+		deliveryValidation,
+		orderCityValidation,
+		orderEmailValidation,
+		orderNameValidation,
+		orderPhoneValidation,
+		orderStreetValidation,
+		orderZipCodeValidation
+	} from '$lib/client/schemas/order';
 
-	let cartLocalProducts: CartProductWithQuantity[] = $cart.products || [];
+	onMount(() => {
+		cart.update((oldCart) => ({
+			...oldCart,
+			customerName: data.user?.fullName || '',
+			delivery: {
+				...oldCart.delivery,
+				email: data.user?.email || ''
+			}
+		}));
+	});
 
 	export let data;
+
+	$: deliveryValidation.safeParse($cart.delivery).success
+		? ($cart.isAddressValid = true)
+		: ($cart.isAddressValid = false);
 </script>
 
 <svelte:head>
@@ -28,7 +42,7 @@
 	<h1 class="text-3xl font-bold">Dostawa 🚚</h1>
 
 	<h2 class="mb-5 text-lg font-medium">Wybierz metodę dostawy</h2>
-	<ul class="flex flex-col w-full max-w-[500px] md:max-w-none xl:max-w-[700px] space-y-4">
+	<ul class="flex flex-col w-full xs:max-w-[500px] space-y-4">
 		<li>
 			<DeliveryMethod
 				name="Odbiór osobisty"
@@ -46,27 +60,29 @@
 		</li>
 	</ul>
 
-	{#if $cart.deliveryMethod !== 'personal-pickup'}
+	{#if $cart.deliveryMethod && $cart.deliveryMethod !== 'personal-pickup'}
 		<div class="flex flex-col space-y-2">
 			<h3 class="text-lg font-medium">Dane do wysyłki</h3>
 			<div class="form-control w-full">
 				<label class="label" for="first-name">
-					<span class="label-text">Imię i nazwisko</span>
+					<span class="label-text">Imię i nazwisko*</span>
 				</label>
 				<input
 					type="text"
 					placeholder="Wpisz tu imię i nazwisko odbiorcy..."
 					name="first-name"
 					class="input input-bordered w-full"
-					value={data.user?.fullName}
 					required
-					maxlength="100"
-					minlength="3"
+					bind:value={$cart.customerName}
+					class:input-success={$cart.customerName.length > 0 &&
+						orderNameValidation.safeParse($cart.customerName).success}
+					class:input-error={$cart.customerName.length > 0 &&
+						!orderNameValidation.safeParse($cart.customerName).success}
 				/>
 			</div>
 			<div class="form-control w-full">
 				<label class="label" for="first-name">
-					<span class="label-text">Ulica i numer</span>
+					<span class="label-text">Ulica i numer*</span>
 				</label>
 				<input
 					type="text"
@@ -74,14 +90,17 @@
 					name="first-name"
 					class="input input-bordered w-full"
 					required
-					maxlength="120"
-					minlength="3"
+					bind:value={$cart.delivery.street}
+					class:input-success={$cart.delivery.street.length > 0 &&
+						orderStreetValidation.safeParse($cart.delivery.street).success}
+					class:input-error={$cart.delivery.street.length > 0 &&
+						!orderStreetValidation.safeParse($cart.delivery.street).success}
 				/>
 			</div>
 			<div class="flex space-x-3">
 				<div class="form-control w-full">
 					<label class="label" for="first-name">
-						<span class="label-text">Kod pocztowy</span>
+						<span class="label-text">Kod pocztowy*</span>
 					</label>
 					<input
 						type="text"
@@ -89,13 +108,16 @@
 						name="address-zip-code"
 						class="input input-bordered w-full max-w-xs"
 						required
-						maxlength="50"
-						minlength="3"
+						bind:value={$cart.delivery.zipCode}
+						class:input-success={$cart.delivery.zipCode.length > 0 &&
+							orderZipCodeValidation.safeParse($cart.delivery.zipCode).success}
+						class:input-error={$cart.delivery.zipCode.length > 0 &&
+							!orderZipCodeValidation.safeParse($cart.delivery.zipCode).success}
 					/>
 				</div>
 				<div class="form-control w-full">
 					<label class="label" for="first-name">
-						<span class="label-text">Miasto</span>
+						<span class="label-text">Miasto*</span>
 					</label>
 					<input
 						type="text"
@@ -103,39 +125,47 @@
 						name="address-city"
 						class="input input-bordered w-full max-w-xs"
 						required
-						maxlength="100"
-						minlength="2"
+						bind:value={$cart.delivery.city}
+						class:input-success={$cart.delivery.city.length > 0 &&
+							orderCityValidation.safeParse($cart.delivery.city).success}
+						class:input-error={$cart.delivery.city.length > 0 &&
+							!orderCityValidation.safeParse($cart.delivery.city).success}
 					/>
 				</div>
 			</div>
 			<div class="flex space-x-3">
 				<div class="form-control w-full">
 					<label class="label" for="first-name">
-						<span class="label-text">Telefon</span>
+						<span class="label-text">Telefon*</span>
 					</label>
 					<input
 						type="tel"
 						placeholder="Wpisz tu numer telefonu do odbiorcy..."
 						name="address-phone-number"
 						class="input input-bordered w-full max-w-xs"
+						class:input-success={$cart.delivery.phone.length > 0 &&
+							orderPhoneValidation.safeParse($cart.delivery.phone).success}
+						class:input-error={$cart.delivery.phone.length > 0 &&
+							!orderPhoneValidation.safeParse($cart.delivery.phone).success}
 						required
-						maxlength="20"
-						minlength="3"
+						bind:value={$cart.delivery.phone}
 					/>
 				</div>
 				<div class="form-control w-full">
 					<label class="label" for="first-name">
-						<span class="label-text">Adres email</span>
+						<span class="label-text">Adres email*</span>
 					</label>
 					<input
 						type="email"
 						placeholder="Wpisz tu adres email odbiorcy..."
 						name="address-email"
 						class="input input-bordered w-full max-w-xs"
+						class:input-success={$cart.delivery.email.length > 0 &&
+							orderEmailValidation.safeParse($cart.delivery.email).success}
+						class:input-error={$cart.delivery.email.length > 0 &&
+							!orderEmailValidation.safeParse($cart.delivery.email).success}
 						required
-						maxlength="200"
-						minlength="2"
-						value={data.user?.email}
+						bind:value={$cart.delivery.email}
 					/>
 				</div>
 			</div>

@@ -68,7 +68,8 @@ const handleLogin: Action = async ({ request }) => {
 			create: {
 				code: verificationCode,
 				email,
-				expires: new Date(Date.now() + verificationKeysExpirationTime) // 12 hours from now
+				expires: new Date(Date.now() + verificationKeysExpirationTime), // 12 hours from now
+				userAgent: ''
 			},
 			update: {
 				code: verificationCode,

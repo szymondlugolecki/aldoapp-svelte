@@ -27,7 +27,7 @@
 			class="max-h-24"
 			width="96px"
 			height="96px"
-			src={product.images[0] && product.images[0].url}
+			src={product.images[0]}
 			alt="Zdjęcie produktu"
 		/>
 	</a>

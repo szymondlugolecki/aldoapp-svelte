@@ -4,13 +4,17 @@
 	import { ArrowLeft, ArrowRight, LogOut, RefreshCcw } from 'lucide-svelte';
 	import type { CartProductWithQuantity, Role, SessionUser } from '../../types';
 	import { fade, slide } from 'svelte/transition';
-	import { cart, changeCartState, removeProduct } from '$lib/client/stores/cart';
+	import { cart, changeCartState, clearCart, removeProduct } from '$lib/client/stores/cart';
 	import { onMount } from 'svelte';
 	import wretch from 'wretch';
 	import toast from 'svelte-french-toast';
 	import { error } from '@sveltejs/kit';
 	import type { Product } from '@prisma/client';
 	import { imagesSorting } from '$lib/client/functions/sorting';
+	import { orderValidation } from '$lib/client/schemas/order';
+	import { betterZodParse } from '$lib/client/functions/betterZodParse';
+	import type { Z } from 'vitest/dist/types-71ccd11d';
+	import type { z } from 'zod';
 
 	export let data;
 
@@ -80,6 +84,70 @@
 		}
 	};
 
+	const createOrder = async () => {
+		// if ($cart.status !== 'verified') {
+		// 	toast.error('Koszyk nie jest zsynchronizowany');
+		// 	return;
+		// }
+
+		if ($cart.products.length === 0) {
+			toast.error('Koszyk jest pusty');
+			return;
+		}
+
+		if (!$cart.deliveryMethod) {
+			toast.error('Nie wybrano metody dostawy');
+			return;
+		}
+
+		if (!$cart.paymentMethod) {
+			toast.error('Nie wybrano metody płatności');
+			return;
+		}
+
+		if ($cart.deliveryMethod !== 'personal-pickup' && $cart.isAddressValid !== true) {
+			toast.error('Niepoprawny adres');
+			return;
+		}
+
+		try {
+			const [order, orderParseError] = betterZodParse(orderValidation, {
+				products: $cart.products.map((product) => ({
+					id: product.id,
+					quantity: product.quantity
+				})),
+				deliveryMethod: $cart.deliveryMethod,
+				paymentMethod: $cart.paymentMethod,
+				customerName: $cart.customerName,
+				address: $cart.address,
+				promoCode: $cart.promoCode
+			} as z.infer<typeof orderValidation>);
+
+			if (orderParseError) {
+				toast.error(orderParseError[0]);
+				return;
+			}
+
+			const createOrderPromise = wretch('/api/order/create')
+				.post(order)
+				.json<{ success: true; orderId: string }>();
+
+			toast.promise(createOrderPromise, {
+				error: 'Nie udało się złożyć zamówienia',
+				success: 'Złożono zamówienie',
+				loading: 'Składanie zamówienia...'
+			});
+
+			const data = await createOrderPromise;
+
+			// toast.success('Pomyślnie złożono zamówienie');
+
+			// clearCart();
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
 	onMount(() => {
 		synchronizeCart();
 	});
@@ -109,6 +177,13 @@
 			}
 		}
 	}
+
+	$: disableNextStep =
+		(stageIndex === 1 && !$cart.deliveryMethod) ||
+		(stageIndex === 2 && !$cart.paymentMethod) ||
+		(stageIndex === 1 &&
+			$cart.deliveryMethod !== 'personal-pickup' &&
+			$cart.isAddressValid === false);
 
 	$: console.log('cart', $cart);
 </script>
@@ -153,29 +228,27 @@
 			<div
 				class="xl:max-w-[340px] lg:max-w-[270px] px-1 sm:px-0 w-full h-full flex flex-col space-y-4 sm:space-y-6 sticky top-0"
 			>
-				<h2 class="text-2xl font-bold">Podsumowanie 📒</h2>
+				<h2 class="text-3xl font-bold">Podsumowanie 📒</h2>
 				<div class="flex flex-col space-y-2 lg:text-base md:text-sm">
 					<div class="flex justify-between items-center">
-						<span class="text-sm xs:text-base">Suma częściowa</span>
-						<bold class="font-semibold text-sm xs:text-base">{subtotal.toFixed(2)} PLN</bold>
+						<span class="text-base">Suma częściowa</span>
+						<bold class="font-semibold text-base">{subtotal.toFixed(2)} PLN</bold>
 					</div>
 					<div class="flex justify-between items-center">
-						<span class="text-sm xs:text-base">Przesyłka</span>
-						<bold class="font-semibold text-sm xs:text-base">{(10).toFixed(2)} PLN</bold>
+						<span class="text-base">Przesyłka</span>
+						<bold class="font-semibold text-base">{(10).toFixed(2)} PLN</bold>
 					</div>
 					<div class="flex justify-between items-center">
-						<span class="text-sm xs:text-base">VAT</span>
-						<bold class="font-semibold text-sm xs:text-base"
-							>{(subtotal * 0.23).toFixed(2)} PLN</bold
-						>
+						<span class="text-base">VAT</span>
+						<bold class="font-semibold text-base">{(subtotal * 0.23).toFixed(2)} PLN</bold>
 					</div>
 					<div class="flex justify-between items-center">
-						<span class="text-sm xs:text-base">Rabat</span>
-						<bold class="font-semibold text-sm xs:text-base">{0} PLN</bold>
+						<span class="text-base">Rabat</span>
+						<bold class="font-semibold text-base">{0} PLN</bold>
 					</div>
 					<div class="flex justify-between items-center">
-						<bold class="font-bold text-sm xs:text-base">Suma całkowita</bold>
-						<bold class="font-bold text-sm xs:text-base"
+						<bold class="font-bold text-base">Suma całkowita</bold>
+						<bold class="font-bold text-base"
 							>{(subtotal + 10 + subtotal * 0.23).toFixed(2)} PLN</bold
 						>
 					</div>
@@ -201,18 +274,26 @@
 
 				<div class="flex space-x-3">
 					{#if stageIndex > 0}
-						<a href="/zamowienie/{stages[stageIndex - 1]}" class="btn btn-accent flex-1">
+						<a href="/zamowienie/{stages[stageIndex - 1]}" class="btn btn-accent">
 							<ArrowLeft class="mr-1" /> Wstecz</a
 						>
 					{/if}
-					{#if stageIndex < stages.length - 1}
+					{#if stageIndex === 2}
+						<button
+							disabled={disableNextStep}
+							on:click={() => createOrder()}
+							class="btn btn-primary flex-1">ZAMAWIAM <ArrowRight class="ml-1" /></button
+						>
+					{:else if stageIndex < stages.length - 1}
 						<!-- class:btn-disabled={$cart.status === 'loading'} -->
 						<a
-							class:btn-disabled={(stageIndex === 1 && !$cart.deliveryMethod) ||
-								(stageIndex === 2 && !$cart.paymentMethod)}
+							class:btn-disabled={disableNextStep}
 							href="/zamowienie/{stages[stageIndex + 1]}"
-							class="btn btn-primary flex-1">Dalej <ArrowRight class="ml-1" /></a
+							class="btn btn-primary flex-1"
 						>
+							Dalej
+							<ArrowRight class="ml-1" />
+						</a>
 					{/if}
 				</div>
 

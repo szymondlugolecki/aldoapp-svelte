@@ -8,11 +8,7 @@ export type Subcategory = (typeof fodderCategories)[Category][number]['id'];
 
 export type ProductWithAuthorAndImage = Product & {
 	author: ProductAuthor;
-	images: ProductImage[];
-};
-
-type ProductImage = {
-	url: string;
+	images: string[];
 };
 
 export type ProductFilter = {

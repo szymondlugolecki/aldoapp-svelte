@@ -10,6 +10,7 @@
 	import NewProduct from '$components/Modals/Product/NewProduct.svelte';
 	import EditProduct from '$components/Modals/Product/EditProduct.svelte';
 	import RemoveProduct from '$components/Modals/Product/RemoveProduct.svelte';
+	import { imagesSorting } from '$lib/client/functions/sorting';
 
 	export let data;
 
@@ -32,19 +33,26 @@
 		'id'
 	);
 
+	const dataProductsSorted = data.products
+		.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+		.map((product) => {
+			return {
+				...product,
+				images: product.images.map(({ url }) => url).sort(imagesSorting)
+			};
+		});
+
 	// Final list of products filtered by the input from the searchbar, etc.
-	$: products = applyProductFilters(
-		data.products.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
-		filter,
-		searchInput
-	);
+	$: products = applyProductFilters(dataProductsSorted, filter, searchInput);
 
 	let product: ProductWithAuthorAndImage | undefined;
 
 	drawer.subscribe((value) => {
 		if (!value || value.type !== 'product') return;
 		if (value.action === 'edit' || value.action === 'remove') {
-			product = data.products.find((product) => product.id === value.id);
+			product = data.products
+				.map((product) => ({ ...product, images: product.images.map(({ url }) => url) }))
+				.find((product) => product.id === value.id);
 		}
 	});
 </script>

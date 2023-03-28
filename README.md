@@ -41,7 +41,7 @@ You can preview the production build with `npm run preview`.
 
 [✅] Add toasts (also fix toasts stopped showing when logging in)
 
-[] Add animations for smoother and nicer user experience (SvelteKit has many built-in)
+[✅] Add animations for smoother and nicer user experience (SvelteKit has many built-in)
 
 [✅] Make the filters work on Użytkownicy, Produkty & Zamówienia pages
 
@@ -68,9 +68,9 @@ cookie that would prevent logging in with someone else's verification code. > Us
 
 [ ] Add PWA
 
-[ ] Add push notifications
+[✅] Add push notifications
 
-[ ] Add light/dark mode switch
+[✅] Add light/dark mode switch
 
 [ ] Write & run tests
 
@@ -94,6 +94,6 @@ Under consideration:
 
 [ ] Add chatbot for easy user interactions (bot asks what the user wants => user can choose: buy sth, get a phone number for a service of choice, live chat with the staff)
 
-[ ] Add user settings (possibility to add permanent address for future deliveries?, ?, ?)
+[✅] Add user settings (possibility to add permanent address for future deliveries?, ?, ?)
 
 [ ] Train chatgpt for indefinite interactions with users

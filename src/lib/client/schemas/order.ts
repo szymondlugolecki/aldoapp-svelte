@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { deliveryMethods, paymentMethods } from '../constants';
 
 export const orderNameValidation = z
 	.string({
@@ -34,7 +35,7 @@ export const orderPhoneValidation = z
 		required_error: 'Numer telefonu jest wymagany',
 		invalid_type_error: 'Nieprawidłowy numer telefonu'
 	})
-	.min(3, { message: 'Nieprawidłowy numer telefonu' })
+	.min(9, { message: 'Nieprawidłowy numer telefonu' })
 	.max(20, { message: 'Nieprawidłowy numer telefonu' });
 
 export const orderEmailValidation = z
@@ -44,11 +45,71 @@ export const orderEmailValidation = z
 	})
 	.email({ message: 'Nieprawidłowy adres email' });
 
-export const addressValidation = z.object({
-	name: orderNameValidation,
+export const deliveryValidation = z.object({
 	street: orderStreetValidation,
 	zipCode: orderZipCodeValidation,
 	city: orderCityValidation,
 	phone: orderPhoneValidation,
 	email: orderEmailValidation
 });
+
+// if delivery method is 'pickup', then delivery address is not required
+
+const deliveryUnion = z.union([deliveryValidation, z.object({}).optional()]);
+
+export const orderValidation = z
+	.object({
+		products: z
+			.array(
+				z.object({
+					id: z.string(),
+					quantity: z
+						.number({
+							invalid_type_error: 'Nieprawidłowa ilość produktu',
+							required_error: 'Ilość produktu jest wymagana'
+						})
+						.min(1, { message: 'Nie można zamówić mniej niż jednej sztuki' })
+				}),
+				{
+					invalid_type_error: 'Niespodziewany błąd produktów w koszyku',
+					required_error: 'Należy wybrać produkty'
+				}
+			)
+			.nonempty({ message: 'Nie można zamówić pustego koszyka' }),
+		deliveryMethod: z.enum(deliveryMethods, {
+			errorMap(issue) {
+				switch (issue.code) {
+					case 'invalid_type':
+						return { message: 'Nieprawidłowa metoda dostawy' };
+						break;
+					case 'invalid_enum_value':
+						return { message: 'Nieprawidłowa metoda dostawy' };
+						break;
+					default:
+						return { message: 'Niespodziewany błąd: metoda dostawy' };
+						break;
+				}
+			}
+		}),
+		paymentMethod: z.enum(paymentMethods, {
+			errorMap(issue) {
+				switch (issue.code) {
+					case 'invalid_type':
+						return { message: 'Nieprawidłowa metoda płatności' };
+						break;
+					case 'invalid_enum_value':
+						return { message: 'Nieprawidłowa metoda płatności' };
+						break;
+					default:
+						return { message: 'Niespodziewany błąd: metoda płatności' };
+						break;
+				}
+			}
+		}),
+		customerName: orderNameValidation,
+		address: deliveryUnion.optional(),
+		promoCode: z.string({ invalid_type_error: 'Nieprawidłowy kod rabatowy' }).nullish()
+	})
+	.refine((obj) => obj.deliveryMethod !== 'personal-pickup' || obj.address, {
+		message: 'Adres dostawy jest wymagany'
+	});

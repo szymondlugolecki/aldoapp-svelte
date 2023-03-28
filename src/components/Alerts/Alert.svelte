@@ -4,13 +4,6 @@
 	export let message: string;
 	export let type: 'success' | 'error' | 'warning' | 'info';
 
-	const borderClass = {
-		success: 'border-success',
-		error: 'border-error',
-		warning: 'border-warning',
-		info: 'border-info'
-	};
-
 	const alertTitle = {
 		success: 'Sukces',
 		error: 'Błąd',
@@ -20,9 +13,11 @@
 </script>
 
 <div
-	class="shadow-lg border-l-2 {borderClass[
-		type
-	]} rounded flex flex-row bg-base-300 min-h-[72px] py-3 px-2 items-center"
+	class="shadow-lg border-l-2 rounded flex flex-row bg-base-300 min-h-[72px] py-3 px-2 items-center"
+	class:border-success={type === 'success'}
+	class:border-error={type === 'error'}
+	class:border-warning={type === 'warning'}
+	class:border-info={type === 'info'}
 >
 	<div class="h-full mr-3 ml-1 flex items-center justify-center">
 		<AlertIcon {type} />
