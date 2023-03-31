@@ -1,0 +1,1 @@
+DROP INDEX subscription_endpointx ON `subscriptions`;

@@ -1,0 +1,34 @@
+{
+  "version": "5",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1680272186398,
+      "tag": "0000_awesome_master_chief",
+      "breakpoints": false
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1680272270530,
+      "tag": "0001_reflective_newton_destine",
+      "breakpoints": false
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1680272449331,
+      "tag": "0002_pale_jigsaw",
+      "breakpoints": false
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1680272550977,
+      "tag": "0003_red_tarantula",
+      "breakpoints": false
+    }
+  ]
+}

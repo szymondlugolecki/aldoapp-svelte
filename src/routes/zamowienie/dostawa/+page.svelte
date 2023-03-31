@@ -19,8 +19,8 @@
 		cart.update((oldCart) => ({
 			...oldCart,
 			customerName: data.user?.fullName || '',
-			delivery: {
-				...oldCart.delivery,
+			address: {
+				...oldCart.address,
 				email: data.user?.email || ''
 			}
 		}));
@@ -28,7 +28,7 @@
 
 	export let data;
 
-	$: deliveryValidation.safeParse($cart.delivery).success
+	$: deliveryValidation.safeParse($cart.address).success
 		? ($cart.isAddressValid = true)
 		: ($cart.isAddressValid = false);
 </script>
@@ -90,11 +90,11 @@
 					name="first-name"
 					class="input input-bordered w-full"
 					required
-					bind:value={$cart.delivery.street}
-					class:input-success={$cart.delivery.street.length > 0 &&
-						orderStreetValidation.safeParse($cart.delivery.street).success}
-					class:input-error={$cart.delivery.street.length > 0 &&
-						!orderStreetValidation.safeParse($cart.delivery.street).success}
+					bind:value={$cart.address.street}
+					class:input-success={$cart.address.street.length > 0 &&
+						orderStreetValidation.safeParse($cart.address.street).success}
+					class:input-error={$cart.address.street.length > 0 &&
+						!orderStreetValidation.safeParse($cart.address.street).success}
 				/>
 			</div>
 			<div class="flex space-x-3">
@@ -108,11 +108,11 @@
 						name="address-zip-code"
 						class="input input-bordered w-full max-w-xs"
 						required
-						bind:value={$cart.delivery.zipCode}
-						class:input-success={$cart.delivery.zipCode.length > 0 &&
-							orderZipCodeValidation.safeParse($cart.delivery.zipCode).success}
-						class:input-error={$cart.delivery.zipCode.length > 0 &&
-							!orderZipCodeValidation.safeParse($cart.delivery.zipCode).success}
+						bind:value={$cart.address.zipCode}
+						class:input-success={$cart.address.zipCode.length > 0 &&
+							orderZipCodeValidation.safeParse($cart.address.zipCode).success}
+						class:input-error={$cart.address.zipCode.length > 0 &&
+							!orderZipCodeValidation.safeParse($cart.address.zipCode).success}
 					/>
 				</div>
 				<div class="form-control w-full">
@@ -125,11 +125,11 @@
 						name="address-city"
 						class="input input-bordered w-full max-w-xs"
 						required
-						bind:value={$cart.delivery.city}
-						class:input-success={$cart.delivery.city.length > 0 &&
-							orderCityValidation.safeParse($cart.delivery.city).success}
-						class:input-error={$cart.delivery.city.length > 0 &&
-							!orderCityValidation.safeParse($cart.delivery.city).success}
+						bind:value={$cart.address.city}
+						class:input-success={$cart.address.city.length > 0 &&
+							orderCityValidation.safeParse($cart.address.city).success}
+						class:input-error={$cart.address.city.length > 0 &&
+							!orderCityValidation.safeParse($cart.address.city).success}
 					/>
 				</div>
 			</div>
@@ -143,12 +143,12 @@
 						placeholder="Wpisz tu numer telefonu do odbiorcy..."
 						name="address-phone-number"
 						class="input input-bordered w-full max-w-xs"
-						class:input-success={$cart.delivery.phone.length > 0 &&
-							orderPhoneValidation.safeParse($cart.delivery.phone).success}
-						class:input-error={$cart.delivery.phone.length > 0 &&
-							!orderPhoneValidation.safeParse($cart.delivery.phone).success}
+						class:input-success={$cart.address.phone.length > 0 &&
+							orderPhoneValidation.safeParse($cart.address.phone).success}
+						class:input-error={$cart.address.phone.length > 0 &&
+							!orderPhoneValidation.safeParse($cart.address.phone).success}
 						required
-						bind:value={$cart.delivery.phone}
+						bind:value={$cart.address.phone}
 					/>
 				</div>
 				<div class="form-control w-full">
@@ -160,12 +160,12 @@
 						placeholder="Wpisz tu adres email odbiorcy..."
 						name="address-email"
 						class="input input-bordered w-full max-w-xs"
-						class:input-success={$cart.delivery.email.length > 0 &&
-							orderEmailValidation.safeParse($cart.delivery.email).success}
-						class:input-error={$cart.delivery.email.length > 0 &&
-							!orderEmailValidation.safeParse($cart.delivery.email).success}
+						class:input-success={$cart.address.email.length > 0 &&
+							orderEmailValidation.safeParse($cart.address.email).success}
+						class:input-error={$cart.address.email.length > 0 &&
+							!orderEmailValidation.safeParse($cart.address.email).success}
 						required
-						bind:value={$cart.delivery.email}
+						bind:value={$cart.address.email}
 					/>
 				</div>
 			</div>
