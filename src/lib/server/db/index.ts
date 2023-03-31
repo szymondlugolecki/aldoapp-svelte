@@ -12,8 +12,6 @@ const connection = connect({
 	password: DATABASE_PASSWORD
 });
 
-const db = drizzle(connection, { logger: true });
-
-export { db };
+export const db = drizzle(connection, { logger: true });
 
 // const allUsers = await db.select().from(users);

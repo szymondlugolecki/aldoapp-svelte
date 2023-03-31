@@ -29,6 +29,27 @@
       "when": 1680272550977,
       "tag": "0003_red_tarantula",
       "breakpoints": false
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1680274498963,
+      "tag": "0004_chunky_speed",
+      "breakpoints": false
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1680274674717,
+      "tag": "0005_awesome_piledriver",
+      "breakpoints": false
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1680274802291,
+      "tag": "0006_free_obadiah_stane",
+      "breakpoints": false
     }
   ]
 }

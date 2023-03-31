@@ -35,7 +35,7 @@ export const products = mysqlTable(
 
 		// Product info
 		name: varchar('name', { length: 255 }).notNull(),
-		description: varchar('description', { length: 255 }),
+		description: varchar('description', { length: 2048 }),
 		symbol: varchar('symbol', { length: 255 }).notNull(),
 		category: varchar('category', { length: 255 }).notNull(),
 		subcategory: varchar('subcategory', { length: 255 }).notNull(),

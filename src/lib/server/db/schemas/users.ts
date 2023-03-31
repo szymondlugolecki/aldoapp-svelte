@@ -15,13 +15,13 @@ import {
 export const users = mysqlTable(
 	'users',
 	{
-		id: serial('id').primaryKey().autoincrement(),
+		id: char('id').primaryKey(),
 		createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
 		// updatedAt: timestamp('created_at').notNull().defaultNow().onUpdateNow(),
 
 		// user data
 		email: varchar('email', { length: 320 }).notNull(),
-		fullName: varchar('name', { length: 256 }),
+		fullName: varchar('name', { length: 256 }).notNull(),
 		role: text('role', { enum: ['admin', 'moderator', 'customer'] }).notNull(),
 		banned: boolean('banned').default(false).notNull()
 

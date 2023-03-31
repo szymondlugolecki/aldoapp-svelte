@@ -1,10 +1,10 @@
 import adapter from '@sveltejs/adapter-vercel';
 import { vitePreprocess } from '@sveltejs/kit/vite';
 
-// import { prisma } from './src/lib/server/clients/prismaClient';
+// import { p } from './src/lib/server/clients/pClient';
 
 // const getProductsNames = async () => {
-// 	const products = await prisma.product
+// 	const products = await p.product
 // 		.findMany({
 // 			select: {
 // 				name: true
