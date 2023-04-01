@@ -22,6 +22,11 @@
 			</PaymentMethod>
 		</li>
 		<li>
+			<PaymentMethod name="Dotpay" description="Płatność online" id="dotpay" checked={false}>
+				<CreditCard size={50} />
+			</PaymentMethod>
+		</li>
+		<!-- <li>
 			<PaymentMethod
 				name="Przelew"
 				description="Przelew bankowy online"
@@ -40,6 +45,6 @@
 			>
 				<CreditCard size={50} />
 			</PaymentMethod>
-		</li>
+		</li> -->
 	</ul>
 </div>

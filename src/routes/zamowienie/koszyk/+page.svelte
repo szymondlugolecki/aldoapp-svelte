@@ -1,12 +1,5 @@
 <script lang="ts">
-	import {
-		addProduct,
-		cart,
-		decrementProduct,
-		incrementProduct,
-		removeProduct
-	} from '$lib/client/stores/cart';
-	import Alert from '$components/Alerts/Alert.svelte';
+	import { cart, decrementProduct, incrementProduct, removeProduct } from '$lib/client/stores/cart';
 	import { Minus, Plus, X } from 'lucide-svelte';
 </script>
 

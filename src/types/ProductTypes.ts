@@ -1,10 +1,10 @@
 import type { ProductAuthor } from './UserTypes';
 import type { User } from './UserTypes';
 import type { fodderCategories } from '$lib/client/constants';
-import type { MainCategories } from '$lib/client/constants/dbTypes';
+import type { MainCategory } from '$lib/client/constants/dbTypes';
 import type { Product } from '$lib/server/db/schemas/products';
 
-export type Category = MainCategories;
+export type Category = MainCategory;
 export type Subcategory = (typeof fodderCategories)[Category][number]['id'];
 
 export type ProductWithAuthorAndImage = Product & {

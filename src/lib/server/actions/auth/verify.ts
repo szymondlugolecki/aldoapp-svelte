@@ -44,17 +44,6 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 			.leftJoin(users, eq(verificationTokens.userId, users.id))
 	);
 
-	// p.verificationToken.findUnique({
-	// 	where: {
-	// 		code
-	// 	},
-	// 	select: {
-	// 		email: true,
-	// 		user: true,
-	// 		expires: true
-	// 	}
-	// })
-
 	if (getTokenError) {
 		// Unexpected-error
 		console.log('getTokenError', getTokenError);
@@ -72,7 +61,7 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 	const dbQueryValuesCheck = <Q extends Record<string, unknown>, T>(
 		dbObj: Record<string, unknown>,
 		...keys: string[]
-	): dbObj is Exclude<Q & T, null> => {
+	): dbObj is Q & Exclude<T, null> => {
 		let allCorrect = true;
 
 		keys.forEach((key) => {
@@ -84,7 +73,12 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 		return allCorrect;
 	};
 
-	if (!dbQueryValuesCheck<Pick<VerificationToken, 'userId' | 'expiresAt'>, User>(token, 'email')) {
+	if (
+		!dbQueryValuesCheck<Pick<VerificationToken, 'expiresAt'>, Omit<User, 'createdAt'>>(
+			token,
+			...Object.keys(token).filter((key) => key !== 'createdAt')
+		)
+	) {
 		return fail(400, {
 			errors: ['Podany kod nie istnieje lub jest przedawniony']
 		});
@@ -93,15 +87,23 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 	// here properties from the user obj are still nullable
 
 	// Create a new session
+	const sessionUser = {
+		id: token.id,
+		email: token.email,
+		role: token.role,
+		fullName: token.fullName,
+		access: token.access
+	} satisfies Optional<typeof token, 'expiresAt'>;
+
+	console.log('verify', token.id);
+
 	const [createTokens, createTokensError] = await trytm(
-		Promise.all([
-			createAccessToken({ email: token.email }),
-			createRefreshToken({ email: token.email })
-		])
+		Promise.all([createAccessToken(sessionUser), createRefreshToken({ userId: token.id })])
 	);
 
 	if (createTokensError) {
 		// Unexpected-error
+		console.error('createTokensError', createTokensError);
 		return fail(500, {
 			errors: ['Niespodziewany błąd']
 		});
@@ -133,3 +135,14 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 };
 
 export default handleVerification;
+
+// p.verificationToken.findUnique({
+// 	where: {
+// 		code
+// 	},
+// 	select: {
+// 		email: true,
+// 		user: true,
+// 		expires: true
+// 	}
+// })

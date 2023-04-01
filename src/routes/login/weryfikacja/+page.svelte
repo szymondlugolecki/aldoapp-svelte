@@ -12,7 +12,7 @@
 	<meta name="description" content="Weryfikacja logowania. Sprawdź swoją pocztę." />
 </svelte:head>
 
-<section class="w-full h-full flex justify-center items-center flex-1">
+<section class="w-full flex justify-center items-center">
 	<div
 		class="flex flex-col items-center justify-center px-6 py-8 mx-auto w-96 shadow-2xl space-y-2"
 	>

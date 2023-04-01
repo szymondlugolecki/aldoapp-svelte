@@ -13,14 +13,14 @@ export const verificationKeysExpirationTime = 12 * HOUR;
 export const dateInXMinutes = (x: number) => new Date(Date.now() + MINUTE * x);
 export const dateInXMonths = (x: number) => new Date(Date.now() + MONTH * x);
 
-export const accessTokenExpiryDate = () => dateInXMinutes(1);
-export const refreshTokenExpiryDate = () => dateInXMonths(3.01);
+export const accessTokenExpiryDate = () => dateInXMinutes(5);
+export const refreshTokenExpiryDate = () => dateInXMonths(3);
 
 export const jwtConfig = {
 	alg: 'HS256',
 	secret: secretEncoded,
 	accessTokenConfig: {
-		expirationTime: '1m'
+		expirationTime: '5m'
 	},
 	refreshTokenConfig: {
 		expirationTime: '90d'

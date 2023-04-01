@@ -4,7 +4,6 @@
 
 	import { applyProductFilters, arrayUniqueByKey } from '$lib/client/functions';
 	import type { ProductFilter, ProductWithAuthorAndImage } from '$types';
-	import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 	import Table from '$components/Table/Table.svelte';
 	import { drawer } from '$lib/client/stores/adminDrawer';
 	import NewProduct from '$components/Modals/Product/NewProduct.svelte';

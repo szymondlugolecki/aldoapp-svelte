@@ -4,7 +4,10 @@
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import logo from '$lib/assets/logo.png?run&width=110&height=80&format=webp';
 	import Img from '@zerodevx/svelte-img';
-	import Success from '$components/Alerts/Alert.svelte';
+	import { emailValidation } from '$lib/client/schemas/users';
+	import toast from 'svelte-french-toast';
+
+	let emailInput = '';
 </script>
 
 <svelte:head>
@@ -12,7 +15,7 @@
 	<meta name="description" content="Zaloguj się do aplikacji Twoje ALDO." />
 </svelte:head>
 
-<section class="w-full h-full flex justify-center items-center flex-1">
+<section class="w-full flex justify-center items-center">
 	<div
 		class="flex flex-col items-center justify-center px-6 py-8 mx-auto w-96 shadow-2xl space-y-2"
 	>
@@ -36,7 +39,13 @@
 					class="space-y-4"
 					method="post"
 					use:enhance={() => {
+						if (!emailValidation.safeParse(emailInput).success) {
+							toast.error('Nieprawidłowy adres email');
+							return;
+						}
+
 						const toastId = createLoadingToast('redirecting');
+
 						return async ({ result, update }) => {
 							handleFormResponse(result, toastId);
 							update();
@@ -51,9 +60,14 @@
 							type="email"
 							name="email"
 							id="email"
-							class="bg-base placeholder:text-bg-base-content border border-base-300 text-xs sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+							class="bg-base placeholder:text-bg-base-content border border-base-300 text-xs sm:text-sm rounded-lg block w-full p-2.5"
 							placeholder="przykladowy.email@gmail.com"
 							required
+							bind:value={emailInput}
+							class:input-success={emailInput.length > 0 &&
+								emailValidation.safeParse(emailInput).success}
+							class:input-error={emailInput.length > 0 &&
+								!emailValidation.safeParse(emailInput).success}
 						/>
 					</div>
 					<button

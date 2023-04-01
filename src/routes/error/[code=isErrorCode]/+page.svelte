@@ -24,7 +24,7 @@
 	/>
 </svelte:head>
 
-<section class="w-full h-full flex justify-center items-center flex-col">
+<section class="w-full flex justify-center items-center flex-col">
 	{#if visible}
 		<div class="text-center w-full px-6 sm:px-2">
 			<p class="text-6xl font-bold mb-1" in:fly={{ y: -200, duration: 1000 }}>⚠️</p>
@@ -36,13 +36,13 @@
 			</h2>
 		</div>
 		<div class="flex space-x-3 items-center mt-2" in:fade={{ duration: 1350 }}>
-			<a href="/" class="text-blue-500 hover:text-blue-700">Strona główna</a>
+			<a href="/" class="text-primary hover:text-primary-focus">Strona główna</a>
 			{#if data.user}
-				<a href="/api/logout" class="text-blue-500 hover:text-blue-700">Wyloguj się</a>
+				<a href="/api/logout" class="text-primary hover:text-primary-focus">Wyloguj się</a>
 			{:else}
 				<a
 					href="/login"
-					class="text-white hover:bg-blue-800 duration-200 bg-blue-700 rounded-md px-3 py-2"
+					class="text-white hover:bg-primary-focus duration-200 bg-primary rounded-md px-3 py-2"
 					>Zaloguj się</a
 				>
 			{/if}

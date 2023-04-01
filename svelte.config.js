@@ -26,11 +26,8 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		adapter: adapter({
-			runtime: 'nodejs18.x'
+			runtime: 'edge'
 		}),
-		// serviceWorker: {
-		// 	register: false
-		// },
 		alias: {
 			'$components/*': 'src/components',
 			$types: './src/types'

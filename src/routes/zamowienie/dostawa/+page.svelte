@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ShoppingBag } from 'lucide-svelte';
+	import { Car, ShoppingBag } from 'lucide-svelte';
 	import { cart } from '$lib/client/stores/cart';
 	import { onMount } from 'svelte';
 	import dpdLogo from '$lib/assets/dpd_logo.png?run&width=225&height=100&format=webp';
@@ -45,6 +45,16 @@
 	<ul class="flex flex-col w-full xs:max-w-[500px] space-y-4">
 		<li>
 			<DeliveryMethod
+				name="Kurier"
+				description="Przywieziemy do Ciebie w ciągu 3 dni"
+				id="personal-delivery"
+				price="Gratis!"
+			>
+				<Car size={50} class="-scale-x-100" />
+			</DeliveryMethod>
+		</li>
+		<li>
+			<DeliveryMethod
 				name="Odbiór osobisty"
 				description="Gotowe do odbioru w ciągu 3 dni"
 				id="personal-pickup"
@@ -53,11 +63,11 @@
 				<ShoppingBag size={50} />
 			</DeliveryMethod>
 		</li>
-		<li>
+		<!-- <li>
 			<DeliveryMethod name="DPD" description="Transport zajmie 3 dni" id="dpd" price="167 PLN">
 				<Img src={dpdLogo} height={50} width={112} alt="Logo DPD" />
 			</DeliveryMethod>
-		</li>
+		</li> -->
 	</ul>
 
 	{#if $cart.deliveryMethod && $cart.deliveryMethod !== 'personal-pickup'}
@@ -91,9 +101,9 @@
 					class="input input-bordered w-full"
 					required
 					bind:value={$cart.address.street}
-					class:input-success={$cart.address.street.length > 0 &&
+					class:input-success={$cart.address.street?.length > 0 &&
 						orderStreetValidation.safeParse($cart.address.street).success}
-					class:input-error={$cart.address.street.length > 0 &&
+					class:input-error={$cart.address.street?.length > 0 &&
 						!orderStreetValidation.safeParse($cart.address.street).success}
 				/>
 			</div>
@@ -109,9 +119,9 @@
 						class="input input-bordered w-full max-w-xs"
 						required
 						bind:value={$cart.address.zipCode}
-						class:input-success={$cart.address.zipCode.length > 0 &&
+						class:input-success={$cart.address.zipCode?.length > 0 &&
 							orderZipCodeValidation.safeParse($cart.address.zipCode).success}
-						class:input-error={$cart.address.zipCode.length > 0 &&
+						class:input-error={$cart.address.zipCode?.length > 0 &&
 							!orderZipCodeValidation.safeParse($cart.address.zipCode).success}
 					/>
 				</div>
@@ -126,9 +136,9 @@
 						class="input input-bordered w-full max-w-xs"
 						required
 						bind:value={$cart.address.city}
-						class:input-success={$cart.address.city.length > 0 &&
+						class:input-success={$cart.address.city?.length > 0 &&
 							orderCityValidation.safeParse($cart.address.city).success}
-						class:input-error={$cart.address.city.length > 0 &&
+						class:input-error={$cart.address.city?.length > 0 &&
 							!orderCityValidation.safeParse($cart.address.city).success}
 					/>
 				</div>
@@ -143,9 +153,9 @@
 						placeholder="Wpisz tu numer telefonu do odbiorcy..."
 						name="address-phone-number"
 						class="input input-bordered w-full max-w-xs"
-						class:input-success={$cart.address.phone.length > 0 &&
+						class:input-success={$cart.address.phone?.length > 0 &&
 							orderPhoneValidation.safeParse($cart.address.phone).success}
-						class:input-error={$cart.address.phone.length > 0 &&
+						class:input-error={$cart.address.phone?.length > 0 &&
 							!orderPhoneValidation.safeParse($cart.address.phone).success}
 						required
 						bind:value={$cart.address.phone}
@@ -160,9 +170,9 @@
 						placeholder="Wpisz tu adres email odbiorcy..."
 						name="address-email"
 						class="input input-bordered w-full max-w-xs"
-						class:input-success={$cart.address.email.length > 0 &&
+						class:input-success={$cart.address.email?.length > 0 &&
 							orderEmailValidation.safeParse($cart.address.email).success}
-						class:input-error={$cart.address.email.length > 0 &&
+						class:input-error={$cart.address.email?.length > 0 &&
 							!orderEmailValidation.safeParse($cart.address.email).success}
 						required
 						bind:value={$cart.address.email}

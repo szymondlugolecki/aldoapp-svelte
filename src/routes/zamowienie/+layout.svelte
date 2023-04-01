@@ -200,7 +200,7 @@
 			</li>
 		</ul>
 
-		<div class="divider" />
+		<div class="divider my-2 lg:my-4" />
 
 		<div class="w-full h-full flex lg:flex-row flex-col items-center justify-center">
 			<div
@@ -211,9 +211,9 @@
 
 			<div class="divider hidden md:flex md:divider-horizontal" />
 			<div
-				class="xl:max-w-[340px] lg:max-w-[270px] px-1 sm:px-0 w-full h-full flex flex-col space-y-4 sm:space-y-6 sticky top-0"
+				class="xl:max-w-[340px] p-4 lg:max-w-[270px] lg:px-1 w-full h-full flex flex-col space-y-4 sm:space-y-6 sticky top-0"
 			>
-				<h2 class="text-3xl font-bold">Podsumowanie 📒</h2>
+				<h2 class="text-2xl xl:text-3xl font-bold">Podsumowanie 📒</h2>
 				<div class="flex flex-col space-y-2 lg:text-base md:text-sm">
 					<div class="flex justify-between items-center">
 						<span class="text-base">Suma częściowa</span>
@@ -259,7 +259,10 @@
 
 				<div class="flex space-x-3">
 					{#if stageIndex > 0}
-						<a href="/zamowienie/{stages[stageIndex - 1]}" class="btn btn-accent">
+						<a
+							href="/zamowienie/{stages[stageIndex - 1]}"
+							class="btn btn-ghost text-white bg-red-400 hover:bg-red-500 flex-1"
+						>
 							<ArrowLeft class="mr-1" /> Wstecz</a
 						>
 					{/if}
@@ -267,7 +270,7 @@
 						<button
 							disabled={disableNextStep}
 							on:click={() => createOrder()}
-							class="btn btn-primary flex-1">ZAMAWIAM <ArrowRight class="ml-1" /></button
+							class="btn btn-primary flex-1">ZAMAWIAM</button
 						>
 					{:else if stageIndex < stages.length - 1}
 						<!-- class:btn-disabled={$cart.status === 'loading'} -->

@@ -1,14 +1,14 @@
 import type { CartProductWithQuantity, StoreProduct } from '$types';
 import { persisted } from 'svelte-local-storage-store';
-import type { DeliveryMethods, PaymentMethods } from '../constants/dbTypes';
+import type { DeliveryMethod, PaymentMethod } from '../constants/dbTypes';
 
 type CartStore = {
 	products: CartProductWithQuantity[];
 	status: 'verified' | 'loading' | 'error' | 'not-verified';
 	lastVerified: Date | null;
 	promoCode: string | null;
-	deliveryMethod: DeliveryMethods | null;
-	paymentMethod: PaymentMethods | null;
+	deliveryMethod: DeliveryMethod | null;
+	paymentMethod: PaymentMethod | null;
 	rememberAddress: boolean;
 	isAddressValid: boolean;
 	customerName: string;

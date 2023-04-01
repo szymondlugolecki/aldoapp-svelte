@@ -1,7 +1,7 @@
 import { errors, jwtVerify, SignJWT } from 'jose';
 import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 import { jwtConfig } from '../constants/auth';
-import type { JWTTokenResult, Role } from '$types';
+import type { JWTAccessTokenResult, JWTRefreshTokenResult, Role, SessionUser } from '$types';
 import { createId } from '@paralleldrive/cuid2';
 import { UAParser } from 'ua-parser-js';
 import { textCrusher as tC } from '$lib/client/functions';
@@ -19,18 +19,18 @@ export const createVerificationKeys = () => ({
 export const createVerificationLink = (token: string) =>
 	`${PUBLIC_WEBSITE_URL}/login/weryfikacja/${token}`;
 
-export const createRefreshToken = (payload: { email: string }) =>
+export const createRefreshToken = (payload: { userId: string }) =>
 	new SignJWT(payload)
 		.setProtectedHeader({ alg: alg })
 		.setIssuedAt()
 		.setIssuer(issuer)
-		.setSubject(payload.email)
+		.setSubject(payload.userId)
 		.setAudience(audience)
 		.setExpirationTime(refreshTokenConfig.expirationTime)
 		.sign(secret);
 
-export const createAccessToken = (payload: { email: string }) =>
-	new SignJWT(payload)
+export const createAccessToken = (payload: SessionUser) =>
+	new SignJWT({ user: payload })
 		.setProtectedHeader({ alg: alg })
 		.setIssuedAt()
 		.setIssuer(issuer)
@@ -39,12 +39,19 @@ export const createAccessToken = (payload: { email: string }) =>
 		.setExpirationTime(accessTokenConfig.expirationTime)
 		.sign(secret);
 
-export const verifyToken = async (token: string): Promise<JWTTokenResult> => {
+export const verifyAccessToken = async (token?: string) => {
 	if (!token) throw new errors.JWTExpired('Token is expired');
 	return jwtVerify(token, secret, {
 		issuer,
 		audience
-	}) as Promise<JWTTokenResult>;
+	}) as Promise<JWTAccessTokenResult>;
+};
+
+export const verifyRefreshToken = async (token: string) => {
+	return jwtVerify(token, secret, {
+		issuer,
+		audience
+	}) as Promise<JWTRefreshTokenResult>;
 };
 
 export const uaParser = (header: string | null) => {

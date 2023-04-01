@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { deliveryMethods, paymentMethods } from '../constants';
+import { deliveryMethods, paymentMethods } from '../constants/dbTypes';
 
 export const orderNameValidation = z
 	.string({

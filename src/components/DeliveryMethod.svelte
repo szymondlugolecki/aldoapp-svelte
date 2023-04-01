@@ -1,9 +1,10 @@
 <script lang="ts">
+	import type { DeliveryMethod } from '$lib/client/constants/dbTypes';
 	import { cart } from '$lib/client/stores/cart';
 
 	export let name: string;
 	export let description: string;
-	export let id: string;
+	export let id: DeliveryMethod;
 	export let price: string;
 </script>
 

@@ -58,7 +58,7 @@ export const promoCodeUsages = mysqlTable(
 		// Promocode and user IDs
 		promoCodeId: varchar('promocode_id', { length: 36 }).notNull(),
 		// .references(() => promoCodes.id),
-		userId: char('user_id').notNull()
+		userId: char('user_id', { length: 255 }).notNull()
 		// .references(() => users.id)
 	},
 	(promoCodeUsage) => ({

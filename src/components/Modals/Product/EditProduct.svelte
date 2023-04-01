@@ -3,6 +3,7 @@
 	import { enhance } from '$app/forms';
 	import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 	import { fodderCategories, fodderNames } from '$lib/client/constants';
+	import { mainCategories } from '$lib/client/constants/dbTypes';
 	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import { drawer } from '$lib/client/stores/adminDrawer';
@@ -13,7 +14,6 @@
 		ImagesList,
 		ProductWithAuthorAndImage
 	} from '$types';
-	import { mainCategories } from '$lib/client/constants';
 	import { Edit, PlusCircle, Trash2, X } from 'lucide-svelte';
 	import ModalHeader from '../ModalHeader.svelte';
 

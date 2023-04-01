@@ -25,12 +25,15 @@ const handleLogin: Action = async ({ request }) => {
 	// const { email } = result;
 	const email = result.email.toLowerCase();
 
+	console.log('email', email);
+
 	// Check if the user exists (was invited)
 	const [usersQuery, fetchUserError] = await trytm(
 		db.select({ id: users.id }).from(users).where(eq(users.email, email))
 	);
 
 	if (fetchUserError) {
+		console.error('fetchUserError', fetchUserError);
 		// Unexpected-error
 		return fail(500, {
 			errors: ['Niespodziewany błąd']
@@ -64,6 +67,7 @@ const handleLogin: Action = async ({ request }) => {
 
 	if (createTokenError) {
 		// Unexpected-error
+		console.log('createTokenError', createTokenError);
 		return fail(500, {
 			errors: ['Niespodziewany błąd']
 		});

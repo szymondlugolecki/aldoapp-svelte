@@ -14,7 +14,7 @@ import {
 export const users = mysqlTable(
 	'users',
 	{
-		id: char('id').primaryKey(),
+		id: char('id', { length: 255 }).primaryKey(),
 		createdAt: timestamp('created_at')
 			.default(sql`CURRENT_TIMESTAMP`)
 			.notNull(),
@@ -50,7 +50,7 @@ export const verificationTokens = mysqlTable(
 		expiresAt: timestamp('expires_at').notNull(),
 
 		// relations
-		userId: char('user_id').notNull()
+		userId: char('user_id', { length: 255 }).notNull()
 		// .references(() => users.id)
 	},
 	(verificationToken) => ({

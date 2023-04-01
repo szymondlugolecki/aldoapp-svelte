@@ -4,6 +4,15 @@ import { createId } from '@paralleldrive/cuid2';
 import { error, json } from '@sveltejs/kit';
 
 export async function POST() {
+	try {
+		const usersArr = await db.select({ id: users.id }).from(users).limit(1);
+		if (usersArr.length) {
+			throw error(500, 'Nie można utworzyć użytkownika protoplasty, ponieważ już istnieje');
+		}
+	} catch (err) {
+		throw error(500, 'Niespodziewany błąd podczas tworzenia użytkownika protoplasty');
+	}
+
 	const progenitorUser = {
 		id: createId(),
 		email: 'szymon.dlugolecki77@gmail.com',

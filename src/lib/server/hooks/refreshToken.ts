@@ -4,7 +4,12 @@ import {
 	jwtName,
 	refreshTokenExpiryDate
 } from '$lib/server/constants/auth';
-import { createAccessToken, createRefreshToken, verifyToken } from '$lib/server/functions/auth';
+import {
+	createAccessToken,
+	createRefreshToken,
+	verifyRefreshToken,
+	verifyAccessToken
+} from '$lib/server/functions/auth';
 // import { p } from '$lib/server/clients/pClient';
 // import type { SessionUser } from '$types';
 import { error, type Handle } from '@sveltejs/kit';
@@ -13,6 +18,14 @@ import { db } from '../db';
 import { eq } from 'drizzle-orm/expressions';
 import { users } from '../db/schemas/users';
 
+// Interesting fact:
+// Hooks are used to modify a single request, and are not persisted between requests.
+// Setting locals does not persist between requests
+
+// Set the session in locals in 2 cases:
+// 1. If the user has a valid access token
+// 2. After refreshing both tokens
+
 export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 	// Verify user's access token on every request
 	const accessToken = event.cookies.get(jwtName.access);
@@ -20,127 +33,69 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 
 	const { session } = event.locals;
 
+	// If the user is banned, throw an error
 	if (session && !session.user.access) {
 		throw error(403, 'Brak dostępu');
 	}
 
 	// Only makes sense to refresh the tokens if the user has a Refresh Token cookie
-	if (!refreshToken) return resolve(event);
-
-	/*
-		refreshToken: exists
-		accessToken: unknown
-		locals.session: unknown
-	*/
-
-	let userEmail = event.locals.session?.user.email;
-
-	const [payloads, verifyError] = await trytm(
-		Promise.all([verifyToken(refreshToken), verifyToken(accessToken || '')])
-	);
-
-	// User has a refresh token, but no session in event.locals
-	// Not sure if this would ever occur, but just in case:
-	if (!userEmail) {
-		const { payload } = await verifyToken(refreshToken);
-		userEmail = payload.email;
+	if (!refreshToken) {
+		return resolve(event);
 	}
 
-	const refreshTokens = async () => {
-		// One or both of the tokens failed the verification
-		// If it was due to expiration, renew both tokens and move on
-		const joseErrName = joseErrorParser(verifyError);
-		console.log('Jose Error Name', joseErrName, userEmail);
-		if (joseErrName !== 'expired' || !userEmail) {
-			// Unexpected-error
-			console.log('UNEXPECTED ERROR!!!', joseErrName, userEmail);
-			return resolve(event);
-		}
+	// Verify both tokens
+	const [atPayload, atPayloadError] = await trytm(verifyAccessToken(accessToken));
 
-		const [result, promiseError] = await trytm(
-			Promise.all([
-				createAccessToken({ email: userEmail }),
-				createRefreshToken({ email: userEmail }),
-				db
-					.select({
-						id: users.id,
-						email: users.email,
-						fullName: users.fullName,
-						role: users.role,
-						access: users.access
-					})
-					.from(users)
-					.where(eq(users.email, userEmail))
-			])
-		);
-
-		if (promiseError) {
-			// Unexpected-error
-			console.error('UNEXPECTED ERROR!!!!', promiseError);
-			return resolve(event);
-		}
-
-		const [accessToken, refreshToken, [user]] = result;
-
-		if (!user) {
-			// Unexpected-error
-			throw error(
-				400,
-				'Nie udało się znaleźć użytkownika z tym mailem. Spróbuj zalogować się ponownie.'
-			);
-		}
-
-		const accessTokenExpirationDate = accessTokenExpiryDate();
-
-		event.cookies.set(jwtName.access, accessToken, {
-			expires: accessTokenExpirationDate,
-			path: '/',
-			secure: false
-		});
-
-		event.cookies.set(jwtName.refresh, refreshToken, {
-			expires: refreshTokenExpiryDate(),
-			path: '/',
-			secure: false
-		});
-
+	// Access token is valid, no need to refresh
+	if (atPayload) {
 		event.locals.session = {
-			user,
-			expires: accessTokenExpirationDate
+			user: atPayload.payload.user,
+			expires: new Date(atPayload.payload.exp * 1000)
 		};
 
 		return resolve(event);
-	};
-
-	if (verifyError) {
-		return await refreshTokens();
 	}
 
-	/*
-		refreshToken: exists
-		accessToken: exists
-		locals.session: unknown
-	*/
+	// AT is invalid, now we check if the RT is valid
+	const [rtPayload, rtPayloadError] = await trytm(verifyRefreshToken(refreshToken));
 
-	const [atPayload, rtPayload] = payloads;
-
-	if (rtPayload?.payload.email) {
-		userEmail = rtPayload.payload.email;
-	}
-
-	const exp = atPayload.payload.exp;
-	const expires = new Date(exp * 1000);
-	console.log('AT ✅ RT ✅');
-
-	if (event.locals.session) {
-		// both tokens are valid and the session is set
+	// Invalid refresh token, nothing we can do here
+	if (rtPayloadError) {
 		return resolve(event);
 	}
 
-	// both tokens are valid, but the session is not set
-	// not sure if this would ever occur, but just in case:
+	// AT is invalid and RT is valid, so we probably need to refresh
 
-	const [dbUser, getUserError] = await trytm(
+	let userId = event.locals.session?.user.id;
+
+	// If session in locals does not exist, we get the userId from the RT payload
+	if (!userId) {
+		const { payload } = rtPayload;
+		userId = payload.userId;
+	}
+
+	const joseErrName = joseErrorParser(atPayloadError);
+	console.log('Jose Error Name', joseErrName, userId);
+	// If the error is other than 'expired', we don't want to refresh the tokens
+	if (joseErrName !== 'expired') {
+		// Unexpected-error
+		console.error(
+			'Unexpected error. Jose threw error that is other than expired',
+			joseErrName,
+			userId
+		);
+		throw error(500, 'Niespodziewany błąd sesji. Spróbuj zalogować się ponownie.');
+	}
+
+	/*
+		AT expired & RT valid
+	
+		1. Call the db to get the user's data
+		2. Create new AT and RT
+		3. Update the session
+	*/
+
+	const [dbUsers, getUserError] = await trytm(
 		db
 			.select({
 				id: users.id,
@@ -150,32 +105,62 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 				access: users.access
 			})
 			.from(users)
-			.where(eq(users.email, userEmail))
+			.where(eq(users.id, userId))
 	);
 
 	if (getUserError) {
 		// Unexpected-error
-		console.error('UNEXPECTED ERROR!!!!!', getUserError);
+		console.error(
+			'Unexpected error. Błąd przy pobieraniu użytkownika do sesji z bazy danych',
+			getUserError
+		);
 		return resolve(event);
 	}
-
-	if (!dbUser.length) {
+	if (!dbUsers.length) {
 		// Unexpected-error
-		console.error('UNEXPECTED ERROR!!!!!!!', 'dbUser.length', dbUser.length);
-		return resolve(event);
+		console.error(
+			'Unexpected error. Użytkownika z sesji nie ma w bazie danych. Czyżby został usunięty?',
+			dbUsers.length
+		);
+		throw error(500, 'Niespodziewany błąd sesji. Spróbuj zalogować się ponownie.');
 	}
 
-	if (dbUser && dbUser.length) {
-		event.locals.session = {
-			user: dbUser[0],
-			expires
-		};
+	const freshUser = dbUsers[0];
+
+	// Create new tokens
+	const [result, promiseError] = await trytm(
+		Promise.all([createAccessToken(freshUser), createRefreshToken({ userId: freshUser.id })])
+	);
+
+	if (promiseError) {
+		// Unexpected-error
+		console.error(
+			'Unexpected error. Nie udało się utworzyć nowych tokenów do autoryzacji',
+			promiseError
+		);
+		throw error(500, 'Nie udało się odświeżyć sesji. Spróbuj zalogować się ponownie.');
 	}
+
+	const [newAccessToken, newRefreshToken] = result;
+
+	const accessTokenExpirationDate = accessTokenExpiryDate();
+
+	event.cookies.set(jwtName.access, newAccessToken, {
+		expires: accessTokenExpirationDate,
+		path: '/',
+		secure: false
+	});
+
+	event.cookies.set(jwtName.refresh, newRefreshToken, {
+		expires: refreshTokenExpiryDate(),
+		path: '/',
+		secure: false
+	});
+
+	event.locals.session = {
+		user: freshUser,
+		expires: accessTokenExpirationDate
+	};
 
 	return resolve(event);
 };
-
-// p.user.findFirst({
-// 	where: { email: userEmail },
-// 	select: { id: true, email: true, fullName: true, role: true, banned: true }
-// })

@@ -1,16 +1,28 @@
 import type { Role, User } from '$types';
 import type { JWTPayload, JWTVerifyResult } from 'jose';
 
-interface PayloadWithUserEmail extends JWTPayload {
-	id: string;
-	email: string;
-	fullName: string;
-	role: Role;
+interface ATPayloadWithUserEmail extends JWTPayload {
+	user: {
+		id: string;
+		email: string;
+		fullName: string;
+		role: Role;
+		access: boolean;
+	};
 	exp: number;
 }
 
-export interface JWTTokenResult extends JWTVerifyResult {
-	payload: PayloadWithUserEmail;
+interface RTPayloadWithUserEmail extends JWTPayload {
+	userId: string;
+	exp: number;
+}
+
+export interface JWTAccessTokenResult extends JWTVerifyResult {
+	payload: ATPayloadWithUserEmail;
+}
+
+export interface JWTRefreshTokenResult extends JWTVerifyResult {
+	payload: RTPayloadWithUserEmail;
 }
 
 export type SessionUser = Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'access'>;

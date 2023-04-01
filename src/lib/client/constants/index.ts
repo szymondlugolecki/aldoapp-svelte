@@ -1,5 +1,5 @@
 import type { ShortService, Outlets, Role } from '$types';
-import type { MainCategories } from './dbTypes';
+import type { MainCategory } from './dbTypes';
 
 type SalesmenMenuType = {
 	name: string;
@@ -33,7 +33,7 @@ export const userTable = {
 	profile: 'Profil'
 } as const;
 
-export const fodderNames: Record<MainCategories, string> = {
+export const fodderNames: Record<MainCategory, string> = {
 	cattle: '🐮 Bydło',
 	poultry: '🐣 Drób',
 	backyard: '🐶 Hodowla przydomowa'

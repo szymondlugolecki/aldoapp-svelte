@@ -1,3 +1,12 @@
+import { error, type Action } from '@sveltejs/kit';
+
+const edit: Action = async () => {
+	throw error(400, 'NARAZIE NIE DA SIE EDYTOWAC PRODUKTOW');
+};
+
+export default edit;
+
+/*
 import { editProductSchema } from '$lib/client/schemas/products';
 import { prisma } from '$lib/server/clients/prismaClient';
 import { error, fail, type Action } from '@sveltejs/kit';
@@ -121,3 +130,6 @@ const edit: Action = async ({ request, locals }) => {
 };
 
 export default edit;
+
+
+*/

@@ -1,9 +1,10 @@
 import { z } from 'zod';
-import { fodderCategories, mainCategories, producents } from '../constants';
+import { fodderCategories } from '../constants';
 import type { Category } from '$types';
+import { mainCategories, producents, type Producent } from '../constants/dbTypes';
 
 type SubCategories = (typeof fodderCategories)[keyof typeof fodderCategories][number]['id'];
-type Producent = (typeof producents)[number];
+// type Producent = (typeof producents)[number];
 
 const PRODUCENTS: [Producent, ...Producent[]] = [producents[0], ...producents.slice(1)];
 

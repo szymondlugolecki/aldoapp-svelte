@@ -2,15 +2,13 @@
 	import { browser } from '$app/environment';
 	import { enhance } from '$app/forms';
 	import { fodderCategories, fodderNames, producentsList } from '$lib/client/constants';
+	import { mainCategories, type Producent } from '$lib/client/constants/dbTypes';
 	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import { drawer } from '$lib/client/stores/adminDrawer';
 	import type { Category, FileInputEvent, FileWithBase64, ImagesList } from '$types';
-	import { mainCategories, producents } from '$lib/client/constants';
 	import { Edit, PlusCircle, Trash2, X } from 'lucide-svelte';
 	import ModalHeader from '../ModalHeader.svelte';
-
-	type Producent = (typeof producents)[number];
 
 	let images: ImagesList = {};
 
