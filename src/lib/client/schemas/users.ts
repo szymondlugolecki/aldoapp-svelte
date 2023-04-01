@@ -23,7 +23,10 @@ export const roleValidation = z.union(
 	}
 );
 
-export const bannedValidation = z.literal('true').optional();
+export const accessPermittedValidation = z.boolean({
+	invalid_type_error: "Nieprawidłowa wartość dla 'dostęp przyznany'",
+	required_error: "Brak wartości dla 'dostęp przyznany'"
+});
 
 export const idValidation = z
 	.string({
@@ -43,15 +46,15 @@ export const verificationCodeValidation = z
 	.length(4, { message: 'Nieprawidłowy kod' });
 
 export const addUserSchema = z.object({
-	name: nameValidation,
+	fullName: nameValidation,
 	email: emailValidation,
 	role: roleValidation
 });
 
 export const editUserSchema = z.object({
 	id: idValidation,
-	name: nameValidation,
+	fullName: nameValidation,
 	email: emailValidation,
 	role: roleValidation,
-	banned: bannedValidation
+	access: accessPermittedValidation
 });

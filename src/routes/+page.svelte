@@ -6,14 +6,28 @@
 	let sessionData: import('./$types').PageData['user'] | undefined = undefined;
 
 	async function session() {
-		const response = await fetch('/api/session', {
-			method: 'GET',
+		const response = await fetch('/api/session');
+
+		sessionData = await response.json();
+	}
+
+	async function createProgenitor() {
+		const createPromise = fetch('/api/progenitor/create', {
+			method: 'POST',
 			headers: {
 				'content-type': 'application/json'
 			}
 		});
 
-		sessionData = await response.json();
+		toast.promise(createPromise, {
+			loading: 'Tworzenie protoplasty...',
+			success: 'Protoplasta utworzony pomyślnie!',
+			error: 'Wystąpił błąd podczas tworzenia protoplasty!'
+		});
+
+		const response = await createPromise;
+		const json = await response.json();
+		console.log('Response', json);
 	}
 
 	function showToast() {
@@ -34,8 +48,8 @@
 	<h2 class="text-xl">Na razie nic tu nie ma... 😌</h2>
 	<button on:click={session} class="px-3 py-2 bg-gray-800 text-white text-lg">Get session</button>
 	<button on:click={showToast} class="px-3 py-2 bg-gray-800 text-white text-lg">Poggers xD</button>
-	{JSON.stringify(sessionData)}
-	<button
+	<span>{JSON.stringify(sessionData)}</span>
+	<!-- <button
 		on:click={() => {
 			subscribe();
 		}}
@@ -47,5 +61,9 @@
 			unsubscribe();
 		}}
 		class="px-3 py-2 bg-gray-800 text-white text-lg">Nie chcę już otrzymywać powiadomień</button
+	> -->
+
+	<button on:click={() => createProgenitor} class="px-3 py-2 bg-gray-800 text-white text-lg"
+		>Utwórz protoplastę</button
 	>
 </section>

@@ -1,6 +1,5 @@
+import type { Role, User } from '$types';
 import type { JWTPayload, JWTVerifyResult } from 'jose';
-
-import type { Role, User } from './UserTypes';
 
 interface PayloadWithUserEmail extends JWTPayload {
 	id: string;
@@ -14,4 +13,4 @@ export interface JWTTokenResult extends JWTVerifyResult {
 	payload: PayloadWithUserEmail;
 }
 
-export type SessionUser = Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'banned'>;
+export type SessionUser = Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'access'>;

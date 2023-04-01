@@ -1,12 +1,13 @@
 import { addProductSchema } from '$lib/client/schemas/products';
-import { prisma } from '$lib/server/clients/prismaClient';
+// import { p } from '$lib/server/clients/pClient';
 import { error, fail, type Action } from '@sveltejs/kit';
 import { cloudinary } from '$lib/server/clients/cloudinaryClient';
 import { trytm } from '@bdsqqq/try';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { errorResponses } from '$lib/client/constants/errorResponses';
 import { productURLParser } from '$lib/client/functions';
-import { createId } from '@paralleldrive/cuid2';
+import { db } from '$lib/server/db';
+import { products, type Product } from '$lib/server/db/schemas/products';
 
 const add: Action = async ({ request, locals }) => {
 	// Only moderators and admins are allowed to add a product
@@ -18,9 +19,15 @@ const add: Action = async ({ request, locals }) => {
 	}
 
 	// Validate the user input
-	const formData = await request.formData();
+	const [formData, formDataError] = await trytm(request.formData());
+	if (formDataError) {
+		return fail(400, {
+			errors: ['Niepoprawne dane']
+		});
+	}
+
 	// Need to extract the images from the formData before using Object.fromEntries
-	// Because then the images overwrite each other
+	// Because then images overwrite each other
 	const imageArray = formData.getAll('images');
 
 	const data = {
@@ -95,39 +102,29 @@ const add: Action = async ({ request, locals }) => {
 	console.log('imagesURL', imagesURL);
 
 	const encodedURL = productURLParser(name, symbol);
-	const productId = createId();
+
+	const newProduct = {
+		authorId: locals.session.user.id,
+		name,
+		symbol,
+		description: description || null,
+		images: imagesURL,
+		category,
+		subcategory: subcategory ?? '',
+		price,
+		weight,
+		producent,
+		encodedURL,
+		amountLeft: Math.floor(Math.random() * 5) // 0 - 5
+	} satisfies Omit<Product, 'id' | 'createdAt'>;
 
 	// Add the product to the database
-	const [, addProductError] = await trytm(
-		prisma.product.create({
-			data: {
-				id: productId,
-				userId: locals.session.user.id,
-				name,
-				symbol,
-				description,
-				images: {
-					createMany: {
-						data: imagesURL.map((url) => ({
-							url
-						}))
-					}
-				},
-				category,
-				subcategory: subcategory ?? '',
-				price,
-				weight,
-				producent,
-				encodedURL,
-				amountLeft: Math.floor(Math.random() * 5) // 0 - 5
-			}
-		})
-	);
-
+	const [, addProductError] = await trytm(db.insert(products).values(newProduct));
 	if (addProductError) {
+		// Unexpected-error
 		console.log('addProductError', addProductError);
 		return fail(500, {
-			errors: ['Nie udało się dodać produktu']
+			errors: ['Wystąpił błąd. Produkt był poprawny, ale nie udało się go dodać do bazy danych']
 		});
 	}
 
@@ -135,3 +132,27 @@ const add: Action = async ({ request, locals }) => {
 };
 
 export default add;
+
+// p.product.create({
+// 	data: {
+// 		id: productId,
+// 		userId: locals.session.user.id,
+// 		name,
+// 		symbol,
+// 		description,
+// 		images: {
+// 			createMany: {
+// 				data: imagesURL.map((url) => ({
+// 					url
+// 				}))
+// 			}
+// 		},
+// 		category,
+// 		subcategory: subcategory ?? '',
+// 		price,
+// 		weight,
+// 		producent,
+// 		encodedURL,
+// 		amountLeft: Math.floor(Math.random() * 5) // 0 - 5
+// 	}
+// })

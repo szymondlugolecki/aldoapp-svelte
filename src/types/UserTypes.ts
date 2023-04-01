@@ -1,4 +1,4 @@
-import type { Role, User } from '@prisma/client';
+import type { User, Role } from '$lib/server/db/schemas/users';
 
 export { Role, User };
 

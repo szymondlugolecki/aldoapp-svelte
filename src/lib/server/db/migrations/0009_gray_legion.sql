@@ -1,0 +1,15 @@
+ALTER TABLE orders MODIFY COLUMN `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE orders MODIFY COLUMN `customer_id` varchar(36) NOT NULL;
+ALTER TABLE products MODIFY COLUMN `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE products MODIFY COLUMN `images` json NOT NULL DEFAULT ('[]');
+ALTER TABLE promo_code_usages MODIFY COLUMN `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE promo_codes MODIFY COLUMN `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE subscriptions MODIFY COLUMN `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE users MODIFY COLUMN `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE verification_tokens MODIFY COLUMN `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE orders ADD `delivery_method` text NOT NULL;
+ALTER TABLE orders ADD `payment_method` text NOT NULL;
+ALTER TABLE users ADD `access` boolean DEFAULT true NOT NULL;
+ALTER TABLE users DROP COLUMN `banned`;
+DROP INDEX user_id ON `products`;
+CREATE UNIQUE INDEX author_id ON products (`user_id`);

@@ -1,9 +1,6 @@
 import type { CartProductWithQuantity, StoreProduct } from '$types';
 import { persisted } from 'svelte-local-storage-store';
-import type { deliveryMethods, paymentMethods } from '../constants';
-
-type DeliveryMethods = (typeof deliveryMethods)[number];
-type PaymentMethods = (typeof paymentMethods)[number];
+import type { DeliveryMethods, PaymentMethods } from '../constants/dbTypes';
 
 type CartStore = {
 	products: CartProductWithQuantity[];
@@ -102,7 +99,7 @@ export const addProduct = (product: StoreProduct) => {
 	});
 };
 
-export const incrementProduct = (productId: string) => {
+export const incrementProduct = (productId: number) => {
 	cart.update((cartObj) => {
 		const products = cartObj.products.map((product) => {
 			if (product.id === productId) {
@@ -119,7 +116,7 @@ export const incrementProduct = (productId: string) => {
 	});
 };
 
-export const decrementProduct = (productId: string) => {
+export const decrementProduct = (productId: number) => {
 	cart.update((cartObj) => {
 		const products = cartObj.products
 			.map((product) => {
@@ -138,7 +135,7 @@ export const decrementProduct = (productId: string) => {
 	});
 };
 
-export const removeProduct = (productId: string) => {
+export const removeProduct = (productId: number) => {
 	cart.update((cartObj) => {
 		const products = cartObj.products.filter((product) => product.id !== productId);
 		return {

@@ -33,8 +33,7 @@ const config = {
 		// },
 		alias: {
 			'$components/*': 'src/components',
-			$types: './src/types',
-			$prisma: './src/lib/server/prismaClient.ts'
+			$types: './src/types'
 		},
 		prerender: {
 			entries: [

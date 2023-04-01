@@ -1,8 +1,5 @@
-import type { ShortService, Outlets } from '$types';
-import type { MainCategories, Role } from '@prisma/client';
-
-export const mainCategories = ['cattle', 'poultry', 'backyard'] as const;
-export const producents = ['deheus', 'unknown'] as const;
+import type { ShortService, Outlets, Role } from '$types';
+import type { MainCategories } from './dbTypes';
 
 type SalesmenMenuType = {
 	name: string;
@@ -10,9 +7,6 @@ type SalesmenMenuType = {
 	locations: Outlets[];
 	href: ShortService;
 };
-
-export const paymentMethods = ['cash'] as const;
-export const deliveryMethods = ['personal-pickup', 'dpd'] as const;
 
 export const producentsList = {
 	deheus: 'De Heus',

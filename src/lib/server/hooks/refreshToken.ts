@@ -5,7 +5,7 @@ import {
 	refreshTokenExpiryDate
 } from '$lib/server/constants/auth';
 import { createAccessToken, createRefreshToken, verifyToken } from '$lib/server/functions/auth';
-// import { prisma } from '$lib/server/clients/prismaClient';
+// import { p } from '$lib/server/clients/pClient';
 // import type { SessionUser } from '$types';
 import { error, type Handle } from '@sveltejs/kit';
 import { trytm } from '@bdsqqq/try';
@@ -18,7 +18,9 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 	const accessToken = event.cookies.get(jwtName.access);
 	const refreshToken = event.cookies.get(jwtName.refresh);
 
-	if (event.locals.session?.user.banned) {
+	const { session } = event.locals;
+
+	if (session && !session.user.access) {
 		throw error(403, 'Brak dostępu');
 	}
 
@@ -65,7 +67,7 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 						email: users.email,
 						fullName: users.fullName,
 						role: users.role,
-						banned: users.banned
+						access: users.access
 					})
 					.from(users)
 					.where(eq(users.email, userEmail))
@@ -145,20 +147,21 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 				email: users.email,
 				fullName: users.fullName,
 				role: users.role,
-				banned: users.banned
+				access: users.access
 			})
 			.from(users)
 			.where(eq(users.email, userEmail))
 	);
 
-	// prisma.user.findFirst({
-	// 	where: { email: userEmail },
-	// 	select: { id: true, email: true, fullName: true, role: true, banned: true }
-	// })
-
 	if (getUserError) {
 		// Unexpected-error
 		console.error('UNEXPECTED ERROR!!!!!', getUserError);
+		return resolve(event);
+	}
+
+	if (!dbUser.length) {
+		// Unexpected-error
+		console.error('UNEXPECTED ERROR!!!!!!!', 'dbUser.length', dbUser.length);
 		return resolve(event);
 	}
 
@@ -171,3 +174,8 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 
 	return resolve(event);
 };
+
+// p.user.findFirst({
+// 	where: { email: userEmail },
+// 	select: { id: true, email: true, fullName: true, role: true, banned: true }
+// })

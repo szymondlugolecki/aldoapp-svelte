@@ -1,20 +1,13 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { roleNames, salesmenMenu } from '$lib/client/constants';
-	import { ArrowLeft, ArrowRight, LogOut, RefreshCcw } from 'lucide-svelte';
-	import type { CartProductWithQuantity, Role, SessionUser } from '../../types';
-	import { fade, slide } from 'svelte/transition';
-	import { cart, changeCartState, clearCart, removeProduct } from '$lib/client/stores/cart';
+	import { ArrowLeft, ArrowRight } from 'lucide-svelte';
+	import { cart, changeCartState } from '$lib/client/stores/cart';
 	import { onMount } from 'svelte';
 	import wretch from 'wretch';
 	import toast from 'svelte-french-toast';
-	import { error } from '@sveltejs/kit';
-	import type { Product } from '@prisma/client';
 	import { imagesSorting } from '$lib/client/functions/sorting';
 	import { orderValidation } from '$lib/client/schemas/order';
 	import { betterZodParse } from '$lib/client/functions/betterZodParse';
-	import type { Z } from 'vitest/dist/types-71ccd11d';
-	import type { z } from 'zod';
+	import type { CartProduct } from '$types';
 
 	export let data;
 
@@ -35,15 +28,7 @@
 				.get()
 				.json<{
 					success: true;
-					products: {
-						images: string[];
-						symbol: string;
-						id: string;
-						name: string;
-						price: number;
-						amountLeft: number;
-						encodedURL: string;
-					}[];
+					products: CartProduct[];
 				}>();
 
 			toast.promise(syncCartPromise, {
@@ -52,11 +37,11 @@
 				loading: 'Synchronizowanie koszyka...'
 			});
 
-			const data = await syncCartPromise;
+			const cartData = await syncCartPromise;
 
-			console.log('data', data);
+			console.log('cartData', cartData);
 
-			const cartLocalProducts = data.products.map((product) => {
+			const cartLocalProducts = cartData.products.map((product) => {
 				return {
 					...product,
 					images: product.images.sort(imagesSorting),
@@ -113,7 +98,7 @@
 		try {
 			const [order, orderParseError] = betterZodParse(orderValidation, {
 				products: $cart.products.map((product) => ({
-					id: product.id,
+					productId: product.id,
 					quantity: product.quantity
 				})),
 				deliveryMethod: $cart.deliveryMethod,
@@ -121,7 +106,7 @@
 				customerName: $cart.customerName,
 				address: $cart.address,
 				promoCode: $cart.promoCode
-			} as z.infer<typeof orderValidation>);
+			});
 
 			if (orderParseError) {
 				toast.error(orderParseError[0]);

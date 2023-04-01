@@ -1,9 +1,10 @@
-import type { Product } from '@prisma/client';
 import type { ProductAuthor } from './UserTypes';
 import type { User } from './UserTypes';
-import type { fodderCategories, mainCategories } from '$lib/client/constants';
+import type { fodderCategories } from '$lib/client/constants';
+import type { MainCategories } from '$lib/client/constants/dbTypes';
+import type { Product } from '$lib/server/db/schemas/products';
 
-export type Category = (typeof mainCategories)[number];
+export type Category = MainCategories;
 export type Subcategory = (typeof fodderCategories)[Category][number]['id'];
 
 export type ProductWithAuthorAndImage = Product & {
@@ -62,3 +63,8 @@ export type CartProductWithQuantity = Pick<
 	ProductWithStringImage,
 	'symbol' | 'id' | 'images' | 'name' | 'price' | 'amountLeft' | 'encodedURL'
 > & { quantity: number };
+
+export type CartProduct = Pick<
+	Product,
+	'id' | 'name' | 'symbol' | 'price' | 'images' | 'amountLeft' | 'encodedURL'
+>;

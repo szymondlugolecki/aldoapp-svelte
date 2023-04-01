@@ -5,7 +5,7 @@ import { trytm } from '@bdsqqq/try';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { errorResponses } from '$lib/client/constants/errorResponses';
 import type { Product } from '@prisma/client';
-import { compareObjects } from '$lib/server/functions/utils';
+import { areObjectsEqual } from '$lib/server/functions/utils';
 import { productURLParser } from '$lib/client/functions';
 
 const edit: Action = async ({ request, locals }) => {
@@ -76,7 +76,7 @@ const edit: Action = async ({ request, locals }) => {
 
 	// If nothing has changed, do not call the db to save resources
 	// if (!thumbnail) {
-	// 	const nothingChanged = compareObjects(
+	// 	const nothingChanged = areObjectsEqual(
 	// 		{
 	// 			name,
 	// 			symbol,

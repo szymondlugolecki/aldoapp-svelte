@@ -2,11 +2,11 @@
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
 	import { handleFormResponse } from '$lib/client/functions/forms';
-	import type { User } from '@prisma/client';
 	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 	import { X } from 'lucide-svelte';
 	import { drawer } from '$lib/client/stores/adminDrawer';
 	import ModalHeader from '../ModalHeader.svelte';
+	import type { User } from '$types';
 
 	export let user: User | undefined;
 </script>
@@ -37,10 +37,10 @@
 		<ModalHeader title="Edytuj użytkownika" />
 
 		<div>
-			<label for="name" class="label label-text"> Imię i nazwisko </label>
+			<label for="fullName" class="label label-text"> Imię i nazwisko </label>
 			<input
 				type="text"
-				name="name"
+				name="fullName"
 				class="input input-bordered w-full text-base-content"
 				required
 				value={user.fullName}
@@ -72,14 +72,14 @@
 		{#if user.role !== 'admin' && (user.role !== 'moderator' || $page.data.user?.role === 'admin')}
 			<div class="flex items-center mb-4">
 				<input
-					id="banned"
-					name="banned"
+					id="access"
+					name="access"
 					type="checkbox"
 					value="true"
-					checked={user.banned}
+					checked={user.access}
 					class="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 dark:focus:ring-red-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
 				/>
-				<label for="banned" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+				<label for="access" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
 					>Zablokuj</label
 				>
 			</div>

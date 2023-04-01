@@ -1,5 +1,6 @@
 // db.ts
 // import { sql } from 'drizzle-orm';
+import type { InferModel } from 'drizzle-orm';
 import {
 	mysqlTable,
 	serial,
@@ -9,7 +10,8 @@ import {
 	timestamp,
 	text,
 	int,
-	double
+	double,
+	char
 } from 'drizzle-orm/mysql-core';
 import { sql } from 'drizzle-orm/sql';
 // import { users } from './users';
@@ -18,7 +20,9 @@ export const promoCodes = mysqlTable(
 	'promo_codes',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
+		createdAt: timestamp('created_at')
+			.default(sql`CURRENT_TIMESTAMP`)
+			.notNull(),
 		// updatedAt: timestamp('updated_at').onUpdateNow(),
 
 		// Promo Code info
@@ -47,12 +51,14 @@ export const promoCodeUsages = mysqlTable(
 	'promo_code_usages',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
+		createdAt: timestamp('created_at')
+			.default(sql`CURRENT_TIMESTAMP`)
+			.notNull(),
 
 		// Promocode and user IDs
 		promoCodeId: varchar('promocode_id', { length: 36 }).notNull(),
 		// .references(() => promoCodes.id),
-		userId: int('user_id').notNull()
+		userId: char('user_id').notNull()
 		// .references(() => users.id)
 	},
 	(promoCodeUsage) => ({
@@ -61,3 +67,6 @@ export const promoCodeUsages = mysqlTable(
 		userId: uniqueIndex('user_id_idx').on(promoCodeUsage.userId)
 	})
 );
+
+export type PromoCode = InferModel<typeof promoCodes>;
+export type PromoCodeUsage = InferModel<typeof promoCodeUsages>;

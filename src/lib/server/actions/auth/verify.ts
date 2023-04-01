@@ -1,10 +1,19 @@
-import { prisma } from '$lib/server/clients/prismaClient';
+// import { p } from '$lib/server/clients/pClient';
 import { fail, redirect, type Action } from '@sveltejs/kit';
 import { trytm } from '@bdsqqq/try';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { verificationCodeSchema } from '$lib/client/schemas/auth';
 import { accessTokenExpiryDate, jwtName, refreshTokenExpiryDate } from '$lib/server/constants/auth';
 import { createAccessToken, createRefreshToken } from '$lib/server/functions/auth';
+import { db } from '$lib/server/db';
+import {
+	users,
+	verificationTokens,
+	type User,
+	type VerificationToken
+} from '$lib/server/db/schemas/users';
+import { eq } from 'drizzle-orm/expressions';
+import type { Optional } from '$types/UtilityTypes';
 
 const handleVerification: Action = async ({ request, cookies, locals }) => {
 	// Validate the user input
@@ -19,33 +28,69 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 	const { code } = codeParsed;
 
 	// Check if the token exists & is not expired
-	const [token, getTokenError] = await trytm(
-		prisma.verificationToken.findUnique({
-			where: {
-				code
-			},
-			select: {
-				email: true,
-				user: true,
-				expires: true
-			}
-		})
+	const [tokens, getTokenError] = await trytm(
+		db
+			.select({
+				// userId: verificationTokens.userId,
+				expiresAt: verificationTokens.expiresAt,
+				id: users.id,
+				email: users.email,
+				role: users.role,
+				fullName: users.fullName,
+				access: users.access
+			})
+			.from(verificationTokens)
+			.where(eq(verificationTokens.code, code))
+			.leftJoin(users, eq(verificationTokens.userId, users.id))
 	);
+
+	// p.verificationToken.findUnique({
+	// 	where: {
+	// 		code
+	// 	},
+	// 	select: {
+	// 		email: true,
+	// 		user: true,
+	// 		expires: true
+	// 	}
+	// })
 
 	if (getTokenError) {
 		// Unexpected-error
+		console.log('getTokenError', getTokenError);
 		return fail(500, {
 			errors: ['Niespodziewany błąd']
 		});
 	}
-
-	if (!token || token.expires < new Date()) {
+	const token = tokens[0];
+	if (!token || new Date() > token.expiresAt) {
 		return fail(400, {
-			errors: {
-				code: ['Podany kod nie istnieje lub jest przedawniony']
-			}
+			errors: ['Podany kod nie istnieje lub jest przedawniony']
 		});
 	}
+
+	const dbQueryValuesCheck = <Q extends Record<string, unknown>, T>(
+		dbObj: Record<string, unknown>,
+		...keys: string[]
+	): dbObj is Exclude<Q & T, null> => {
+		let allCorrect = true;
+
+		keys.forEach((key) => {
+			if (!(key in dbObj) || dbObj[key] === null) {
+				allCorrect = false;
+			}
+		});
+
+		return allCorrect;
+	};
+
+	if (!dbQueryValuesCheck<Pick<VerificationToken, 'userId' | 'expiresAt'>, User>(token, 'email')) {
+		return fail(400, {
+			errors: ['Podany kod nie istnieje lub jest przedawniony']
+		});
+	}
+
+	// here properties from the user obj are still nullable
 
 	// Create a new session
 	const [createTokens, createTokensError] = await trytm(
@@ -76,17 +121,12 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 		secure: false
 	});
 
+	const user: Optional<typeof token, 'expiresAt'> = { ...token };
+	delete user.expiresAt;
 	locals.session = {
-		user: {
-			id: token.user.id,
-			email: token.user.email,
-			role: token.user.role,
-			fullName: token.user.fullName,
-			banned: token.user.banned
-		},
-		expires: accessTokenExpiryDate()
+		expires: accessTokenExpiryDate(),
+		user
 	};
-
 	console.log('locals.session', locals.session);
 
 	throw redirect(303, '/');

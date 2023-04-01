@@ -1,38 +1,47 @@
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { pushSubscriptionJSONSchema } from '$lib/client/schemas/pushSubscription';
-import { prisma } from '$lib/server/clients/prismaClient';
+import { db } from '$lib/server/db';
+import { subscriptions } from '$lib/server/db/schemas/subscriptions';
+// import { p } from '$lib/server/clients/pClient';
 import { trytm } from '@bdsqqq/try';
-import { json, fail } from '@sveltejs/kit';
+import { json, error } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm/expressions';
 
 export async function POST({ request }) {
-	const data: PushSubscription = await request.json();
+	// No need to be logged in to unsubscribe :)
+	const [data, dataError] = await trytm(request.json());
 	console.log('data', data);
+
+	if (dataError) {
+		throw error(400, 'Nieprawidłowe dane do anulowania subskrypcji powiadomień');
+	}
 
 	const [result, parseError] = betterZodParse(pushSubscriptionJSONSchema, data);
 	if (parseError) {
-		throw fail(400, {
-			errors: 'Błąd przy odsubskrypcji powiadomień'
-		});
+		throw error(400, 'Błąd podczas anulowania subskrypcji powiadomień');
 	}
 
-	// check if subscription exists
-	// if exists, update. if not, create
+	// MAYBE THERE'S NO NEED TO DO CHECK, JUST TRY TO DELETE
+	// Check if subscription exists
+
+	// const [, deleteSubscriptionError] = await trytm();
+
 	const [, deleteSubscriptionError] = await trytm(
-		prisma.subscription.delete({
-			where: {
-				endpoint: result.endpoint
-			}
-		})
+		db.delete(subscriptions).where(eq(subscriptions.endpoint, result.endpoint))
 	);
 
 	if (deleteSubscriptionError) {
-		throw fail(400, {
-			errors: 'Błąd przy odsubskrypcji powiadomień'
-		});
+		throw error(400, 'Błąd przy anulowaniu subskrypcji powiadomień');
 	}
 
 	return json({
 		success: true,
-		message: 'Pomyślnie odsubskrybowano'
+		message: 'Pomyślnie anulowano subskrypcję powiadomień'
 	});
 }
+
+// p.subscription.delete({
+// 	where: {
+// 		endpoint: result.endpoint
+// 	}
+// })

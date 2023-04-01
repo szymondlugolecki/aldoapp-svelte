@@ -1,9 +1,12 @@
 import add from '$lib/server/actions/users/add';
 import edit from '$lib/server/actions/users/edit';
-import { prisma } from '$lib/server/clients/prismaClient';
+// import { p } from '$lib/server/clients/pClient';
+import { db } from '$lib/server/db';
+import { users } from '$lib/server/db/schemas/users';
 
 export const load = () => {
-	return { users: prisma.user.findMany({}) };
+	return { users: db.select().from(users) };
+	// p.user.findMany({})
 };
 
 export const actions = {

@@ -55,14 +55,19 @@ export const deliveryValidation = z.object({
 
 // if delivery method is 'pickup', then delivery address is not required
 
-const deliveryUnion = z.union([deliveryValidation, z.object({}).optional()]);
+const deliveryUnion = z.union([deliveryValidation, z.null()]);
 
 export const orderValidation = z
 	.object({
 		products: z
 			.array(
 				z.object({
-					id: z.string(),
+					productId: z
+						.number({
+							invalid_type_error: 'Nieprawidłowe id produktu',
+							required_error: 'Id produktu jest wymagane'
+						})
+						.min(0, { message: 'Id nie może być ujemne' }),
 					quantity: z
 						.number({
 							invalid_type_error: 'Nieprawidłowa ilość produktu',
@@ -107,7 +112,7 @@ export const orderValidation = z
 			}
 		}),
 		customerName: orderNameValidation,
-		address: deliveryUnion.optional(),
+		address: deliveryUnion,
 		promoCode: z.string({ invalid_type_error: 'Nieprawidłowy kod rabatowy' }).nullish()
 	})
 	.refine((obj) => obj.deliveryMethod !== 'personal-pickup' || obj.address, {

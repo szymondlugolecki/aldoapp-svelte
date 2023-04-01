@@ -1,31 +1,17 @@
 import { verificationKeysExpirationTime } from '$lib/server/constants/auth';
-import { createVerificationCode, createVerificationLink } from '$lib/server/functions/auth';
+import {
+	createVerificationKeys,
+	createVerificationLink,
+	uaParser
+} from '$lib/server/functions/auth';
 import { sendVerificationEmail } from '$lib/server/clients/sendGridClient';
-import { prisma } from '$lib/server/clients/prismaClient';
 import { fail, redirect, type Action } from '@sveltejs/kit';
 import { trytm } from '@bdsqqq/try';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { loginSchema } from '$lib/client/schemas/auth';
-
-// export const handleLogin: Handle = async ({ event, request, resolve }) => {
-
-// } catch (err) {
-// 	console.log('err', err);
-// 	if (err instanceof ZodError) {
-// 		const { fieldErrors: errors } = err.flatten();
-// 		return fail(400, {
-// 			errors
-// 		});
-// 	}
-
-// 	if (err instanceof PrismaClientKnownRequestError) {
-// 		console.log('prisma error', err.code, err.message);
-// 		throw error(500, { message: 'Niespodziewany błąd. Spróbuj ponownie' });
-// 	}
-
-// 	throw error(500, { message: 'Niespodziewany błąd. Spróbuj ponownie' });
-// }
-// };
+import { db } from '$lib/server/db';
+import { eq } from 'drizzle-orm/expressions';
+import { users, verificationTokens, type VerificationToken } from '$lib/server/db/schemas/users';
 
 const handleLogin: Action = async ({ request }) => {
 	// Validate the user input
@@ -36,15 +22,12 @@ const handleLogin: Action = async ({ request }) => {
 			errors: parseError
 		});
 	}
-	const { email } = result;
+	// const { email } = result;
+	const email = result.email.toLowerCase();
 
 	// Check if the user exists (was invited)
-	const [user, fetchUserError] = await trytm(
-		prisma.user.findUnique({
-			where: {
-				email
-			}
-		})
+	const [usersQuery, fetchUserError] = await trytm(
+		db.select({ id: users.id }).from(users).where(eq(users.email, email))
 	);
 
 	if (fetchUserError) {
@@ -54,6 +37,8 @@ const handleLogin: Action = async ({ request }) => {
 		});
 	}
 
+	const user = usersQuery[0];
+
 	if (!user) {
 		return fail(401, {
 			errors: ['Podany adres email nie uzyskał dostępu']
@@ -61,27 +46,20 @@ const handleLogin: Action = async ({ request }) => {
 	}
 
 	// Create a verification token & send the email
-	const verificationCode = createVerificationCode();
+	const { code, token } = createVerificationKeys();
 
-	const [tokenResult, createTokenError] = await trytm(
-		prisma.verificationToken.upsert({
-			create: {
-				code: verificationCode,
-				email,
-				expires: new Date(Date.now() + verificationKeysExpirationTime), // 12 hours from now
-				userAgent: ''
-			},
-			update: {
-				code: verificationCode,
-				expires: new Date(Date.now() + verificationKeysExpirationTime) // 12 hours from now
-			},
-			where: {
-				email
-			},
-			select: {
-				verificationToken: true
-			}
-		})
+	const userAgent = uaParser(request.headers.get('User-Agent'));
+
+	const newVerificationToken: Omit<VerificationToken, 'createdAt' | 'id'> = {
+		code,
+		token,
+		userAgent,
+		userId: user.id,
+		expiresAt: new Date(Date.now() + verificationKeysExpirationTime)
+	};
+
+	const [, createTokenError] = await trytm(
+		db.insert(verificationTokens).values(newVerificationToken)
 	);
 
 	if (createTokenError) {
@@ -91,15 +69,11 @@ const handleLogin: Action = async ({ request }) => {
 		});
 	}
 
-	const { verificationToken } = tokenResult;
-
-	const verificationLink = createVerificationLink(verificationToken);
-
 	const [, sendEmailError] = await trytm(
 		sendVerificationEmail({
 			receiver: email,
-			code: verificationCode,
-			link: verificationLink
+			code,
+			link: createVerificationLink(token)
 		})
 	);
 
@@ -116,3 +90,28 @@ const handleLogin: Action = async ({ request }) => {
 };
 
 export default handleLogin;
+
+// p.user.findUnique({
+// 	where: {
+// 		email
+// 	}
+// })
+
+// p.verificationToken.upsert({
+// 	create: {
+// 		code: verificationCode,
+// 		email,
+// 		expires: new Date(Date.now() + verificationKeysExpirationTime), // 12 hours from now
+// 		userAgent: ''
+// 	},
+// 	update: {
+// 		code: verificationCode,
+// 		expires: new Date(Date.now() + verificationKeysExpirationTime) // 12 hours from now
+// 	},
+// 	where: {
+// 		email
+// 	},
+// 	select: {
+// 		verificationToken: true
+// 	}
+// })

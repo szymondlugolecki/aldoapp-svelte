@@ -50,12 +50,10 @@ export const subcategoryValidation = z
 	})
 	.optional();
 
-export const idValidation = z
-	.string({
-		required_error: 'Id jest wymagane',
-		invalid_type_error: 'Nieprawidłowe id'
-	})
-	.uuid({ message: 'Nieprawidłowe id' });
+export const idValidation = z.number({
+	invalid_type_error: 'Nieprawidłowe id produktu',
+	required_error: 'Id produktu jest wymagane'
+});
 
 export const nameValidation = z
 	.string({

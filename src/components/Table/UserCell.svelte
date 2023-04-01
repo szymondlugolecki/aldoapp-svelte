@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { PUBLIC_WEBSITE_URL } from '$env/static/public';
-	import type { UserRowType, ProductWithAuthorAndImage } from '$types';
-	import type { User } from '@prisma/client';
+	import type { UserRowType, ProductWithAuthorAndImage, User } from '$types';
 	import { roleNames } from '$lib/client/constants';
 	import { page } from '$app/stores';
 	import { CheckCircle, ExternalLink, XCircle } from 'lucide-svelte';
@@ -53,10 +51,10 @@
 		<span>🚫</span>
 	{/if}
 {:else if rowType === 'access'}
-	{#if user.banned}
-		<XCircle color="red" aria-label="Zablokowany" />
-	{:else}
+	{#if user.access}
 		<CheckCircle color="green" aria-label="Brak blokady" />
+	{:else}
+		<XCircle color="red" aria-label="Zablokowany" />
 	{/if}
 {:else if rowType === 'joined'}
 	<div

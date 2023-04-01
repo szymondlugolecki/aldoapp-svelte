@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm';
+import { sql, type InferModel } from 'drizzle-orm';
 import {
 	mysqlTable,
 	serial,
@@ -8,7 +8,6 @@ import {
 	boolean,
 	timestamp,
 	text,
-	int,
 	index
 } from 'drizzle-orm/mysql-core';
 
@@ -16,14 +15,16 @@ export const users = mysqlTable(
 	'users',
 	{
 		id: char('id').primaryKey(),
-		createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
+		createdAt: timestamp('created_at')
+			.default(sql`CURRENT_TIMESTAMP`)
+			.notNull(),
 		// updatedAt: timestamp('created_at').notNull().defaultNow().onUpdateNow(),
 
 		// user data
 		email: varchar('email', { length: 320 }).notNull(),
 		fullName: varchar('name', { length: 256 }).notNull(),
 		role: text('role', { enum: ['admin', 'moderator', 'customer'] }).notNull(),
-		banned: boolean('banned').default(false).notNull()
+		access: boolean('access').default(true).notNull()
 
 		// relations
 	},
@@ -37,7 +38,9 @@ export const verificationTokens = mysqlTable(
 	'verification_tokens',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
+		createdAt: timestamp('created_at')
+			.default(sql`CURRENT_TIMESTAMP`)
+			.notNull(),
 
 		// token data
 		token: varchar('token', { length: 72 }).notNull(),
@@ -47,7 +50,7 @@ export const verificationTokens = mysqlTable(
 		expiresAt: timestamp('expires_at').notNull(),
 
 		// relations
-		userId: int('user_id').notNull()
+		userId: char('user_id').notNull()
 		// .references(() => users.id)
 	},
 	(verificationToken) => ({
@@ -57,3 +60,7 @@ export const verificationTokens = mysqlTable(
 		userAgent: index('unique_user_agentx').on(verificationToken.userAgent)
 	})
 );
+
+export type User = InferModel<typeof users>;
+export type VerificationToken = InferModel<typeof verificationTokens>;
+export type Role = User['role'];

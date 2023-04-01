@@ -1,11 +1,15 @@
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { addUserSchema } from '$lib/client/schemas/users';
 import { errorResponses } from '$lib/client/constants/errorResponses';
-import { prisma } from '$lib/server/clients/prismaClient';
+// import { p } from '$lib/server/clients/pClient';
 import { trytm } from '@bdsqqq/try';
 import { error, fail, type Action } from '@sveltejs/kit';
+import { createId } from '@paralleldrive/cuid2';
+import type { User } from '$types';
+import { db } from '$lib/server/db';
+import { users } from '$lib/server/db/schemas/users';
 
-const add: Action = async ({ request, locals }) => {
+const add = (async ({ request, locals }) => {
 	// Only moderators and admins are allowed to add a user
 	if (!locals.session) {
 		throw error(...errorResponses[401]);
@@ -15,33 +19,47 @@ const add: Action = async ({ request, locals }) => {
 	}
 
 	// Validate the user input
-	const data = Object.fromEntries(await request.formData());
-	const [addUserObj, addUserObjParseError] = betterZodParse(addUserSchema, data);
-	if (addUserObjParseError) {
+	const [formData, formDataError] = await trytm(request.formData());
+	if (formDataError) {
 		return fail(400, {
 			errors: ['Niepoprawne dane']
 		});
 	}
-	const { email, name, role } = addUserObj;
+
+	const data = Object.fromEntries(formData);
+	const [newUserParsed, newUserParseError] = betterZodParse(addUserSchema, data);
+	if (newUserParseError) {
+		return fail(400, {
+			errors: ['Niepoprawne dane']
+		});
+	}
+
+	const newUser = {
+		id: createId(),
+		...newUserParsed
+	} satisfies Omit<User, 'createdAt' | 'access'>;
 
 	// Add the user to the database
-	const [, addUserError] = await trytm(
-		prisma.user.create({
-			data: {
-				email,
-				role,
-				fullName: name
-			}
-		})
-	);
+	const [, addUserError] = await trytm(db.insert(users).values(newUser));
 
 	if (addUserError) {
+		// Unexpected-error
+		console.error('addUserError', addUserError);
 		return fail(500, {
 			errors: ['Nie udało się dodać użytkownika']
 		});
 	}
 
 	return { success: true, message: 'Pomyślnie dodano użytkownika' };
-};
+}) satisfies Action;
 
 export default add;
+
+// p.user.create({
+// 	data: {
+// 		id: createId(),
+// 		email,
+// 		role,
+// 		fullName: name
+// 	}
+// })

@@ -1,10 +1,13 @@
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { editUserSchema } from '$lib/client/schemas/users';
-import { compareObjects } from '$lib/server/functions/utils';
-import { prisma } from '$lib/server/clients/prismaClient';
+import { db } from '$lib/server/db';
+import { users, type User } from '$lib/server/db/schemas/users';
+import { getRoleRank } from '$lib/server/functions/auth';
+import { areObjectsEqual } from '$lib/server/functions/utils';
+// import { p } from '$lib/server/clients/pClient';
 import { trytm } from '@bdsqqq/try';
-import type { User } from '@prisma/client';
 import { error, fail, type Action } from '@sveltejs/kit';
+import { eq } from 'drizzle-orm/expressions';
 
 const edit: Action = async ({ request, locals }) => {
 	// Only moderators and admins are allowed to edit a user
@@ -16,95 +19,100 @@ const edit: Action = async ({ request, locals }) => {
 	}
 
 	// Validate the user input
-	const data = Object.fromEntries(await request.formData());
-
+	const [formData, formDataError] = await trytm(request.formData());
+	if (formDataError) {
+		return fail(400, {
+			errors: ['Niepoprawne dane']
+		});
+	}
+	const data = Object.fromEntries(formData);
 	const [editUserObj, editUserObjParseError] = betterZodParse(editUserSchema, data);
 	if (editUserObjParseError) {
 		return fail(400, {
 			errors: ['Niepoprawne dane']
 		});
 	}
-	const { id, email, name, role, banned } = editUserObj;
 
-	const [userBeforeEdit, userBeforeEditError] = await trytm(
-		prisma.user.findFirstOrThrow({
-			where: {
-				id
-			},
-			select: {
-				id: true,
-				email: true,
-				fullName: true,
-				role: true,
-				banned: true
-			}
-		})
+	const { id, email, fullName, role, access } = editUserObj;
+
+	// Fetch the user from the database (before the edit)
+	const [usersBeforeEdit, usersBeforeEditError] = await trytm(
+		db
+			.select({
+				id: users.id,
+				email: users.email,
+				fullName: users.fullName,
+				role: users.role,
+				access: users.access
+			})
+			.from(users)
+			.where(eq(users.id, id))
 	);
-	if (userBeforeEditError) {
-		return fail(400, {
+
+	// Check if the user exists
+	if (usersBeforeEditError) {
+		return fail(500, {
 			errors: ['Niepowodzenie w znalezieniu użytkownika']
 		});
 	}
+	if (!usersBeforeEdit.length) {
+		return fail(400, {
+			errors: ['Nie udało się znaleźć użytkownika, którego próbujesz edytować']
+		});
+	}
 
-	const isNowBanned = banned === 'true' ? true : false;
+	const userBeforeEdit = usersBeforeEdit[0];
 
-	// The edited user is someone else
-	if (userBeforeEdit.id !== locals.session.user.id) {
-		// A user is trying to edit another user that is an admin
-		if (userBeforeEdit.role === 'admin') {
-			return fail(403, {
-				errors: ['Nie możesz edytować admina']
-			});
-		}
-
-		// Non admin user is trying to edit a moderator
-		if (userBeforeEdit.role === 'moderator' && locals.session.user.role !== 'admin') {
-			return fail(403, {
-				errors: ['Nie masz wystarczających uprawień']
-			});
-		}
-	} else {
-		// Here the user is trying to edit himself
+	// ! Handling permissions
+	// If the user is trying to edit themself
+	if (userBeforeEdit.id === locals.session.user.id) {
 		// It's ok as long as they are not trying to block themselves
-		if (isNowBanned) {
+		if (access === false) {
 			return fail(400, {
 				errors: ['Nie możesz zablokować sam siebie']
 			});
 		}
 	}
+	// If the user is trying to edit another user
+	else {
+		// The other user is an admin
+		if (userBeforeEdit.role === 'admin') {
+			return fail(403, {
+				errors: ['Nikt nie może edytować admina']
+			});
+		}
 
-	const oldUserObj = {
+		// User is trying to edit a user with a higher or equal role
+		if (getRoleRank(locals.session.user.role) <= getRoleRank(userBeforeEdit.role)) {
+			return fail(403, {
+				errors: ['Nie masz wystarczających uprawień']
+			});
+		}
+	}
+
+	const oldUser = {
 		email: userBeforeEdit.email,
-		name: userBeforeEdit.fullName,
 		role: userBeforeEdit.role,
-		banned: userBeforeEdit.banned
+		fullName: userBeforeEdit.fullName,
+		access: userBeforeEdit.access
 	};
 
-	const newUserObj: Partial<User> = {
+	const newUser = {
 		email,
 		role,
-		fullName: name,
-		banned: isNowBanned
-	};
+		fullName,
+		access
+	} satisfies Omit<User, 'id' | 'createdAt'>;
 
-	const nothingChanged = compareObjects(oldUserObj, { email, name, role, banned: isNowBanned });
+	const nothingChanged = areObjectsEqual(oldUser, newUser);
 
-	// If nothing has changed, do not call the db to save resources
+	// If nothing has changed, do not update the user
 	if (nothingChanged) {
+		console.log('Nothing has changed');
 		return { success: true, message: 'Pomyślnie edytowano użytkownika' };
 	}
 
-	const [, editUserError] = await trytm(
-		prisma.user.update({
-			where: {
-				id
-			},
-			data: newUserObj,
-			select: {
-				id: true
-			}
-		})
-	);
+	const [, editUserError] = await trytm(db.update(users).set(newUser).where(eq(users.id, id)));
 
 	if (editUserError) {
 		return fail(500, {
@@ -116,3 +124,26 @@ const edit: Action = async ({ request, locals }) => {
 };
 
 export default edit;
+
+// p.user.update({
+// 	where: {
+// 		id
+// 	},
+// 	data: newUserObj,
+// 	select: {
+// 		id: true
+// 	}
+// })
+
+// p.user.findFirstOrThrow({
+// 	where: {
+// 		id
+// 	},
+// 	select: {
+// 		id: true,
+// 		email: true,
+// 		fullName: true,
+// 		role: true,
+// 		banned: true
+// 	}
+// })

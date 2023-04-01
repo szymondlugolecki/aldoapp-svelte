@@ -1,13 +1,12 @@
-import { sql } from 'drizzle-orm';
+import { sql, type InferModel } from 'drizzle-orm';
 import {
 	mysqlTable,
 	uniqueIndex,
 	varchar,
 	timestamp,
-	int,
 	json,
-	// index,
-	serial
+	serial,
+	char
 } from 'drizzle-orm/mysql-core';
 // import { users } from './users';
 
@@ -15,13 +14,15 @@ export const subscriptions = mysqlTable(
 	'subscriptions',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
+		createdAt: timestamp('created_at')
+			.default(sql`CURRENT_TIMESTAMP`)
+			.notNull(),
 		// updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
 
 		// subscription data
-		subscription: json('subscription').$type<PushSubscription>().notNull(),
+		subscription: json('subscription').$type<PushSubscriptionJSON>().notNull(),
 		endpoint: varchar('endpoint', { length: 2048 }).notNull(),
-		userId: int('user_id').notNull()
+		userId: char('user_id').notNull()
 		// .references(() => users.id)
 	},
 	(subscription) => ({
@@ -30,3 +31,5 @@ export const subscriptions = mysqlTable(
 		// subEndpoint: index('subscription_endpointx').on(subscription.endpoint)
 	})
 );
+
+export type Subscription = InferModel<typeof subscriptions>;

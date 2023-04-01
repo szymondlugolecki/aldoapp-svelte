@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { productTable, userTable } from '$lib/client/constants';
-	import type { ProductRowType, ProductWithAuthorAndImage, UserRowType } from '$types';
-	import type { User } from '@prisma/client';
-	import { fly, slide } from 'svelte/transition';
+	import type { ProductRowType, ProductWithAuthorAndImage, User, UserRowType } from '$types';
 	import ProductCell from './ProductCell.svelte';
 	import UserCell from './UserCell.svelte';
 

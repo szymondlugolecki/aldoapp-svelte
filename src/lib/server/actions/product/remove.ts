@@ -1,9 +1,12 @@
-import { prisma } from '$lib/server/clients/prismaClient';
+// import { p } from '$lib/server/clients/pClient';
 import { error, fail, type Action } from '@sveltejs/kit';
 import { trytm } from '@bdsqqq/try';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { errorResponses } from '$lib/client/constants/errorResponses';
 import { removeProductSchema } from '$lib/client/schemas/products';
+import { db } from '$lib/server/db';
+import { products } from '$lib/server/db/schemas/products';
+import { eq } from 'drizzle-orm/expressions';
 
 const remove: Action = async ({ request, locals }) => {
 	// Only moderators and admins are allowed to remove a product
@@ -14,7 +17,15 @@ const remove: Action = async ({ request, locals }) => {
 		throw error(...errorResponses[403]);
 	}
 
-	const data = Object.fromEntries(await request.formData());
+	// Validate the user input
+	const [formData, formDataError] = await trytm(request.formData());
+	if (formDataError) {
+		return fail(400, {
+			errors: ['Niepoprawne dane']
+		});
+	}
+
+	const data = Object.fromEntries(formData);
 	console.log('data', data);
 
 	// Validate the user input
@@ -27,11 +38,7 @@ const remove: Action = async ({ request, locals }) => {
 
 	// Remove the product from the database
 	const [, removeProductError] = await trytm(
-		prisma.product.delete({
-			where: {
-				id: removeProductObj.id
-			}
-		})
+		db.delete(products).where(eq(products.id, removeProductObj.id))
 	);
 
 	if (removeProductError) {
@@ -45,3 +52,9 @@ const remove: Action = async ({ request, locals }) => {
 };
 
 export default remove;
+
+// p.product.delete({
+// 	where: {
+// 		id: removeProductObj.id
+// 	}
+// })

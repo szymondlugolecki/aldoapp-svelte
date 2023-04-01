@@ -33,10 +33,10 @@
 	<ModalHeader title="Dodaj nowego użytkownika" />
 
 	<div>
-		<label for="name" class="label label-text"> Imię i nazwisko </label>
+		<label for="fullName" class="label label-text"> Imię i nazwisko </label>
 		<input
 			type="text"
-			name="name"
+			name="fullName"
 			placeholder="np. Jan Kowalski"
 			class="input input-bordered w-full text-base-content"
 			required

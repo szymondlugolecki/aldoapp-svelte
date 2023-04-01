@@ -1,6 +1,11 @@
 import { PUBLIC_WEBSITE_URL } from '$env/static/public';
-import type { ProductAuthor, ProductFilter, ProductWithAuthorAndImage, UserFilter } from '$types';
-import type { User } from '@prisma/client';
+import type {
+	ProductAuthor,
+	ProductFilter,
+	ProductWithAuthorAndImage,
+	User,
+	UserFilter
+} from '$types';
 import type { Thing, WithContext } from 'schema-dts';
 
 export type Schema = Thing | WithContext<Thing>;
@@ -48,8 +53,8 @@ export const userFilterSearchInputFilter = (
 export const applyUserFilters = (users: User[], filter: UserFilter) => {
 	const bannedFilter = (user: User) => {
 		if (filter.blocked && filter.nonblocked) return true;
-		else if (user.banned && filter.blocked) return true;
-		else if (!user.banned && filter.nonblocked) return true;
+		else if (user.access && filter.nonblocked) return true;
+		else if (!user.access && filter.blocked) return true;
 		return false;
 	};
 
