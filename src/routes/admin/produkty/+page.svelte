@@ -38,7 +38,7 @@
 		.map((product) => {
 			return {
 				...product,
-				images: product.images.map(({ url }) => url).sort(imagesSorting)
+				images: product.images.sort(imagesSorting)
 			};
 		});
 
@@ -51,7 +51,7 @@
 		if (!value || value.type !== 'product') return;
 		if (value.action === 'edit' || value.action === 'remove') {
 			product = data.products
-				.map((product) => ({ ...product, images: product.images.map(({ url }) => url) }))
+				.map((product) => ({ ...product, images: product.images }))
 				.find((product) => product.id === value.id);
 		}
 	});

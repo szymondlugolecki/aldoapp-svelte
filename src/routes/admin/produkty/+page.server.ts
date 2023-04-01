@@ -9,38 +9,31 @@ import { users } from '$lib/server/db/schemas/users';
 import { eq } from 'drizzle-orm/expressions';
 
 export const load = async () => {
-	return {
-		products: db
-			.select({
-				products: products,
-				author: {
-					id: users.id,
-					fullName: users.fullName,
-					email: users.email,
-					role: users.role
-				}
-			})
-			.from(products)
-			.leftJoin(users, eq(products.userId, users.id))
-	};
+	const productsArr = await db
+		.select({
+			products: products,
+			author: {
+				id: users.id,
+				fullName: users.fullName,
+				email: users.email,
+				role: users.role
+			}
+		})
+		.from(products)
+		.leftJoin(users, eq(products.authorId, users.id))
+		.limit(10);
 
-	// p.product.findMany({
-	// 	include: {
-	// 		author: {
-	// 			select: {
-	// 				id: true,
-	// 				fullName: true,
-	// 				email: true,
-	// 				role: true
-	// 			}
-	// 		},
-	// 		images: {
-	// 			select: {
-	// 				url: true
-	// 			}
-	// 		}
-	// 	}
-	// })
+	return {
+		products: productsArr.map((product) => ({
+			...product.products,
+			author: product.author as {
+				id: string;
+				fullName: string;
+				email: string;
+				role: 'admin' | 'moderator' | 'customer';
+			}
+		}))
+	};
 };
 
 export const actions = {
@@ -48,3 +41,21 @@ export const actions = {
 	edit,
 	remove
 };
+
+// p.product.findMany({
+// 	include: {
+// 		author: {
+// 			select: {
+// 				id: true,
+// 				fullName: true,
+// 				email: true,
+// 				role: true
+// 			}
+// 		},
+// 		images: {
+// 			select: {
+// 				url: true
+// 			}
+// 		}
+// 	}
+// })

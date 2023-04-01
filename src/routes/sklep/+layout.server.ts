@@ -18,8 +18,8 @@ export const load = () => {
 				category: products.category,
 				subcategory: products.subcategory,
 				producent: products.producent,
-				encodedURL: products.encodedURL
-				// amountLeft: products.
+				encodedURL: products.encodedURL,
+				amountLeft: products.amountLeft
 			})
 			.from(products)
 			.limit(10)

@@ -84,7 +84,7 @@
 	$: productsFiltered = data.products
 		.map((product) => ({
 			...product,
-			images: product.images.map(({ url }) => url).sort(imagesSorting)
+			images: product.images.sort(imagesSorting)
 		}))
 		.filter((product) => {
 			if (!searchInput.length) return true;

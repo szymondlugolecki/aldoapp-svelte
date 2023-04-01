@@ -14,7 +14,7 @@ export type DrawerStore =
 	  }
 	| {
 			open: boolean;
-			id: string;
+			id: number;
 			type: 'user' | 'product';
 			action: 'edit' | 'remove';
 	  };
