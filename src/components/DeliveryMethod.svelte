@@ -24,15 +24,15 @@
 >
 	<div class="flex justify-between items-center w-full space-x-3">
 		<div class="w-full flex-1">
-			<div class="w-full text-base xs:text-lg font-semibold">{name}</div>
-			<div class="w-full text-sm xs:text-base text-base-content">{description}</div>
+			<div class="w-full text-sm xxs:text-base xs:text-lg font-semibold">{name}</div>
+			<div class="w-full text-xs xxs:text-sm xs:text-base text-base-content">{description}</div>
 		</div>
 
 		<div class="">
-			<span class="font-semibold">{price}</span>
+			<span class="text-sm xs:text-base font-semibold">{price}</span>
 		</div>
 
-		<div class="w-[60px] text-base-content">
+		<div class="w-[48px] xs:w-[60px] text-base-content">
 			<slot />
 		</div>
 	</div>

@@ -49,48 +49,50 @@
 </svelte:head>
 
 <div class="w-full h-full">
-	<h1 class="text-4xl sm:text-5xl font-bold mb-6 mt-4 text-center">Ustawienia</h1>
+	<h1 class="text-3xl sm:text-3xl font-bold mb-3 mt-2 text-center">Ustawienia</h1>
 
 	<div class="overflow-x-auto">
-		<table class="table w-full">
-			<caption>Twoje ustawienia</caption>
+		<table class="table w-full table-compact xs:table-normal">
 			<!-- head -->
 			<thead>
 				<tr>
 					<th>Nazwa</th>
 					<th>Stan</th>
-					<th>Zmiana stanu</th>
+					<th>Akcja</th>
 				</tr>
 			</thead>
 			<tbody>
 				<!-- row 1 -->
-				<tr>
-					<th>Powiadomienia</th>
+				<tr class="text-xs xxs:text-sm">
+					<td>Powiadomienia</td>
 					<td>{subscribed ? 'Włączone 🟢' : 'Wyłączone 🔴'}</td>
 					<td>
 						<button
-							class="btn btn-secondary text-white"
+							class="btn btn-secondary btn-sm"
 							on:click={() => {
-								if (subscribed) unsubscribe();
-								else subscribe();
-							}}>{subscribed ? 'Wyłącz 😟' : 'Włącz 🙂'}</button
+								if (subscribed) unsubscribe().then(() => (subscribed = false));
+								else subscribe().then(() => (subscribed = true));
+							}}>{subscribed ? 'Wyłącz' : 'Włącz'}</button
 						>
 					</td>
 				</tr>
 				<!-- row 2 -->
-				<tr>
-					<th>Motyw</th>
+				<tr class="text-xs xxs:text-sm">
+					<td>Motyw</td>
 					<td>{themeNames[$settings.theme]}</td>
-					<td><button class="btn btn-secondary" on:click={() => nextTheme()}>Zmień tryb</button></td
+					<td
+						><button class="btn btn-secondary btn-sm" on:click={() => nextTheme()}
+							>Zmień tryb</button
+						></td
 					>
-				</tr>
-				<!-- row 3 -->
-				<tr>
-					<th>Brice Swyre</th>
-					<td>Tax Accountant</td>
-					<td>Red</td>
 				</tr>
 			</tbody>
 		</table>
 	</div>
 </div>
+
+<style>
+	.table th:first-child {
+		position: static;
+	}
+</style>

@@ -113,7 +113,7 @@
 	/>
 </svelte:head>
 
-<section class="w-full h-full flex flex-col flex-1">
+<section class="w-full flex flex-col">
 	<div class="drawer drawer-mobile flex-1">
 		<input
 			id="categories-drawer"
@@ -147,7 +147,7 @@
 							id="filterDropdownButton"
 							tabindex="0"
 							for="categories-drawer"
-							class="inline-flex justify-center md:hidden btn btn-accent btn-xs h-7 xxs:h-[40px] w-full flex-1 sm:text-sm px-0 max-w-[125px] xs:max-w-[140px]"
+							class="inline-flex justify-center md:hidden btn btn-accent text-accent-content btn-xs h-7 xxs:h-[40px] w-full flex-1 sm:text-sm px-0 max-w-[125px] xs:max-w-[140px]"
 							on:keypress={(event) => {
 								if (event.key === 'Enter') {
 									event.currentTarget.click();
@@ -184,7 +184,7 @@
 								</a>
 								<div class="flex justify-end items-center w-full pt-2">
 									<button
-										class="btn btn-secondary btn-sm text-xs sm:text-sm"
+										class="btn btn-secondary btn-sm text-xs sm:text-sm flex-1 xs:flex-initial"
 										on:click={() => addProduct(product)}>Do koszyka</button
 									>
 								</div>
@@ -304,9 +304,11 @@
 					{/each}
 				</ul>
 
-				<label for="categories-drawer" class="btn btn-secondary bg-opacity-95 flex md:hidden">
-					<CornerUpLeft class="mr-1" /> Powrót</label
-				>
+				<div class="w-full px-2">
+					<label for="categories-drawer" class="btn btn-secondary bg-opacity-95 flex md:hidden">
+						<CornerUpLeft class="mr-1" /> Powrót</label
+					>
+				</div>
 			</div>
 		</div>
 	</div>

@@ -1,5 +1,5 @@
 export type Producent = 'deheus' | 'unknown';
-export type MainCategory = 'cattle' | 'poultry' | 'backyard';
+export type MainCategory = 'cattle' | 'poultry' | 'pigs' | 'backyard';
 
 export type PaymentMethod = 'cash' | 'dotpay';
 export type DeliveryMethod = 'personal-pickup' | 'personal-delivery';

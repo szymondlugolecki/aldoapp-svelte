@@ -81,7 +81,7 @@
 					type="text"
 					placeholder="Wpisz tu imię i nazwisko odbiorcy..."
 					name="first-name"
-					class="input input-bordered w-full"
+					class="input input-bordered w-full text-sm xs:text-base"
 					required
 					bind:value={$cart.customerName}
 					class:input-success={$cart.customerName.length > 0 &&
@@ -98,7 +98,7 @@
 					type="text"
 					placeholder="Wpisz tu ulicę i numer..."
 					name="first-name"
-					class="input input-bordered w-full"
+					class="input input-bordered w-full text-sm xs:text-base"
 					required
 					bind:value={$cart.address.street}
 					class:input-success={$cart.address.street?.length > 0 &&
@@ -116,7 +116,7 @@
 						type="text"
 						placeholder="Wpisz tu kod pocztowy..."
 						name="address-zip-code"
-						class="input input-bordered w-full max-w-xs"
+						class="input input-bordered w-full max-w-xs text-sm xs:text-base"
 						required
 						bind:value={$cart.address.zipCode}
 						class:input-success={$cart.address.zipCode?.length > 0 &&
@@ -133,7 +133,7 @@
 						type="text"
 						placeholder="Wpisz tu miasto..."
 						name="address-city"
-						class="input input-bordered w-full max-w-xs"
+						class="input input-bordered w-full max-w-xs text-sm xs:text-base"
 						required
 						bind:value={$cart.address.city}
 						class:input-success={$cart.address.city?.length > 0 &&
@@ -152,7 +152,7 @@
 						type="tel"
 						placeholder="Wpisz tu numer telefonu do odbiorcy..."
 						name="address-phone-number"
-						class="input input-bordered w-full max-w-xs"
+						class="input input-bordered w-full max-w-xs text-sm xs:text-base"
 						class:input-success={$cart.address.phone?.length > 0 &&
 							orderPhoneValidation.safeParse($cart.address.phone).success}
 						class:input-error={$cart.address.phone?.length > 0 &&
@@ -169,7 +169,7 @@
 						type="email"
 						placeholder="Wpisz tu adres email odbiorcy..."
 						name="address-email"
-						class="input input-bordered w-full max-w-xs"
+						class="input input-bordered w-full max-w-xs text-sm xs:text-base"
 						class:input-success={$cart.address.email?.length > 0 &&
 							orderEmailValidation.safeParse($cart.address.email).success}
 						class:input-error={$cart.address.email?.length > 0 &&

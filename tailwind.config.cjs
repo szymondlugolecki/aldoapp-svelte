@@ -48,6 +48,7 @@ module.exports = {
 					primary: '#1d4ed8',
 					secondary: '#0284c7',
 					accent: '#f43f5e',
+					'accent-content': '#ffffff',
 					neutral: '#1c1917',
 					'base-100': '#f8f9fa'
 				}

@@ -261,7 +261,7 @@
 					{#if stageIndex > 0}
 						<a
 							href="/zamowienie/{stages[stageIndex - 1]}"
-							class="btn btn-ghost text-white bg-red-400 hover:bg-red-500 flex-1"
+							class="btn btn-ghost text-white bg-red-500 hover:bg-red-600 flex-1"
 						>
 							<ArrowLeft class="mr-1" /> Wstecz</a
 						>

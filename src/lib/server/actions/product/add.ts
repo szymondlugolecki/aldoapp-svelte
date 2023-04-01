@@ -73,7 +73,7 @@ const add: Action = async ({ request, locals }) => {
 					const imageArrayBuffer = await image.arrayBuffer();
 					const imageBuffer = Buffer.from(imageArrayBuffer).toString('base64');
 					return await cloudinary.uploader.upload(`data:${image.type};base64,${imageBuffer}`, {
-						public_id: `products/${symbol}/${index}`,
+						public_id: `products/${name}/${symbol}/${index}`,
 						overwrite: true
 					});
 				});

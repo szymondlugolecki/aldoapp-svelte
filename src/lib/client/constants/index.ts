@@ -36,6 +36,7 @@ export const userTable = {
 export const fodderNames: Record<MainCategory, string> = {
 	cattle: '🐮 Bydło',
 	poultry: '🐣 Drób',
+	pigs: '🐷 Trzoda',
 	backyard: '🐶 Hodowla przydomowa'
 } as const;
 
@@ -43,11 +44,15 @@ export const fodderCategories = {
 	cattle: [
 		{
 			name: 'Pasze dla krów mlecznych',
-			id: 'cow-feed'
+			id: 'milk-cows-fodder'
 		},
 		{
 			name: 'Mieszanki paszowe dla bydła',
-			id: 'cow-mixes'
+			id: 'cow-fodder-mixes'
+		},
+		{
+			name: 'Premiksy dla bydła',
+			id: 'cow-premixes'
 		},
 		{
 			name: 'Koncentraty dla krów mlecznych i opasów',
@@ -55,19 +60,50 @@ export const fodderCategories = {
 		},
 		{
 			name: 'Pasze dla cieląt',
-			id: 'calf-feed'
+			id: 'calfs-fodder'
 		},
 		{
 			name: 'Preparaty mlekozastępcze dla cieląt / mleko dla cieląt',
-			id: 'calf-milk'
+			id: 'calfs-milk-replacements'
 		}
 	],
 	poultry: [
 		{
 			name: 'Pasze dla niosek',
-			id: 'chick-feed'
+			id: 'layer-chickens-fodder'
+		},
+		{
+			name: 'Pasze dla gęsi i kaczek',
+			id: 'geese-and-ducks-fodder'
+		},
+		{
+			name: 'Pasze dla brojlerów',
+			id: 'broilers-fodder'
+		},
+		{
+			name: 'Pasze dla indyków',
+			id: 'turkeys-fodder'
 		}
 	],
+	pigs: [
+		{
+			name: 'Pasze dla tuczników',
+			id: 'porkers-fodder'
+		},
+		{
+			name: 'Płynne żywienie świń',
+			id: 'liquid-pig-feed'
+		},
+		{
+			name: 'Pasze dla prosiąt',
+			id: 'piglets-fodder'
+		},
+		{
+			name: 'Pasze dla loch',
+			id: 'sows-fodder'
+		}
+	],
+
 	backyard: []
 } as const;
 
