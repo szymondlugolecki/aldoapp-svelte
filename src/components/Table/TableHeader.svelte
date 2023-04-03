@@ -12,7 +12,7 @@
 	}
 
 	export let searchInput = '';
-	export let type: 'user' | 'product';
+	export let type: 'user' | 'product' | 'order';
 </script>
 
 <div class="relative bg-base-100 shadow-md sm:rounded-lg px-2">
@@ -41,8 +41,8 @@
 					<input
 						type="text"
 						id="simple-search"
-						class="block w-full p-2 pl-10 h-12 text-sm border border-base-content rounded-lg focus:ring-secondary-focus focus:border-secondary-focus bg-base-100 text-base-content"
-						placeholder="Szukaj..."
+						class="block w-full p-2 pl-10 h-12 sm:text-sm text-base border border-base-content rounded-lg focus:ring-secondary-focus focus:border-secondary-focus bg-base-100 text-base-content"
+						placeholder={type === 'order' ? 'Szukaj po produktach, klientach...' : 'Szukaj...'}
 						required
 						bind:value={searchInput}
 					/>
@@ -51,30 +51,35 @@
 		</div>
 		<div class="flex items-center space-x-2 w-full md:w-auto">
 			<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-			<label
-				for="admin-drawer"
-				tabindex="0"
-				class="btn btn-primary flex-1 w-auto md:min-w-[220px] text-[0px] sm:text-sm"
-				on:keypress={(e) => {
-					if (e.key === 'Enter') {
-						drawer.set({
-							open: true,
-							action: 'add',
-							type
-						});
-					}
-				}}
-				on:click={() => {
-					drawer.set({
-						open: true,
-						action: 'add',
-						type
-					});
-				}}
-			>
-				<Plus class="mr-1" />
-				{addNewItemText}
-			</label>
+			{#if type === 'user' || type === 'product'}
+				<label
+					for="admin-drawer"
+					tabindex="0"
+					class="btn btn-primary flex-1 w-auto md:min-w-[220px] text-[0px] sm:text-sm"
+					on:keypress={(e) => {
+						if (e.key === 'Enter') {
+							if (type === 'user' || type === 'product')
+								drawer.set({
+									open: true,
+									action: 'add',
+									type
+								});
+						}
+					}}
+					on:click={() => {
+						if (type === 'user' || type === 'product')
+							drawer.set({
+								open: true,
+								action: 'add',
+								type
+							});
+					}}
+				>
+					<Plus class="mr-1" />
+					{addNewItemText}
+				</label>
+			{/if}
+
 			<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 			<label
 				id="filterDropdownButton"

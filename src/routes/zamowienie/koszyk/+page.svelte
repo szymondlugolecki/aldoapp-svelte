@@ -18,8 +18,8 @@
 				<th>Zdjęcie</th>
 				<th>Produkt</th>
 				<th>Ilość</th>
+				<th>Cena (PLN)</th>
 				<th>Usuń</th>
-				<th>Cena</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -39,7 +39,9 @@
 								>{product.name}</bold
 							>
 							<small class="text-xs sm:text-sm lg:text-base">{product.symbol}</small>
-							<small class="text-xs sm:text-sm lg:text-base">{product.price} zł / szt.</small>
+							<small class="text-xs sm:text-sm lg:text-base"
+								>{product.price.toFixed(2)} zł / szt.</small
+							>
 						</div>
 					</td>
 					<td>
@@ -59,6 +61,7 @@
 							</button>
 						</div>
 					</td>
+					<td class="min-w-[130px]">{(product.quantity * product.price).toFixed(2)}</td>
 					<td
 						><button
 							class="btn btn-ghost"
@@ -66,7 +69,6 @@
 							aria-label="Usuń"><X /></button
 						></td
 					>
-					<td class="min-w-[130px]">{(product.quantity * product.price).toFixed(2)} PLN</td>
 				</tr>
 			{/each}
 		</tbody>

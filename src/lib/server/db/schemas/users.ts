@@ -24,7 +24,8 @@ export const users = mysqlTable(
 		email: varchar('email', { length: 320 }).notNull(),
 		fullName: varchar('name', { length: 256 }).notNull(),
 		role: text('role', { enum: ['admin', 'moderator', 'customer'] }).notNull(),
-		access: boolean('access').default(true).notNull()
+		access: boolean('access').default(true).notNull(),
+		phone: char('phone', { length: 15 }).notNull()
 
 		// relations
 	},
@@ -56,8 +57,8 @@ export const verificationTokens = mysqlTable(
 	(verificationToken) => ({
 		// indexes
 		token: uniqueIndex('unique_tokenx').on(verificationToken.token),
-		code: index('unique_codex').on(verificationToken.code),
-		userAgent: index('unique_user_agentx').on(verificationToken.userAgent)
+		code: index('codex').on(verificationToken.code),
+		userAgent: index('user_agentx').on(verificationToken.userAgent)
 	})
 );
 

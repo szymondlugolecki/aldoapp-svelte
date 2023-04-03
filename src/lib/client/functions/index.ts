@@ -1,10 +1,12 @@
 import { PUBLIC_WEBSITE_URL } from '$env/static/public';
+import type { Order } from '$lib/server/db/schemas/products';
 import type {
 	ProductAuthor,
 	ProductFilter,
 	ProductWithAuthorAndImage,
 	User,
-	UserFilter
+	UserFilter,
+	OrderFilter
 } from '$types';
 import type { Thing, WithContext } from 'schema-dts';
 
@@ -48,6 +50,15 @@ export const userFilterSearchInputFilter = (
 	)
 		return true;
 	return false;
+};
+
+export const applyOrdersFilters = (orders: Order[], filter: OrderFilter) => {
+	const orderStatus = (order: Order) => {
+		if (filter.order === order.status) return true;
+		return false;
+	};
+
+	return orders.filter(orderStatus);
 };
 
 export const applyUserFilters = (users: User[], filter: UserFilter) => {

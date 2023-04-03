@@ -8,6 +8,7 @@ interface ATPayloadWithUserEmail extends JWTPayload {
 		fullName: string;
 		role: Role;
 		access: boolean;
+		phone: string;
 	};
 	exp: number;
 }
@@ -25,4 +26,4 @@ export interface JWTRefreshTokenResult extends JWTVerifyResult {
 	payload: RTPayloadWithUserEmail;
 }
 
-export type SessionUser = Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'access'>;
+export type SessionUser = Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'access' | 'phone'>;

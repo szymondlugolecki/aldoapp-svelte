@@ -1,14 +1,23 @@
 <script lang="ts">
-	import { productTable, userTable } from '$lib/client/constants';
-	import type { ProductRowType, ProductWithAuthorAndImage, User, UserRowType } from '$types';
+	import { productTable, userTable, orderTable } from '$lib/client/constants';
+	import type {
+		ProductRowType,
+		ProductWithAuthorAndImage,
+		User,
+		UserRowType,
+		OrderRowType,
+		OrderWithCustomer
+	} from '$types';
+	import OrderCell from './OrderCell.svelte';
 	import ProductCell from './ProductCell.svelte';
 	import UserCell from './UserCell.svelte';
 
-	export let type: 'products' | 'users';
+	export let type: 'products' | 'users' | 'orders';
 	export let productHeaders: ProductRowType[] | undefined = undefined;
 	export let userHeaders: UserRowType[] | undefined = undefined;
+	export let orderHeaders: OrderRowType[] | undefined = undefined;
 
-	export let items: ProductWithAuthorAndImage[] | User[];
+	export let items: ProductWithAuthorAndImage[] | User[] | OrderWithCustomer[];
 
 	const isProductItem = (
 		varType: typeof type,
@@ -22,6 +31,16 @@
 
 	const isUserItem = (varType: typeof type, varItem: (typeof items)[number]): varItem is User => {
 		if (varType === 'users') {
+			return true;
+		}
+		return false;
+	};
+
+	const isOrderItem = (
+		varType: typeof type,
+		varItem: (typeof items)[number]
+	): varItem is OrderWithCustomer => {
+		if (varType === 'orders') {
 			return true;
 		}
 		return false;
@@ -41,29 +60,37 @@
 					{#each userHeaders as header}
 						<th>{userTable[header]}</th>
 					{/each}
+				{:else if orderHeaders}
+					{#each orderHeaders as header}
+						<th>{orderTable[header]}</th>
+					{/each}
 				{/if}
 			</tr>
 		</thead>
 		<tbody>
-			{#if items}
-				{#each items as item (item.id)}
-					<tr class="hover">
-						{#if isProductItem(type, item) && productHeaders}
-							{#each productHeaders as header}
-								<td>
-									<ProductCell product={item} rowType={header} />
-								</td>
-							{/each}
-						{:else if isUserItem(type, item) && userHeaders}
-							{#each userHeaders as header}
-								<td>
-									<UserCell user={item} rowType={header} />
-								</td>
-							{/each}
-						{/if}
-					</tr>
-				{/each}
-			{/if}
+			{#each items as item (item.id)}
+				<tr class="hover">
+					{#if isProductItem(type, item) && productHeaders}
+						{#each productHeaders as header}
+							<td>
+								<ProductCell product={item} rowType={header} />
+							</td>
+						{/each}
+					{:else if isUserItem(type, item) && userHeaders}
+						{#each userHeaders as header}
+							<td>
+								<UserCell user={item} rowType={header} />
+							</td>
+						{/each}
+					{:else if isOrderItem(type, item) && orderHeaders}
+						{#each orderHeaders as header}
+							<td>
+								<OrderCell order={item} rowType={header} />
+							</td>
+						{/each}
+					{/if}
+				</tr>
+			{/each}
 		</tbody>
 		<!-- foot -->
 		{#if items && items.length > 4}

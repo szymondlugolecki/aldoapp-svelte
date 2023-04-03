@@ -43,7 +43,7 @@
 	let menuOpen = false;
 	let miniMenuExpanded = false;
 	$: productsCountTitle =
-		$cart.products && $cart.products.length > 0
+		$cart && $cart.products.length > 0
 			? $cart.products.length === 1
 				? '1 produkt'
 				: $cart.products.length < 5
@@ -117,7 +117,7 @@
 								/></svg
 							>
 							<span class="badge badge-sm indicator-item"
-								>{($cart.products && $cart.products.length) || 0}</span
+								>{($cart && $cart.products.length) || 0}</span
 							>
 						</div>
 					</label>
@@ -128,7 +128,7 @@
 					>
 						<div class="card-body">
 							<span class="font-bold text-lg">{productsCountTitle}</span>
-							{#each $cart.products ? $cart.products.slice(0, 7) : [] as product}
+							{#each $cart ? $cart.products.slice(0, 7) : [] as product}
 								<div class="flex flex-grow">
 									<div class="flex items-start flex-1 space-x-2">
 										<a
@@ -147,13 +147,13 @@
 									</div>
 								</div>
 							{/each}
-							{#if $cart.products && $cart.products.length && $cart.products.length > 7}
+							{#if $cart && $cart.products.length > 7}
 								<div class="flex flex-col justify-center items-center text-center">
 									<span>...+{$cart.products.length - 7} więcej 🛒</span>
 								</div>
 							{/if}
 							<span class="text-info"
-								>Suma: {$cart.products
+								>Suma: {$cart
 									? $cart.products
 											.map(({ price, quantity }) => [price, quantity])
 											.reduce((prev, [price, quantity]) => prev + price * quantity, 0)

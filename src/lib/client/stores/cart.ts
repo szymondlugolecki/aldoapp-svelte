@@ -1,44 +1,47 @@
+import type { Address, Customer } from '$lib/server/db/schemas/products';
 import type { CartProductWithQuantity, StoreProduct } from '$types';
 import { persisted } from 'svelte-local-storage-store';
 import type { DeliveryMethod, PaymentMethod } from '../constants/dbTypes';
 
 type CartStore = {
 	products: CartProductWithQuantity[];
+	// products: [CartProductWithQuantity, ...CartProductWithQuantity[]];
 	status: 'verified' | 'loading' | 'error' | 'not-verified';
 	lastVerified: Date | null;
-	promoCode: string | null;
+	promoCode?: {
+		id?: number;
+		code: string;
+	};
 	deliveryMethod: DeliveryMethod | null;
 	paymentMethod: PaymentMethod | null;
 	rememberAddress: boolean;
 	isAddressValid: boolean;
-	customerName: string;
-	address: {
-		street: string;
-		zipCode: string;
-		city: string;
-		phone: string;
-		email: string;
-	};
+	isCustomerValid: boolean;
+	address: Address;
+	customer: Customer;
 };
 
 const emptyDeliveryAddress = {
 	street: '',
 	zipCode: '',
-	city: '',
-	phone: '',
-	email: ''
+	city: ''
 };
 
 const initialCart: Omit<CartStore, 'address'> = {
 	products: [],
 	status: 'not-verified',
 	lastVerified: null,
-	promoCode: null,
+	promoCode: undefined,
 	deliveryMethod: null,
 	paymentMethod: null,
 	rememberAddress: false,
 	isAddressValid: false,
-	customerName: ''
+	isCustomerValid: false,
+	customer: {
+		phone: '',
+		email: '',
+		fullName: ''
+	}
 };
 
 export const cart = persisted<CartStore>('cart', {
@@ -72,6 +75,23 @@ export const changeCartState = (status: CartStore['status']) => {
 	});
 };
 
+export const incrementProduct = (productId: number) => {
+	cart.update((cartObj) => {
+		const products = cartObj.products.map((product) => {
+			if (product.id === productId) {
+				return { ...product, quantity: product.quantity + 1 };
+			}
+			return product;
+		});
+
+		return {
+			...cartObj,
+			status: 'not-verified',
+			products
+		};
+	});
+};
+
 export const addProduct = (product: StoreProduct) => {
 	cart.update((cartObj) => {
 		const { products } = cartObj;
@@ -96,23 +116,6 @@ export const addProduct = (product: StoreProduct) => {
 				products: [...products, cartProductParser(product, 1)]
 			};
 		}
-	});
-};
-
-export const incrementProduct = (productId: number) => {
-	cart.update((cartObj) => {
-		const products = cartObj.products.map((product) => {
-			if (product.id === productId) {
-				return { ...product, quantity: product.quantity + 1 };
-			}
-			return product;
-		});
-
-		return {
-			...cartObj,
-			status: 'not-verified',
-			products
-		};
 	});
 };
 
@@ -147,10 +150,13 @@ export const removeProduct = (productId: number) => {
 };
 
 export const clearCart = () => {
+	// Do not clear address and rememberAddress fields if
+	// the rememberAddress property is set to true
 	cart.update((oldCart) => {
 		return {
 			...initialCart,
 			status: 'not-verified',
+			rememberAddress: oldCart.rememberAddress,
 			address: oldCart.rememberAddress ? oldCart.address : emptyDeliveryAddress
 		};
 	});

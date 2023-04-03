@@ -1,5 +1,5 @@
-import type { ShortService, Outlets, Role } from '$types';
-import type { MainCategory } from './dbTypes';
+import type { ShortService, Outlets, Role, OrderRowType } from '$types';
+import type { DeliveryStatus, MainCategory, OrderStatus, PaymentStatus } from './dbTypes';
 
 type SalesmenMenuType = {
 	name: string;
@@ -23,6 +23,25 @@ export const productTable = {
 	extra: 'Dodatkowe informacje',
 	category: 'Kategoria'
 } as const;
+
+export const orderStatusList: Record<OrderStatus | PaymentStatus | DeliveryStatus, string> = {
+	canceled: 'Anulowano',
+	pending: 'W toku',
+	delivered: 'Dostarczono',
+	returned: 'Zwrócono',
+	shipped: 'Wysłano',
+	completed: 'Zakończono',
+	'refund-request': 'Prośba o zwrot',
+	refunded: 'Zwrócono'
+} as const;
+
+export const orderTable: Record<OrderRowType, string> = {
+	products: 'Produkty',
+	customer: 'Klient',
+	status: 'Status',
+	action: 'Akcja',
+	createdAt: 'Utworzono'
+};
 
 export const userTable = {
 	user: 'Użytkownik',

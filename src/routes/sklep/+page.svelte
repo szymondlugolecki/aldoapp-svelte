@@ -179,7 +179,7 @@
 											>{producentsList[product.producent]}</span
 										>
 										<span class="font-semibold">{product.name}</span>
-										<span>{product.price} zł / szt.</span>
+										<span>{product.price.toFixed(2)} zł / szt.</span>
 									</div>
 								</a>
 								<div class="flex justify-end items-center w-full pt-2">

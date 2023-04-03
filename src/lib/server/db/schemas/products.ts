@@ -5,20 +5,23 @@ import {
 	orderStatus,
 	paymentMethods,
 	paymentStatus,
-	producents
+	producents,
+	type DeliveryStatus,
+	type OrderStatus,
+	type PaymentStatus
 } from '../../../client/constants/dbTypes';
 // '$lib/client/constants/dbTypes';
 import { sql, type InferModel } from 'drizzle-orm';
 import {
 	mysqlTable,
 	serial,
-	uniqueIndex,
 	varchar,
 	timestamp,
 	text,
 	int,
 	json,
-	float
+	index,
+	decimal
 } from 'drizzle-orm/mysql-core';
 
 type OrderProductObj = {
@@ -26,12 +29,22 @@ type OrderProductObj = {
 	quantity: number;
 };
 
-type Address = {
-	email: string;
+export type Address = {
 	street: string;
 	zipCode: string;
 	city: string;
+};
+
+export type Customer = {
+	email: string;
 	phone: string;
+	fullName: string;
+};
+
+export type OrderHistoryEvent = {
+	type: 'order' | 'delivery' | 'payment' | 'event';
+	status: OrderStatus | DeliveryStatus | PaymentStatus | 'created';
+	date: Date;
 };
 
 export const products = mysqlTable(
@@ -49,8 +62,8 @@ export const products = mysqlTable(
 		symbol: varchar('symbol', { length: 255 }).notNull(),
 		category: varchar('category', { length: 255, enum: mainCategories }).notNull(),
 		subcategory: varchar('subcategory', { length: 255 }).notNull(),
-		price: float('price').notNull(),
-		weight: float('weight').notNull(),
+		price: decimal('price', { precision: 8, scale: 2 }).notNull(),
+		weight: decimal('weight', { precision: 8, scale: 2 }).notNull(),
 		amountLeft: int('amount_left').notNull(),
 		producent: varchar('producent', { length: 255, enum: producents }).notNull(),
 		images: json('images').$type<string[]>().default([]).notNull(),
@@ -62,7 +75,7 @@ export const products = mysqlTable(
 	},
 	(product) => ({
 		// indexes
-		authorId: uniqueIndex('author_id').on(product.authorId)
+		authorId: index('author_id').on(product.authorId)
 	})
 );
 
@@ -75,23 +88,38 @@ export const orders = mysqlTable(
 			.notNull(),
 		// updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
 
-		// order data
-		paymentStatus: text('status', {
+		// Order data
+		price: decimal('price', { precision: 8, scale: 2 }).notNull(), // price with discount included
+		discount: decimal('discount', { precision: 8, scale: 2 }).notNull(),
+		paymentStatus: text('payment_status', {
 			enum: paymentStatus
 		}).notNull(),
 		status: text('status', {
 			enum: orderStatus
 		}).notNull(),
-		deliveryStatus: text('status', {
+		deliveryStatus: text('delivery_status', {
 			enum: deliveryStatus
 		}).notNull(),
 		address: json('address').$type<Address>(),
-		customerName: varchar('name', { length: 256 }).notNull(),
+		customer: json('customer').$type<{
+			email: string;
+			phone: string;
+			fullName: string;
+		}>(),
+		// orders table
+		products: json('products')
+			.$type<
+				{
+					productId: number;
+					quantity: number;
+				}[]
+			>()
+			.notNull(),
 
 		deliveryMethod: text('delivery_method', { enum: deliveryMethods }).notNull(),
 		paymentMethod: text('payment_method', { enum: paymentMethods }).notNull(),
 
-		products: json('products').$type<OrderProductObj[]>().notNull(),
+		orderHistory: json('order_history').$type<OrderHistoryEvent[]>().notNull(),
 
 		// relations
 		customerId: varchar('customer_id', { length: 36 }).notNull(),
@@ -101,8 +129,8 @@ export const orders = mysqlTable(
 	},
 	(order) => ({
 		// indexes
-		customerId: uniqueIndex('unique_customer_idx').on(order.customerId),
-		promoCodeId: uniqueIndex('unique_promo_code_idx').on(order.promoCodeId)
+		customerId: index('customer_idx').on(order.customerId),
+		promoCodeId: index('promo_code_idx').on(order.promoCodeId)
 	})
 );
 

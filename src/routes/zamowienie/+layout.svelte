@@ -5,14 +5,21 @@
 	import wretch from 'wretch';
 	import toast from 'svelte-french-toast';
 	import { imagesSorting } from '$lib/client/functions/sorting';
-	import { orderValidation } from '$lib/client/schemas/order';
+	import {
+		orderAddressValidation,
+		orderDeliveryMethodValidation,
+		orderPaymentMethodValidation,
+		serverOrderValidation
+	} from '$lib/client/schemas/order';
 	import { betterZodParse } from '$lib/client/functions/betterZodParse';
 	import type { CartProduct } from '$types';
+	import type { Optional } from '$types/UtilityTypes';
+	import { number } from 'zod';
 
 	export let data;
 
 	const synchronizeCart = async () => {
-		const productIds = $cart.products.map((product) => product.id);
+		const productIds = $cart ? $cart.products.map((product) => product.id) : [];
 
 		console.log('urlXD', data.url);
 
@@ -75,44 +82,39 @@
 		// 	return;
 		// }
 
-		if ($cart.products.length === 0) {
-			toast.error('Koszyk jest pusty');
-			return;
-		}
+		const currentCart: Optional<
+			typeof $cart,
+			'rememberAddress' | 'isAddressValid' | 'lastVerified' | 'isCustomerValid'
+		> = $cart;
 
-		if (!$cart.deliveryMethod) {
-			toast.error('Nie wybrano metody dostawy');
-			return;
-		}
+		// We need to delete these fields otherwise db throws an error when we try to insert them
+		const deleteFields = (...fields: (keyof typeof currentCart)[]) => {
+			fields.forEach((field) => {
+				if (field in currentCart) {
+					delete currentCart[field];
+				}
+			});
+		};
+		deleteFields('rememberAddress', 'isAddressValid', 'lastVerified', 'isCustomerValid');
 
-		if (!$cart.paymentMethod) {
-			toast.error('Nie wybrano metody płatności');
-			return;
-		}
+		const [order, cartValidationError] = betterZodParse(serverOrderValidation, {
+			...currentCart,
+			products: currentCart.products.map((product) => ({
+				productId: product.id,
+				quantity: product.quantity
+			})),
+			promoCodeId: currentCart.promoCode?.id,
+			address: currentCart.deliveryMethod === 'personal-pickup' ? null : currentCart.address,
+			customer: currentCart.deliveryMethod === 'personal-pickup' ? null : currentCart.customer
+		});
 
-		if ($cart.deliveryMethod !== 'personal-pickup' && $cart.isAddressValid !== true) {
-			toast.error('Niepoprawny adres');
+		if (cartValidationError) {
+			console.error('client cart validation error', cartValidationError);
+			toast.error(cartValidationError[0]);
 			return;
 		}
 
 		try {
-			const [order, orderParseError] = betterZodParse(orderValidation, {
-				products: $cart.products.map((product) => ({
-					productId: product.id,
-					quantity: product.quantity
-				})),
-				deliveryMethod: $cart.deliveryMethod,
-				paymentMethod: $cart.paymentMethod,
-				customerName: $cart.customerName,
-				address: $cart.address,
-				promoCode: $cart.promoCode
-			});
-
-			if (orderParseError) {
-				toast.error(orderParseError[0]);
-				return;
-			}
-
 			const createOrderPromise = wretch('/api/order/create')
 				.post(order)
 				.json<{ success: true; orderId: string }>();
@@ -137,15 +139,13 @@
 		synchronizeCart();
 	});
 
-	$: subtotal = $cart.products
+	$: subtotal = $cart
 		? $cart.products.map(({ price, quantity }) => price * quantity).reduce((a, b) => a + b, 0)
 		: 0;
 
 	const stageNames = ['Koszyk', 'Dostawa', 'Płatność', 'Potwierdzenie'];
 	const stages = ['koszyk', 'dostawa', 'platnosc', 'potwierdzenie'] as const;
 	let stageIndex: number = 0;
-
-	// export let data
 
 	$: {
 		const urlSplit = data.url.split('/').reverse();
@@ -163,18 +163,24 @@
 		}
 	}
 
-	$: disableNextStep =
-		(stageIndex === 1 && !$cart.deliveryMethod) ||
-		(stageIndex === 2 && !$cart.paymentMethod) ||
-		(stageIndex === 1 &&
-			$cart.deliveryMethod !== 'personal-pickup' &&
-			$cart.isAddressValid === false);
+	$: stepsPassed = {
+		0: true,
+		1:
+			$cart &&
+			orderDeliveryMethodValidation.safeParse($cart.deliveryMethod).success &&
+			$cart.deliveryMethod === 'personal-pickup'
+				? true
+				: $cart.isAddressValid && $cart.isCustomerValid,
+		2: $cart && orderPaymentMethodValidation.safeParse($cart.paymentMethod).success,
+		3: true
+	} as Record<number, boolean>;
 
+	$: console.log('stepsPassed', stepsPassed);
 	$: console.log('cart', $cart);
 </script>
 
 <section class="w-full flex flex-col items-center justify-center">
-	{#if $cart.products && $cart.products.length === 0}
+	{#if $cart && !$cart.products.length}
 		<div class="text-center mt-7">
 			<h1 class="text-2xl xxs:text-3xl sm:text-5xl font-bold mb-1 xxs:mb-1.5 sm:mb-2">
 				Koszyk jest pusty 😔
@@ -268,14 +274,14 @@
 					{/if}
 					{#if stageIndex === 2}
 						<button
-							disabled={disableNextStep}
+							disabled={!stepsPassed[stageIndex]}
 							on:click={() => createOrder()}
 							class="btn btn-primary flex-1">ZAMAWIAM</button
 						>
 					{:else if stageIndex < stages.length - 1}
 						<!-- class:btn-disabled={$cart.status === 'loading'} -->
 						<a
-							class:btn-disabled={disableNextStep}
+							class:btn-disabled={!stepsPassed[stageIndex]}
 							href="/zamowienie/{stages[stageIndex + 1]}"
 							class="btn btn-primary flex-1"
 						>

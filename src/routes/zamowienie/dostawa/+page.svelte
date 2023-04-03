@@ -2,23 +2,26 @@
 	import { Car, ShoppingBag } from 'lucide-svelte';
 	import { cart } from '$lib/client/stores/cart';
 	import { onMount } from 'svelte';
-	import dpdLogo from '$lib/assets/dpd_logo.png?run&width=225&height=100&format=webp';
-	import Img from '@zerodevx/svelte-img';
 	import DeliveryMethod from '$components/DeliveryMethod.svelte';
 	import {
-		deliveryValidation,
+		orderAddressValidation,
 		orderCityValidation,
 		orderEmailValidation,
-		orderNameValidation,
+		orderCustomerNameValidation,
 		orderPhoneValidation,
 		orderStreetValidation,
-		orderZipCodeValidation
+		orderZipCodeValidation,
+		orderCustomerValidation
 	} from '$lib/client/schemas/order';
 
 	onMount(() => {
 		cart.update((oldCart) => ({
 			...oldCart,
-			customerName: data.user?.fullName || '',
+			customer: {
+				fullName: data.user?.fullName || '',
+				phone: data.user?.phone || '',
+				email: data.user?.email || ''
+			},
 			address: {
 				...oldCart.address,
 				email: data.user?.email || ''
@@ -28,13 +31,12 @@
 
 	export let data;
 
-	$: deliveryValidation.safeParse($cart.address).success
-		? ($cart.isAddressValid = true)
-		: ($cart.isAddressValid = false);
+	$: $cart && ($cart.isAddressValid = orderAddressValidation.safeParse($cart.address).success);
+	$: $cart && ($cart.isCustomerValid = orderCustomerValidation.safeParse($cart.customer).success);
 </script>
 
 <svelte:head>
-	<title>Koszyk {$cart.products ? `(${$cart.products.length}) ` : ''}• Twoje ALDO</title>
+	<title>Koszyk {$cart ? `(${$cart.products.length}) ` : ''}• Twoje ALDO</title>
 	<meta name="description" content="Wybierz metodę dostawy. Dokończ zamówienie." />
 </svelte:head>
 
@@ -83,11 +85,11 @@
 					name="first-name"
 					class="input input-bordered w-full text-sm xs:text-base"
 					required
-					bind:value={$cart.customerName}
-					class:input-success={$cart.customerName.length > 0 &&
-						orderNameValidation.safeParse($cart.customerName).success}
-					class:input-error={$cart.customerName.length > 0 &&
-						!orderNameValidation.safeParse($cart.customerName).success}
+					bind:value={$cart.customer.fullName}
+					class:input-success={$cart.customer.fullName.length > 0 &&
+						orderCustomerNameValidation.safeParse($cart.customer.fullName).success}
+					class:input-error={$cart.customer.fullName.length > 0 &&
+						!orderCustomerNameValidation.safeParse($cart.customer.fullName).success}
 				/>
 			</div>
 			<div class="form-control w-full">
@@ -153,12 +155,12 @@
 						placeholder="Wpisz tu numer telefonu do odbiorcy..."
 						name="address-phone-number"
 						class="input input-bordered w-full max-w-xs text-sm xs:text-base"
-						class:input-success={$cart.address.phone?.length > 0 &&
-							orderPhoneValidation.safeParse($cart.address.phone).success}
-						class:input-error={$cart.address.phone?.length > 0 &&
-							!orderPhoneValidation.safeParse($cart.address.phone).success}
+						class:input-success={$cart.customer.phone?.length > 0 &&
+							orderPhoneValidation.safeParse($cart.customer.phone).success}
+						class:input-error={$cart.customer.phone?.length > 0 &&
+							!orderPhoneValidation.safeParse($cart.customer.phone).success}
 						required
-						bind:value={$cart.address.phone}
+						bind:value={$cart.customer.phone}
 					/>
 				</div>
 				<div class="form-control w-full">
@@ -170,14 +172,24 @@
 						placeholder="Wpisz tu adres email odbiorcy..."
 						name="address-email"
 						class="input input-bordered w-full max-w-xs text-sm xs:text-base"
-						class:input-success={$cart.address.email?.length > 0 &&
-							orderEmailValidation.safeParse($cart.address.email).success}
-						class:input-error={$cart.address.email?.length > 0 &&
-							!orderEmailValidation.safeParse($cart.address.email).success}
+						class:input-success={$cart.customer.email?.length > 0 &&
+							orderEmailValidation.safeParse($cart.customer.email).success}
+						class:input-error={$cart.customer.email?.length > 0 &&
+							!orderEmailValidation.safeParse($cart.customer.email).success}
 						required
-						bind:value={$cart.address.email}
+						bind:value={$cart.customer.email}
 					/>
 				</div>
+			</div>
+			<div class="form-control max-w-[170px]">
+				<label class="label cursor-pointer">
+					<span class="label-text">Zapamiętaj adres</span>
+					<input
+						type="checkbox"
+						bind:checked={$cart.rememberAddress}
+						class="checkbox checkbox-primary"
+					/>
+				</label>
 			</div>
 		</div>
 	{/if}

@@ -18,7 +18,8 @@ export async function POST() {
 		email: 'szymon.dlugolecki77@gmail.com',
 		fullName: 'Szymon Długołęcki',
 		role: 'admin',
-		access: true
+		access: true,
+		phone: '692694963'
 	} satisfies Omit<User, 'createdAt'>;
 
 	try {
