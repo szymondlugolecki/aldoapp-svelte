@@ -9,7 +9,7 @@ export type Outlets = 'surowe' | 'myszyniec' | 'ełk' | 'wójtowo';
 
 export type DrawerStore =
 	| {
-			type: 'user' | 'product';
+			type: 'user' | 'product' | 'promoCode';
 			open: boolean;
 			action: 'add' | 'filter';
 	  }
@@ -18,11 +18,6 @@ export type DrawerStore =
 			open: boolean;
 			id: number;
 			action: 'edit' | 'remove';
-	  }
-	| {
-			type: 'product';
-			open: boolean;
-			action: 'filter';
 	  }
 	| {
 			type: 'user';
@@ -36,7 +31,7 @@ export type DrawerStore =
 			action: 'filter';
 	  }
 	| {
-			type: 'order';
+			type: 'order' | 'promoCode';
 			open: boolean;
 			id: number;
 			action: 'edit';

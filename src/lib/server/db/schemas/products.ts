@@ -101,25 +101,13 @@ export const orders = mysqlTable(
 			enum: deliveryStatus
 		}).notNull(),
 		address: json('address').$type<Address>(),
-		customer: json('customer').$type<{
-			email: string;
-			phone: string;
-			fullName: string;
-		}>(),
-		// orders table
-		products: json('products')
-			.$type<
-				{
-					productId: number;
-					quantity: number;
-				}[]
-			>()
-			.notNull(),
+		customer: json('customer').$type<Customer>(),
 
 		deliveryMethod: text('delivery_method', { enum: deliveryMethods }).notNull(),
 		paymentMethod: text('payment_method', { enum: paymentMethods }).notNull(),
 
 		orderHistory: json('order_history').$type<OrderHistoryEvent[]>().notNull(),
+		products: json('products').$type<OrderProductObj[]>().notNull(),
 
 		// relations
 		customerId: varchar('customer_id', { length: 36 }).notNull(),

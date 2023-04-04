@@ -8,11 +8,13 @@
 			addNewItemText = 'Nowy użytkownik';
 		} else if (type === 'product') {
 			addNewItemText = 'Nowy produkt';
+		} else if (type === 'promoCode') {
+			addNewItemText = 'Nowy kod';
 		}
 	}
 
 	export let searchInput = '';
-	export let type: 'user' | 'product' | 'order';
+	export let type: 'user' | 'product' | 'order' | 'promoCode';
 </script>
 
 <div class="relative bg-base-100 shadow-md sm:rounded-lg px-2">
@@ -51,7 +53,7 @@
 		</div>
 		<div class="flex items-center space-x-2 w-full md:w-auto">
 			<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-			{#if type === 'user' || type === 'product'}
+			{#if type === 'user' || type === 'product' || type === 'promoCode'}
 				<label
 					for="admin-drawer"
 					tabindex="0"

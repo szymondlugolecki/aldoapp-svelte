@@ -14,6 +14,8 @@
 	let searchInput = '';
 	let streamedOrders: DefaultOrderList = [];
 
+	let loadingStreamedOrders = true;
+
 	const orderParser = (orders: DefaultOrderList) => {
 		return orders.reduce<OrderWithCustomer[]>((acc, row) => {
 			const { attachedCustomer, order } = row;
@@ -39,10 +41,15 @@
 		.catch((err) => {
 			console.error(err);
 			toast.error('Nie udało się pobrać wszystkich zamówień');
+		})
+		.finally(() => {
+			loadingStreamedOrders = false;
 		});
 
 	$: orders = orderParser([...data.orders, ...streamedOrders]);
 	// .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+
+	$: console.log('orders', data.orders);
 
 	// .filter(
 	// 	(user) =>
@@ -76,8 +83,9 @@
 
 	<Table
 		type="orders"
-		orderHeaders={['products', 'customer', 'status', 'action', 'createdAt']}
+		orderHeaders={['status', 'customer', 'products', 'action', 'createdAt']}
 		items={orders}
+		isLoading={loadingStreamedOrders}
 	/>
 
 	<Drawer>

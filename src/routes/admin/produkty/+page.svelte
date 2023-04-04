@@ -71,6 +71,7 @@
 		type="products"
 		productHeaders={['image', 'name', 'category', 'author', 'extra', 'action', 'description']}
 		items={products}
+		isLoading={false}
 	/>
 
 	<Drawer>

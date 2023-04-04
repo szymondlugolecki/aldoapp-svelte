@@ -72,6 +72,7 @@
 		type="users"
 		userHeaders={['user', 'role', 'action', 'access', 'joined', 'profile']}
 		items={users}
+		isLoading={false}
 	/>
 
 	<Drawer>

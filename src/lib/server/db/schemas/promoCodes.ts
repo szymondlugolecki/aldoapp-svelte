@@ -30,9 +30,9 @@ export const promoCodes = mysqlTable(
 		validSince: timestamp('valid_since').notNull(),
 		validUntil: timestamp('valid_until').notNull(),
 		// usedCount: int('use_count').notNull(),
-		useLimit: int('use_limit').notNull(),
-		onePerUser: boolean('one_per_user').notNull(),
-		disabled: boolean('disabled').default(false).notNull(),
+		totalUseLimit: int('use_limit').notNull(),
+		perUserLimit: int('per_user_use_limit').notNull(),
+		enabled: boolean('disabled').default(true).notNull(), // we can manualy disable a promo code
 		discountType: text('discount_type', { enum: ['percentage', 'fixed'] }).notNull(),
 		// add products list to which the promo code applies
 

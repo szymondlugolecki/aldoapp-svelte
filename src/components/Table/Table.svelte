@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { productTable, userTable, orderTable } from '$lib/client/constants';
+	import { productTable, userTable, orderTable, promoCodesTable } from '$lib/client/constants';
 	import type {
 		ProductRowType,
 		ProductWithAuthorAndImage,
@@ -8,16 +8,24 @@
 		OrderRowType,
 		OrderWithCustomer
 	} from '$types';
+	import type { PromoCodeRowType, PromoCodeWithUsages } from '$types/PromoCodeTypes';
 	import OrderCell from './OrderCell.svelte';
 	import ProductCell from './ProductCell.svelte';
+	import PromoCodeCell from './PromoCodeCell.svelte';
 	import UserCell from './UserCell.svelte';
 
-	export let type: 'products' | 'users' | 'orders';
+	export let type: 'products' | 'users' | 'orders' | 'promoCodes';
 	export let productHeaders: ProductRowType[] | undefined = undefined;
 	export let userHeaders: UserRowType[] | undefined = undefined;
 	export let orderHeaders: OrderRowType[] | undefined = undefined;
+	export let promoCodesHeaders: PromoCodeRowType[] | undefined = undefined;
+	export let isLoading: boolean;
 
-	export let items: ProductWithAuthorAndImage[] | User[] | OrderWithCustomer[];
+	export let items:
+		| ProductWithAuthorAndImage[]
+		| User[]
+		| OrderWithCustomer[]
+		| PromoCodeWithUsages[];
 
 	const isProductItem = (
 		varType: typeof type,
@@ -45,6 +53,16 @@
 		}
 		return false;
 	};
+
+	const isPromoCodeItem = (
+		varType: typeof type,
+		varItem: (typeof items)[number]
+	): varItem is PromoCodeWithUsages => {
+		if (varType === 'promoCodes') {
+			return true;
+		}
+		return false;
+	};
 </script>
 
 <div class="overflow-x-auto w-full">
@@ -63,6 +81,10 @@
 				{:else if orderHeaders}
 					{#each orderHeaders as header}
 						<th>{orderTable[header]}</th>
+					{/each}
+				{:else if promoCodesHeaders}
+					{#each promoCodesHeaders as header}
+						<th>{promoCodesTable[header]}</th>
 					{/each}
 				{/if}
 			</tr>
@@ -88,6 +110,12 @@
 								<OrderCell order={item} rowType={header} />
 							</td>
 						{/each}
+					{:else if isPromoCodeItem(type, item) && promoCodesHeaders}
+						{#each promoCodesHeaders as header}
+							<td>
+								<PromoCodeCell promoCode={item} rowType={header} />
+							</td>
+						{/each}
 					{/if}
 				</tr>
 			{/each}
@@ -110,7 +138,16 @@
 		{/if}
 	</table>
 </div>
-{#if items && !items.length}
+{#if isLoading}
+	<div role="status" class="w-full text-center">
+		<div class="flex items-center justify-center space-x-2">
+			<div class="w-4 h-4 rounded-full animate-pulse bg-primary" />
+			<div class="w-4 h-4 rounded-full animate-pulse bg-primary" />
+			<div class="w-4 h-4 rounded-full animate-pulse bg-primary" />
+		</div>
+		<span class="sr-only">Loading...</span>
+	</div>
+{:else if items && !items.length}
 	<div class="w-full h-20 flex justify-center items-center text-center mb-8">
 		<span class="text-2xl sm:text-3xl">Brak wyników... 🧐</span>
 	</div>

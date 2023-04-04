@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { List, LineChart, Users, Dna, LayoutList } from 'lucide-svelte';
+	import { List, LineChart, Users, Dna, LayoutList, Hash } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	$: activeUrl = $page.url.pathname;
 
@@ -15,11 +15,6 @@
 			icon: LayoutList
 		},
 		{
-			name: 'Analityka',
-			href: '/admin/analityka',
-			icon: LineChart
-		},
-		{
 			name: 'Produkty',
 			href: '/admin/produkty',
 			icon: List
@@ -28,6 +23,16 @@
 			name: 'Użytkownicy',
 			href: '/admin/uzytkownicy',
 			icon: Users
+		},
+		{
+			name: 'Kody rabatowe',
+			href: '/admin/kody',
+			icon: Hash
+		},
+		{
+			name: 'Analityka',
+			href: '/admin/analityka',
+			icon: LineChart
 		}
 	];
 </script>

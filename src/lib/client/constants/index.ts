@@ -1,4 +1,5 @@
 import type { ShortService, Outlets, Role, OrderRowType } from '$types';
+import type { PromoCodeRowType } from '$types/PromoCodeTypes';
 import type { DeliveryStatus, MainCategory, OrderStatus, PaymentStatus } from './dbTypes';
 
 type SalesmenMenuType = {
@@ -41,6 +42,17 @@ export const orderTable: Record<OrderRowType, string> = {
 	status: 'Status',
 	action: 'Akcja',
 	createdAt: 'Utworzono'
+};
+
+export const promoCodesTable: Record<PromoCodeRowType, string> = {
+	code: 'Kod',
+	discount: 'Rabat',
+	usages: 'Użyto',
+	createdAt: 'Utworzono',
+	action: 'Akcja',
+	extraInfo: 'Dodatkowe informacje',
+	validSince: 'Aktywny od',
+	validUntil: 'Aktywny do'
 };
 
 export const userTable = {

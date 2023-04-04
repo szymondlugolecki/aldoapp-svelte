@@ -1,16 +1,18 @@
 <script lang="ts">
-	import type { OrderRowType, FullOrder } from '$types';
+	import type { OrderRowType, OrderWithCustomer } from '$types';
 	import { orderStatusList } from '$lib/client/constants';
 	import { drawer } from '$lib/client/stores/adminDrawer';
 
-	export let order: FullOrder;
+	export let order: OrderWithCustomer;
 	export let rowType: OrderRowType;
 </script>
 
 {#if rowType === 'products'}
-	{#each order.products as product}
-		<span>• {product.quantity}x{product}</span>
-	{/each}
+	<ul>
+		{#each order.products as product}
+			<li>{product.quantity}x{product.productId}</li>
+		{/each}
+	</ul>
 {:else if rowType === 'customer'}
 	{#if order.customer}
 		<div class="flex flex-col">

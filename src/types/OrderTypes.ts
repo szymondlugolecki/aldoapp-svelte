@@ -5,7 +5,7 @@ import type {
 	PaymentMethod,
 	PaymentStatus
 } from '$lib/client/constants/dbTypes';
-import type { Order, Product } from '$lib/server/db/schemas/products';
+import type { Order } from '$lib/server/db/schemas/products';
 
 export type OrderRowType = 'products' | 'customer' | 'status' | 'action' | 'createdAt';
 
@@ -18,11 +18,11 @@ export type OrderFilter = {
 };
 
 // Customer Info & Products
-export type FullOrder = Order & {
+export type OrderWithCustomer = Order & {
 	attachedCustomer: {
 		id: string;
 		fullName: string;
 		email: string;
 	};
-	productsList: Pick<Product, 'id' | 'symbol' | 'name' | 'encodedURL'>[];
+	// productsList: Pick<Product, 'id' | 'symbol' | 'name' | 'encodedURL'>[];
 };
