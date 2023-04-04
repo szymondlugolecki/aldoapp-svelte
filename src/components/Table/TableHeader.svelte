@@ -60,7 +60,7 @@
 					class="btn btn-primary flex-1 w-auto md:min-w-[220px] text-[0px] sm:text-sm"
 					on:keypress={(e) => {
 						if (e.key === 'Enter') {
-							if (type === 'user' || type === 'product')
+							if (type === 'user' || type === 'product' || type === 'promoCode')
 								drawer.set({
 									open: true,
 									action: 'add',
@@ -69,7 +69,7 @@
 						}
 					}}
 					on:click={() => {
-						if (type === 'user' || type === 'product')
+						if (type === 'user' || type === 'product' || type === 'promoCode')
 							drawer.set({
 								open: true,
 								action: 'add',

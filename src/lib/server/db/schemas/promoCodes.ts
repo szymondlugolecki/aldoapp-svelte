@@ -1,5 +1,6 @@
 // db.ts
 // import { sql } from 'drizzle-orm';
+import { discountTypes, type ApplicableProducts } from '../../../client/constants/dbTypes';
 import type { InferModel } from 'drizzle-orm';
 import {
 	mysqlTable,
@@ -11,7 +12,8 @@ import {
 	int,
 	char,
 	index,
-	decimal
+	decimal,
+	json
 } from 'drizzle-orm/mysql-core';
 import { sql } from 'drizzle-orm/sql';
 // import { users } from './users';
@@ -33,7 +35,9 @@ export const promoCodes = mysqlTable(
 		totalUseLimit: int('use_limit').notNull(),
 		perUserLimit: int('per_user_use_limit').notNull(),
 		enabled: boolean('disabled').default(true).notNull(), // we can manualy disable a promo code
-		discountType: text('discount_type', { enum: ['percentage', 'fixed'] }).notNull(),
+		discountType: text('discount_type', { enum: discountTypes }).notNull(),
+		minCartValue: decimal('min_cart_value', { precision: 8, scale: 2 }).notNull(),
+		applicableProducts: json('applicable_products').$type<ApplicableProducts>().notNull(),
 		// add products list to which the promo code applies
 
 		// relations

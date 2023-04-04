@@ -162,6 +162,14 @@ export async function POST({ request, locals }) {
 				throw error(400, 'Kod rabatowy został dezaktywowany');
 			}
 
+			// discountPrice or noDiscountPrice?
+			if (parsedPromoCode.minCartValue < noDiscountPrice) {
+				throw error(
+					400,
+					`Podany kod rabatowy działa tylko na koszyk o minimalnej kwocie ${parsedPromoCode.minCartValue} zł`
+				);
+			}
+
 			if (parsedPromoCode.validSince > new Date()) {
 				throw error(400, 'Kod rabatowy jest jeszcze nieaktywny');
 			}

@@ -8,6 +8,9 @@ export type OrderStatus = 'pending' | 'completed' | 'canceled' | 'refund-request
 export type PaymentStatus = 'pending' | 'completed' | 'canceled' | 'refunded';
 export type DeliveryStatus = 'pending' | 'shipped' | 'delivered' | 'returned' | 'canceled';
 
+export type DiscountType = 'percentage' | 'fixed';
+export type ApplicableProducts = string[];
+
 export const paymentMethods: [PaymentMethod, ...PaymentMethod[]] = ['cash'];
 export const deliveryMethods: [DeliveryMethod, ...DeliveryMethod[]] = [
 	'personal-pickup',
@@ -38,3 +41,5 @@ export const deliveryStatus: [DeliveryStatus, ...DeliveryStatus[]] = [
 	'returned',
 	'canceled'
 ];
+
+export const discountTypes: [DiscountType, ...DiscountType[]] = ['percentage', 'fixed'];

@@ -139,7 +139,7 @@
 	</div>
 
 	<div class="flex flex-col">
-		<div class="flex flex-row space-x-4">
+		<div class="flex space-x-4">
 			<div class="flex-1">
 				<label for="price" class="label label-text"> Cena* </label>
 				<input

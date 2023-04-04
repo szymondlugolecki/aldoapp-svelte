@@ -7,6 +7,7 @@
 	import { drawer } from '$lib/client/stores/adminDrawer';
 	import toast from 'svelte-french-toast';
 	import type { PromoCodeWithUsages } from '$types/PromoCodeTypes';
+	import NewPromoCode from '$components/Modals/PromoCode/NewPromoCode.svelte';
 
 	export let data;
 
@@ -84,14 +85,14 @@
 	/>
 
 	<Drawer>
-		{#if $drawer && $drawer.type === 'user'}
-			<!-- {#if $drawer.action === 'add'}
-				<NewUser />
-			{:else if $drawer.action === 'edit'}
-				<EditUser user={getUserFromDrawer()} />
-			{:else if $drawer.action === 'filter'}
-				<FilterUsers bind:filter />
-			{/if} -->
+		{#if $drawer && $drawer.type === 'promoCode'}
+			{#if $drawer.action === 'add'}
+				<NewPromoCode />
+				<!-- {:else if $drawer.action === 'edit'} -->
+				<!-- <EditProduct bind:product /> -->
+				<!-- {:else if $drawer.action === 'filter'} -->
+				<!-- <FilterUsers bind:filter /> -->
+			{/if}
 		{/if}
 	</Drawer>
 </section>
