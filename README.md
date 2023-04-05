@@ -60,7 +60,7 @@ cookie that would prevent logging in with someone else's verification code. > Us
 
 [✅] Implement auth system
 
-[ ] Add promo codes
+[✅] Add promo codes
 
 [ ] Implement user profile
 

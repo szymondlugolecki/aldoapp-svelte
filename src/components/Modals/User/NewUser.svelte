@@ -43,11 +43,21 @@
 		/>
 	</div>
 	<div>
-		<label for="name" class="label label-text"> Email </label>
+		<label for="email" class="label label-text"> Email </label>
 		<input
 			type="email"
 			name="email"
 			placeholder="np. jan.kowalski@gmail.com"
+			class="input input-bordered w-full text-base-content"
+			required
+		/>
+	</div>
+	<div>
+		<label for="phone" class="label label-text"> Numer telefonu </label>
+		<input
+			type="tel"
+			name="phone"
+			placeholder="np. 123 456 789"
 			class="input input-bordered w-full text-base-content"
 			required
 		/>

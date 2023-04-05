@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { orderPhoneValidation } from './order';
 
 export const nameValidation = z
 	.string({
@@ -30,9 +31,10 @@ export const accessPermittedValidation = z.boolean({
 
 export const idValidation = z
 	.string({
-		required_error: 'Id jest wymagane'
+		required_error: 'Id jest wymagane',
+		invalid_type_error: 'Nieprawidłowe id'
 	})
-	.uuid({ message: 'Nieprawidłowe id' });
+	.min(1, { message: 'Nieprawidłowe id' });
 
 export const rememberMeValidation = z.union([z.literal('on'), z.literal('off')], {
 	required_error: "Wartość dla 'Zapamiętaj mnie' jest wymagana",
@@ -48,7 +50,8 @@ export const verificationCodeValidation = z
 export const addUserSchema = z.object({
 	fullName: nameValidation,
 	email: emailValidation,
-	role: roleValidation
+	role: roleValidation,
+	phone: orderPhoneValidation
 });
 
 export const editUserSchema = z.object({
@@ -56,5 +59,6 @@ export const editUserSchema = z.object({
 	fullName: nameValidation,
 	email: emailValidation,
 	role: roleValidation,
-	access: accessPermittedValidation
+	access: accessPermittedValidation.optional(),
+	phone: orderPhoneValidation
 });

@@ -25,7 +25,11 @@ const edit: Action = async ({ request, locals }) => {
 			errors: ['Niepoprawne dane']
 		});
 	}
-	const data = Object.fromEntries(formData);
+	const data = {
+		...Object.fromEntries(formData),
+		phone: Object.fromEntries(formData).phone.toString().replaceAll(' ', '') || null
+	};
+
 	const [editUserObj, editUserObjParseError] = betterZodParse(editUserSchema, data);
 	if (editUserObjParseError) {
 		return fail(400, {
@@ -33,7 +37,7 @@ const edit: Action = async ({ request, locals }) => {
 		});
 	}
 
-	const { id, email, fullName, role, access } = editUserObj;
+	const { id, email, fullName, role, access, phone } = editUserObj;
 
 	// Fetch the user from the database (before the edit)
 	const [usersBeforeEdit, usersBeforeEditError] = await trytm(
@@ -43,7 +47,8 @@ const edit: Action = async ({ request, locals }) => {
 				email: users.email,
 				fullName: users.fullName,
 				role: users.role,
-				access: users.access
+				access: users.access,
+				phone: users.phone
 			})
 			.from(users)
 			.where(eq(users.id, id))
@@ -94,14 +99,16 @@ const edit: Action = async ({ request, locals }) => {
 		email: userBeforeEdit.email,
 		role: userBeforeEdit.role,
 		fullName: userBeforeEdit.fullName,
-		access: userBeforeEdit.access
+		access: userBeforeEdit.access,
+		phone: userBeforeEdit.phone
 	};
 
 	const newUser = {
 		email,
 		role,
 		fullName,
-		access
+		access: !access,
+		phone
 	} satisfies Omit<User, 'id' | 'createdAt'>;
 
 	const nothingChanged = areObjectsEqual(oldUser, newUser);

@@ -41,8 +41,7 @@ export const promoCodes = mysqlTable(
 		// add products list to which the promo code applies
 
 		// relations
-		authorId: varchar('author_id', { length: 36 }).notNull(),
-		encodedURL: varchar('encoded_url', { length: 255 }).notNull()
+		authorId: varchar('author_id', { length: 36 }).notNull()
 	},
 	(product) => ({
 		// indexes

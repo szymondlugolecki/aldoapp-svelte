@@ -15,32 +15,34 @@
 	<span>{promoCode.usages.length}</span>
 {:else if rowType === 'extraInfo'}
 	<div class="flex flex-col">
-		<span>Włączony: {promoCode.enabled ? 'Tak 🟢' : 'Nie 🔴'}</span>
+		<span>Aktywowany: {promoCode.enabled ? 'Tak 🟢' : 'Nie 🔴'}</span>
 		<span>Limit na klienta: {promoCode.perUserLimit}</span>
 		<span>Całkowity limit: {promoCode.totalUseLimit}</span>
 	</div>
-{:else if rowType === 'validSince'}
-	<span
-		>{promoCode.validSince.toLocaleDateString('pl-PL', {
-			month: 'long',
-			day: 'numeric',
-			year: 'numeric',
-			hour: '2-digit',
-			minute: '2-digit',
-			second: '2-digit'
-		})}</span
-	>
-{:else if rowType === 'validUntil'}
-	<span
-		>{promoCode.validUntil.toLocaleDateString('pl-PL', {
-			month: 'long',
-			day: 'numeric',
-			year: 'numeric',
-			hour: '2-digit',
-			minute: '2-digit',
-			second: '2-digit'
-		})}</span
-	>
+{:else if rowType === 'validDateRange'}
+	<div class="flex flex-col">
+		<span
+			>{promoCode.validSince.toLocaleDateString('pl-PL', {
+				month: 'numeric',
+				day: 'numeric',
+				year: 'numeric',
+				hour: '2-digit',
+				minute: '2-digit',
+				second: '2-digit'
+			})}</span
+		>
+		<span>-</span>
+		<span
+			>{promoCode.validUntil.toLocaleDateString('pl-PL', {
+				month: 'numeric',
+				day: 'numeric',
+				year: 'numeric',
+				hour: '2-digit',
+				minute: '2-digit',
+				second: '2-digit'
+			})}</span
+		>
+	</div>
 {:else if rowType === 'action'}
 	<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 	<label

@@ -26,7 +26,11 @@ const add = (async ({ request, locals }) => {
 		});
 	}
 
-	const data = Object.fromEntries(formData);
+	const data = {
+		...Object.fromEntries(formData),
+		phone: Object.fromEntries(formData).phone.toString().replaceAll(' ', '') || null
+	};
+
 	const [newUserParsed, newUserParseError] = betterZodParse(addUserSchema, data);
 	if (newUserParseError) {
 		return fail(400, {
@@ -36,8 +40,9 @@ const add = (async ({ request, locals }) => {
 
 	const newUser = {
 		id: createId(),
-		...newUserParsed
-	} satisfies Omit<User, 'createdAt' | 'access'>;
+		...newUserParsed,
+		access: true
+	} satisfies Omit<User, 'createdAt'>;
 
 	// Add the user to the database
 	const [, addUserError] = await trytm(db.insert(users).values(newUser));

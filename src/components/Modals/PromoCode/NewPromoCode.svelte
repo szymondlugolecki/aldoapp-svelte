@@ -35,6 +35,7 @@
 >
 	<ModalHeader title="Dodaj nowy kod rabatowy" />
 
+	<!-- Row 1 -->
 	<div class="flex space-x-4">
 		<div class="flex-1">
 			<label for="code" class="label label-text"> Kod rabatowy* </label>
@@ -44,15 +45,16 @@
 				placeholder="np. aldo2023"
 				class="input input-bordered w-full text-base-content"
 				required
+				min="1"
 			/>
 		</div>
 		<div class="form-control max-w-[160px]">
-			<label for="" class="label">
+			<label for="minCartValue" class="label">
 				<span class="label-text">Min. wartość koszyka*</span>
 			</label>
 			<input
 				required
-				name=""
+				name="minCartValue"
 				type="number"
 				placeholder="np. 200"
 				class="input input-bordered"
@@ -62,7 +64,8 @@
 		</div>
 	</div>
 
-	<div class="flex space-x-4">
+	<!-- Row 2 -->
+	<div class="flex flex-col xs:flex-row xs:space-x-4">
 		<div class="form-control flex-1">
 			<label class="label" for="">
 				<span class="label-text">Przecena*</span>
@@ -73,17 +76,17 @@
 					name="discount"
 					type="number"
 					placeholder="np. 15"
-					class="input input-bordered"
+					class="input input-bordered w-full"
 				/>
 				<span>{discountType === 'percentage' ? '%' : 'PLN'}</span>
 			</label>
 		</div>
-		<div class="">
+		<div class="sm:max-w-[160px] max-w-none flex-1">
 			<label for="name" class="label label-text"> Rodzaj przeceny* </label>
 			<select
 				required
 				id="discount-type-selection"
-				name="discount-type"
+				name="discountType"
 				class="select select-bordered w-full"
 				bind:value={discountType}
 			>
@@ -92,8 +95,10 @@
 			</select>
 		</div>
 	</div>
+
+	<!-- Row 3 -->
 	<div class="flex flex-col">
-		<h3>Maksymalna ilość użyć</h3>
+		<h4>Maksymalna ilość użyć</h4>
 		<div class="flex space-x-4">
 			<div class="form-control w-full">
 				<label for="perUserLimit" class="label">
@@ -125,10 +130,15 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- Row 4 -->
 	<div>
+		<h4>Okres aktywności kodu</h4>
 		<div class="flex space-y-2 sm:space-y-0 sm:space-x-4 flex-col sm:flex-row">
 			<div class="w-full">
-				<label for="validSince" class="block text-sm text-base-content">Od</label>
+				<label for="validSince" class="block text-sm text-base-content label">
+					<span class="label-text">Od</span>
+				</label>
 				<input
 					required
 					type="datetime-local"
@@ -137,7 +147,9 @@
 				/>
 			</div>
 			<div class="w-full">
-				<label for="validUntil" class="block text-sm text-base-content">Do</label>
+				<label for="validUntil" class="block text-sm text-base-content label">
+					<span class="label-text">Do</span>
+				</label>
 				<input
 					required
 					type="datetime-local"
@@ -151,3 +163,9 @@
 		<button type="submit" class="btn btn-primary w-full">Dodaj</button>
 	</div>
 </form>
+
+<style>
+	.input-group > .input {
+		isolation: auto;
+	}
+</style>

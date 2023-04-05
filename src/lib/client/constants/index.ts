@@ -47,12 +47,11 @@ export const orderTable: Record<OrderRowType, string> = {
 export const promoCodesTable: Record<PromoCodeRowType, string> = {
 	code: 'Kod',
 	discount: 'Rabat',
-	usages: 'Użyto',
-	createdAt: 'Utworzono',
+	usages: 'Użyty',
+	createdAt: 'Utworzony',
 	action: 'Akcja',
 	extraInfo: 'Dodatkowe informacje',
-	validSince: 'Aktywny od',
-	validUntil: 'Aktywny do'
+	validDateRange: 'Aktywny od - do'
 };
 
 export const userTable = {

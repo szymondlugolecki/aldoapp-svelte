@@ -76,8 +76,7 @@
 			'usages',
 			'action',
 			'extraInfo',
-			'validSince',
-			'validUntil',
+			'validDateRange',
 			'createdAt'
 		]}
 		items={promoCodes}

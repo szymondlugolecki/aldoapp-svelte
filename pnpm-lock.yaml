@@ -20,7 +20,7 @@ specifiers:
   daisyui: ^2.51.3
   dotenv: ^16.0.3
   drizzle-kit: 0.17.1-609a4f0
-  drizzle-orm: ^0.23.2
+  drizzle-orm: ^0.23.6
   eslint: ^8.35.0
   eslint-config-prettier: ^8.7.0
   eslint-plugin-svelte3: ^4.0.0
@@ -53,7 +53,7 @@ dependencies:
   cloudinary: 1.35.0
   daisyui: 2.51.4_j7yt3jd32cwenjqavrrga47yr4
   dotenv: 16.0.3
-  drizzle-orm: 0.23.2_yjazpptyy5hkedviejakk766iq
+  drizzle-orm: 0.23.6_yjazpptyy5hkedviejakk766iq
   jose: 4.13.1
   lucide-svelte: 0.113.0_svelte@3.57.0
   schema-dts: 1.1.2_typescript@4.9.5
@@ -2970,11 +2970,12 @@ packages:
       - supports-color
     dev: true
 
-  /drizzle-orm/0.23.2_yjazpptyy5hkedviejakk766iq:
-    resolution: {integrity: sha512-GSOhOc+gGSMsf3eyBzL1Yb0g0M3pOurWmFI1lVhOrmMQCVuA/smJgYSy4UeTzBV521+J+emiFaSKSomEmc+fog==}
+  /drizzle-orm/0.23.6_yjazpptyy5hkedviejakk766iq:
+    resolution: {integrity: sha512-bVJS5elA/36J//s5K8P8oyB0YDZiTidBQQEUzTtp6As/i4GNvuskByG3e+2NfbmF5KH9e4WpWuavXf0iSLnQPg==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=3'
+      '@libsql/client': '*'
       '@neondatabase/serverless': '>=0.1'
       '@planetscale/database': '>=1'
       '@types/better-sqlite3': '*'
@@ -2993,6 +2994,8 @@ packages:
       '@aws-sdk/client-rds-data':
         optional: true
       '@cloudflare/workers-types':
+        optional: true
+      '@libsql/client':
         optional: true
       '@neondatabase/serverless':
         optional: true

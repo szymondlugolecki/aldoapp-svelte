@@ -23,7 +23,7 @@
 	class="modal modal-bottom sm:modal-middle cursor-pointer"
 	bind:this={adminDrawerLabel}
 >
-	<label for="" class="modal-box relative">
+	<label for="" class="modal-box relative p-5 xs:p-6">
 		<slot />
 	</label>
 </label>

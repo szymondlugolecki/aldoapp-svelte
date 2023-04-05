@@ -1,4 +1,5 @@
 import { db } from '$lib/server/db';
+import add from '$lib/server/actions/promoCodes/add';
 import { promoCodeUsages, promoCodes } from '$lib/server/db/schemas/promoCodes';
 import { desc, eq } from 'drizzle-orm/expressions';
 
@@ -30,4 +31,8 @@ export const load = async () => {
 				.limit(999_999)
 		}
 	};
+};
+
+export const actions = {
+	add
 };

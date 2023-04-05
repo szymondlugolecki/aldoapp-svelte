@@ -60,22 +60,22 @@ export const products = mysqlTable(
 		name: varchar('name', { length: 255 }).notNull(),
 		description: varchar('description', { length: 2048 }),
 		symbol: varchar('symbol', { length: 255 }).notNull(),
-		category: varchar('category', { length: 255, enum: mainCategories }).notNull(),
 		subcategory: varchar('subcategory', { length: 255 }).notNull(),
+		category: varchar('category', { length: 255, enum: mainCategories }).notNull(),
 		price: decimal('price', { precision: 8, scale: 2 }).notNull(),
 		weight: decimal('weight', { precision: 8, scale: 2 }).notNull(),
 		amountLeft: int('amount_left').notNull(),
 		producent: varchar('producent', { length: 255, enum: producents }).notNull(),
+		encodedURL: varchar('encoded_url', { length: 512 }).notNull(),
 		images: json('images').$type<string[]>().default([]).notNull(),
 
 		// relations
-		authorId: varchar('user_id', { length: 36 }).notNull(), // user that added this product
+		authorId: varchar('author_id', { length: 36 }).notNull() // user that added this product
 		// .references(() => users.id),
-		encodedURL: varchar('encoded_url', { length: 255 }).notNull()
 	},
 	(product) => ({
 		// indexes
-		authorId: index('author_id').on(product.authorId)
+		authorId: index('author_idx').on(product.authorId)
 	})
 );
 

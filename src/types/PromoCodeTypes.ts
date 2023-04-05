@@ -5,7 +5,8 @@ export type PromoCodeWithUsages = PromoCode & {
 };
 
 export type PromoCodeRowType =
-	| Extract<keyof PromoCode, 'code' | 'discount' | 'validSince' | 'validUntil' | 'createdAt'>
+	| Extract<keyof PromoCode, 'code' | 'discount' | 'createdAt'>
 	| 'usages'
 	| 'action'
-	| 'extraInfo';
+	| 'extraInfo'
+	| 'validDateRange';

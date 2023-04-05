@@ -59,6 +59,17 @@
 		</div>
 
 		<div>
+			<label for="phone" class="label label-text"> Numer telefonu </label>
+			<input
+				type="tel"
+				name="phone"
+				class="input input-bordered w-full text-base-content"
+				value={user.phone}
+				required
+			/>
+		</div>
+
+		<div>
 			<label for="name" class="label label-text"> Rola </label>
 			<select id="role-selection" name="role" class="select select-bordered w-full">
 				<option selected={user.role === 'customer'} value="customer">Klient</option>
@@ -70,7 +81,19 @@
 		</div>
 
 		{#if user.role !== 'admin' && (user.role !== 'moderator' || $page.data.user?.role === 'admin')}
-			<div class="flex items-center mb-4">
+			<div class="form-control max-w-[90px]">
+				<label class="cursor-pointer label">
+					<span class="label-text">Dostęp</span>
+					<input
+						id="access"
+						name="access"
+						type="checkbox"
+						checked={user.access}
+						class="checkbox checkbox-success"
+					/>
+				</label>
+			</div>
+			<!-- <div class="flex items-center mb-4">
 				<input
 					id="access"
 					name="access"
@@ -79,10 +102,10 @@
 					checked={user.access}
 					class="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 dark:focus:ring-red-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
 				/>
-				<label for="access" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+				<label for="access" class="ml-2 text-sm font-medium"
 					>Zablokuj</label
 				>
-			</div>
+			</div> -->
 		{/if}
 
 		<button type="submit" class="btn btn-primary w-full">Edytuj</button>

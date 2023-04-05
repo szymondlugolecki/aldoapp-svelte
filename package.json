@@ -50,7 +50,7 @@
 		"cloudinary": "^1.35.0",
 		"daisyui": "^2.51.3",
 		"dotenv": "^16.0.3",
-		"drizzle-orm": "^0.23.2",
+		"drizzle-orm": "^0.23.6",
 		"jose": "^4.13.1",
 		"lucide-svelte": "^0.113.0",
 		"schema-dts": "^1.1.2",

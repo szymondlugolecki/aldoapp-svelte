@@ -37,6 +37,17 @@ const add: Action = async ({ request, locals }) => {
 		images: imageArray
 	};
 
+	if (isNaN(data.price)) {
+		return fail(400, {
+			errors: ['Niepoprawna cena']
+		});
+	}
+	if (isNaN(data.weight)) {
+		return fail(400, {
+			errors: ['Niepoprawna waga']
+		});
+	}
+
 	console.log('data', data);
 
 	const [addProductObj, addProductParseError] = betterZodParse(addProductSchema, data);
@@ -117,6 +128,8 @@ const add: Action = async ({ request, locals }) => {
 		encodedURL,
 		amountLeft: Math.floor(Math.random() * 5) // 0 - 5
 	} satisfies Omit<Product, 'id' | 'createdAt'>;
+
+	console.log('newProduct', newProduct);
 
 	// Add the product to the database
 	const [, addProductError] = await trytm(db.insert(products).values(newProduct));

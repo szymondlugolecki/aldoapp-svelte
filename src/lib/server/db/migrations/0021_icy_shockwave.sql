@@ -1,0 +1,1 @@
+ALTER TABLE promo_codes DROP COLUMN `encoded_url`;
