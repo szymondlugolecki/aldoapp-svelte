@@ -48,7 +48,7 @@
 				min="1"
 			/>
 		</div>
-		<div class="form-control max-w-[160px]">
+		<div class="form-control max-w-[160px] justify-end">
 			<label for="minCartValue" class="label">
 				<span class="label-text">Min. wartość koszyka*</span>
 			</label>
@@ -100,7 +100,7 @@
 	<div class="flex flex-col">
 		<h4>Maksymalna ilość użyć</h4>
 		<div class="flex space-x-4">
-			<div class="form-control w-full">
+			<div class="form-control w-full justify-end">
 				<label for="perUserLimit" class="label">
 					<span class="label-text">Dla jednego klienta*</span>
 				</label>
@@ -114,7 +114,7 @@
 					min="1"
 				/>
 			</div>
-			<div class="form-control w-full">
+			<div class="form-control w-full justify-end">
 				<label for="totalUseLimit" class="label">
 					<span class="label-text">Całkowita*</span>
 				</label>

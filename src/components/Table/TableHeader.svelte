@@ -15,6 +15,24 @@
 
 	export let searchInput = '';
 	export let type: 'user' | 'product' | 'order' | 'promoCode';
+
+	let searchByText = 'Szukaj...';
+	switch (type) {
+		case 'order':
+			searchByText = 'Szukaj po id produktu, kliencie...';
+			break;
+		case 'user':
+			searchByText = 'Szukaj po imieniu i nazwisku, mailu, numerze telefonu...';
+			break;
+		case 'product':
+			searchByText = 'Szukaj po nazwie i symbolu, twórcy i opisie...';
+			break;
+		case 'promoCode':
+			searchByText = 'Szukaj po kodzie, rabacie, twórcy...';
+			break;
+		default:
+			break;
+	}
 </script>
 
 <div class="relative bg-base-100 shadow-md sm:rounded-lg px-2">
@@ -23,7 +41,7 @@
 	>
 		<div class="w-full">
 			<form class="flex items-center">
-				<label for="simple-search" class="sr-only">Szukaj</label>
+				<label for="simple-search" class="sr-only">{searchByText}</label>
 				<div class="relative w-full">
 					<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
 						<svg
@@ -44,7 +62,7 @@
 						type="text"
 						id="simple-search"
 						class="block w-full p-2 pl-10 h-12 sm:text-sm text-base border border-base-content rounded-lg focus:ring-secondary-focus focus:border-secondary-focus bg-base-100 text-base-content"
-						placeholder={type === 'order' ? 'Szukaj po produktach, klientach...' : 'Szukaj...'}
+						placeholder={searchByText}
 						required
 						bind:value={searchInput}
 					/>

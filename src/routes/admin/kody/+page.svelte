@@ -20,13 +20,20 @@
 
 	const codesParser = (promoCodes: DefaultPromoCodesList) => {
 		const groupedPromoCodes = promoCodes.reduce<Record<number, PromoCodeWithUsages>>((acc, row) => {
-			const { promoCode, usage } = row;
+			const { promoCode, usage, author } = row;
+
+			if (!author) return acc;
 
 			if (!acc[promoCode.id]) {
 				acc[promoCode.id] = {
 					...promoCode,
+					author: author,
 					usages: []
 				};
+			}
+
+			if (author) {
+				acc[promoCode.id].author = author;
 			}
 
 			if (usage) {

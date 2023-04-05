@@ -6,6 +6,7 @@ import type {
 	PaymentStatus
 } from '$lib/client/constants/dbTypes';
 import type { Order } from '$lib/server/db/schemas/products';
+import type { User } from './UserTypes';
 
 export type OrderRowType = 'products' | 'customer' | 'status' | 'action' | 'createdAt';
 
@@ -19,10 +20,6 @@ export type OrderFilter = {
 
 // Customer Info & Products
 export type OrderWithCustomer = Order & {
-	attachedCustomer: {
-		id: string;
-		fullName: string;
-		email: string;
-	};
+	attachedCustomer: Pick<User, 'id' | 'fullName' | 'email'>;
 	// productsList: Pick<Product, 'id' | 'symbol' | 'name' | 'encodedURL'>[];
 };

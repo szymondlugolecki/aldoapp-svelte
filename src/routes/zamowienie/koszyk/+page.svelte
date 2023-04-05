@@ -39,9 +39,7 @@
 								>{product.name}</bold
 							>
 							<small class="text-xs sm:text-sm lg:text-base">{product.symbol}</small>
-							<small class="text-xs sm:text-sm lg:text-base"
-								>{product.price.toFixed(2)} zł / szt.</small
-							>
+							<small class="text-xs sm:text-sm lg:text-base">{product.price} zł / szt.</small>
 						</div>
 					</td>
 					<td>
@@ -61,7 +59,7 @@
 							</button>
 						</div>
 					</td>
-					<td class="min-w-[130px]">{(product.quantity * product.price).toFixed(2)}</td>
+					<td class="min-w-[130px]">{(product.quantity * Number(product.price)).toFixed(2)}</td>
 					<td
 						><button
 							class="btn btn-ghost"

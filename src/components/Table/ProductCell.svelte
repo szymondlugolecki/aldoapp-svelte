@@ -1,6 +1,8 @@
 <script lang="ts">
+	import CellToolTip from '$components/CellToolTip.svelte';
 	import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 	import { fodderCategories, fodderNames, producentsList, roleNames } from '$lib/client/constants';
+	import { dateParser } from '$lib/client/functions';
 	import { drawer } from '$lib/client/stores/adminDrawer';
 	import type { ProductRowType, ProductWithAuthorAndImage } from '$types';
 
@@ -58,37 +60,20 @@
 				? 'badge-success'
 				: 'badge-info'}">{roleNames[product.author.role]}</span
 		>
-		<div class="flex justify-start items-center">
+		<div class="flex justify-start items-center mb-2">
 			<div class="tooltip mt-2" data-tip={product.author.email}>
 				<span>{product.author.fullName}</span>
 			</div>
 		</div>
 
-		<div
-			class="tooltip mt-2"
-			data-tip={product.createdAt.toLocaleDateString('pl-PL', {
-				month: 'long',
-				day: 'numeric',
-				year: 'numeric',
-				hour: '2-digit',
-				minute: '2-digit',
-				second: '2-digit'
-			}) + ` ⌚`}
-		>
-			<span
-				>📅 {product.createdAt.toLocaleDateString('pl-PL', {
-					month: 'short',
-					day: 'numeric',
-					year: 'numeric'
-				})}</span
-			>
-		</div>
+		<CellToolTip
+			textData={dateParser(product.createdAt, 'short')}
+			tooltipData={dateParser(product.createdAt, 'medium')}
+		/>
 	</div>
 {:else if rowType === 'action'}
 	<div class="flex space-y-3 flex-col justify-center items-start">
-		<button type="button" class="font-medium text-blue-400 hover:text-blue-500 duration-200"
-			>Edytuj</button
-		>
+		<button type="button" class="font-medium btn btn-sm btn-ghost">Edytuj</button>
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<label
 			for="admin-drawer"
@@ -101,7 +86,8 @@
 					action: 'remove'
 				});
 			}}
-			class="cursor-pointer font-medium text-red-400 hover:text-red-500 duration-200">Usuń</label
+			class="font-medium btn btn-sm btn-ghost text-red-500 hover:text-red-600 duration-100"
+			>Usuń</label
 		>
 	</div>
 {/if}

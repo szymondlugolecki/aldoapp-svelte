@@ -2,6 +2,8 @@
 	import type { OrderRowType, OrderWithCustomer } from '$types';
 	import { orderStatusList } from '$lib/client/constants';
 	import { drawer } from '$lib/client/stores/adminDrawer';
+	import CellToolTip from '$components/CellToolTip.svelte';
+	import { dateParser } from '$lib/client/functions';
 
 	export let order: OrderWithCustomer;
 	export let rowType: OrderRowType;
@@ -66,7 +68,11 @@
 		Edytuj
 	</label>
 {:else if rowType === 'createdAt'}
-	<div
+	<CellToolTip
+		textData={dateParser(order.createdAt, 'short')}
+		tooltipData={dateParser(order.createdAt, 'medium')}
+	/>
+	<!-- <div
 		class="tooltip"
 		data-tip={order.createdAt.toLocaleDateString('pl-PL', {
 			month: 'long',
@@ -84,5 +90,5 @@
 				year: 'numeric'
 			})}</span
 		>
-	</div>
+	</div> -->
 {/if}

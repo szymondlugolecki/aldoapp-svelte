@@ -102,7 +102,8 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 				email: users.email,
 				fullName: users.fullName,
 				role: users.role,
-				access: users.access
+				access: users.access,
+				phone: users.phone
 			})
 			.from(users)
 			.where(eq(users.id, userId))

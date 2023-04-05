@@ -140,7 +140,9 @@
 	});
 
 	$: subtotal = $cart
-		? $cart.products.map(({ price, quantity }) => price * quantity).reduce((a, b) => a + b, 0)
+		? $cart.products
+				.map(({ price, quantity }) => Number(price) * quantity)
+				.reduce((a, b) => a + b, 0)
 		: 0;
 
 	const stageNames = ['Koszyk', 'Dostawa', 'Płatność', 'Potwierdzenie'];

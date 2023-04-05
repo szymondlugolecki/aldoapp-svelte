@@ -4,11 +4,11 @@
 	import { page } from '$app/stores';
 	import { CheckCircle, ExternalLink, XCircle } from 'lucide-svelte';
 	import { drawer } from '$lib/client/stores/adminDrawer';
+	import CellToolTip from '$components/CellToolTip.svelte';
+	import { dateParser } from '$lib/client/functions';
 
 	export let user: User;
 	export let rowType: UserRowType;
-
-	// userTable
 </script>
 
 {#if rowType === 'user'}
@@ -57,25 +57,10 @@
 		<XCircle color="red" aria-label="Zablokowany" />
 	{/if}
 {:else if rowType === 'joined'}
-	<div
-		class="tooltip"
-		data-tip={user.createdAt.toLocaleDateString('pl-PL', {
-			month: 'long',
-			day: 'numeric',
-			year: 'numeric',
-			hour: '2-digit',
-			minute: '2-digit',
-			second: '2-digit'
-		})}
-	>
-		<span
-			>{user.createdAt.toLocaleDateString('pl-PL', {
-				month: 'short',
-				day: 'numeric',
-				year: 'numeric'
-			})}</span
-		>
-	</div>
+	<CellToolTip
+		textData={dateParser(user.createdAt, 'short')}
+		tooltipData={dateParser(user.createdAt, 'medium')}
+	/>
 {:else if rowType === 'profile'}
 	<a rel="noreferrer" class="hover:text-primary" target="_blank" href={`/uzytkownik/${user.id}`}
 		><ExternalLink /></a

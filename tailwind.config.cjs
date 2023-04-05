@@ -8,9 +8,13 @@ module.exports = {
 		},
 		screens: {
 			xxs: '330px',
+			// => @media (min-width: 330px) { ... }
+
+			ss: '370px',
+			// => @media (min-width: 370px) { ... }
 
 			xs: '550px',
-			// => @media (min-width: 640px) { ... }
+			// => @media (min-width: 550px) { ... }
 
 			sm: '640px',
 			// => @media (min-width: 640px) { ... }

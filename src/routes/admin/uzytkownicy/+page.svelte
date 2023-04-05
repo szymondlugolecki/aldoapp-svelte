@@ -41,7 +41,8 @@
 	).filter(
 		(user) =>
 			textCrusher(user.email).includes(textCrusher(searchInput)) ||
-			textCrusher(user.fullName).includes(textCrusher(searchInput))
+			textCrusher(user.fullName).includes(textCrusher(searchInput)) ||
+			textCrusher(user.phone).includes(textCrusher(searchInput))
 	);
 
 	let editDrawerUserId: string;

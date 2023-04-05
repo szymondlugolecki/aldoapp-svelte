@@ -147,7 +147,7 @@
 							id="filterDropdownButton"
 							tabindex="0"
 							for="categories-drawer"
-							class="inline-flex justify-center md:hidden btn btn-accent text-accent-content btn-xs h-7 xxs:h-[40px] w-full flex-1 sm:text-sm px-0 max-w-[125px] xs:max-w-[140px]"
+							class="inline-flex justify-center md:hidden btn btn-accent text-accent-content text-[0px] btn-sm ss:text-sm h-7 xxs:h-[40px] w-full flex-1 px-0 max-w-[64px] ss:max-w-[130px] xs:max-w-[140px]"
 							on:keypress={(event) => {
 								if (event.key === 'Enter') {
 									event.currentTarget.click();
@@ -161,7 +161,7 @@
 					<div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-10">
 						{#each productsFiltered as product}
 							<div
-								class="flex flex-col justify-between max-w-[300px] w-full shadow-sm sm:shadow-md shadow-base-content border border-base-content border-opacity-10 p-1 xxs:p-2 sm:p-3 pt-4 group/product duration-100 rounded-md outline-primary outline-offset-2"
+								class="flex flex-col justify-between max-w-[300px] w-full border border-base-content border-opacity-10 p-1 xxs:p-2 sm:p-3 pt-4 group/product duration-100 rounded-md outline-primary outline-offset-2"
 							>
 								<a
 									class="flex flex-col justify-start items-center text-xs xxs:text-sm sm:text-base p-2"
@@ -175,11 +175,11 @@
 										height="160px"
 									/>
 									<div class="flex flex-col items-start pt-2 w-full space-y-2">
-										<span class="text-red-500 text-sm font-semibold whitespace-normal"
+										<!-- <span class="text-red-500 text-sm font-semibold whitespace-normal"
 											>{producentsList[product.producent]}</span
-										>
+										> -->
 										<span class="font-semibold">{product.name}</span>
-										<span>{product.price} zł / szt.</span>
+										<span>{product.price} zł</span>
 									</div>
 								</a>
 								<div class="flex justify-end items-center w-full pt-2">
@@ -220,7 +220,7 @@
 				{/if}
 			</div>
 		</div>
-		<div class="drawer-side h-full bg-base-100 bg-opacity-95 w-72 xxs:w-80 md:w-64 lg:w-80">
+		<div class="drawer-side h-full bg-base-100 bg-opacity-95 w-72 ss:w-80 md:w-64 lg:w-80">
 			<label for="categories-drawer" class="drawer-overlay" />
 			<div class="flex flex-col px-2 py-1 bg-base-100 sticky top-0">
 				<div class="flex justify-between items-center">

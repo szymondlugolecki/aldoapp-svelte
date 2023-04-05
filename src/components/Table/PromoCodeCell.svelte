@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { orderStatusList } from '$lib/client/constants';
+	import CellToolTip from '$components/CellToolTip.svelte';
+	import { dateParser } from '$lib/client/functions';
 	import { drawer } from '$lib/client/stores/adminDrawer';
 	import type { PromoCodeRowType, PromoCodeWithUsages } from '$types/PromoCodeTypes';
 
@@ -12,36 +13,24 @@
 {:else if rowType === 'discount'}
 	<span>{promoCode.discount}{promoCode.discountType === 'fixed' ? ' PLN' : '%'}</span>
 {:else if rowType === 'usages'}
-	<span>{promoCode.usages.length}</span>
+	<span>{promoCode.usages.length} {promoCode.usages.length === 1 ? 'raz' : 'razy'}</span>
 {:else if rowType === 'extraInfo'}
 	<div class="flex flex-col">
-		<span>Aktywowany: {promoCode.enabled ? 'Tak 🟢' : 'Nie 🔴'}</span>
+		<span>{promoCode.enabled ? 'Aktywowany 🟢' : 'Dezaktywowany 🔴'}</span>
 		<span>Limit na klienta: {promoCode.perUserLimit}</span>
 		<span>Całkowity limit: {promoCode.totalUseLimit}</span>
 	</div>
 {:else if rowType === 'validDateRange'}
-	<div class="flex flex-col">
-		<span
-			>{promoCode.validSince.toLocaleDateString('pl-PL', {
-				month: 'numeric',
-				day: 'numeric',
-				year: 'numeric',
-				hour: '2-digit',
-				minute: '2-digit',
-				second: '2-digit'
-			})}</span
-		>
+	<div class="flex flex-col items-start">
+		<CellToolTip
+			textData={dateParser(promoCode.validSince, 'short')}
+			tooltipData={dateParser(promoCode.validSince, 'medium')}
+		/>
 		<span>-</span>
-		<span
-			>{promoCode.validUntil.toLocaleDateString('pl-PL', {
-				month: 'numeric',
-				day: 'numeric',
-				year: 'numeric',
-				hour: '2-digit',
-				minute: '2-digit',
-				second: '2-digit'
-			})}</span
-		>
+		<CellToolTip
+			textData={dateParser(promoCode.validUntil, 'short')}
+			tooltipData={dateParser(promoCode.validUntil, 'medium')}
+		/>
 	</div>
 {:else if rowType === 'action'}
 	<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
@@ -70,23 +59,16 @@
 		Edytuj
 	</label>
 {:else if rowType === 'createdAt'}
-	<div
-		class="tooltip"
-		data-tip={promoCode.createdAt.toLocaleDateString('pl-PL', {
-			month: 'long',
-			day: 'numeric',
-			year: 'numeric',
-			hour: '2-digit',
-			minute: '2-digit',
-			second: '2-digit'
-		})}
-	>
-		<span
-			>{promoCode.createdAt.toLocaleDateString('pl-PL', {
-				month: 'short',
-				day: 'numeric',
-				year: 'numeric'
-			})}</span
-		>
+	<div class="flex flex-col items-start">
+		<CellToolTip
+			position="left"
+			textData={promoCode.author.fullName}
+			tooltipData={promoCode.author.email}
+		/>
+		<CellToolTip
+			position="left"
+			textData={dateParser(promoCode.createdAt, 'short')}
+			tooltipData={dateParser(promoCode.createdAt, 'long')}
+		/>
 	</div>
 {/if}

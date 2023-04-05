@@ -32,23 +32,23 @@
 
 	<div class="flex flex-col w-full h-full">
 		<Navbar user={data.user} />
-		{#if data.url.includes('/admin')}
-			<main
-				in:fade
-				class="min-h-[calc(100vh-65px)] flex px-1.5 xxs:px-2 sm:px-3 pt-1 sm:pt-2 pb-[65px] relative items-stretch"
-			>
-				<slot />
-			</main>
-		{:else}
+		<!-- {#if data.url.includes('/admin')} -->
+		<main
+			in:fade
+			class="w-full min-h-[calc(100vh-65px)] flex px-1.5 xs:px-2 sm:px-3 pt-1 sm:pt-2 pb-[65px] relative items-stretch"
+		>
+			<slot />
+		</main>
+		<!-- {:else}
 			{#key data.url}
 				<main
 					in:fade
-					class="min-h-[calc(100vh-65px)] flex px-1.5 xxs:px-2 sm:px-3 pt-1 sm:pt-2 pb-[65px] relative items-stretch"
+					class="min-h-[calc(100vh-65px)] flex px-1.5 xs:px-2 sm:px-3 pt-1 sm:pt-2 pb-[65px] relative items-stretch"
 				>
 					<slot />
 				</main>
 			{/key}
-		{/if}
+		{/if} -->
 	</div>
 	<Footer />
 </div>

@@ -133,3 +133,39 @@ export const arrayUniqueByKey = <T>(arr: T[], key: keyof T) =>
 			Array.isArray(arr) ? arr.filter(Boolean).map((item) => [item[key], item]) : []
 		).values()
 	] as T[];
+
+export const dateParser = (date: Date, format: 'short' | 'medium' | 'long') => {
+	switch (format) {
+		case 'short':
+			return date.toLocaleDateString('pl-PL', {
+				month: 'short',
+				day: 'numeric',
+				year: 'numeric'
+			});
+		case 'medium':
+			return date.toLocaleDateString('pl-PL', {
+				month: 'numeric',
+				day: 'numeric',
+				year: 'numeric',
+				hour: '2-digit',
+				minute: '2-digit',
+				second: '2-digit'
+			});
+		case 'long':
+			return date.toLocaleDateString('pl-PL', {
+				month: 'long',
+				day: 'numeric',
+				year: 'numeric',
+				hour: '2-digit',
+				minute: '2-digit',
+				second: '2-digit'
+			});
+		default:
+			return date.toLocaleDateString('pl-PL', {
+				month: 'short',
+				day: 'numeric',
+				year: 'numeric'
+			});
+			break;
+	}
+};

@@ -41,7 +41,7 @@ export const orderTable: Record<OrderRowType, string> = {
 	customer: 'Klient',
 	status: 'Status',
 	action: 'Akcja',
-	createdAt: 'Utworzono'
+	createdAt: 'Złożył(a)'
 };
 
 export const promoCodesTable: Record<PromoCodeRowType, string> = {
