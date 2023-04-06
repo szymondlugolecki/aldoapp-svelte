@@ -27,7 +27,10 @@
 					<li>{product.name}</li>
 				</ul>
 			</div>
-			<div class="mt-8 flex flex-col lg:flex-row items-center lg:items-baseline justify-center">
+			<!-- w-72 ss:w-80 md:w-64 -->
+			<div
+				class="mt-8 flex flex-col lg:flex-row items-center lg:items-start justify-start lg:justify-center 2xl:mr-64"
+			>
 				<div class="lg:col-span-3 lg:row-end-1">
 					<!-- All images -->
 					<div class="lg:flex lg:items-start">
@@ -58,9 +61,9 @@
 					</div>
 				</div>
 
-				<div class="divider divider-horizontal mx-24" />
+				<div class="divider divider-horizontal xl:mx-16" />
 
-				<div class="lg:col-span-2 lg:row-span-2 lg:row-end-2 max-w-[576px] lg:max-w-[340px]">
+				<div class="max-w-[576px] lg:max-w-[340px] lg:w-[300px] xl:w-auto">
 					<h1 class="text-2xl font-bold sm:text-3xl">{product.name}</h1>
 					<h2 class="text-lg mt-1">Kod produktu: {product.symbol}</h2>
 
@@ -79,62 +82,66 @@
 						</div>
 					</div>
 
-					<div class="mt-6 w-full flex space-x-4">
-						<button
-							type="button"
-							class="btn btn-primary flex-1"
-							on:click={() => {
-								addProduct(product);
-								toast('Dodano do koszyka', { icon: '🛒' });
-							}}>Dodaj do koszyka</button
+					<div>
+						<div
+							class="mt-6 w-full flex space-y-2 flex-col xs:space-x-4 xs:space-y-0 xs:flex-row lg:space-x-0 lg:space-y-2 lg:flex-col xl:space-x-4 xl:space-y-0 xl:flex-row"
 						>
+							<button
+								type="button"
+								class="btn btn-primary flex-1 w-full"
+								on:click={() => {
+									addProduct(product);
+									toast('Dodano do koszyka', { icon: '🛒' });
+								}}>Dodaj do koszyka</button
+							>
 
-						<a type="button" class="btn btn-ghost" href="/zamowienie/koszyk"
-							>Przejdź do koszyka <ShoppingCart class="ml-2.5" /></a
-						>
+							<a type="button" class="btn btn-md" href="/zamowienie/koszyk"
+								>Przejdź do koszyka <ShoppingCart class="ml-2.5" /></a
+							>
+						</div>
+
+						<div class="divider" />
+
+						<ul class="space-y-2">
+							<li class="flex items-center text-left text-sm font-medium text-gray-600">
+								<svg
+									class="mr-2 block h-5 w-5 align-middle text-gray-500"
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+										class=""
+									/>
+								</svg>
+								Darmowa dostawa
+							</li>
+
+							<li class="flex items-center text-left text-sm font-medium text-gray-600">
+								<svg
+									class="mr-2 block h-5 w-5 align-middle text-gray-500"
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+										class=""
+									/>
+								</svg>
+								14 dni na zwrot
+							</li>
+						</ul>
 					</div>
-
-					<div class="divider" />
-
-					<ul class="space-y-2">
-						<li class="flex items-center text-left text-sm font-medium text-gray-600">
-							<svg
-								class="mr-2 block h-5 w-5 align-middle text-gray-500"
-								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-									class=""
-								/>
-							</svg>
-							Darmowa dostawa
-						</li>
-
-						<li class="flex items-center text-left text-sm font-medium text-gray-600">
-							<svg
-								class="mr-2 block h-5 w-5 align-middle text-gray-500"
-								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-									class=""
-								/>
-							</svg>
-							14 dni na zwrot
-						</li>
-					</ul>
 				</div>
 
 				<!-- <div class="lg:col-span-3">

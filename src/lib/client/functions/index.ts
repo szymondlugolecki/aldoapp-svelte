@@ -6,9 +6,11 @@ import type {
 	ProductWithAuthorAndImage,
 	User,
 	UserFilter,
-	OrderFilter
+	OrderFilter,
+	Category
 } from '$types';
 import type { Thing, WithContext } from 'schema-dts';
+import { fodderCategories } from '../constants';
 
 export type Schema = Thing | WithContext<Thing>;
 
@@ -133,6 +135,10 @@ export const arrayUniqueByKey = <T>(arr: T[], key: keyof T) =>
 			Array.isArray(arr) ? arr.filter(Boolean).map((item) => [item[key], item]) : []
 		).values()
 	] as T[];
+
+export const isProperCategory = (category: string): category is Category => {
+	return category in fodderCategories;
+};
 
 export const dateParser = (date: Date, format: 'short' | 'medium' | 'long') => {
 	switch (format) {
