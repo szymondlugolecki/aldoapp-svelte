@@ -133,7 +133,6 @@ export const fodderCategories = {
 			id: 'sows-fodder'
 		}
 	],
-
 	backyard: []
 } as const;
 

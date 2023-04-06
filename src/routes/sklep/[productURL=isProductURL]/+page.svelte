@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { producentsList } from '$lib/client/constants';
+	import { fodderCategories, producentsList } from '$lib/client/constants';
 	import { addProduct } from '$lib/client/stores/cart';
 	import { ShoppingCart } from 'lucide-svelte';
 	import toast from 'svelte-french-toast';
@@ -15,6 +15,8 @@
 		}
 		return product.encodedURL === data.url.slice(index + 1);
 	});
+
+	let selectedImagePreview = 0;
 </script>
 
 {#if product}
@@ -39,7 +41,7 @@
 							<div class="max-w-xl overflow-hidden rounded-lg">
 								<img
 									class="h-[500px] w-full max-w-full object-cover"
-									src={product.images[0]}
+									src={product.images[selectedImagePreview]}
 									alt=""
 								/>
 							</div>
@@ -51,7 +53,8 @@
 								{#each product.images as image}
 									<button
 										type="button"
-										class="flex-0 aspect-square mb-3 h-20 overflow-hidden rounded-lg border-2 border-gray-900 text-center"
+										class="flex-0 aspect-square mb-3 h-20 overflow-hidden rounded-lg outline outline-2 outline-offset-2 outline-base-content text-center"
+										on:click={() => (selectedImagePreview = product.images.indexOf(image))}
 									>
 										<img class="h-full w-full object-cover" src={image} alt={product.name} />
 									</button>
@@ -96,7 +99,7 @@
 							>
 
 							<a type="button" class="btn btn-md" href="/zamowienie/koszyk"
-								>Przejdź do koszyka <ShoppingCart class="ml-2.5" /></a
+								>Otwórz koszyk <ShoppingCart class="ml-2.5" /></a
 							>
 						</div>
 
@@ -153,5 +156,5 @@
 		<!-- <div class="divider hidden md:flex md:divider-horizontal" /> -->
 	</section>
 {:else}
-	<h1>Nie znaleziono produktu</h1>
+	<h1 class="text-xl">Nie znaleziono produktu ☹️</h1>
 {/if}

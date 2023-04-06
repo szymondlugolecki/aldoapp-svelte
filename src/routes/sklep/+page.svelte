@@ -88,8 +88,6 @@
 		.filter((product) => categoryFilter($selectedCategories, product));
 	// Sort the images by their index
 
-	let productsFilterDrawer: HTMLInputElement;
-
 	$: console.log(data.products);
 </script>
 

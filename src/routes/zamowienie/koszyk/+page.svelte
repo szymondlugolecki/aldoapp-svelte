@@ -127,4 +127,10 @@
 			<div class="divider" />
 		{/each}
 	</div> -->
+
 <!-- {/if} -->
+<style>
+	.table th:first-child {
+		position: static;
+	}
+</style>

@@ -193,7 +193,7 @@
 			>
 		</div>
 	{:else}
-		<ul class="steps py-2">
+		<ul class="steps py-2 steps-vertical xs:steps-horizontal">
 			<li data-content="🛒" class="step {stageIndex >= 0 ? 'step-primary' : 'step-neutral'}">
 				{stageNames[0]}
 			</li>
