@@ -31,7 +31,7 @@
 	}
 
 	function showToast() {
-		toast.success('Poggerson XD');
+		toast.success('Testowe Powiadomienie');
 	}
 </script>
 
@@ -46,9 +46,10 @@
 <section class="h-full w-full px-3 py-2">
 	<h1 class="text-3xl">Strona główna</h1>
 	<h2 class="text-xl">Na razie nic tu nie ma... 😌</h2>
-	<button on:click={session} class="px-3 py-2 bg-gray-800 text-white text-lg">Get session</button>
-	<button on:click={showToast} class="px-3 py-2 bg-gray-800 text-white text-lg">Poggers xD</button>
-	<span>{JSON.stringify(sessionData)}</span>
+	<!-- <button on:click={session} class="px-3 py-2 bg-gray-800 text-white text-lg">Get session</button> -->
+	<button on:click={showToast} class="px-3 py-2 bg-gray-800 text-white text-lg"
+		>Testowe powiadomienie</button
+	>
 	<!-- <button
 		on:click={() => {
 			subscribe();

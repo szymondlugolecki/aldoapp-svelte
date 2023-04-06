@@ -25,8 +25,10 @@ const remove: Action = async ({ request, locals }) => {
 		});
 	}
 
-	const data = Object.fromEntries(formData);
-	console.log('data', data);
+	const data = {
+		...Object.fromEntries(formData),
+		id: Number(Object.fromEntries(formData).id)
+	};
 
 	// Validate the user input
 	const [removeProductObj, removeProductSchemaError] = betterZodParse(removeProductSchema, data);

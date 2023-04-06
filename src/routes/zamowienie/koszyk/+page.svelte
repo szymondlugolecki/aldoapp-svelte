@@ -17,8 +17,8 @@
 			<tr>
 				<th>Zdjęcie</th>
 				<th>Produkt</th>
-				<th>Ilość</th>
 				<th>Cena (PLN)</th>
+				<th>Ilość</th>
 				<th>Usuń</th>
 			</tr>
 		</thead>
@@ -42,6 +42,7 @@
 							<small class="text-xs sm:text-sm lg:text-base">{product.price} zł / szt.</small>
 						</div>
 					</td>
+					<td class="min-w-[130px]">{(product.quantity * Number(product.price)).toFixed(2)}</td>
 					<td>
 						<div class="flex">
 							<button class="btn btn-square" on:click={() => incrementProduct(product.id)}>
@@ -59,7 +60,6 @@
 							</button>
 						</div>
 					</td>
-					<td class="min-w-[130px]">{(product.quantity * Number(product.price)).toFixed(2)}</td>
 					<td
 						><button
 							class="btn btn-ghost"

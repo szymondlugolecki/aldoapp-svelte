@@ -24,7 +24,7 @@
 </script>
 
 {#if rowType === 'image'}
-	<a href={`${PUBLIC_WEBSITE_URL}/sklep/${product.symbol}`}>
+	<a href={`${PUBLIC_WEBSITE_URL}/sklep/${product.encodedURL}`}>
 		<img
 			class="max-h-24"
 			width="96px"

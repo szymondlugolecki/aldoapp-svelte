@@ -193,7 +193,7 @@
 			>
 		</div>
 	{:else}
-		<ul class="steps py-2 steps-vertical xs:steps-horizontal">
+		<ul class="steps py-2 container">
 			<li data-content="🛒" class="step {stageIndex >= 0 ? 'step-primary' : 'step-neutral'}">
 				{stageNames[0]}
 			</li>
@@ -203,9 +203,9 @@
 			<li data-content="💵" class="step {stageIndex >= 2 ? 'step-primary' : 'step-neutral'}">
 				{stageNames[2]}
 			</li>
-			<li data-content="👍" class="step {stageIndex >= 3 ? 'step-primary' : 'step-neutral'}">
+			<!-- <li data-content="👍" class="step {stageIndex >= 3 ? 'step-primary' : 'step-neutral'}">
 				{stageNames[3]}
-			</li>
+			</li> -->
 		</ul>
 
 		<div class="divider my-2 lg:my-4" />

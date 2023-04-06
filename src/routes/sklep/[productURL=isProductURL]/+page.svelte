@@ -3,6 +3,7 @@
 	import { addProduct } from '$lib/client/stores/cart';
 	import { ShoppingCart } from 'lucide-svelte';
 	import toast from 'svelte-french-toast';
+	import { fade, slide } from 'svelte/transition';
 
 	export let data;
 
@@ -49,11 +50,16 @@
 
 						<!-- Left Side Images -->
 						<div class="mt-2 lg:order-1 lg:flex-shrink-0">
-							<div class="flex flex-row items-start lg:flex-col">
-								{#each product.images as image}
+							<div
+								class="flex flex-row items-start lg:flex-col w-full mb-3 space-x-4 lg:space-x-0 lg:space-y-4"
+							>
+								{#each product.images.slice(0, 4) as image}
+									<!-- transition:fade={{ duration: 400 }} -->
 									<button
 										type="button"
-										class="flex-0 aspect-square mb-3 h-20 overflow-hidden rounded-lg outline outline-2 outline-offset-2 outline-base-content text-center"
+										class:outline={selectedImagePreview === product.images.indexOf(image)}
+										class:outline-2={selectedImagePreview === product.images.indexOf(image)}
+										class="flex-0 aspect-square h-20 overflow-hidden rounded-lg outline outline-offset-2 outline-base-content text-center"
 										on:click={() => (selectedImagePreview = product.images.indexOf(image))}
 									>
 										<img class="h-full w-full object-cover" src={image} alt={product.name} />

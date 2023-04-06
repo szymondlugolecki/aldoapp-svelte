@@ -85,7 +85,7 @@ const add: Action = async ({ request, locals }) => {
 					const imageBuffer = Buffer.from(imageArrayBuffer).toString('base64');
 					return await cloudinary.uploader.upload(`data:${image.type};base64,${imageBuffer}`, {
 						public_id: `products/${name}/${symbol}/${index}`,
-						background_removal: 'cloudinary_ai',
+						// background_removal: 'cloudinary_ai',
 						overwrite: true
 					});
 				});

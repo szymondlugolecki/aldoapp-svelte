@@ -13,6 +13,10 @@
 	// 	sub: null
 	// };
 
+	// export let data;
+
+	// $: console.log(data.products.map((product) => product.images));
+
 	let productsFilterDrawer: HTMLInputElement;
 </script>
 
