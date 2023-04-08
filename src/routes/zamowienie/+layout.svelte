@@ -15,6 +15,7 @@
 	import type { CartProduct } from '$types';
 	import type { Optional } from '$types/UtilityTypes';
 	import { number } from 'zod';
+	import { goto } from '$app/navigation';
 
 	export let data;
 
@@ -117,7 +118,7 @@
 		try {
 			const createOrderPromise = wretch('/api/order/create')
 				.post(order)
-				.json<{ success: true; orderId: string }>();
+				.json<{ success: true; orderId: number }>();
 
 			toast.promise(createOrderPromise, {
 				error: 'Nie udało się złożyć zamówienia',
@@ -126,6 +127,10 @@
 			});
 
 			const data = await createOrderPromise;
+
+			changeCartState('finished');
+
+			goto(`/zamowienie/potwierdzenie/${data.orderId}`);
 
 			// toast.success('Pomyślnie złożono zamówienie');
 
@@ -229,7 +234,7 @@
 					</div>
 					<div class="flex justify-between items-center">
 						<span class="text-base">Przesyłka</span>
-						<bold class="font-semibold text-base">{(10).toFixed(2)} PLN</bold>
+						<bold class="font-semibold text-base">{(0).toFixed(2)} PLN</bold>
 					</div>
 					<div class="flex justify-between items-center">
 						<span class="text-base">VAT</span>
@@ -237,12 +242,13 @@
 					</div>
 					<div class="flex justify-between items-center">
 						<span class="text-base">Rabat</span>
-						<bold class="font-semibold text-base">{0} PLN</bold>
+						<bold class="font-semibold text-base">{(0).toFixed(2)} PLN</bold>
 					</div>
 					<div class="flex justify-between items-center">
 						<bold class="font-bold text-base">Suma całkowita</bold>
 						<bold class="font-bold text-base"
-							>{(subtotal + 10 + subtotal * 0.23).toFixed(2)} PLN</bold
+							>{(Number(subtotal.toFixed(2)) + Number((subtotal * 0.23).toFixed(2))).toFixed(2)}
+							PLN</bold
 						>
 					</div>
 				</div>

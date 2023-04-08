@@ -189,7 +189,7 @@
 </div>
 {#if !productsFiltered.length}
 	<div class="flex flex-col justify-center items-center pb-3 mb-3" in:slide={{ axis: 'y' }}>
-		<h2 class="text-2xl text-center">Brak wyników... 🤔</h2>
-		<h3 class="text-lg text-center">Spróbuj wybrać inną kategorię 💡</h3>
+		<h2 class="text-2xl text-center">🤔 Brak wyników...</h2>
+		<h3 class="text-lg text-center">Spróbuj wybrać inną kategorię</h3>
 	</div>
 {/if}

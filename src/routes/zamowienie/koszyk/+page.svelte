@@ -4,7 +4,9 @@
 </script>
 
 <svelte:head>
-	<title>Koszyk {$cart.products.length ? `(${$cart.products.length}) ` : ''}• Twoje ALDO</title>
+	<title
+		>Koszyk {$cart && $cart.products.length ? `(${$cart.products.length}) ` : ''}• Twoje ALDO</title
+	>
 	<meta name="description" content="Twój koszyk. Dokończ zamówienie." />
 </svelte:head>
 

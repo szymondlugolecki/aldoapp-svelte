@@ -12,7 +12,7 @@
 {#if rowType === 'products'}
 	<ul>
 		{#each order.products as product}
-			<li>{product.quantity}x{product.productId}</li>
+			<li>{product.quantity}x"{product.productId}"</li>
 		{/each}
 	</ul>
 {:else if rowType === 'customer'}

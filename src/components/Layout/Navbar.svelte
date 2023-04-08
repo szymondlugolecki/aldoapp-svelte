@@ -156,7 +156,10 @@
 								>Suma: {$cart
 									? $cart.products
 											.map(({ price, quantity }) => [price, quantity])
-											.reduce((prev, [price, quantity]) => prev + price * quantity, 0)
+											.reduce(
+												(prev, [price, quantity]) => prev + Number(price) * Number(quantity),
+												0
+											)
 											.toFixed(2)
 									: 0} PLN</span
 							>

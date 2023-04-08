@@ -3,11 +3,16 @@
 </script>
 
 {#if type === 'success'}
-	<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
+	<svg
+		class="text-primary w-[60px] ss:w-[70px]"
+		version="1.1"
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 130.2 130.2"
+	>
 		<circle
 			class="path circle"
 			fill="none"
-			stroke="#51cf66"
+			stroke="currentColor"
 			stroke-width="6"
 			stroke-miterlimit="10"
 			cx="65.1"
@@ -17,7 +22,7 @@
 		<polyline
 			class="path check"
 			fill="none"
-			stroke="#51cf66"
+			stroke="currentColor"
 			stroke-width="6"
 			stroke-linecap="round"
 			stroke-miterlimit="10"
@@ -25,7 +30,12 @@
 		/>
 	</svg>
 {:else if type === 'error'}
-	<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.2 130.2">
+	<svg
+		class="w-[60px] ss:w-[70px]"
+		version="1.1"
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 130.2 130.2"
+	>
 		<circle
 			class="path circle"
 			fill="none"
@@ -64,11 +74,9 @@
 {/if}
 
 <style>
-	svg {
-		width: 100px;
-		display: block;
-		margin: 40px auto 0;
-	}
+	/* svg {
+		width: 70px;
+	} */
 	.path {
 		stroke-dasharray: 1000;
 		stroke-dashoffset: 0;

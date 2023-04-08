@@ -82,6 +82,7 @@
 												main: category,
 												sub: null
 											};
+											goto('/sklep');
 										}}>{fodderNames[category]}</button
 									>
 								{:else}

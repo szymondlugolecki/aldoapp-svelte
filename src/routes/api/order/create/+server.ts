@@ -106,7 +106,7 @@ export async function POST({ request, locals }) {
 	}
 
 	const noDiscountPrice = productsList.reduce((prev, curr) => {
-		return prev + curr.price;
+		return prev + Number(curr.price);
 	}, 0);
 
 	// Make sure the price is not 0
@@ -148,7 +148,7 @@ export async function POST({ request, locals }) {
 				acc = { ...promoCode, usages: [] };
 			}
 
-			if (usage) {
+			if (usage && acc) {
 				acc.usages.push(usage.userId);
 			}
 
@@ -163,7 +163,7 @@ export async function POST({ request, locals }) {
 			}
 
 			// discountPrice or noDiscountPrice?
-			if (parsedPromoCode.minCartValue < noDiscountPrice) {
+			if (Number(parsedPromoCode.minCartValue) < noDiscountPrice) {
 				throw error(
 					400,
 					`Podany kod rabatowy działa tylko na koszyk o minimalnej kwocie ${parsedPromoCode.minCartValue} zł`
@@ -195,9 +195,9 @@ export async function POST({ request, locals }) {
 
 			// Calculate the discount
 			if (parsedPromoCode.discountType === 'fixed') {
-				discountPrice = noDiscountPrice - parsedPromoCode.discount;
+				discountPrice = noDiscountPrice - Number(parsedPromoCode.discount);
 			} else if (parsedPromoCode.discountType === 'percentage') {
-				discountPrice = noDiscountPrice - (noDiscountPrice * parsedPromoCode.discount) / 100;
+				discountPrice = noDiscountPrice - (noDiscountPrice * Number(parsedPromoCode.discount)) / 100;
 			}
 		}
 	}
@@ -212,8 +212,8 @@ export async function POST({ request, locals }) {
 		status: 'pending',
 		promoCodeId: null,
 		orderHistory: [orderHistoryEvent],
-		price: discountPrice,
-		discount: noDiscountPrice - discountPrice
+		price: discountPrice.toString(),
+		discount: (noDiscountPrice - discountPrice).toString()
 	};
 
 	console.log('putting this order into the db', newOrder);
@@ -230,9 +230,12 @@ export async function POST({ request, locals }) {
 		);
 	}
 
+	console.log(query, query.insertId);
+
 	await sleep(3);
 
 	return json({
-		success: true
+		success: true,
+		orderId: Number(query.insertId), 
 	});
 }

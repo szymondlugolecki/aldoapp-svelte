@@ -26,8 +26,8 @@
 			<thead class="text-xs uppercase">
 				<tr>
 					<th scope="col" class="px-3 sm:px-6 py-3"> Punkt sprzedaży </th>
-					<th scope="col" class="px-3 sm:px-6 py-3"> Numer telefonu </th>
-					<th scope="col" class="px-3 sm:px-6 py-3"> Akcja </th>
+					<th scope="col" class="px-3 sm:px-6 py-3"> Numery telefonu </th>
+					<!-- <th scope="col" class="px-3 sm:px-6 py-3"> Akcja </th> -->
 				</tr>
 			</thead>
 			<tbody>
@@ -38,14 +38,14 @@
 						</th>
 						<td class="px-3 sm:px-6 py-4 space-y-4 whitespace-nowrap">
 							{#each data[1] as number}
-								<span class="block">{number}</span>
+								<a href={`tel:+48${number}`} class="block">{number}</a>
 							{/each}
 						</td>
-						<td class="px-3 sm:px-6 py-4 space-y-4 whitespace-nowrap">
+						<!-- <td class="px-3 sm:px-6 py-4 space-y-4 whitespace-nowrap">
 							{#each data[1] as number}
 								<a class="block hover:text-primary" href={`tel:+48${number}`}>Zadzwoń 📞</a>
 							{/each}
-						</td>
+						</td> -->
 					</tr>
 				{/each}
 			</tbody>

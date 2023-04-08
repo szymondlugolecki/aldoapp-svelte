@@ -3,10 +3,10 @@ import type { CartProductWithQuantity, StoreProduct } from '$types';
 import { persisted } from 'svelte-local-storage-store';
 import type { DeliveryMethod, PaymentMethod } from '../constants/dbTypes';
 
-type CartStore = {
+export type CartStore = {
 	products: CartProductWithQuantity[];
 	// products: [CartProductWithQuantity, ...CartProductWithQuantity[]];
-	status: 'verified' | 'loading' | 'error' | 'not-verified';
+	status: 'verified' | 'loading' | 'error' | 'not-verified' | 'finished';
 	lastVerified: Date | null;
 	promoCode?: {
 		id?: number;
