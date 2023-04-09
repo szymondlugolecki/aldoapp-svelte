@@ -27,7 +27,7 @@ export const productTable = {
 
 export const orderStatusList: Record<OrderStatus | PaymentStatus | DeliveryStatus, string> = {
 	canceled: 'Anulowano',
-	pending: 'W toku',
+	pending: 'Oczekiwanie',
 	delivered: 'Dostarczono',
 	returned: 'Zwrócono',
 	shipped: 'Wysłano',

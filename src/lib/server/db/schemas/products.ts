@@ -103,6 +103,7 @@ export const orders = mysqlTable(
 		address: json('address').$type<Address>(),
 		customer: json('customer').$type<Customer>(),
 
+		estimatedDeliveryDate: timestamp('estimated_delivery_date'),
 		deliveryMethod: text('delivery_method', { enum: deliveryMethods }).notNull(),
 		paymentMethod: text('payment_method', { enum: paymentMethods }).notNull(),
 

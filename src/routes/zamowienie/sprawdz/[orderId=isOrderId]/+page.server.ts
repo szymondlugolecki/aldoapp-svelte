@@ -1,18 +1,21 @@
 import { db } from '$lib/server/db/index.js';
-import { orders } from '$lib/server/db/schemas/products.js';
+import { orders, products } from '$lib/server/db/schemas/products.js';
 import { getRoleRank } from '$lib/server/functions/auth';
 import { error } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm/expressions.js';
+import { eq, inArray } from 'drizzle-orm/expressions.js';
 
 export const load = async ({ params, locals }) => {
 	const sessionUser = locals.session?.user;
-	// only logged in user can see their orders
-	// 1. must be logged in
-	// 2. it must be their order
+	// In order to see order details, user must be:
+	// 1. logged in
+	// 2a. must be the owner of the order
+	// 2b. must be an admin/mod
 
 	if (!sessionUser) {
 		throw error(401, 'Nie jesteś zalogowany');
 	}
+
+	const roleRank = getRoleRank(sessionUser.role);
 
 	const [queriedOrder] = await db
 		.select({
@@ -26,22 +29,55 @@ export const load = async ({ params, locals }) => {
 			customerId: orders.customerId,
 			address: orders.address,
 			products: orders.products,
-			price: orders.price
+			price: orders.price,
+			discount: orders.discount,
+			customer: orders.customer,
+			estimatedDeliveryDate: orders.estimatedDeliveryDate
 		})
 		.from(orders)
+		// .leftJoin(
+		// 	sql`JSON_TABLE(orders.products, '$[*]' COLUMNS (productId INT PATH '$.productId', quantity INT PATH '$.quantity')) AS op`,
+		// 	sql`1=1`
+		// )
+		// // .leftJoin(sql`products`, sql`op.productId = products.id`)
 		.where(eq(orders.id, Number(params.orderId)));
+
+	console.log('queriedOrder', queriedOrder);
 
 	if (!queriedOrder) {
 		throw error(404, 'Nie znaleziono zamówienia');
 	}
 
-	const roleRank = getRoleRank(sessionUser.role);
-
 	if (sessionUser.id !== queriedOrder.customerId && roleRank < 1) {
 		throw error(401, 'Nie masz uprawnień do przeglądania tego zamówienia');
 	}
 
+	const queriedProducts = await db
+		.select({
+			id: products.id,
+			name: products.name,
+			price: products.price,
+			symbol: products.symbol,
+			images: products.images
+		})
+		.from(products)
+		.where(
+			inArray(
+				products.id,
+				queriedOrder.products.map((p) => p.productId)
+			)
+		);
+
+	if (!queriedProducts) {
+		throw error(404, 'Nie udało się wczytać zamówionych produktów');
+	}
+
+	if (queriedProducts.length !== queriedOrder.products.length) {
+		throw error(404, 'Nie udało się wczytać wszystkich zamówionych produktów');
+	}
+
 	return {
-		order: queriedOrder
+		order: queriedOrder,
+		products: queriedProducts
 	};
 };
