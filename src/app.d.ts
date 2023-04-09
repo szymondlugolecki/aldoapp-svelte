@@ -2,6 +2,15 @@
 // import type { ILazyLoadInstance } from 'vanilla-lazyload';
 import type { SessionUser } from '$types';
 
+interface BeforeInstallPromptEvent extends Event {
+	readonly platforms: string[];
+	readonly userChoice: Promise<{
+	  outcome: "accepted" | "dismissed";
+	  platform: string;
+	}>;
+	prompt(): Promise<void>;
+  }
+
 // for information about these interfaces
 declare global {
 	// interface Document {
@@ -19,6 +28,10 @@ declare global {
 			user: SessionUser | undefined;
 		}
 		// interface Platform {}
+
+		interface WindowEventMap {
+			beforeinstallprompt: BeforeInstallPromptEvent;
+		  }
 	}
 
 	declare namespace svelteHTML {

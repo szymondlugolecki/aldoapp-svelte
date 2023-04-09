@@ -118,7 +118,7 @@
 		try {
 			const createOrderPromise = wretch('/api/order/create')
 				.post(order)
-				.json<{ success: true; orderId: number }>();
+				.json<{ success: true; orderId: number; message?: string }>();
 
 			toast.promise(createOrderPromise, {
 				error: 'Nie udało się złożyć zamówienia',
@@ -127,6 +127,11 @@
 			});
 
 			const data = await createOrderPromise;
+
+			if (data.message) {
+				toast.error(data.message);
+				return;
+			}
 
 			changeCartState('finished');
 

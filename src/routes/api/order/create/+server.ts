@@ -1,5 +1,6 @@
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { orderCustomerValidation, serverOrderValidation } from '$lib/client/schemas/order';
+import { sendOrderConfirmationEmail } from '$lib/server/clients/sendGridClient';
 // import { p } from '$lib/server/clients/pClient';
 import { db } from '$lib/server/db';
 import {
@@ -9,7 +10,7 @@ import {
 	type OrderHistoryEvent
 } from '$lib/server/db/schemas/products';
 import { promoCodes, promoCodeUsages } from '$lib/server/db/schemas/promoCodes';
-import { sleep } from '$lib/server/functions/utils';
+// import { sleep } from '$lib/server/functions/utils';
 import type { PromoCodeWithUsages } from '$types/PromoCodeTypes';
 // import type { Optional } from '$types/UtilityTypes';
 import { trytm } from '@bdsqqq/try';
@@ -197,7 +198,8 @@ export async function POST({ request, locals }) {
 			if (parsedPromoCode.discountType === 'fixed') {
 				discountPrice = noDiscountPrice - Number(parsedPromoCode.discount);
 			} else if (parsedPromoCode.discountType === 'percentage') {
-				discountPrice = noDiscountPrice - (noDiscountPrice * Number(parsedPromoCode.discount)) / 100;
+				discountPrice =
+					noDiscountPrice - (noDiscountPrice * Number(parsedPromoCode.discount)) / 100;
 			}
 		}
 	}
@@ -230,12 +232,40 @@ export async function POST({ request, locals }) {
 		);
 	}
 
-	console.log(query, query.insertId);
+	// await sleep(3);
 
-	await sleep(3);
+	const orderId = Number(query.insertId);
+
+	const [, sendEmailError] = await trytm(
+		sendOrderConfirmationEmail({
+			receiver: sessionUser.email,
+			templateData: {
+				order_id: orderId,
+				discount_price: discountPrice.toFixed(2),
+				no_discount_price: noDiscountPrice.toFixed(2),
+				discount: (noDiscountPrice - discountPrice).toFixed(2),
+				phone_number: sessionUser.phone,
+				full_name: sessionUser.fullName,
+				first_name: sessionUser.fullName.split(' ')[0],
+				address_1: order.address ? `${order.address.city}, ${order.address.zipCode}` : '',
+				address_2: order.address ? order.address.street : '',
+				delivery_method: '',
+				payment_method: 'Gotówka'
+			}
+		})
+	);
+
+	if (sendEmailError) {
+		// Unexpected-error
+		return json({
+			success: true,
+			message: 'Przepraszamy, nie udało się wysłać maila z potwierdzeniem zamówienia',
+			orderId
+		});
+	}
 
 	return json({
 		success: true,
-		orderId: Number(query.insertId), 
+		orderId
 	});
 }

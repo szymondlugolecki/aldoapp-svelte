@@ -92,7 +92,8 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 		email: token.email,
 		role: token.role,
 		fullName: token.fullName,
-		access: token.access
+		access: token.access,
+		phone: token.phone,
 	} satisfies Optional<typeof token, 'expiresAt'>;
 
 	console.log('verify', token.id);

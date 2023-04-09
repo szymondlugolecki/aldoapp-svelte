@@ -11,9 +11,13 @@
 
 {#if rowType === 'products'}
 	<ul>
-		{#each order.products as product}
+		{#each order.products.slice(0, 3) as product}
 			<li>{product.quantity}x"{product.productId}"</li>
 		{/each}
+
+		{#if order.products.length > 3}
+			<li>i {order.products.length - 3} więcej...</li>
+		{/if}
 	</ul>
 {:else if rowType === 'customer'}
 	{#if order.customer}

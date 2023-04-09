@@ -2,7 +2,7 @@
 	import '../app.css';
 	import Navbar from '../components/Layout/Navbar.svelte';
 	import Footer from '../components/Layout/Footer.svelte';
-	import { fade, fly } from 'svelte/transition';
+	import { fade } from 'svelte/transition';
 	import toast, { Toaster } from 'svelte-french-toast';
 
 	import { onMount } from 'svelte';
@@ -10,6 +10,9 @@
 	import { settings } from '$lib/client/stores/settings';
 	import { base64StringToUint8Arr } from '$lib/client/functions/base64StringToUint8Arr';
 	import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public';
+	import type { BeforeInstallPromptEvent } from '../app';
+
+	let deferredInstallEvent: BeforeInstallPromptEvent | undefined = undefined;
 
 	// NOTE: the element that is using one of the theme attributes must be in the DOM on mount
 	onMount(async () => {
@@ -19,7 +22,32 @@
 		// setInterval(() => {
 		// 	toast('Jaroslaw wlasnie kupil Pasze ALDO Premium', { icon: '🔔' });
 		// }, 1000 * 30);
+
+		console.log('mount');
+
+		window.addEventListener('beforeinstallprompt', (e) => {
+			console.log('before install prompt', e);
+			// e.preventDefault();
+			toast.success('Before install prompt!');
+			deferredInstallEvent = e as BeforeInstallPromptEvent;
+		});
 	});
+
+	async function handleInstall() {
+		if (deferredInstallEvent) {
+			deferredInstallEvent.prompt();
+			let choice = await deferredInstallEvent.userChoice;
+			if (choice.outcome === 'accepted') {
+				// User accepted to install the application
+				console.log('user accepted');
+			} else {
+				// User dismissed the prompt
+				console.log('user dismissed');
+			}
+		}
+
+		deferredInstallEvent = undefined;
+	}
 
 	export let data;
 </script>
@@ -32,23 +60,15 @@
 
 	<div class="flex flex-col w-full h-full">
 		<Navbar user={data.user} />
-		<!-- {#if data.url.includes('/admin')} -->
 		<main
 			in:fade
 			class="w-full min-h-[calc(100vh-65px)] flex px-1.5 xs:px-2 sm:px-3 pt-1 sm:pt-2 pb-[65px] relative items-stretch"
 		>
 			<slot />
 		</main>
-		<!-- {:else}
-			{#key data.url}
-				<main
-					in:fade
-					class="min-h-[calc(100vh-65px)] flex px-1.5 xs:px-2 sm:px-3 pt-1 sm:pt-2 pb-[65px] relative items-stretch"
-				>
-					<slot />
-				</main>
-			{/key}
-		{/if} -->
+		{#if deferredInstallEvent}
+			<button class="btn btn-ghost" on:click={handleInstall}>Install</button>
+		{/if}
 	</div>
 	<Footer />
 </div>
