@@ -2,8 +2,9 @@ import { db } from '$lib/server/db/index.js';
 import { orders } from '$lib/server/db/schemas/products.js';
 import { users } from '$lib/server/db/schemas/users.js';
 import { getRoleRank } from '$lib/server/functions/auth';
+import { trytm } from '@bdsqqq/try';
 import { error } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm/expressions.js';
+import { desc, eq } from 'drizzle-orm/expressions.js';
 
 export const load = async ({ params, locals }) => {
 	const sessionUser = locals.session?.user;
@@ -24,30 +25,44 @@ export const load = async ({ params, locals }) => {
 		userId = sessionUser.id;
 	}
 
-	const userData = await db
-		.select({
-			user: users,
-			orders
-		})
-		.from(users)
-		.leftJoin(orders, eq(users.id, orders.customerId))
-		.where(eq(users.id, userId));
+	const fetchOrders = db
+		.select()
+		.from(orders)
+		.orderBy(desc(orders.id))
+		.where(eq(orders.customerId, userId));
+	const fetchUser = db.select().from(users).where(eq(users.id, userId));
+
+	const [dbData, dbFetchError] = await trytm(Promise.all([fetchUser, fetchOrders]));
+
+	if (dbFetchError) {
+		throw error(500, 'Wystąpił błąd podczas pobierania danych');
+	}
+
+	const [usersData, ordersData] = dbData;
+
+	// const userData = await db
+	// 	.select({
+	// 		user: users,
+	// 		orders
+	// 	})
+	// 	.from(users)
+	// 	.leftJoin(orders, eq(users.id, orders.customerId))
+	// 	.where(eq(users.id, userId));
 
 	// console.log('userData', userData);
+
+	const userData = usersData[0];
 
 	if (!userData) {
 		throw error(404, 'Nie znaleziono użytkownika');
 	}
 
-	if (!userData[0] || !userData[0].user) {
-		throw error(404, 'Nie znaleziono użytkownika');
-	}
-
-	if (sessionUser.id !== userData[0].user.id && roleRank < 1) {
+	if (sessionUser.id !== userData.id && roleRank < 1) {
 		throw error(401, 'Nie masz uprawnień do przeglądania tego profilu');
 	}
 
 	return {
+		orders: ordersData,
 		userData
 	};
 };

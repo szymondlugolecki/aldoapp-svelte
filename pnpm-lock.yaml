@@ -20,8 +20,8 @@ specifiers:
   cloudinary: ^1.35.0
   daisyui: ^2.51.3
   dotenv: ^16.0.3
-  drizzle-kit: 0.17.1-609a4f0
-  drizzle-orm: ^0.23.6
+  drizzle-kit: 0.17.4
+  drizzle-orm: ^0.23.10
   eslint: ^8.35.0
   eslint-config-prettier: ^8.7.0
   eslint-plugin-svelte3: ^4.0.0
@@ -55,7 +55,7 @@ dependencies:
   cloudinary: 1.35.0
   daisyui: 2.51.4_j7yt3jd32cwenjqavrrga47yr4
   dotenv: 16.0.3
-  drizzle-orm: 0.23.6_yjazpptyy5hkedviejakk766iq
+  drizzle-orm: 0.23.10_yjazpptyy5hkedviejakk766iq
   jose: 4.13.1
   lucide-svelte: 0.113.0_svelte@3.57.0
   schema-dts: 1.1.2_typescript@4.9.5
@@ -82,7 +82,7 @@ devDependencies:
   '@vite-pwa/sveltekit': 0.2.0_cyr67kkeq544aq22jzbt4y5hjy
   '@zerodevx/svelte-img': 1.2.10_hgpqesmt7lo64t7vigy4pfv2ga
   autoprefixer: 10.4.14_postcss@8.4.21
-  drizzle-kit: 0.17.1-609a4f0
+  drizzle-kit: 0.17.4
   eslint: 8.36.0
   eslint-config-prettier: 8.8.0_eslint@8.36.0
   eslint-plugin-svelte3: 4.0.0_wzem237sbvnwe7n34ytc5phasy
@@ -2958,8 +2958,8 @@ packages:
       wordwrap: 1.0.0
     dev: true
 
-  /drizzle-kit/0.17.1-609a4f0:
-    resolution: {integrity: sha512-bXflv8YQPe8gE+OSqllxVJEiwzupHjzu6tcBqfO4avrlspiP3shFJfDuHeiv+ztpKcG+8KXAuuFRIplJtD89LA==}
+  /drizzle-kit/0.17.4:
+    resolution: {integrity: sha512-9OuHsZBxS1IkWnF9vFeTWR5XH9UCv4SclfPaFt7he8TPVzDka5vpGmhNh9Oaj+OZg6Pf4PSV2Yt8X3c44ayHVA==}
     hasBin: true
     dependencies:
       camelcase: 7.0.1
@@ -2970,14 +2970,13 @@ packages:
       glob: 8.1.0
       hanji: 0.0.5
       json-diff: 0.9.0
-      minimatch: 7.4.3
       zod: 3.21.4
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /drizzle-orm/0.23.6_yjazpptyy5hkedviejakk766iq:
-    resolution: {integrity: sha512-bVJS5elA/36J//s5K8P8oyB0YDZiTidBQQEUzTtp6As/i4GNvuskByG3e+2NfbmF5KH9e4WpWuavXf0iSLnQPg==}
+  /drizzle-orm/0.23.10_yjazpptyy5hkedviejakk766iq:
+    resolution: {integrity: sha512-JCmLGwuJRn546/fg8ndKhtti2F5h1VSwRWrmEcS0Nc8Dp8hjE4lrv1kpF1itcJviAQY+HmleYj3UCFqpr5sF6w==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=3'
@@ -4562,13 +4561,6 @@ packages:
 
   /minimatch/5.1.6:
     resolution: {integrity: sha512-lKwV/1brpG6mBUFHtb7NUmtABCb2WZZmm2wNiOA5hAb8VdCS4B3dtMWyvcoViccwAW/COERjXLt0zP1zXUN26g==}
-    engines: {node: '>=10'}
-    dependencies:
-      brace-expansion: 2.0.1
-    dev: true
-
-  /minimatch/7.4.3:
-    resolution: {integrity: sha512-5UB4yYusDtkRPbRiy1cqZ1IpGNcJCGlEMG17RKzPddpyiPKoCdwohbED8g4QXT0ewCt8LTkQXuljsUfQ3FKM4A==}
     engines: {node: '>=10'}
     dependencies:
       brace-expansion: 2.0.1

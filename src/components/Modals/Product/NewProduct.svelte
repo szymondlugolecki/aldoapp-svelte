@@ -55,7 +55,7 @@
 		if (!browser) return;
 		const newFile = e.currentTarget.files && e.currentTarget.files[0];
 		if (newFile) {
-			const imageId = randomId(15); // crypto.randomUUID();
+			const imageId = crypto.randomUUID();
 			const uniqueFile: FileWithBase64 = Object.assign(newFile, { base64: undefined });
 			images[imageId] = uniqueFile;
 			addBase64ToFile(imageId);

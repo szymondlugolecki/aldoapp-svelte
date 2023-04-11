@@ -9,6 +9,11 @@ import { trytm } from '@bdsqqq/try';
 import { json, error } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm/expressions';
 import type { PushSubscription } from 'web-push';
+import type { Config } from '@sveltejs/adapter-vercel';
+
+export const config: Config = {
+	runtime: 'nodejs18.x'
+};
 
 export async function POST({ request, locals }) {
 	if (!locals.session) {

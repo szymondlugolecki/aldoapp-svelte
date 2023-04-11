@@ -8,6 +8,8 @@ import type {
 import type { Order } from '$lib/server/db/schemas/products';
 import type { User } from './UserTypes';
 
+export type { Order };
+
 export type OrderRowType = 'products' | 'customer' | 'status' | 'action' | 'createdAt';
 
 export type OrderFilter = {
