@@ -1,4 +1,3 @@
-import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 import type { Order } from '$lib/server/db/schemas/products';
 import type {
 	ProductAuthor,
@@ -22,11 +21,6 @@ export const productURLParser = (name: string, symbol: string) => {
 	return encodeURIComponent(
 		`${name}-${symbol}`.replaceAll('  ', ' ').replaceAll(' ', '-').toLowerCase().trim()
 	);
-};
-
-export const getProductImageURL = (image: string | null) => {
-	if (!image) return null;
-	return `${PUBLIC_WEBSITE_URL}/products/${image}`;
 };
 
 export const capitalize = (text: string) => {

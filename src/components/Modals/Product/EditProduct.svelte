@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { enhance } from '$app/forms';
-	import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 	import { fodderCategories, fodderNames } from '$lib/client/constants';
 	import { mainCategories } from '$lib/client/constants/dbTypes';
 	import createLoadingToast from '$lib/client/functions/createLoadingToast';

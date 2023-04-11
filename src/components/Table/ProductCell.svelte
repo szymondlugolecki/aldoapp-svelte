@@ -1,6 +1,5 @@
 <script lang="ts">
 	import CellToolTip from '$components/CellToolTip.svelte';
-	import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 	import { fodderCategories, fodderNames, producentsList, roleNames } from '$lib/client/constants';
 	import { dateParser } from '$lib/client/functions';
 	import { drawer } from '$lib/client/stores/adminDrawer';
@@ -24,7 +23,7 @@
 </script>
 
 {#if rowType === 'image'}
-	<a href={`${PUBLIC_WEBSITE_URL}/sklep/${product.encodedURL}`}>
+	<a href="/sklep/{product.encodedURL}">
 		<img
 			class="max-h-24"
 			width="96px"
