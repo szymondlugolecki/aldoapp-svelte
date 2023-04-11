@@ -18,7 +18,6 @@
 		const deliveryDays = 3;
 		let orderCreatedAtTs = orderCreatedAt.getTime() + deliveryDays * DAY;
 		const dayInXDays = new Date(orderCreatedAtTs).getDay();
-		console.log('dayInXDays', dayInXDays);
 		if (dayInXDays === 6) {
 			// if its saturday in X days, add 2 more days (so its monday)
 			orderCreatedAtTs += 2 * DAY;

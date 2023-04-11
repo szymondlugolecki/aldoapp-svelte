@@ -85,7 +85,7 @@
 			</div>
 		</div>
 		<div class="flex-none flex items-center">
-			<button
+			<!-- <button
 				aria-label="Zmień szatę graficzną"
 				on:click={nextTheme}
 				tabindex="0"
@@ -98,7 +98,7 @@
 						<Moon class="swap-off text-sky-500" />
 					{/if}
 				</div>
-			</button>
+			</button> -->
 			{#if user}
 				<div class="dropdown dropdown-end">
 					<label for="cart" tabindex="-1" class="btn btn-ghost btn-circle">

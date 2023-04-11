@@ -22,8 +22,6 @@
 	const synchronizeCart = async () => {
 		const productIds = $cart ? $cart.products.map((product) => product.id) : [];
 
-		console.log('urlXD', data.url);
-
 		if (!productIds.length) return;
 
 		if (!data.url.toLowerCase().endsWith('/zamowienie/koszyk') || $cart.status === 'verified')
@@ -46,8 +44,6 @@
 			});
 
 			const cartData = await syncCartPromise;
-
-			console.log('cartData', cartData);
 
 			const cartLocalProducts = cartData.products.map((product) => {
 				return {
@@ -187,8 +183,8 @@
 		3: true
 	} as Record<number, boolean>;
 
-	$: console.log('stepsPassed', stepsPassed);
-	$: console.log('cart', $cart);
+	// $: console.log('stepsPassed', stepsPassed);
+	// $: console.log('cart', $cart);
 </script>
 
 <section class="w-full flex flex-col items-center justify-center">

@@ -88,7 +88,7 @@
 		.filter((product) => categoryFilter($selectedCategories, product));
 	// Sort the images by their index
 
-	$: console.log(data.products);
+	// $: console.log(data.products);
 </script>
 
 <svelte:head>

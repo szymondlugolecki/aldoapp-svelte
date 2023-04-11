@@ -13,7 +13,7 @@
 	let innerWidth = 0;
 	let innerHeight = 0;
 
-	$: console.log(innerWidth, innerHeight);
+	// $: console.log(innerWidth, innerHeight);
 
 	const DAY = 1000 * 60 * 60 * 24;
 
@@ -23,7 +23,7 @@
 		const deliveryDays = 3;
 		let orderCreatedAtTs = orderCreatedAt.getTime() + deliveryDays * DAY;
 		const dayInXDays = new Date(orderCreatedAtTs).getDay();
-		console.log('dayInXDays', dayInXDays);
+		// console.log('dayInXDays', dayInXDays);
 		if (dayInXDays === 6) {
 			// if its saturday in X days, add 2 more days (so its monday)
 			orderCreatedAtTs += 2 * DAY;
@@ -46,7 +46,6 @@
 
 	onMount(() => {
 		if (order && order.products.length && $cart && $cart.products.length) {
-			console.log('passed 1');
 			if (
 				order.products.every((product) =>
 					Boolean(
@@ -57,7 +56,6 @@
 					)
 				)
 			) {
-				console.log('clearing');
 				clearCart();
 				cartCleared = true;
 			}

@@ -1,13 +1,12 @@
 <script lang="ts">
-	import { fodderCategories, producentsList } from '$lib/client/constants';
+	import { producentsList } from '$lib/client/constants';
 	import { addProduct } from '$lib/client/stores/cart';
 	import { ShoppingCart } from 'lucide-svelte';
 	import toast from 'svelte-french-toast';
-	import { fade, slide } from 'svelte/transition';
 
 	export let data;
 
-	$: console.log('data.url', data.url.slice(data.url.lastIndexOf('/') + 1));
+	// $: console.log('data.url', data.url.slice(data.url.lastIndexOf('/') + 1));
 
 	const product = data.products.find((product) => {
 		const index = data.url.lastIndexOf('/');
