@@ -14,7 +14,7 @@ export const orderStreetValidation = z
 		required_error: 'Ulica i numer jest wymagany',
 		invalid_type_error: 'Nieprawidłowa ulica i numer'
 	})
-	.min(3, { message: 'Nieprawidłowa ulica i numer' })
+	.min(4, { message: 'Nieprawidłowa ulica i numer' })
 	.max(150, { message: 'Nieprawidłowe ulica i numer' });
 
 export const orderZipCodeValidation = z
@@ -22,12 +22,12 @@ export const orderZipCodeValidation = z
 		required_error: 'Kod pocztowy jest wymagany',
 		invalid_type_error: 'Nieprawidłowy kod pocztowy'
 	})
-	.min(1, { message: 'Nieprawidłowy kod pocztowy' })
+	.min(4, { message: 'Nieprawidłowy kod pocztowy' })
 	.max(30, { message: 'Nieprawidłowe kod pocztowy' });
 
 export const orderCityValidation = z
 	.string({ required_error: 'Miasto jest wymagane', invalid_type_error: 'Nieprawidłowe miasto' })
-	.min(1, { message: 'Nieprawidłowe miasto' })
+	.min(3, { message: 'Nieprawidłowe miasto' })
 	.max(120, { message: 'Nieprawidłowe miasto' });
 
 export const orderPhoneValidation = z
@@ -125,49 +125,25 @@ export const orderProductsValidation = z
 
 */
 
-export const clientOrderValidation = z
-	.object({
-		products: orderProductsValidation,
-		deliveryMethod: orderDeliveryMethodValidation,
-		paymentMethod: orderPaymentMethodValidation,
-		address: orderAddressValidation,
-		customer: orderCustomerValidation,
-		promoCode: z
-			.object({
-				id: z
-					.number({
-						invalid_type_error: 'Nieprawidłowe id kodu promocyjnego',
-						required_error: 'Id kodu promocyjnego jest wymagane'
-					})
-					.min(0, { message: 'Nieprawidłowe id kodu promocyjnego' })
-					.optional(),
-				code: z
-					.string({
-						invalid_type_error: 'Nieprawidłowy kod promocyjny',
-						required_error: 'Kod promocyjny jest wymagany'
-					})
-					.min(1, { message: 'Nieprawidłowy kod promocyjny' })
-			})
-			.optional()
+export const promoCodeIdValidation = z
+	.number({
+		invalid_type_error: 'Nieprawidłowe id kodu promocyjnego',
+		required_error: 'Id kodu promocyjnego jest wymagane'
 	})
-	.refine((obj) => obj.deliveryMethod !== 'personal-pickup' || obj.address, {
-		message: 'Adres dostawy jest wymagany'
-	})
-	.refine((obj) => obj.deliveryMethod !== 'personal-pickup' || obj.customer, {
-		message: 'Imię i nazwisko jest wymagane'
-	});
+	.min(0, { message: 'Nieprawidłowe id kodu promocyjnego' });
+
+export const clientOrderValidation = z.object({
+	productsQuantity: orderProductsValidation,
+	deliveryMethod: orderDeliveryMethodValidation,
+	paymentMethod: orderPaymentMethodValidation,
+	address: orderAddressValidation,
+	promoCodeId: promoCodeIdValidation.optional()
+});
 
 export const serverOrderValidation = z.object({
-	products: orderProductsValidation,
+	productsQuantity: orderProductsValidation,
 	deliveryMethod: orderDeliveryMethodValidation,
 	paymentMethod: orderPaymentMethodValidation,
 	address: orderAddressValidation.nullable(),
-	customer: orderCustomerValidation.nullable(),
-	promoCodeId: z
-		.number({
-			invalid_type_error: 'Nieprawidłowe id kodu promocyjnego',
-			required_error: 'Id kodu promocyjnego jest wymagane'
-		})
-		.min(0, { message: 'Nieprawidłowe id kodu promocyjnego' })
-		.optional()
+	promoCodeId: promoCodeIdValidation.optional()
 });

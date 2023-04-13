@@ -5,8 +5,6 @@
 		LogOut,
 		User,
 		Lock,
-		Sun,
-		Moon,
 		Menu,
 		ChevronDown,
 		LogIn,
@@ -19,11 +17,10 @@
 	import Img from '@zerodevx/svelte-img';
 	import logo from '$lib/assets/logo.png?run&width=110&height=80&format=webp';
 	import logout from '$lib/client/functions/logout';
-	import { nextTheme, settings } from '$lib/client/stores/settings';
 	import MegaMenu from './MegaMenu.svelte';
 	import { slide } from 'svelte/transition';
 	import { cart } from '$lib/client/stores/cart';
-	import { productURLParser } from '$lib/client/functions';
+	import { isAtLeastModerator, productURLParser } from '$lib/client/functions';
 	export let user: SessionUser | undefined;
 
 	$: activeUrl = $page.url.pathname.toLowerCase();
@@ -36,20 +33,23 @@
 	// }
 	const roleBadgeColors: Record<Role, string> = {
 		admin: 'badge-error',
-		moderator: 'badge-success',
+		driver: 'badge-success',
+		adviser: 'badge-success',
 		customer: 'badge-info'
 	};
 
 	let menuOpen = false;
 	let miniMenuExpanded = false;
 	$: productsCountTitle =
-		$cart && $cart.products.length > 0
-			? $cart.products.length === 1
+		$cart?.productsQuantity && $cart.productsQuantity.length > 0
+			? $cart.productsQuantity.length === 1
 				? '1 produkt'
-				: $cart.products.length < 5
-				? `${$cart.products.length} produkty`
-				: `${$cart.products.length} produktów`
+				: $cart.productsQuantity.length < 5
+				? `${$cart.productsQuantity.length} produkty`
+				: `${$cart.productsQuantity.length} produktów`
 			: 'Pusty koszyk';
+
+	$: console.log('cart', $cart);
 </script>
 
 <nav class="navbar bg-base-100 border-b border-base-content rounded flex flex-col relative">
@@ -117,7 +117,7 @@
 								/></svg
 							>
 							<span class="badge badge-sm indicator-item"
-								>{($cart && $cart.products.length) || 0}</span
+								>{($cart?.productsQuantity && $cart.productsQuantity.length) || 0}</span
 							>
 						</div>
 					</label>
@@ -128,7 +128,7 @@
 					>
 						<div class="card-body">
 							<span class="font-bold text-lg">{productsCountTitle}</span>
-							{#each $cart ? $cart.products.slice(0, 7) : [] as product}
+							{#each $cart?.productsQuantity ? $cart.productsQuantity.slice(0, 7) : [] as product}
 								<div class="flex flex-grow">
 									<div class="flex items-start flex-1 space-x-2">
 										<a
@@ -147,14 +147,14 @@
 									</div>
 								</div>
 							{/each}
-							{#if $cart && $cart.products.length > 7}
+							{#if $cart?.productsQuantity && $cart.productsQuantity.length > 7}
 								<div class="flex flex-col justify-center items-center text-center">
-									<span>...+{$cart.products.length - 7} więcej 🛒</span>
+									<span>...+{$cart.productsQuantity.length - 7} więcej 🛒</span>
 								</div>
 							{/if}
 							<span class="text-info"
-								>Suma: {$cart
-									? $cart.products
+								>Suma: {$cart?.productsQuantity
+									? $cart.productsQuantity
 											.map(({ price, quantity }) => [price, quantity])
 											.reduce(
 												(prev, [price, quantity]) => prev + Number(price) * Number(quantity),
@@ -191,7 +191,7 @@
 								{roleNames[user.role]}</span
 							>
 						</li>
-						{#if ['moderator', 'admin'].includes(user.role)}
+						{#if isAtLeastModerator(user.role)}
 							<li class="">
 								<a href="/admin"><Lock /> Panel administracyjny </a>
 							</li>

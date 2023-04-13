@@ -1,3 +1,4 @@
+import { userRoles } from '../../../client/constants/dbTypes';
 import { sql, type InferModel } from 'drizzle-orm';
 import {
 	mysqlTable,
@@ -20,18 +21,20 @@ export const users = mysqlTable(
 			.notNull(),
 		// updatedAt: timestamp('created_at').notNull().defaultNow().onUpdateNow(),
 
-		// user data
+		// User data
 		email: varchar('email', { length: 320 }).notNull(),
 		fullName: varchar('name', { length: 256 }).notNull(),
-		role: text('role', { enum: ['admin', 'moderator', 'customer'] }).notNull(),
+		role: text('role', { enum: userRoles }).notNull(),
 		access: boolean('access').default(true).notNull(),
-		phone: char('phone', { length: 15 }).notNull()
+		phone: char('phone', { length: 15 }).notNull(),
 
 		// relations
+		assignedAdviser: char('assigned_adviser', { length: 255 })
 	},
 	(user) => ({
 		// indexes
-		email: uniqueIndex('unique_emailx').on(user.email)
+		email: uniqueIndex('unique_emailx').on(user.email),
+		assignedAdviser: index('assigned_adviserx').on(user.assignedAdviser)
 	})
 );
 
@@ -65,3 +68,4 @@ export const verificationTokens = mysqlTable(
 export type User = InferModel<typeof users>;
 export type VerificationToken = InferModel<typeof verificationTokens>;
 export type Role = User['role'];
+export type GeneralRole = Extract<Role, 'customer' | 'admin'> | 'moderator';

@@ -7,6 +7,7 @@
 	import { drawer } from '$lib/client/stores/adminDrawer';
 	import ModalHeader from '../ModalHeader.svelte';
 	import type { User } from '$types';
+	import { getRoleRank } from '$lib/client/functions';
 
 	export let user: User | undefined;
 </script>
@@ -73,14 +74,15 @@
 			<label for="name" class="label label-text"> Rola </label>
 			<select id="role-selection" name="role" class="select select-bordered w-full">
 				<option selected={user.role === 'customer'} value="customer">Klient</option>
-				<option selected={user.role === 'moderator'} value="moderator">Moderator</option>
+				<option selected={user.role === 'driver'} value="driver">Kierowca</option>
+				<option selected={user.role === 'adviser'} value="adviser">Doradca</option>
 				{#if $page.data.user?.role === 'admin'}
 					<option selected={user.role === 'admin'} value="admin">Admin</option>
 				{/if}
 			</select>
 		</div>
 
-		{#if user.role !== 'admin' && (user.role !== 'moderator' || $page.data.user?.role === 'admin')}
+		{#if $page.data.user && getRoleRank(user.role) < getRoleRank($page.data.user?.role)}
 			<div class="form-control max-w-[90px]">
 				<label class="cursor-pointer label">
 					<span class="label-text">Dostęp</span>

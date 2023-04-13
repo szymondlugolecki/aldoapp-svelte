@@ -1,6 +1,6 @@
+import { getRoleRank } from '$lib/client/functions';
 import { db } from '$lib/server/db/index.js';
 import { orders, products } from '$lib/server/db/schemas/products.js';
-import { getRoleRank } from '$lib/server/functions/auth';
 import { error } from '@sveltejs/kit';
 import { eq, inArray } from 'drizzle-orm/expressions.js';
 
@@ -28,10 +28,9 @@ export const load = async ({ params, locals }) => {
 			paymentMethod: orders.paymentMethod,
 			customerId: orders.customerId,
 			address: orders.address,
-			products: orders.products,
+			products: orders.productsQuantity,
 			price: orders.price,
 			discount: orders.discount,
-			customer: orders.customer,
 			estimatedDeliveryDate: orders.estimatedDeliveryDate
 		})
 		.from(orders)

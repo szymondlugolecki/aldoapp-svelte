@@ -22,7 +22,7 @@ const edit: Action = async ({ request, locals }) => {
 	if (!locals.session) {
 		throw error(...errorResponses[401]);
 	}
-	if (!['admin', 'moderator'].includes(locals.session?.user.role)) {
+	if (!isAtLeastModerator(locals.session?.user.role)) {
 		throw error(...errorResponses[403]);
 	}
 

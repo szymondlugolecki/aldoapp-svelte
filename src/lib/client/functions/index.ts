@@ -6,12 +6,42 @@ import type {
 	User,
 	UserFilter,
 	OrderFilter,
-	Category
+	Category,
+	Role
 } from '$types';
 import type { Thing, WithContext } from 'schema-dts';
 import { fodderCategories } from '../constants';
 
 export type Schema = Thing | WithContext<Thing>;
+
+export const getRoleRank = (role: Role) => {
+	switch (role) {
+		case 'customer':
+			return 0;
+		case 'driver':
+			return 1;
+		case 'adviser':
+			return 2;
+		case 'admin':
+			return 3;
+	}
+};
+
+export const getGeneralRole = (role: Role) => {
+	if (isModerator(role)) return 'moderator';
+	if (role === 'admin') return 'admin';
+	return 'customer';
+};
+
+export const isModerator = (role: Role) => {
+	if (getRoleRank(role) > 0 && role !== 'admin') return true;
+	return false;
+};
+
+export const isAtLeastModerator = (role: Role) => {
+	if (getRoleRank(role) > 0) return true;
+	return false;
+};
 
 export const serializeSchema = (thing: Schema) => {
 	return `<script type="application/ld+json">${JSON.stringify(thing, null, 2)}</script>`;
@@ -67,7 +97,8 @@ export const applyUserFilters = (users: User[], filter: UserFilter) => {
 
 	const roleFilter = (user: User) => {
 		if (filter.roles.admin && user.role === 'admin') return true;
-		if (filter.roles.moderator && user.role === 'moderator') return true;
+		if (filter.roles.adviser && user.role === 'adviser') return true;
+		if (filter.roles.driver && user.role === 'driver') return true;
 		if (filter.roles.customer && user.role === 'customer') return true;
 		return false;
 	};

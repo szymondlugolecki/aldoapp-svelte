@@ -1,8 +1,8 @@
+import { getRoleRank, isAtLeastModerator } from '$lib/client/functions';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { editUserSchema } from '$lib/client/schemas/users';
 import { db } from '$lib/server/db';
 import { users, type User } from '$lib/server/db/schemas/users';
-import { getRoleRank } from '$lib/server/functions/auth';
 import { areObjectsEqual } from '$lib/server/functions/utils';
 // import { p } from '$lib/server/clients/pClient';
 import { trytm } from '@bdsqqq/try';
@@ -14,7 +14,7 @@ const edit: Action = async ({ request, locals }) => {
 	if (!locals.session) {
 		throw error(401, 'Nie jesteś zalogowany');
 	}
-	if (!['admin', 'moderator'].includes(locals.session?.user.role)) {
+	if (!isAtLeastModerator(locals.session?.user.role)) {
 		throw error(403, 'Nie masz wystarczających uprawień');
 	}
 
@@ -109,7 +109,7 @@ const edit: Action = async ({ request, locals }) => {
 		fullName,
 		access: !access,
 		phone
-	} satisfies Omit<User, 'id' | 'createdAt'>;
+	} satisfies Omit<User, 'id' | 'createdAt' | 'assignedAdviser'>;
 
 	const nothingChanged = areObjectsEqual(oldUser, newUser);
 

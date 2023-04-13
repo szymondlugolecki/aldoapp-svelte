@@ -5,7 +5,7 @@ import { cloudinary } from '$lib/server/clients/cloudinaryClient';
 import { trytm } from '@bdsqqq/try';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { errorResponses } from '$lib/client/constants/errorResponses';
-import { productURLParser } from '$lib/client/functions';
+import { isAtLeastModerator, productURLParser } from '$lib/client/functions';
 import { db } from '$lib/server/db';
 import { products, type Product } from '$lib/server/db/schemas/products';
 
@@ -14,7 +14,8 @@ const add: Action = async ({ request, locals }) => {
 	if (!locals.session) {
 		throw error(...errorResponses[401]);
 	}
-	if (!['admin', 'moderator'].includes(locals.session?.user.role)) {
+
+	if (!isAtLeastModerator(locals.session?.user.role)) {
 		throw error(...errorResponses[403]);
 	}
 

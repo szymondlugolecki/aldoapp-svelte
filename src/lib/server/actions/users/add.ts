@@ -8,13 +8,14 @@ import { createId } from '@paralleldrive/cuid2';
 import type { User } from '$types';
 import { db } from '$lib/server/db';
 import { users } from '$lib/server/db/schemas/users';
+import { isAtLeastModerator } from '$lib/client/functions';
 
 const add = (async ({ request, locals }) => {
 	// Only moderators and admins are allowed to add a user
 	if (!locals.session) {
 		throw error(...errorResponses[401]);
 	}
-	if (!['admin', 'moderator'].includes(locals.session?.user.role)) {
+	if (!isAtLeastModerator(locals.session?.user.role)) {
 		throw error(...errorResponses[403]);
 	}
 
@@ -42,7 +43,7 @@ const add = (async ({ request, locals }) => {
 		id: createId(),
 		...newUserParsed,
 		access: true
-	} satisfies Omit<User, 'createdAt'>;
+	} satisfies Omit<User, 'createdAt' | 'assignedAdviser'>;
 
 	// Add the user to the database
 	const [, addUserError] = await trytm(db.insert(users).values(newUser));

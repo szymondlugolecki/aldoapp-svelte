@@ -1,7 +1,7 @@
+import { getRoleRank } from '$lib/client/functions';
 import { db } from '$lib/server/db/index.js';
 import { orders } from '$lib/server/db/schemas/products.js';
 import { users } from '$lib/server/db/schemas/users.js';
-import { getRoleRank } from '$lib/server/functions/auth';
 import { trytm } from '@bdsqqq/try';
 import { error } from '@sveltejs/kit';
 import { desc, eq } from 'drizzle-orm/expressions.js';

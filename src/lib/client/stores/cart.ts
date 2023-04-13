@@ -1,24 +1,18 @@
-import type { Address, Customer } from '$lib/server/db/schemas/products';
+import type { Address } from '$lib/server/db/schemas/products';
 import type { CartProductWithQuantity, StoreProduct } from '$types';
 import { persisted } from 'svelte-local-storage-store';
 import type { DeliveryMethod, PaymentMethod } from '../constants/dbTypes';
 
 export type CartStore = {
-	products: CartProductWithQuantity[];
-	// products: [CartProductWithQuantity, ...CartProductWithQuantity[]];
-	status: 'verified' | 'loading' | 'error' | 'not-verified' | 'finished';
+	productsQuantity: CartProductWithQuantity[];
 	lastVerified: Date | null;
-	promoCode?: {
-		id?: number;
-		code: string;
-	};
-	deliveryMethod: DeliveryMethod | null;
+	promoCodeId?: number;
+	deliveryMethod: DeliveryMethod;
 	paymentMethod: PaymentMethod | null;
 	rememberAddress: boolean;
 	isAddressValid: boolean;
-	isCustomerValid: boolean;
 	address: Address;
-	customer: Customer;
+	isAddressDifferent: boolean;
 };
 
 const emptyDeliveryAddress = {
@@ -28,20 +22,15 @@ const emptyDeliveryAddress = {
 };
 
 const initialCart: Omit<CartStore, 'address'> = {
-	products: [],
-	status: 'not-verified',
+	productsQuantity: [],
 	lastVerified: null,
-	promoCode: undefined,
-	deliveryMethod: null,
+	promoCodeId: undefined,
+	deliveryMethod: 'personal-delivery',
 	paymentMethod: null,
+
 	rememberAddress: false,
 	isAddressValid: false,
-	isCustomerValid: false,
-	customer: {
-		phone: '',
-		email: '',
-		fullName: ''
-	}
+	isAddressDifferent: false
 };
 
 export const cart = persisted<CartStore>('cart', {
@@ -66,18 +55,9 @@ const cartProductParser = (product: StoreProduct, quantity: number) => {
 	};
 };
 
-export const changeCartState = (status: CartStore['status']) => {
-	cart.update((cartObj) => {
-		return {
-			...cartObj,
-			status
-		};
-	});
-};
-
 export const incrementProduct = (productId: number) => {
 	cart.update((cartObj) => {
-		const products = cartObj.products.map((product) => {
+		const productsQuantity = cartObj.productsQuantity.map((product) => {
 			if (product.id === productId) {
 				return { ...product, quantity: product.quantity + 1 };
 			}
@@ -86,21 +66,19 @@ export const incrementProduct = (productId: number) => {
 
 		return {
 			...cartObj,
-			status: 'not-verified',
-			products
+			productsQuantity
 		};
 	});
 };
 
 export const addProduct = (product: StoreProduct) => {
 	cart.update((cartObj) => {
-		const { products } = cartObj;
+		const { productsQuantity } = cartObj;
 		// if already exists, just increment quantity
-		if (products.find((p) => p.id === product.id)) {
+		if (productsQuantity.find((p) => p.id === product.id)) {
 			return {
 				...cartObj,
-				status: 'not-verified',
-				products: products.map((p) => {
+				products: productsQuantity.map((p) => {
 					if (p.id === product.id) {
 						return cartProductParser(product, p.quantity + 1);
 					}
@@ -112,8 +90,7 @@ export const addProduct = (product: StoreProduct) => {
 		else {
 			return {
 				...cartObj,
-				status: 'not-verified',
-				products: [...products, cartProductParser(product, 1)]
+				productsQuantity: [...productsQuantity, cartProductParser(product, 1)]
 			};
 		}
 	});
@@ -121,7 +98,7 @@ export const addProduct = (product: StoreProduct) => {
 
 export const decrementProduct = (productId: number) => {
 	cart.update((cartObj) => {
-		const products = cartObj.products
+		const productsQuantity = cartObj.productsQuantity
 			.map((product) => {
 				if (product.id === productId) {
 					return { ...product, quantity: product.quantity - 1 };
@@ -132,19 +109,17 @@ export const decrementProduct = (productId: number) => {
 
 		return {
 			...cartObj,
-			// status: products.length ? cartObj.status : 'not-verified',
-			products
+			productsQuantity
 		};
 	});
 };
 
 export const removeProduct = (productId: number) => {
 	cart.update((cartObj) => {
-		const products = cartObj.products.filter((product) => product.id !== productId);
+		const productsQuantity = cartObj.productsQuantity.filter((product) => product.id !== productId);
 		return {
 			...cartObj,
-			// status: products.length ? cartObj.status : 'not-verified',
-			products
+			productsQuantity
 		};
 	});
 };
@@ -155,7 +130,6 @@ export const clearCart = () => {
 	cart.update((oldCart) => {
 		return {
 			...initialCart,
-			status: 'not-verified',
 			rememberAddress: oldCart.rememberAddress,
 			address: oldCart.rememberAddress ? oldCart.address : emptyDeliveryAddress
 		};

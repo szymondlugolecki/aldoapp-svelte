@@ -7,13 +7,14 @@ import { removeProductSchema } from '$lib/client/schemas/products';
 import { db } from '$lib/server/db';
 import { products } from '$lib/server/db/schemas/products';
 import { eq } from 'drizzle-orm/expressions';
+import { isAtLeastModerator } from '$lib/client/functions';
 
 const remove: Action = async ({ request, locals }) => {
 	// Only moderators and admins are allowed to remove a product
 	if (!locals.session) {
 		throw error(...errorResponses[401]);
 	}
-	if (!['admin', 'moderator'].includes(locals.session?.user.role)) {
+	if (!isAtLeastModerator(locals.session?.user.role)) {
 		throw error(...errorResponses[403]);
 	}
 

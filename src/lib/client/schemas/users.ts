@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { orderPhoneValidation } from './order';
+import { userRoles } from '../constants/dbTypes';
 
 export const nameValidation = z
 	.string({
@@ -16,13 +17,21 @@ export const emailValidation = z
 	.max(64, { message: 'Nieprawidłowy email' })
 	.email({ message: 'Nieprawidłowy email' });
 
-export const roleValidation = z.union(
-	[z.literal('customer'), z.literal('moderator'), z.literal('admin')],
-	{
-		required_error: 'Rola jest wymagana',
-		invalid_type_error: 'Nieprawidłowa rola'
+export const roleValidation = z.enum(userRoles, {
+	errorMap(issue) {
+		switch (issue.code) {
+			case 'invalid_type':
+				return { message: 'Nieprawidłowa rola' };
+				break;
+			case 'invalid_enum_value':
+				return { message: 'Nieprawidłowa rola' };
+				break;
+			default:
+				return { message: 'Niespodziewany błąd: rola' };
+				break;
+		}
 	}
-);
+});
 
 export const accessPermittedValidation = z.boolean({
 	invalid_type_error: "Nieprawidłowa wartość dla 'dostęp przyznany'",

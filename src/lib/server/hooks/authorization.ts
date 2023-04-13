@@ -1,5 +1,6 @@
 import { type Handle, redirect, error } from '@sveltejs/kit';
 import { customErrorURL } from '../functions/utils';
+import { isAtLeastModerator } from '$lib/client/functions';
 
 export const handleAuthorization: Handle = ({ event, resolve }) => {
 	const { session } = event.locals;
@@ -13,7 +14,7 @@ export const handleAuthorization: Handle = ({ event, resolve }) => {
 		}
 
 		if (event.locals.session.user.role) {
-			if (!['admin', 'moderator'].includes(event.locals.session.user.role)) {
+			if (!isAtLeastModerator(event.locals.session.user.role)) {
 				throw redirect(307, customErrorURL('insufficient-permissions'));
 			}
 		}

@@ -66,7 +66,8 @@
 		<label for="name" class="label label-text"> Rola </label>
 		<select id="role-selection" name="role" class="select select-bordered w-full">
 			<option selected value="customer">Klient</option>
-			<option value="moderator">Moderator</option>
+			<option value="driver">Kierowca</option>
+			<option value="adviser">Doradca</option>
 			{#if $page.data.user?.role === 'admin'}
 				<option value="admin">Admin</option>
 			{/if}

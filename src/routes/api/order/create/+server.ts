@@ -1,5 +1,5 @@
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
-import { orderCustomerValidation, serverOrderValidation } from '$lib/client/schemas/order';
+import { serverOrderValidation } from '$lib/client/schemas/order';
 import { sendOrderConfirmationEmail } from '$lib/server/clients/sendGridClient';
 // import { p } from '$lib/server/clients/pClient';
 import { db } from '$lib/server/db';
@@ -12,7 +12,6 @@ import {
 import { promoCodes, promoCodeUsages } from '$lib/server/db/schemas/promoCodes';
 // import { sleep } from '$lib/server/functions/utils';
 import type { PromoCodeWithUsages } from '$types/PromoCodeTypes';
-// import type { Optional } from '$types/UtilityTypes';
 import { trytm } from '@bdsqqq/try';
 import { json, error } from '@sveltejs/kit';
 import { eq, inArray } from 'drizzle-orm/expressions';
@@ -49,20 +48,6 @@ export async function POST({ request, locals }) {
 	// };
 	// delete order.promoCodeId;
 
-	const validCustomerName = orderCustomerValidation.safeParse(order.customer).success;
-	const isPersonalPickup = order.deliveryMethod === 'personal-pickup';
-
-	// Customer Name is set to optional, so customers who choose personal pickup
-	// do not need to pass their name. It's taken from the session instead.
-	if (!validCustomerName && !isPersonalPickup) {
-		throw error(400, 'Nieprawidłowe imię i nazwisko');
-	}
-
-	// Remove spaces from the phone number
-	if (order.customer) {
-		order.customer.phone = order.customer.phone.replace(/ /g, '');
-	}
-
 	const orderHistoryEvent: OrderHistoryEvent = {
 		date: new Date(),
 		status: 'created',
@@ -80,7 +65,7 @@ export async function POST({ request, locals }) {
 			.where(
 				inArray(
 					products.id,
-					order.products.map((p) => p.productId)
+					order.productsQuantity.map((p) => p.productId)
 				)
 			)
 	);
@@ -99,7 +84,7 @@ export async function POST({ request, locals }) {
 		);
 	}
 
-	if (productsList.length !== order.products.length) {
+	if (productsList.length !== order.productsQuantity.length) {
 		throw error(
 			400,
 			'Nie znaleziono wszystkich wybranych produktów. Upewnij się, że masz najnowszą wersję aplikacji'
@@ -204,10 +189,12 @@ export async function POST({ request, locals }) {
 		}
 	}
 
-	const newOrder: Omit<Order, 'id' | 'createdAt' | 'updatedAt'> = {
+	const newOrder: Omit<
+		Order,
+		'id' | 'createdAt' | 'updatedAt' | 'estimatedDeliveryDate' | 'driverId'
+	> = {
 		...order,
-		customer: isPersonalPickup ? null : order.customer,
-		address: isPersonalPickup ? null : order.address,
+		address: order.address,
 		customerId: sessionUser.id,
 		deliveryStatus: 'pending',
 		paymentStatus: 'pending',
@@ -215,7 +202,8 @@ export async function POST({ request, locals }) {
 		promoCodeId: null,
 		orderHistory: [orderHistoryEvent],
 		price: discountPrice.toString(),
-		discount: (noDiscountPrice - discountPrice).toString()
+		discount: (noDiscountPrice - discountPrice).toString(),
+		productIds: productsList.map(({ id }) => id)
 	};
 
 	console.log('putting this order into the db', newOrder);

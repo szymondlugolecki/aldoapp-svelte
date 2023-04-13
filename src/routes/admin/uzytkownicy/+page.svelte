@@ -24,7 +24,8 @@
 		nonblocked: true,
 		roles: {
 			admin: true,
-			moderator: true,
+			driver: true,
+			adviser: true,
 			customer: true
 		},
 		since: null,

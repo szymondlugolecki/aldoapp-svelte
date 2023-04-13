@@ -5,7 +5,9 @@
 
 <svelte:head>
 	<title
-		>Koszyk {$cart && $cart.products.length ? `(${$cart.products.length}) ` : ''}• Twoje ALDO</title
+		>Koszyk {$cart?.productsQuantity && $cart.productsQuantity.length
+			? `(${$cart.productsQuantity.length}) `
+			: ''}• Twoje ALDO</title
 	>
 	<meta name="description" content="Twój koszyk. Dokończ zamówienie." />
 </svelte:head>
@@ -25,7 +27,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each $cart.products as product}
+			{#each $cart.productsQuantity as product}
 				<tr>
 					<td>
 						<a
@@ -76,7 +78,7 @@
 </div>
 
 <!-- <div class="flex flex-col space-y-3">
-		{#each $cart.products as product}
+		{#each $cart.productsQuantity as product}
 			<div class="flex items-center">
 				<a href="/sklep/{product.encodedURL}" class="rounded w-16 h-16 xs:w-24 xs:h-24">
 					<img src={product.images[0]} alt={product.name} />

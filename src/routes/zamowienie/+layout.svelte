@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { ArrowLeft, ArrowRight } from 'lucide-svelte';
-	import { cart, changeCartState } from '$lib/client/stores/cart';
+	import { cart } from '$lib/client/stores/cart';
 	import { onMount } from 'svelte';
 	import wretch from 'wretch';
 	import toast from 'svelte-french-toast';
 	import { imagesSorting } from '$lib/client/functions/sorting';
 	import {
-		orderAddressValidation,
 		orderDeliveryMethodValidation,
 		orderPaymentMethodValidation,
 		serverOrderValidation
@@ -14,21 +13,19 @@
 	import { betterZodParse } from '$lib/client/functions/betterZodParse';
 	import type { CartProduct } from '$types';
 	import type { Optional } from '$types/UtilityTypes';
-	import { number } from 'zod';
 	import { goto } from '$app/navigation';
 
 	export let data;
 
 	const synchronizeCart = async () => {
-		const productIds = $cart ? $cart.products.map((product) => product.id) : [];
+		const productIds = $cart ? $cart.productsQuantity.map((product) => product.id) : [];
 
 		if (!productIds.length) return;
 
-		if (!data.url.toLowerCase().endsWith('/zamowienie/koszyk') || $cart.status === 'verified')
-			return;
+		if (!data.url.toLowerCase().endsWith('/zamowienie/koszyk')) return;
 
 		try {
-			changeCartState('loading');
+			// changeCartState('loading');
 
 			const syncCartPromise = wretch(`/api/mycart?cart=${productIds.join(',')}`)
 				.get()
@@ -49,7 +46,7 @@
 				return {
 					...product,
 					images: product.images.sort(imagesSorting),
-					quantity: $cart.products.find((p) => p.id === product.id)?.quantity || 1
+					quantity: $cart.productsQuantity.find((p) => p.id === product.id)?.quantity || 1
 				};
 			});
 
@@ -57,8 +54,7 @@
 				return {
 					...cartObj,
 					lastVerified: new Date(),
-					status: 'verified',
-					products: cartLocalProducts
+					productsQuantity: cartLocalProducts
 				};
 			});
 		} catch (error) {
@@ -67,9 +63,6 @@
 				errorMessage = error.message;
 			}
 			toast.error(errorMessage);
-			cart.update((cartObj) => {
-				return { ...cartObj, status: 'error' };
-			});
 		}
 	};
 
@@ -81,7 +74,7 @@
 
 		const currentCart: Optional<
 			typeof $cart,
-			'rememberAddress' | 'isAddressValid' | 'lastVerified' | 'isCustomerValid'
+			'rememberAddress' | 'isAddressValid' | 'lastVerified' | 'isAddressDifferent'
 		> = $cart;
 
 		// We need to delete these fields otherwise db throws an error when we try to insert them
@@ -92,18 +85,19 @@
 				}
 			});
 		};
-		deleteFields('rememberAddress', 'isAddressValid', 'lastVerified', 'isCustomerValid');
+		deleteFields('rememberAddress', 'isAddressValid', 'lastVerified', 'isAddressDifferent');
 
 		const [order, cartValidationError] = betterZodParse(serverOrderValidation, {
 			...currentCart,
-			products: currentCart.products.map((product) => ({
+			productsQuantity: currentCart.productsQuantity.map((product) => ({
 				productId: product.id,
 				quantity: product.quantity
 			})),
-			promoCodeId: currentCart.promoCode?.id,
-			address: currentCart.deliveryMethod === 'personal-pickup' ? null : currentCart.address,
-			customer: currentCart.deliveryMethod === 'personal-pickup' ? null : currentCart.customer
+			address: currentCart.isAddressDifferent ? currentCart.address : null,
+			promoCodeId: currentCart.promoCodeId
 		});
+
+		console.log('sending order', order);
 
 		if (cartValidationError) {
 			console.error('client cart validation error', cartValidationError);
@@ -129,7 +123,7 @@
 				return;
 			}
 
-			changeCartState('finished');
+			// changeCartState('finished');
 
 			goto(`/zamowienie/potwierdzenie/${data.orderId}`);
 
@@ -145,8 +139,8 @@
 		synchronizeCart();
 	});
 
-	$: subtotal = $cart
-		? $cart.products
+	$: subtotal = $cart?.productsQuantity
+		? $cart.productsQuantity
 				.map(({ price, quantity }) => Number(price) * quantity)
 				.reduce((a, b) => a + b, 0)
 		: 0;
@@ -176,9 +170,9 @@
 		1:
 			$cart &&
 			orderDeliveryMethodValidation.safeParse($cart.deliveryMethod).success &&
-			$cart.deliveryMethod === 'personal-pickup'
-				? true
-				: $cart.isAddressValid && $cart.isCustomerValid,
+			$cart.isAddressDifferent
+				? $cart.isAddressValid
+				: true,
 		2: $cart && orderPaymentMethodValidation.safeParse($cart.paymentMethod).success,
 		3: true
 	} as Record<number, boolean>;
@@ -188,7 +182,7 @@
 </script>
 
 <section class="w-full flex flex-col items-center justify-center">
-	{#if $cart && !$cart.products.length}
+	{#if $cart?.productsQuantity && !$cart.productsQuantity.length}
 		<div class="text-center mt-7">
 			<h1 class="text-2xl xxs:text-3xl sm:text-5xl font-bold mb-1 xxs:mb-1.5 sm:mb-2">
 				Koszyk jest pusty 😔
@@ -234,12 +228,8 @@
 						<bold class="font-semibold text-base">{subtotal.toFixed(2)} PLN</bold>
 					</div>
 					<div class="flex justify-between items-center">
-						<span class="text-base">Przesyłka</span>
+						<span class="text-base">Dostawa</span>
 						<bold class="font-semibold text-base">{(0).toFixed(2)} PLN</bold>
-					</div>
-					<div class="flex justify-between items-center">
-						<span class="text-base">VAT</span>
-						<bold class="font-semibold text-base">{(subtotal * 0.23).toFixed(2)} PLN</bold>
 					</div>
 					<div class="flex justify-between items-center">
 						<span class="text-base">Rabat</span>
@@ -248,7 +238,7 @@
 					<div class="flex justify-between items-center">
 						<bold class="font-bold text-base">Suma całkowita</bold>
 						<bold class="font-bold text-base"
-							>{(Number(subtotal.toFixed(2)) + Number((subtotal * 0.23).toFixed(2))).toFixed(2)}
+							>{Number(subtotal.toFixed(2)).toFixed(2)}
 							PLN</bold
 						>
 					</div>

@@ -20,7 +20,7 @@ specifiers:
   cloudinary: ^1.35.0
   daisyui: ^2.51.3
   dotenv: ^16.0.3
-  drizzle-kit: 0.17.4
+  drizzle-kit: 0.17.1-609a4f0
   drizzle-orm: ^0.23.10
   eslint: ^8.35.0
   eslint-config-prettier: ^8.7.0
@@ -82,7 +82,7 @@ devDependencies:
   '@vite-pwa/sveltekit': 0.2.0_cyr67kkeq544aq22jzbt4y5hjy
   '@zerodevx/svelte-img': 1.2.10_hgpqesmt7lo64t7vigy4pfv2ga
   autoprefixer: 10.4.14_postcss@8.4.21
-  drizzle-kit: 0.17.4
+  drizzle-kit: 0.17.1-609a4f0
   eslint: 8.36.0
   eslint-config-prettier: 8.8.0_eslint@8.36.0
   eslint-plugin-svelte3: 4.0.0_wzem237sbvnwe7n34ytc5phasy
@@ -2958,8 +2958,8 @@ packages:
       wordwrap: 1.0.0
     dev: true
 
-  /drizzle-kit/0.17.4:
-    resolution: {integrity: sha512-9OuHsZBxS1IkWnF9vFeTWR5XH9UCv4SclfPaFt7he8TPVzDka5vpGmhNh9Oaj+OZg6Pf4PSV2Yt8X3c44ayHVA==}
+  /drizzle-kit/0.17.1-609a4f0:
+    resolution: {integrity: sha512-bXflv8YQPe8gE+OSqllxVJEiwzupHjzu6tcBqfO4avrlspiP3shFJfDuHeiv+ztpKcG+8KXAuuFRIplJtD89LA==}
     hasBin: true
     dependencies:
       camelcase: 7.0.1
@@ -2970,6 +2970,7 @@ packages:
       glob: 8.1.0
       hanji: 0.0.5
       json-diff: 0.9.0
+      minimatch: 7.4.6
       zod: 3.21.4
     transitivePeerDependencies:
       - supports-color
@@ -4561,6 +4562,13 @@ packages:
 
   /minimatch/5.1.6:
     resolution: {integrity: sha512-lKwV/1brpG6mBUFHtb7NUmtABCb2WZZmm2wNiOA5hAb8VdCS4B3dtMWyvcoViccwAW/COERjXLt0zP1zXUN26g==}
+    engines: {node: '>=10'}
+    dependencies:
+      brace-expansion: 2.0.1
+    dev: true
+
+  /minimatch/7.4.6:
+    resolution: {integrity: sha512-sBz8G/YjVniEz6lKPNpKxXwazJe4c19fEfV2GDMX6AjFz+MX9uDWIZW8XreVhkFW3fkIdTv/gxWr/Kks5FFAVw==}
     engines: {node: '>=10'}
     dependencies:
       brace-expansion: 2.0.1

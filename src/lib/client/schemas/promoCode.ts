@@ -9,17 +9,17 @@ export const addPromoCodeValidation = z.object({
 		})
 		.min(1, { message: 'Nieprawidłowy kod promocyjny' }),
 	minCartValue: z
-		.number({
+		.string({
 			invalid_type_error: 'Nieprawidłowa minimalna wartość koszyka',
 			required_error: 'Minimalna wartość koszyka jest wymagana'
 		})
-		.min(0, { message: 'Minimalna wartość koszyka nie może być ujemna' }),
+		.min(1, { message: 'Minimalna wartość koszyka jest wymagana' }),
 	discount: z
-		.number({
+		.string({
 			invalid_type_error: 'Nieprawidłowa wartość rabatu',
 			required_error: 'Wartość rabatu jest wymagana'
 		})
-		.min(0, { message: 'Minimalna wartość rabatu nie może być ujemna' }),
+		.min(1, { message: 'Minimalna wartość rabatu jest wymagana' }),
 	discountType: z.enum(discountTypes, {
 		errorMap(issue) {
 			switch (issue.code) {

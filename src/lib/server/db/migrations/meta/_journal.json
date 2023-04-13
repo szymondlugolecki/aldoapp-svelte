@@ -169,6 +169,20 @@
       "when": 1681067574046,
       "tag": "0023_abnormal_iceman",
       "breakpoints": false
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1681398150793,
+      "tag": "0024_sudden_omega_red",
+      "breakpoints": false
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1681402834423,
+      "tag": "0025_nifty_giant_man",
+      "breakpoints": false
     }
   ]
 }

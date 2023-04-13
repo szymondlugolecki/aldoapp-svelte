@@ -1,4 +1,5 @@
-import type { ShortService, Outlets, Role, OrderRowType } from '$types';
+import type { Role } from '$lib/server/db/schemas/users';
+import type { ShortService, Outlets, OrderRowType } from '$types';
 import type { PromoCodeRowType } from '$types/PromoCodeTypes';
 import type { DeliveryStatus, MainCategory, OrderStatus, PaymentStatus } from './dbTypes';
 
@@ -29,11 +30,8 @@ export const orderStatusList: Record<OrderStatus | PaymentStatus | DeliveryStatu
 	canceled: 'Anulowano',
 	pending: 'Oczekiwanie',
 	delivered: 'Dostarczono',
-	returned: 'Zwrócono',
 	shipped: 'Wysłano',
-	completed: 'Zakończono',
-	'refund-request': 'Prośba o zwrot',
-	refunded: 'Zwrócono'
+	completed: 'Zakończono'
 } as const;
 
 export const orderTable: Record<OrderRowType, string> = {
@@ -270,7 +268,8 @@ export const badgeRoleColors = {
 
 export const roleNames: Record<Role, string> = {
 	customer: 'Klient',
-	moderator: 'Moderator',
+	driver: 'Kierowca',
+	adviser: 'Doradca',
 	admin: 'Admin'
 };
 

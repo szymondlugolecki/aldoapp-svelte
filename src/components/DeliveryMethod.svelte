@@ -16,6 +16,7 @@
 	class="hidden peer"
 	required
 	bind:group={$cart.deliveryMethod}
+	checked={id === $cart.deliveryMethod}
 />
 
 <label

@@ -10,6 +10,7 @@ import { json, error } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm/expressions';
 import type { PushSubscription } from 'web-push';
 import type { Config } from '@sveltejs/adapter-vercel';
+import { isAtLeastModerator } from '$lib/client/functions';
 
 export const config: Config = {
 	runtime: 'nodejs18.x'
@@ -19,7 +20,7 @@ export async function POST({ request, locals }) {
 	if (!locals.session) {
 		throw error(...errorResponses[401]);
 	}
-	if (!['admin', 'moderator'].includes(locals.session.user.role)) {
+	if (!isAtLeastModerator(locals.session.user.role)) {
 		throw error(...errorResponses[403]);
 	}
 

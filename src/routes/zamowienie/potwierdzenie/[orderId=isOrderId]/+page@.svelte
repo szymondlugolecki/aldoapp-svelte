@@ -40,16 +40,16 @@
 	let cartSnapshot: CartStore | null = null;
 	let cartCleared = false;
 
-	$: if ($cart && $cart.products.length && !cartSnapshot) {
+	$: if ($cart && $cart.productsQuantity.length && !cartSnapshot) {
 		cartSnapshot = $cart;
 	}
 
 	onMount(() => {
-		if (order && order.products.length && $cart && $cart.products.length) {
+		if (order && order.products.length && $cart && $cart.productsQuantity.length) {
 			if (
 				order.products.every((product) =>
 					Boolean(
-						$cart.products.find(
+						$cart.productsQuantity.find(
 							(cartProduct) =>
 								cartProduct.id === product.productId && cartProduct.quantity === product.quantity
 						)
@@ -101,24 +101,18 @@
 			<OrderConfirmationCell title="Kwota" value="{order.price} zł" />
 			<OrderConfirmationCell
 				title="Metoda płatności"
-				value={order.paymentMethod === 'cash' ? 'Gotówka' : 'Płatność internetowa'}
+				value={order.paymentMethod === 'cash' ? 'Gotówka' : 'Przelew bankowy'}
 			/>
-			<OrderConfirmationCell
-				title="Metoda dostawy"
-				value={order.deliveryMethod === 'personal-pickup' ? 'Odbiór osobisty' : 'Kurier'}
-			/>
-			{#if order.deliveryMethod !== 'personal-pickup'}
-				<OrderConfirmationCell
-					title="Adres dostawy"
-					value={order.address
-						? `${order.address.zipCode} ${order.address.city}, ${order.address.street}`
-						: `Adres nie został podany! ⚠️`}
-				/>
-			{/if}
-			<OrderConfirmationCell
-				title="Oczekiwany czas dostawy"
-				value={dateParser(getEstimatedDeliveryTime(order.createdAt), 'long')}
-			/>
+			<OrderConfirmationCell title="Metoda dostawy" value="Kurier" />
+			<!-- {#if order.deliveryMethod !== 'personal-pickup'} -->
+			<!-- <OrderConfirmationCell
+				title="Adres dostawy"
+				value={order.address
+					? `${order.address.zipCode} ${order.address.city}, ${order.address.street}`
+					: `Adres nie został podany! ⚠️`}
+			/> -->
+			<!-- {/if} -->
+			<OrderConfirmationCell title="Czas dostawy" value="W ciągu 3 dni roboczych" />
 			<OrderConfirmationCell
 				title="Data złożenia zamówienia"
 				value={dateParser(order.createdAt, 'long')}
@@ -134,7 +128,7 @@
 
 		<Alert type="info" message="Na twojego maila wysłane zostało potwierdzenie zamówienia." />
 
-		{#if cartSnapshot && cartSnapshot.products && cartSnapshot.products.length && cartCleared}
+		{#if cartSnapshot && cartSnapshot.productsQuantity && cartSnapshot.productsQuantity.length && cartCleared}
 			<div class="flex flex-col items-center w-full space-y-1">
 				<span>Koszyk został wyczyszczony</span>
 				<button

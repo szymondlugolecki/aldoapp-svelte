@@ -101,25 +101,25 @@ export const orders = mysqlTable(
 			enum: deliveryStatus
 		}).notNull(),
 		address: json('address').$type<Address>(),
-		customer: json('customer').$type<Customer>(),
 
 		estimatedDeliveryDate: timestamp('estimated_delivery_date'),
 		deliveryMethod: text('delivery_method', { enum: deliveryMethods }).notNull(),
 		paymentMethod: text('payment_method', { enum: paymentMethods }).notNull(),
 
 		orderHistory: json('order_history').$type<OrderHistoryEvent[]>().notNull(),
-		products: json('products').$type<OrderProductObj[]>().notNull(),
+		productIds: json('product_ids').$type<Product['id'][]>().notNull(),
+		productsQuantity: json('products_quantity').$type<OrderProductObj[]>().notNull(),
 
 		// relations
 		customerId: varchar('customer_id', { length: 36 }).notNull(),
-		// .references(() => users.id),
-		promoCodeId: int('promo_code_id')
-		// .references(() => promoCodes.id)
+		promoCodeId: int('promo_code_id'),
+		driverId: varchar('driver_id', { length: 36 })
 	},
 	(order) => ({
 		// indexes
 		customerId: index('customer_idx').on(order.customerId),
-		promoCodeId: index('promo_code_idx').on(order.promoCodeId)
+		promoCodeId: index('promo_code_idx').on(order.promoCodeId),
+		driverId: index('driver_idx').on(order.driverId)
 	})
 );
 

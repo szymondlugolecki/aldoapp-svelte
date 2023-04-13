@@ -1,7 +1,7 @@
 import { errors, jwtVerify, SignJWT } from 'jose';
 import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 import { jwtConfig } from '../constants/auth';
-import type { JWTAccessTokenResult, JWTRefreshTokenResult, Role, SessionUser } from '$types';
+import type { JWTAccessTokenResult, JWTRefreshTokenResult, SessionUser } from '$types';
 import { createId } from '@paralleldrive/cuid2';
 import { UAParser } from 'ua-parser-js';
 import { textCrusher as tC } from '$lib/client/functions';
@@ -67,15 +67,4 @@ export const uaParser = (header: string | null) => {
 		.map((str) => strFb(str))
 		.join('+');
 	return tC(userAgent);
-};
-
-export const getRoleRank = (role: Role) => {
-	switch (role) {
-		case 'customer':
-			return 0;
-		case 'moderator':
-			return 1;
-		case 'admin':
-			return 2;
-	}
 };

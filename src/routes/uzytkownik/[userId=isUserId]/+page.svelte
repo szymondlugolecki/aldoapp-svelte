@@ -19,7 +19,7 @@
 		| 'price'
 		| 'discount'
 		| 'status'
-		| 'products'
+		| 'productIds'
 		| 'createdAt'
 		| 'deliveryStatus'
 		| 'paymentStatus'
@@ -45,8 +45,8 @@
 
 	const ordersCount = orders.length;
 
-	const productsCount = orders.reduce((acc, { products }) => {
-		return acc + products.length;
+	const productsCount = orders.reduce((acc, { productIds }) => {
+		return acc + productIds.length;
 	}, 0);
 
 	const oldestOrder = orders.sort((a, b) => {
@@ -54,7 +54,6 @@
 	})[0];
 
 	const completedOrdersCount = orders.filter(({ status }) => status === 'completed').length;
-	const refundedOrdersCount = orders.filter(({ status }) => status === 'refunded').length;
 </script>
 
 <svelte:head>
@@ -96,155 +95,6 @@
 						{/each}
 					</tbody>
 				</table>
-			</div>
-
-			<div class="flex flex-col md:flex-row lg:flex-col lg:space-y-4 md:space-y-0 space-y-4">
-				<div class="collapse">
-					<input type="checkbox" />
-					<div class="collapse-title text-xl font-medium">Statystyki zamówień</div>
-					<div class="collapse-content">
-						<div class="stats shadow stats-vertical lg:stats-horizontal">
-							<div class="stat">
-								<div class="stat-figure text-primary">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										fill="none"
-										viewBox="0 0 24 24"
-										class="inline-block w-8 h-8 stroke-current"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-										/></svg
-									>
-								</div>
-								<div class="stat-title">Ilość zamówień</div>
-								<div class="stat-value text-primary text-3xl ss:text-4xl">{ordersCount}</div>
-								<div class="stat-desc">Od {dateParser(oldestOrder.createdAt, 'short')}</div>
-							</div>
-
-							<div class="stat">
-								<div class="stat-figure text-secondary">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										fill="none"
-										viewBox="0 0 24 24"
-										class="inline-block w-8 h-8 stroke-current"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M13 10V3L4 14h7v7l9-11h-7z"
-										/></svg
-									>
-								</div>
-								<div class="stat-title">Ilość produktów</div>
-								<div class="stat-value text-secondary text-3xl ss:text-4xl">
-									{productsCount}
-								</div>
-								<div class="stat-desc">kupionych przez aplikację</div>
-							</div>
-
-							<div class="stat">
-								<div class="stat-figure text-secondary">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										fill="none"
-										viewBox="0 0 24 24"
-										class="inline-block w-8 h-8 stroke-current"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M13 10V3L4 14h7v7l9-11h-7z"
-										/></svg
-									>
-								</div>
-								<div class="stat-value text-3xl ss:text-4xl">
-									{((completedOrdersCount / ordersCount) * 100).toFixed(2)}%
-								</div>
-								<div class="stat-title">Pomyślnych zamówień</div>
-								<div class="stat-desc text-secondary">
-									{((refundedOrdersCount / ordersCount) * 100).toFixed(2)}% zwróconych
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<div class="collapse">
-					<input type="checkbox" />
-					<div class="collapse-title text-xl font-medium">Statystyki finansowe</div>
-					<div class="collapse-content">
-						<div class="stats shadow stats-vertical lg:stats-horizontal">
-							<div class="stat">
-								<div class="stat-figure text-primary">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										fill="none"
-										viewBox="0 0 24 24"
-										class="inline-block w-8 h-8 stroke-current"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-										/></svg
-									>
-								</div>
-								<div class="stat-title">Łączna kwota zamówień</div>
-								<div class="stat-value text-primary text-3xl ss:text-4xl">
-									{moneySpent.toFixed(2)} zł
-								</div>
-								<div class="stat-desc">Kwota uwzględnia kody rabatowe</div>
-							</div>
-
-							<div class="stat">
-								<div class="stat-figure text-secondary">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										fill="none"
-										viewBox="0 0 24 24"
-										class="inline-block w-8 h-8 stroke-current"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M13 10V3L4 14h7v7l9-11h-7z"
-										/></svg
-									>
-								</div>
-								<div class="stat-title">Kwota bez rabatów</div>
-								<div class="stat-value text-secondary text-3xl ss:text-4xl">
-									{(moneySpent + moneySaved).toFixed(2)} zł
-								</div>
-							</div>
-
-							<div class="stat">
-								<div class="stat-figure text-secondary">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										fill="none"
-										viewBox="0 0 24 24"
-										class="inline-block w-8 h-8 stroke-current"
-										><path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M13 10V3L4 14h7v7l9-11h-7z"
-										/></svg
-									>
-								</div>
-								<div class="stat-title">Zaoszczędzono</div>
-								<div class="stat-value text-3xl ss:text-4xl">
-									{moneySaved.toFixed(2)} zł
-								</div>
-								<div class="stat-desc">Dzięki kodom rabatowym</div>
-							</div>
-						</div>
-					</div>
-				</div>
 			</div>
 		</div>
 	</div>

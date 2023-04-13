@@ -23,10 +23,18 @@
 			<label class="cursor-pointer label justify-start space-x-3">
 				<input
 					type="checkbox"
-					bind:checked={filter.roles.moderator}
+					bind:checked={filter.roles.driver}
 					class="checkbox checkbox-success"
 				/>
-				<span class="label-text">Moderator</span>
+				<span class="label-text">Kierowca</span>
+			</label>
+			<label class="cursor-pointer label justify-start space-x-3">
+				<input
+					type="checkbox"
+					bind:checked={filter.roles.adviser}
+					class="checkbox checkbox-success"
+				/>
+				<span class="label-text">Doradca</span>
 			</label>
 			<label class="cursor-pointer label justify-start space-x-3">
 				<input type="checkbox" bind:checked={filter.roles.admin} class="checkbox checkbox-error" />

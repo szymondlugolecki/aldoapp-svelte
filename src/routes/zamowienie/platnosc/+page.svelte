@@ -6,7 +6,9 @@
 </script>
 
 <svelte:head>
-	<title>Koszyk {$cart.products ? `(${$cart.products.length}) ` : ''}• Twoje ALDO</title>
+	<title
+		>Koszyk {$cart?.productsQuantity ? `(${$cart.productsQuantity.length}) ` : ''}• Twoje ALDO</title
+	>
 	<meta name="description" content="Wybierz metodę dostawy. Dokończ zamówienie." />
 </svelte:head>
 
@@ -17,13 +19,18 @@
 	<Alert type="info" message="Możliwość płatności online pojawi się w przyszłości 💳" />
 	<ul class="flex flex-col w-full xs:max-w-[500px] space-y-4">
 		<li>
-			<PaymentMethod name="Gotówka" description="Przy odbiorze" id="cash" checked={true}>
+			<PaymentMethod name="Gotówka/Przedpłata" description="Przy odbiorze" id="cash" checked={true}>
 				<Wallet size={50} />
 			</PaymentMethod>
 		</li>
 		<li>
-			<PaymentMethod name="Dotpay" description="Płatność online" id="dotpay" checked={false}>
-				<CreditCard size={50} />
+			<PaymentMethod
+				name="Przelew"
+				description="Na podany rachunek bankowy"
+				id="transfer"
+				checked={false}
+			>
+				<Landmark size={50} />
 			</PaymentMethod>
 		</li>
 		<!-- <li>

@@ -5,7 +5,7 @@ import edit from '$lib/server/actions/product/edit';
 import remove from '$lib/server/actions/product/remove';
 import { db } from '$lib/server/db';
 import { products } from '$lib/server/db/schemas/products';
-import { users } from '$lib/server/db/schemas/users';
+import { users, type User } from '$lib/server/db/schemas/users';
 import { eq } from 'drizzle-orm/expressions';
 import type { Config } from '@sveltejs/adapter-vercel';
 
@@ -31,12 +31,7 @@ export const load = async () => {
 	return {
 		products: productsArr.map((product) => ({
 			...product.products,
-			author: product.author as {
-				id: string;
-				fullName: string;
-				email: string;
-				role: 'admin' | 'moderator' | 'customer';
-			}
+			author: product.author as Pick<User, 'id' | 'fullName' | 'email' | 'role'>
 		}))
 	};
 };

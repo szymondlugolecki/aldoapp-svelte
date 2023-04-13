@@ -6,6 +6,7 @@ import { error, fail, type Action } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { addPromoCodeValidation } from '$lib/client/schemas/promoCode';
 import { promoCodes, type PromoCode } from '$lib/server/db/schemas/promoCodes';
+import { isAtLeastModerator } from '$lib/client/functions';
 
 const stringToDateParser = (value: FormDataEntryValue | null) => {
 	if (value === null) {
@@ -23,7 +24,7 @@ const add = (async ({ request, locals }) => {
 	if (!locals.session) {
 		throw error(...errorResponses[401]);
 	}
-	if (!['admin', 'moderator'].includes(locals.session?.user.role)) {
+	if (!isAtLeastModerator(locals.session?.user.role)) {
 		throw error(...errorResponses[403]);
 	}
 
@@ -54,21 +55,16 @@ const add = (async ({ request, locals }) => {
 
 	const data = {
 		...Object.fromEntries(formData),
-		discount: Number(formData.get('discount')?.toString().replace(',', '.')),
+		discount: formData.get('discount')?.toString().replace(',', '.'),
 		totalUseLimit: Number(formData.get('totalUseLimit')?.toString().replace(',', '.')),
 		perUserLimit: Number(formData.get('perUserLimit')?.toString().replace(',', '.')),
-		minCartValue: Number(formData.get('minCartValue')?.toString().replace(',', '.')),
+		minCartValue: formData.get('minCartValue')?.toString().replace(',', '.'),
 		validSince,
 		validUntil
 	};
 
 	console.log('data', data);
 
-	if (isNaN(data.discount)) {
-		return fail(400, {
-			errors: ['Niepoprawna wartość przeceny']
-		});
-	}
 	if (isNaN(data.totalUseLimit)) {
 		return fail(400, {
 			errors: ['Niepoprawny całkowity limit użycia kodu']
@@ -78,12 +74,6 @@ const add = (async ({ request, locals }) => {
 	if (isNaN(data.perUserLimit)) {
 		return fail(400, {
 			errors: ['Niepoprawny limit użycia kodu na użytkownika']
-		});
-	}
-
-	if (isNaN(data.minCartValue)) {
-		return fail(400, {
-			errors: ['Niepoprawna minimalna wartość koszyka']
 		});
 	}
 
