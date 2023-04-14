@@ -60,7 +60,8 @@ export const addUserSchema = z.object({
 	fullName: nameValidation,
 	email: emailValidation,
 	role: roleValidation,
-	phone: orderPhoneValidation
+	phone: orderPhoneValidation,
+	assignedAdviser: idValidation.optional()
 });
 
 export const editUserSchema = z.object({
@@ -69,5 +70,6 @@ export const editUserSchema = z.object({
 	email: emailValidation,
 	role: roleValidation,
 	access: accessPermittedValidation.optional(),
-	phone: orderPhoneValidation
+	phone: orderPhoneValidation,
+	assignedAdviser: idValidation.optional()
 });

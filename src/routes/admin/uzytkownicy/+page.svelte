@@ -80,7 +80,7 @@
 	<Drawer>
 		{#if $drawer && $drawer.type === 'user'}
 			{#if $drawer.action === 'add'}
-				<NewUser />
+				<NewUser advisers={data.advisers} />
 			{:else if $drawer.action === 'edit'}
 				<EditUser user={getUserFromDrawer()} />
 			{:else if $drawer.action === 'filter'}

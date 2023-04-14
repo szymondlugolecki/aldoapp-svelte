@@ -68,6 +68,7 @@
 
 		<div class="flex flex-col">
 			<div class="overflow-x-auto">
+				<h3 class="ss:text-lg xs:text-xl">Historia zamówień</h3>
 				<table class="table w-full">
 					<!-- head -->
 					<thead>
@@ -95,6 +96,11 @@
 						{/each}
 					</tbody>
 				</table>
+				{#if orders.length === 0}
+					<div class="w-full h-20 flex justify-center items-center text-center mb-8">
+						<span class="text-2xl sm:text-3xl">Brak zamówień... 🧐</span>
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>

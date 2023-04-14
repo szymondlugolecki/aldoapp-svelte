@@ -32,10 +32,12 @@ const add = (async ({ request, locals }) => {
 		phone: Object.fromEntries(formData).phone.toString().replaceAll(' ', '') || null
 	};
 
+	console.log('new user data', data);
+
 	const [newUserParsed, newUserParseError] = betterZodParse(addUserSchema, data);
 	if (newUserParseError) {
 		return fail(400, {
-			errors: ['Niepoprawne dane']
+			errors: newUserParseError[0]
 		});
 	}
 
