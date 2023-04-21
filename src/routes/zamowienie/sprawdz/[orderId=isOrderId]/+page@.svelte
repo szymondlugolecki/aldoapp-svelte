@@ -87,17 +87,10 @@
 			/>
 		{/if}
 
-		{#if order.customer}
-			<UserOrderCell
-				title="Klient"
-				value={[order.customer.fullName, order.customer.email, order.customer.phone]}
-			/>
-		{:else if data.user}
-			<UserOrderCell
+		<!-- <UserOrderCell
 				title="Klient"
 				value={[data.user.fullName, data.user.email, data.user.phone]}
-			/>
-		{/if}
+			/> -->
 
 		<h3 class="ss:text-xl xs:text-2xl">Produkty ({data.products.length})</h3>
 

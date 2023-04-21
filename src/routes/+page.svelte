@@ -2,6 +2,8 @@
 	import toast from 'svelte-french-toast';
 	import { onMount } from 'svelte';
 	import { subscribe, unsubscribe } from '$lib/client/functions/push';
+	// import { Grid } from "gridjs";
+	import Grid from 'gridjs-svelte';
 
 	let sessionData: import('./$types').PageData['user'] | undefined = undefined;
 
@@ -33,6 +35,29 @@
 	function showToast() {
 		toast.success('Testowe Powiadomienie');
 	}
+
+	const data = [
+		['John', new Date().toDateString()],
+		['Mark', new Date().toDateString()]
+		// { name: 'John', email: 'john@example.com' },
+		// { name: 'Mark', email: 'mark@gmail.com' }
+	];
+
+	const columns = [
+		{
+			name: 'Title',
+			sort: false
+		},
+		{
+			name: 'Date',
+			formatter: (cell: string) => {
+				return new Date(cell).toLocaleString('en-US', {
+					month: 'short',
+					year: 'numeric'
+				});
+			}
+		}
+	];
 </script>
 
 <svelte:head>
@@ -67,4 +92,6 @@
 	<button on:click={createProgenitor} class="px-3 py-2 bg-gray-800 text-white text-lg"
 		>Utwórz protoplastę</button
 	>
+
+	<Grid {columns} sort search pagination={{ enabled: true, limit: 3 }} {data} />
 </section>

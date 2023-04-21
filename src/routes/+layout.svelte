@@ -1,5 +1,7 @@
 <script lang="ts">
 	import '../app.css';
+	import 'gridjs/dist/theme/mermaid.css';
+
 	import Navbar from '../components/Layout/Navbar.svelte';
 	import Footer from '../components/Layout/Footer.svelte';
 	import { fade } from 'svelte/transition';

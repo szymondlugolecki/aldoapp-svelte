@@ -10,7 +10,7 @@ import type {
 	Role
 } from '$types';
 import type { Thing, WithContext } from 'schema-dts';
-import { fodderCategories } from '../constants';
+import { fodderCategories, roleNames } from '../constants';
 
 export type Schema = Thing | WithContext<Thing>;
 
@@ -51,6 +51,13 @@ export const productURLParser = (name: string, symbol: string) => {
 	return encodeURIComponent(
 		`${name}-${symbol}`.replaceAll('  ', ' ').replaceAll(' ', '-').toLowerCase().trim()
 	);
+};
+
+export const getUserRoleByName = (role: string) => {
+	return Object.entries(roleNames).reduce<Role | undefined>((acc, [key, value]) => {
+		if (value === role) return key as Role;
+		return acc;
+	}, undefined);
 };
 
 export const capitalize = (text: string) => {

@@ -25,6 +25,8 @@ specifiers:
   eslint: ^8.35.0
   eslint-config-prettier: ^8.7.0
   eslint-plugin-svelte3: ^4.0.0
+  gridjs: ^6.0.6
+  gridjs-svelte: ^2.1.1
   jose: ^4.13.1
   lucide-svelte: ^0.113.0
   postcss: ^8.4.21
@@ -56,6 +58,8 @@ dependencies:
   daisyui: 2.51.4_j7yt3jd32cwenjqavrrga47yr4
   dotenv: 16.0.3
   drizzle-orm: 0.23.10_yjazpptyy5hkedviejakk766iq
+  gridjs: 6.0.6
+  gridjs-svelte: 2.1.1_gridjs@6.0.6+svelte@3.57.0
   jose: 4.13.1
   lucide-svelte: 0.113.0_svelte@3.57.0
   schema-dts: 1.1.2_typescript@4.9.5
@@ -3930,6 +3934,22 @@ packages:
     resolution: {integrity: sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==}
     dev: true
 
+  /gridjs-svelte/2.1.1_gridjs@6.0.6+svelte@3.57.0:
+    resolution: {integrity: sha512-tYkgdqNKSnfmAYYc8EP4axn/Xlugp7VLwAlpNkP4SBLHHYD/ejD2DJ+FMatDNqcJ1Z1kuMnJWO+VBcAOirEByw==}
+    peerDependencies:
+      gridjs: '>=5.0.0'
+      svelte: '>=3.30.0'
+    dependencies:
+      gridjs: 6.0.6
+      svelte: 3.57.0
+    dev: false
+
+  /gridjs/6.0.6:
+    resolution: {integrity: sha512-TZ20nY+weE/wlyXOd3A9FJyJlsJ/MrHr6frMgUHFN29RmWZCYtnyfF0zuspXC81oePwSJeSZ8HY651aeyX8+rQ==}
+    dependencies:
+      preact: 10.13.2
+    dev: false
+
   /hanji/0.0.5:
     resolution: {integrity: sha512-Abxw1Lq+TnYiL4BueXqMau222fPSPMFtya8HdpWsz/xVAhifXou71mPh/kY2+08RgFcVccjG3uZHs6K5HAe3zw==}
     dependencies:
@@ -4917,6 +4937,10 @@ packages:
       nanoid: 3.3.4
       picocolors: 1.0.0
       source-map-js: 1.0.2
+
+  /preact/10.13.2:
+    resolution: {integrity: sha512-q44QFLhOhty2Bd0Y46fnYW0gD/cbVM9dUVtNTDKPcdXSMA7jfY+Jpd6rk3GB0lcQss0z5s/6CmVP0Z/hV+g6pw==}
+    dev: false
 
   /prebuild-install/7.1.1:
     resolution: {integrity: sha512-jAXscXWMcCK8GgCoHOfIr0ODh5ai8mj63L2nWrjuAgXE6tDyYGnx4/8o/rCgU+B4JSyZBKbeZqzhtwtC3ovxjw==}

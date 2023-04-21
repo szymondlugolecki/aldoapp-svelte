@@ -3,9 +3,20 @@ export * from './UserTypes';
 export * from './OrderTypes';
 export * from './AuthTypes';
 export * from './ApiTypes';
+import type { ComponentType } from 'svelte';
 
 export type ShortService = 'pasze' | 'komis' | 'market' | 'paliwa' | 'maszyny' | 'serwis';
 export type Outlets = 'surowe' | 'myszyniec' | 'ełk' | 'wójtowo';
+
+export type GridTableColumn = {
+	key: string;
+	label?: string;
+	hidden?: boolean;
+	formatter?: (cell: any) => string;
+	sort?: boolean;
+	editableType?: 'text' | 'date' | 'access' | 'user' | 'role' | 'category';
+	component?: ComponentType;
+};
 
 export type DrawerStore =
 	| {

@@ -52,6 +52,8 @@
 		"daisyui": "^2.51.3",
 		"dotenv": "^16.0.3",
 		"drizzle-orm": "^0.23.10",
+		"gridjs": "^6.0.6",
+		"gridjs-svelte": "^2.1.1",
 		"jose": "^4.13.1",
 		"lucide-svelte": "^0.113.0",
 		"schema-dts": "^1.1.2",
