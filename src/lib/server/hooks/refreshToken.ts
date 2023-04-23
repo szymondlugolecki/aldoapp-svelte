@@ -109,6 +109,8 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 			.where(eq(users.id, userId))
 	);
 
+	console.log('dbUsers', dbUsers);
+
 	if (getUserError) {
 		// Unexpected-error
 		console.error(

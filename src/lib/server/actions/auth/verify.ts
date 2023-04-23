@@ -93,8 +93,8 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 		role: token.role,
 		fullName: token.fullName,
 		access: token.access,
-		phone: token.phone,
-	} satisfies Optional<typeof token, 'expiresAt'>;
+		phone: token.phone
+	} satisfies Optional<typeof token, 'expiresAt' | 'assignedAdviser'>;
 
 	console.log('verify', token.id);
 

@@ -1,10 +1,17 @@
 import { z } from 'zod';
-import { emailValidation, verificationCodeValidation } from './users';
 
-export const loginSchema = z.object({
-	email: emailValidation
-});
+export const authSchemas = {
+	code: z
+		.string({
+			required_error: 'Kod weryfikacyjny jest wymagany'
+		})
+		.length(4, { message: 'Nieprawidłowy kod' })
+};
+
+// export const loginSchema = z.object({
+// 	email: emailValidation
+// });
 
 export const verificationCodeSchema = z.object({
-	code: verificationCodeValidation
+	code: authSchemas.code
 });

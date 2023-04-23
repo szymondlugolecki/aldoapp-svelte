@@ -4,7 +4,7 @@
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import logo from '$lib/assets/logo.png?run&width=110&height=80&format=webp';
 	import Img from '@zerodevx/svelte-img';
-	import { emailValidation } from '$lib/client/schemas/users';
+	import { userPropertySchemas } from '$lib/client/schemas/users';
 	import toast from 'svelte-french-toast';
 
 	let emailInput = '';
@@ -39,7 +39,7 @@
 					class="space-y-4"
 					method="post"
 					use:enhance={() => {
-						if (!emailValidation.safeParse(emailInput).success) {
+						if (!userPropertySchemas.email.safeParse(emailInput).success) {
 							toast.error('Nieprawidłowy adres email');
 							return;
 						}
@@ -65,9 +65,9 @@
 							required
 							bind:value={emailInput}
 							class:input-success={emailInput.length > 0 &&
-								emailValidation.safeParse(emailInput).success}
+								userPropertySchemas.email.safeParse(emailInput).success}
 							class:input-error={emailInput.length > 0 &&
-								!emailValidation.safeParse(emailInput).success}
+								!userPropertySchemas.email.safeParse(emailInput).success}
 						/>
 					</div>
 					<button

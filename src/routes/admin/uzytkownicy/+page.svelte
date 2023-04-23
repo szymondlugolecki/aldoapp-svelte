@@ -27,6 +27,8 @@
 
 	let searchInput = '';
 
+	console.log('data', data.users);
+
 	let filter: UserFilter = {
 		blocked: true,
 		nonblocked: true,
@@ -190,7 +192,7 @@
 		})}
 	/> -->
 
-	<NewTable data={data.users} {columns} />
+	<NewTable data={data.users} {columns} tableName="users" />
 
 	<Drawer>
 		{#if $drawer && $drawer.type === 'user'}

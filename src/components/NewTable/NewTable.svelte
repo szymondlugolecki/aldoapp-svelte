@@ -23,6 +23,7 @@
 	export let pagination = false;
 	export let data: Record<string, unknown>[];
 	export let columns: GridTableColumn[];
+	export let tableName: 'users' | 'orders' | 'promocodes' | 'products' | 'categories';
 	let extendedRow: string | null = null;
 
 	console.log('table data', data);
@@ -161,6 +162,7 @@
 													column={columns.find((column) => column.key === key)}
 													{extendRow}
 													{cell}
+													{tableName}
 												/>
 											{/if}
 											<!-- {console.log('row', row)} -->

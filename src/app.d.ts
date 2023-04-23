@@ -5,11 +5,11 @@ import type { SessionUser } from '$types';
 interface BeforeInstallPromptEvent extends Event {
 	readonly platforms: string[];
 	readonly userChoice: Promise<{
-	  outcome: "accepted" | "dismissed";
-	  platform: string;
+		outcome: 'accepted' | 'dismissed';
+		platform: string;
 	}>;
 	prompt(): Promise<void>;
-  }
+}
 
 // for information about these interfaces
 declare global {
@@ -23,6 +23,7 @@ declare global {
 				user: SessionUser;
 				expires: Date;
 			} | null;
+			updateData?: unknown;
 		}
 		interface PageData {
 			user: SessionUser | undefined;
@@ -31,7 +32,7 @@ declare global {
 
 		interface WindowEventMap {
 			beforeinstallprompt: BeforeInstallPromptEvent;
-		  }
+		}
 	}
 
 	declare namespace svelteHTML {
