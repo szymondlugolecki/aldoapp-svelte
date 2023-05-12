@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { userPropertySchemas } from './users';
 
 export const authSchemas = {
 	code: z
@@ -8,9 +9,9 @@ export const authSchemas = {
 		.length(4, { message: 'Nieprawidłowy kod' })
 };
 
-// export const loginSchema = z.object({
-// 	email: emailValidation
-// });
+export const loginSchema = z.object({
+	email: userPropertySchemas.email
+});
 
 export const verificationCodeSchema = z.object({
 	code: authSchemas.code
