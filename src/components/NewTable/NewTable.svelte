@@ -1,32 +1,14 @@
 <script lang="ts">
-	import Alert from '$components/Alerts/Alert.svelte';
-	import type { GridTableColumn } from '$types';
-	import { ColumnsIcon } from 'lucide-svelte';
-	import TableCell from './TableCell.svelte';
-	import type { ComponentType } from 'svelte';
+	import type { GridTableColumn, TableType } from '$types';
+	import TableRow from './TableRow.svelte';
 
 	type ObjectWithRenamedKey<T, K1 extends keyof T, K2 extends string> = Omit<T, K1> &
 		Record<K2, T[K1]>;
 
-	function renameKey<T, K1 extends keyof T, K2 extends string>(
-		obj: T,
-		oldKey: K1,
-		newKey: K2
-	): ObjectWithRenamedKey<T, K1, K2> {
-		const { [oldKey]: old, ...rest } = obj;
-		return {
-			...rest,
-			[newKey]: old
-		} as ObjectWithRenamedKey<T, K1, K2>;
-	}
-
 	export let pagination = false;
 	export let data: Record<string, unknown>[];
 	export let columns: GridTableColumn[];
-	export let tableName: 'users' | 'orders' | 'promocodes' | 'products' | 'categories';
-	let extendedRow: string | null = null;
-
-	console.log('table data', data);
+	export let tableType: TableType;
 
 	const columnNameSubstitutes: Record<string, string> = {};
 
@@ -35,47 +17,19 @@
 		if (column.key) columnNameSubstitutes[column.key] = column.label || column.key;
 	});
 
-	const extendRow = (id: string) => {
-		extendedRow = extendedRow === id ? null : id;
-	};
-
 	// Prepare data for rendering
-	$: modifiedData = data.map((user) => {
-		console.log('user 0', user);
+	$: modifiedData = data.map((el) => {
+		// console.log('el 0', el);
 
 		// Handle columns order
-		user = Object.fromEntries(
+		el = Object.fromEntries(
 			columns.map((column) => {
-				const value = user[column.key];
+				const value = el[column.key];
 				return [column.key, value];
 			})
 		);
 
-		console.log('user 1', user);
-
-		// Handle hidden columns
-		// user = Object.fromEntries(
-		// 	Object.entries(user).reduce((acc, [key, value]) => {
-		// 		const column = columns.find((column) => column.key === key);
-		// 		console.log('column', column, '!column.hidden', !column?.hidden);
-		// 		if (column && !column.hidden) {
-		// 			acc.push([key, value as string]);
-		// 		}
-		// 		return acc;
-		// 	}, [] as [string, string][])
-		// );
-
-		console.log('user 2', user);
-
-		// Handle formatters
-		// columns.forEach((column) => {
-		// 	if (column.formatter) {
-		// 		const value = user[column.key];
-		// 		user[column.key] = column.formatter(value);
-		// 	}
-		// });
-
-		return user;
+		return el;
 	}) as Record<string, string>[];
 
 	$: columnHeaders = Object.keys(modifiedData[0]).reduce<
@@ -94,8 +48,19 @@
 		return acc;
 	}, []);
 
-	$: hiddenColumns = columns.filter((column) => column.hidden).map((column) => column.key);
-	$: console.log('extendedRow', extendedRow);
+	// $: console.log('hiddenColumns', hiddenColumns, 'modifiedData', modifiedData);
+
+	const updateData = (id: string | number, changedData: Record<string, unknown>) => {
+		data = data.map((element) => {
+			if (element.id === id) {
+				return {
+					...element,
+					...changedData
+				};
+			}
+			return element;
+		});
+	};
 </script>
 
 <article class="w-full relative">
@@ -151,23 +116,7 @@
 							</thead>
 							<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
 								{#each modifiedData as row}
-									<tr class="" class:h-48={row.id === extendedRow}>
-										{#each Object.entries(row) as [key, cell]}
-											<!-- {console.log('cell', cell)} -->
-
-											{#if typeof cell !== 'string' || !hiddenColumns.includes(key)}
-												<TableCell
-													isExtended={row.id === extendedRow}
-													id={typeof row.id === 'string' ? row.id : undefined}
-													column={columns.find((column) => column.key === key)}
-													{extendRow}
-													{cell}
-													{tableName}
-												/>
-											{/if}
-											<!-- {console.log('row', row)} -->
-										{/each}
-									</tr>
+									<TableRow {columns} {tableType} {row} {updateData} />
 								{/each}
 							</tbody>
 						</table>

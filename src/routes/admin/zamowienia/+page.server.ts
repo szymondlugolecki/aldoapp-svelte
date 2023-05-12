@@ -5,8 +5,11 @@ import { db } from '$lib/server/db';
 import { orders } from '$lib/server/db/schemas/products';
 import { users } from '$lib/server/db/schemas/users';
 import { desc, eq } from 'drizzle-orm/expressions';
+import { alias } from 'drizzle-orm/mysql-core/alias.js';
 
 export const load = () => {
+	const drivers = alias(users, 'drivers');
+
 	return {
 		// fetch with products in the future
 		// when i find out how to do it
@@ -17,6 +20,11 @@ export const load = () => {
 					id: users.id,
 					fullName: users.fullName,
 					email: users.email
+				},
+				attachedDriver: {
+					id: drivers.id,
+					fullName: drivers.fullName,
+					email: drivers.email
 				}
 				// productsList: {
 				// 	id: products.id,
@@ -28,7 +36,8 @@ export const load = () => {
 			.from(orders)
 			.orderBy(desc(orders.createdAt))
 			.limit(3)
-			.leftJoin(users, eq(orders.customerId, users.id)),
+			.leftJoin(users, eq(orders.customerId, users.id))
+			.leftJoin(drivers, eq(drivers.id, orders.driverId)),
 		promise: {
 			// order it by updatedAt once drizzle/planetscale supports it
 			orders: db
@@ -38,6 +47,11 @@ export const load = () => {
 						id: users.id,
 						fullName: users.fullName,
 						email: users.email
+					},
+					attachedDriver: {
+						id: drivers.id,
+						fullName: drivers.fullName,
+						email: drivers.email
 					}
 				})
 				.from(orders)
@@ -45,6 +59,7 @@ export const load = () => {
 				.limit(999_999)
 				.offset(3)
 				.leftJoin(users, eq(orders.customerId, users.id))
+				.leftJoin(drivers, eq(drivers.id, orders.driverId))
 		}
 	};
 };

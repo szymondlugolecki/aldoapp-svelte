@@ -3,16 +3,25 @@
 	import { enhance } from '$app/forms';
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import createLoadingToast from '$lib/client/functions/createLoadingToast';
-	import { X } from 'lucide-svelte';
-	import { drawer } from '$lib/client/stores/adminDrawer';
+	import { closeDrawer, drawer, getPropertyKey } from '$lib/client/stores/adminDrawer';
 	import ModalHeader from '../ModalHeader.svelte';
 	import type { User } from '$types';
 	import { getRoleRank } from '$lib/client/functions';
+	import AdviserSelection from './AdviserSelection.svelte';
 
-	export let user: User | undefined;
+	export let user: User;
+	$: key = $drawer?.action === 'edit' && $drawer?.type === 'user' && $drawer.key;
+
+	$: console.log('key', key);
+
+	// role of the person that is editing the user
+	const editorRole = $page.data.user?.role;
+
+	// whether the user that is being edited is of lower role than the editor
+	$: editorIsOfHigherRole = editorRole && getRoleRank(user.role) < getRoleRank(editorRole);
 </script>
 
-{#if user}
+{#if editorIsOfHigherRole || $page.data.user?.id === user.id}
 	<form
 		class="flex flex-col space-y-4"
 		method="post"
@@ -30,59 +39,59 @@
 			const toastId = createLoadingToast('please-wait');
 			return async ({ result, update }) => {
 				handleFormResponse(result, toastId);
-				drawer.set(undefined);
+				closeDrawer();
 				update();
 			};
 		}}
 	>
 		<ModalHeader title="Edytuj użytkownika" />
 
-		<div>
-			<label for="fullName" class="label label-text"> Imię i nazwisko </label>
-			<input
-				type="text"
-				name="fullName"
-				class="input input-bordered w-full text-base-content"
-				required
-				value={user.fullName}
-			/>
-		</div>
-
-		<div>
-			<label for="name" class="label label-text"> Email </label>
-			<input
-				type="email"
-				name="email"
-				class="input input-bordered w-full text-base-content"
-				value={user.email}
-				required
-			/>
-		</div>
-
-		<div>
-			<label for="phone" class="label label-text"> Numer telefonu </label>
-			<input
-				type="tel"
-				name="phone"
-				class="input input-bordered w-full text-base-content"
-				value={user.phone}
-				required
-			/>
-		</div>
-
-		<div>
-			<label for="name" class="label label-text"> Rola </label>
-			<select id="role-selection" name="role" class="select select-bordered w-full">
-				<option selected={user.role === 'customer'} value="customer">Klient</option>
-				<option selected={user.role === 'driver'} value="driver">Kierowca</option>
-				<option selected={user.role === 'adviser'} value="adviser">Doradca</option>
-				{#if $page.data.user?.role === 'admin'}
-					<option selected={user.role === 'admin'} value="admin">Admin</option>
-				{/if}
-			</select>
-		</div>
-
-		{#if $page.data.user && getRoleRank(user.role) < getRoleRank($page.data.user?.role)}
+		{#if key === 'fullName'}
+			<div>
+				<label for="fullName" class="label label-text"> Imię i nazwisko </label>
+				<input
+					type="text"
+					name="fullName"
+					class="input input-bordered w-full text-base-content"
+					required
+					value={user.fullName}
+				/>
+			</div>
+		{:else if key === 'email'}
+			<div>
+				<label for="name" class="label label-text"> Email </label>
+				<input
+					type="email"
+					name="email"
+					class="input input-bordered w-full text-base-content"
+					value={user.email}
+					required
+				/>
+			</div>
+		{:else if key === 'phone'}
+			<div>
+				<label for="phone" class="label label-text"> Numer telefonu </label>
+				<input
+					type="tel"
+					name="phone"
+					class="input input-bordered w-full text-base-content"
+					value={user.phone}
+					required
+				/>
+			</div>
+		{:else if key === 'role'}
+			<div>
+				<label for="name" class="label label-text"> Rola </label>
+				<select id="role-selection" name="role" class="select select-bordered w-full">
+					<option selected={user.role === 'customer'} value="customer">Klient</option>
+					<option selected={user.role === 'driver'} value="driver">Kierowca</option>
+					<option selected={user.role === 'adviser'} value="adviser">Doradca</option>
+					{#if $page.data.user?.role === 'admin'}
+						<option selected={user.role === 'admin'} value="admin">Admin</option>
+					{/if}
+				</select>
+			</div>
+		{:else if key === 'access'}
 			<div class="form-control max-w-[90px]">
 				<label class="cursor-pointer label">
 					<span class="label-text">Dostęp</span>
@@ -95,24 +104,15 @@
 					/>
 				</label>
 			</div>
-			<!-- <div class="flex items-center mb-4">
-				<input
-					id="access"
-					name="access"
-					type="checkbox"
-					value="true"
-					checked={user.access}
-					class="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 dark:focus:ring-red-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-				/>
-				<label for="access" class="ml-2 text-sm font-medium"
-					>Zablokuj</label
-				>
-			</div> -->
+		{:else if key === 'assignedAdviser'}
+			<AdviserSelection />
 		{/if}
 
-		<button type="submit" class="btn btn-primary w-full">Edytuj</button>
+		{#if key !== 'assignedAdviser'}
+			<button type="submit" class="btn btn-primary w-full">Edytuj</button>
+		{/if}
 		<input type="hidden" hidden value={user.id} name="id" />
 	</form>
 {:else}
-	<p>Nie znaleziono użytkownika 😥</p>
+	<span>Nie możesz edytować kogoś z taką samą lub wyższą rolą</span>
 {/if}

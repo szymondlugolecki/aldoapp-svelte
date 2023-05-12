@@ -87,7 +87,7 @@
 		{/await}
 	{/if}
 	<div
-		class="container space-y-2 ss:space-y-4 flex items-center justify-center flex-col h-full w-[448px] max-w-[320px] ss:max-w-[370px] xs:max-w-none px-3 ss:px-9 pt-2 pb-4 shadow-md"
+		class=" border-x border-base-content border-opacity-10 container space-y-2 ss:space-y-4 flex items-center justify-center flex-col h-full w-[448px] max-w-[320px] ss:max-w-[370px] xs:max-w-none px-3 ss:px-9 pt-2 pb-4 shadow-md"
 	>
 		<div class="flex items-center space-x-4 text-center">
 			<h1 class="text-3xl xs:text-4xl font-bold">Dziękujemy Ci</h1>

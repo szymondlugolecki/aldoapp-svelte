@@ -63,7 +63,7 @@
 
 <div class="w-full flex flex-col items-center justify-start">
 	<div class="container space-y-2 ss:space-y-4 flex flex-col h-full px-1 md:px-2 lg:px-4 pt-2 pb-4">
-		<h1 class="text-3xl xs:text-4xl font-bold">Profil użytkownika</h1>
+		<h1 class="text-3xl xs:text-4xl font-bold">Profil użytkownika | Design do poprawy!</h1>
 		<h2 class="ss:text-xl xs:text-2xl">{userData.fullName}</h2>
 
 		<div class="flex flex-col">

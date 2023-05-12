@@ -281,4 +281,8 @@ export const wretchClient = wretch('/api')
 	.resolve((_) => _.forbidden(() => toast.error('Nie masz uprawnień')))
 	.resolve((_) => _.notFound(() => toast.error('Nie znaleziono')))
 	.resolve((_) => _.unauthorized(() => toast.error('Nie jesteś zalogowany')))
-	.resolve((_) => _.error(400, (e) => toast.error(e.message)));
+	.resolve((_) =>
+		_.error(400, (e) => {
+			toast.error(e.json.message || 'Niespodziewany błąd');
+		})
+	);

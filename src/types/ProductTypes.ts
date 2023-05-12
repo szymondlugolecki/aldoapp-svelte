@@ -14,8 +14,8 @@ export type ProductWithAuthorAndImage = Product & {
 
 export type ProductFilter = {
 	excludedUserIds: User['id'][];
-	since: string | null;
-	until: string | null;
+	createdSince: string | null;
+	createdUntil: string | null;
 };
 
 export type ProductRowType =

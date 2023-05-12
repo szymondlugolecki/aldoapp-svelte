@@ -23,5 +23,6 @@ export type OrderFilter = {
 // Customer Info & Products
 export type OrderWithCustomer = Order & {
 	attachedCustomer: Pick<User, 'id' | 'fullName' | 'email'>;
+	attachedDriver: Pick<User, 'id' | 'fullName' | 'email'> | null;
 	// productsList: Pick<Product, 'id' | 'symbol' | 'name' | 'encodedURL'>[];
 };

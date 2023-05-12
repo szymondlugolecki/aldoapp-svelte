@@ -1,11 +1,11 @@
 import { getRoleRank, isAtLeastModerator } from '$lib/client/functions';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
-import { editUserSchema } from '$lib/client/schemas/users';
+import { editUserSchema, type EditUserSchema } from '$lib/client/schemas/users';
 import { db } from '$lib/server/db';
 import { users, type User } from '$lib/server/db/schemas/users';
-import { areObjectsEqual } from '$lib/server/functions/utils';
 // import { p } from '$lib/server/clients/pClient';
 import { trytm } from '@bdsqqq/try';
+import { isCuid } from '@paralleldrive/cuid2';
 import { error, fail, type Action } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm/expressions';
 
@@ -25,19 +25,36 @@ const edit: Action = async ({ request, locals }) => {
 			errors: ['Niepoprawne dane']
 		});
 	}
-	const data = {
-		...Object.fromEntries(formData),
-		phone: Object.fromEntries(formData).phone.toString().replaceAll(' ', '') || null
-	};
+	const data: Partial<EditUserSchema> = Object.fromEntries(formData);
 
-	const [editUserObj, editUserObjParseError] = betterZodParse(editUserSchema, data);
-	if (editUserObjParseError) {
+	// Only id is required, the rest is optional
+	if (!data.id) {
 		return fail(400, {
-			errors: ['Niepoprawne dane']
+			errors: ['Brak id edytowanego użytkownika']
+		});
+	}
+	if (!isCuid(data.id)) {
+		return fail(400, {
+			errors: ['Niepoprawne id edytowanego użytkownika']
 		});
 	}
 
-	const { id, email, fullName, role, access, phone } = editUserObj;
+	// Make sure anything else other than id was provided
+	if (Object.keys(data).length === 1) {
+		return fail(400, {
+			errors: ['Brak danych do edycji']
+		});
+	}
+
+	// Zod parse the data
+	const [editUserObj, editUserObjParseError] = betterZodParse(editUserSchema, data);
+	if (editUserObjParseError) {
+		return fail(400, {
+			errors: [editUserObjParseError[0]]
+		});
+	}
+
+	const { id, email, fullName, role, access, phone, assignedAdviser } = editUserObj;
 
 	// Fetch the user from the database (before the edit)
 	const [usersBeforeEdit, usersBeforeEditError] = await trytm(
@@ -57,7 +74,7 @@ const edit: Action = async ({ request, locals }) => {
 	// Check if the user exists
 	if (usersBeforeEditError) {
 		return fail(500, {
-			errors: ['Niepowodzenie w znalezieniu użytkownika']
+			errors: ['Błąd serwera. Nie udało się znaleźć tego użytkownika']
 		});
 	}
 	if (!usersBeforeEdit.length) {
@@ -71,7 +88,7 @@ const edit: Action = async ({ request, locals }) => {
 	// ! Handling permissions
 	// If the user is trying to edit themself
 	if (userBeforeEdit.id === locals.session.user.id) {
-		// It's ok as long as they are not trying to block themselves
+		// It's ok as long as they are not trying to block themself
 		if (access === false) {
 			return fail(400, {
 				errors: ['Nie możesz zablokować sam siebie']
@@ -80,14 +97,14 @@ const edit: Action = async ({ request, locals }) => {
 	}
 	// If the user is trying to edit another user
 	else {
-		// The other user is an admin
-		if (userBeforeEdit.role === 'admin') {
-			return fail(403, {
-				errors: ['Nikt nie może edytować admina']
-			});
-		}
+		// // The other user is an admin
+		// if (userBeforeEdit.role === 'admin') {
+		// 	return fail(403, {
+		// 		errors: ['Nikt nie może edytować admina']
+		// 	});
+		// }
 
-		// User is trying to edit a user with a higher or equal role
+		// User is trying to edit a user with higher or equal role
 		if (getRoleRank(locals.session.user.role) <= getRoleRank(userBeforeEdit.role)) {
 			return fail(403, {
 				errors: ['Nie masz wystarczających uprawień']
@@ -95,28 +112,32 @@ const edit: Action = async ({ request, locals }) => {
 		}
 	}
 
-	const oldUser = {
-		email: userBeforeEdit.email,
-		role: userBeforeEdit.role,
-		fullName: userBeforeEdit.fullName,
-		access: userBeforeEdit.access,
-		phone: userBeforeEdit.phone
-	};
+	const newUser: Partial<
+		Pick<User, 'email' | 'fullName' | 'access' | 'phone' | 'role' | 'assignedAdviser'>
+	> = {};
 
-	const newUser = {
-		email,
-		role,
-		fullName,
-		access: !access,
-		phone
-	} satisfies Omit<User, 'id' | 'createdAt' | 'assignedAdviser'>;
+	if (email) {
+		newUser.email = email.toLowerCase();
+	}
 
-	const nothingChanged = areObjectsEqual(oldUser, newUser);
+	if (fullName) {
+		newUser.fullName = fullName;
+	}
 
-	// If nothing has changed, do not update the user
-	if (nothingChanged) {
-		console.log('Nothing has changed');
-		return { success: true, message: 'Pomyślnie edytowano użytkownika' };
+	if (role) {
+		newUser.role = role;
+	}
+
+	if (access) {
+		newUser.access = access;
+	}
+
+	if (phone) {
+		newUser.phone = phone.toString().replaceAll(' ', '');
+	}
+
+	if (assignedAdviser) {
+		newUser.assignedAdviser = assignedAdviser;
 	}
 
 	const [, editUserError] = await trytm(db.update(users).set(newUser).where(eq(users.id, id)));
@@ -131,26 +152,3 @@ const edit: Action = async ({ request, locals }) => {
 };
 
 export default edit;
-
-// p.user.update({
-// 	where: {
-// 		id
-// 	},
-// 	data: newUserObj,
-// 	select: {
-// 		id: true
-// 	}
-// })
-
-// p.user.findFirstOrThrow({
-// 	where: {
-// 		id
-// 	},
-// 	select: {
-// 		id: true,
-// 		email: true,
-// 		fullName: true,
-// 		role: true,
-// 		banned: true
-// 	}
-// })

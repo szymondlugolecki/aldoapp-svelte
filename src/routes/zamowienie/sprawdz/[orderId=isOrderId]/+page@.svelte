@@ -39,7 +39,7 @@
 
 <div class="w-full flex flex-col items-center justify-start">
 	<div class="container space-y-2 ss:space-y-4 flex flex-col h-full px-1 ss:px-3 sm:px-6 pt-2 pb-4">
-		<h1 class="text-3xl xs:text-4xl font-bold">Zamówienie #{order.id}</h1>
+		<h1 class="text-3xl xs:text-4xl font-bold">Zamówienie #{order.id} | DESIGN DO POPRAWY!</h1>
 		<h2 class="ss:text-xl xs:text-2xl">Dane zamówienia</h2>
 		<div class="grid grid-cols-3 gap-2">
 			<UserOrderCell title="Kwota" value={order.price} />
@@ -103,26 +103,6 @@
 					<span class="text-lg font-bold">{product.price} zł</span>
 				</div>
 			{/each}
-		</div>
-
-		<div class="flex flex-col shadow-md p-4 rounded-md space-y-2">
-			<span class="text-xl">Zarządzaj zamówieniem</span>
-			<div class="grid grid-cols-2 gap-4">
-				<button
-					class="btn btn-info flex-1"
-					on:click={() => {
-						console.log('refund request');
-					}}
-					class:btn-disabled={order.deliveryStatus !== 'delivered'}>Zarządaj zwrot</button
-				>
-				<button
-					class="btn btn-error flex-1"
-					on:click={() => {
-						console.log('cancel request');
-					}}
-					class:btn-disabled={order.deliveryStatus !== 'pending'}>Anuluj zamówienie</button
-				>
-			</div>
 		</div>
 	</div>
 </div>

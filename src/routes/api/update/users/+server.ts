@@ -99,10 +99,19 @@ export async function POST({ locals }) {
 		updatedUser.role = userData.role;
 	}
 
+	if (shouldChangeField('phone')) {
+		updatedUser.phone = userData.phone;
+	}
+
+	if (Object.keys(updatedUser).length === 0) {
+		throw error(400, 'Nie podano żadnych danych do edycji');
+	}
+
 	const [, updateUserError] = await trytm(
 		db.update(users).set(updatedUser).where(eq(users.id, userData.id))
 	);
 	if (updateUserError) {
+		console.log('updatedUser', updatedUser);
 		console.error('Failed to update the user', parseError);
 		throw error(400, 'Nie udało się zaktualizować użytkownika');
 	}

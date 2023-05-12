@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { enhance } from '$app/forms';
-	import { fodderCategories, fodderNames } from '$lib/client/constants';
-	import { mainCategories } from '$lib/client/constants/dbTypes';
+	import { fodderCategories, fodderNames, producentsList } from '$lib/client/constants';
+	import { mainCategories, type Producent } from '$lib/client/constants/dbTypes';
 	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import { drawer } from '$lib/client/stores/adminDrawer';
@@ -15,8 +15,14 @@
 	} from '$types';
 	import { Edit, PlusCircle, Trash2, X } from 'lucide-svelte';
 	import ModalHeader from '../ModalHeader.svelte';
+	import { symbol } from 'zod';
+	import { desc } from 'drizzle-orm';
 
-	export let product: ProductWithAuthorAndImage | undefined;
+	export let product: ProductWithAuthorAndImage;
+	$: key =
+		$drawer?.action === 'edit' &&
+		$drawer?.type === 'product' &&
+		($drawer.key as keyof ProductWithAuthorAndImage | false);
 
 	let images: ImagesList = {};
 
@@ -85,33 +91,35 @@
 			selectedSubcategory = product.subcategory;
 		}
 	}
+
+	const producentsListTyped = Object.keys(producentsList) as Producent[];
 </script>
 
-{#if product}
-	<form
-		class="flex flex-col space-y-6"
-		method="post"
-		action="?/edit"
-		on:submit={() => {
-			drawer.update((value) => {
-				if (!value) return undefined;
-				return {
-					...value,
-					open: false
-				};
-			});
-		}}
-		use:enhance={() => {
-			const toastId = createLoadingToast('please-wait');
-			return async ({ result, update }) => {
-				handleFormResponse(result, toastId);
-				drawer.set(undefined);
-				update();
+<form
+	class="flex flex-col space-y-6"
+	method="post"
+	action="?/edit"
+	on:submit={() => {
+		drawer.update((value) => {
+			if (!value) return undefined;
+			return {
+				...value,
+				open: false
 			};
-		}}
-	>
-		<ModalHeader title="Edytuj produkt" />
+		});
+	}}
+	use:enhance={() => {
+		const toastId = createLoadingToast('please-wait');
+		return async ({ result, update }) => {
+			handleFormResponse(result, toastId);
+			drawer.set(undefined);
+			update();
+		};
+	}}
+>
+	<ModalHeader title="Edytuj produkt" />
 
+	{#if key === 'name'}
 		<div>
 			<label for="name" class="label label-text"> Nazwa </label>
 			<input
@@ -122,28 +130,63 @@
 				required
 			/>
 		</div>
-		<div class="flex space-x-4">
-			<div class="flex-1">
-				<label for="name" class="label label-text"> Symbol </label>
-				<input
-					type="text"
-					name="symbol"
-					class="input input-bordered w-full text-base-content"
-					value={product.symbol}
-					required
-				/>
-			</div>
-			<div class="w-28 sm:w-36">
-				<label for="price" class="label label-text"> Cena </label>
-				<input
-					type="number"
-					name="price"
-					value={product.price}
-					class="input input-bordered w-full text-base-content"
-					required
-				/>
-			</div>
+	{/if}
+	{#if key === 'symbol'}
+		<div class="flex-1">
+			<label for="name" class="label label-text"> Symbol </label>
+			<input
+				type="text"
+				name="symbol"
+				class="input input-bordered w-full text-base-content"
+				value={product.symbol}
+				required
+			/>
 		</div>
+	{/if}
+	{#if key === 'producent'}
+		<div>
+			<label for="producent" class="label label-text"> Producent* </label>
+			<select
+				id="producent"
+				name="producent"
+				class="select select-bordered w-full"
+				required
+				value={product.producent}
+			>
+				{#each producentsListTyped as producent}
+					<option value={producent}>{producentsList[producent]}</option>
+				{/each}
+			</select>
+		</div>
+	{/if}
+	{#if key === 'weight'}
+		<div class="flex-1">
+			<label for="weight" class="label label-text"> Waga (kg)* </label>
+			<input
+				name="weight"
+				placeholder="np. 25kg"
+				type="number"
+				step="0.01"
+				min="0"
+				class="input input-bordered w-full text-base-content"
+				required
+				value={product.weight}
+			/>
+		</div>
+	{/if}
+	{#if key === 'price'}
+		<div class="w-28 sm:w-36">
+			<label for="price" class="label label-text"> Cena (zł)* </label>
+			<input
+				type="number"
+				name="price"
+				value={product.price}
+				class="input input-bordered w-full text-base-content"
+				required
+			/>
+		</div>
+	{/if}
+	{#if key === 'description'}
 		<div>
 			<label for="description" class="label label-text">Opis</label>
 			<textarea
@@ -153,7 +196,8 @@
 				class="textarea textarea-bordered textarea-lg w-full"
 			/>
 		</div>
-
+	{/if}
+	{#if key === 'category'}
 		<div>
 			<label for="name" class="label label-text"> Kategoria </label>
 			<select
@@ -173,7 +217,8 @@
 				{/each}
 			</select>
 		</div>
-
+	{/if}
+	{#if key === 'subcategory'}
 		<div>
 			<label for="name" class="label label-text"> Podkategoria </label>
 			<select
@@ -187,8 +232,10 @@
 				{/each}
 			</select>
 		</div>
-
-		<div>
+	{/if}
+	{#if key === 'images'}
+		<span>Nie da się jeszcze edytować zdjęć...</span>
+		<!-- <div>
 			<label for="images" class="label label-text">Zdjęcie</label>
 			<div class="grid grid-cols-2 sm:grid-cols-3 gap-2 py-2">
 				{#each Object.entries(images) as [id, imageFile] (id)}
@@ -212,7 +259,7 @@
 						/>
 
 						<div class="flex justify-between items-center">
-							<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+							svelte-ignore a11y-no-noninteractive-tabindex
 							<label
 								for="image-{id}"
 								tabindex="0"
@@ -246,7 +293,7 @@
 							this.value = '';
 						}}
 					/>
-					<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+					svelte-ignore a11y-no-noninteractive-tabindex
 					<label
 						for="add-new-image"
 						tabindex="0"
@@ -256,11 +303,10 @@
 					</label>
 				</div>
 			</div>
-		</div>
-		<button type="submit" class="btn btn-primary w-full">Dodaj</button>
+		</div> -->
+	{/if}
 
-		<input type="hidden" hidden value={product.id} name="id" />
-	</form>
-{:else}
-	<p>Nie znaleziono wybranego produktu 😥</p>
-{/if}
+	<button type="submit" class="btn btn-primary w-full">Dodaj</button>
+
+	<input type="hidden" hidden value={product.id} name="id" />
+</form>

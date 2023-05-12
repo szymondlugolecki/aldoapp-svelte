@@ -179,10 +179,11 @@
 
 	// $: console.log('stepsPassed', stepsPassed);
 	// $: console.log('cart', $cart);
+	$: console.log($cart.productsQuantity, $cart.productsQuantity?.length);
 </script>
 
 <section class="w-full flex flex-col items-center justify-center">
-	{#if $cart?.productsQuantity && !$cart.productsQuantity.length}
+	{#if $cart && $cart.productsQuantity && $cart.productsQuantity.length === 0}
 		<div class="text-center mt-7">
 			<h1 class="text-2xl xxs:text-3xl sm:text-5xl font-bold mb-1 xxs:mb-1.5 sm:mb-2">
 				Koszyk jest pusty 😔

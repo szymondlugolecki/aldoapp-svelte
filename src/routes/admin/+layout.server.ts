@@ -5,5 +5,3 @@
 // 		user: locals.session?.user
 // 	};
 // }) satisfies LayoutServerLoad;
-
-export const prerender = false;

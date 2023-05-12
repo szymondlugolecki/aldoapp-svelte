@@ -1,11 +1,17 @@
 <script lang="ts">
-	import TableHeader from '$components/Table/TableHeader.svelte';
+	import Grid from 'gridjs-svelte';
+	import { Row, h } from 'gridjs';
+	import plPL from '$lib/client/constants/gridLocalePL';
+	import type { TCell } from 'gridjs/dist/src/types.js';
 
-	import type { OrderFilter, OrderWithCustomer } from '$types';
-	import Table from '$components/Table/Table.svelte';
+	import type { GridTableColumn, OrderFilter, OrderWithCustomer } from '$types';
 	import Drawer from '$components/AdminDrawer.svelte';
-	import { drawer } from '$lib/client/stores/adminDrawer';
+	import { drawer, openDrawer } from '$lib/client/stores/adminDrawer';
 	import toast from 'svelte-french-toast';
+	import type { OrderStatus } from '$lib/client/constants/dbTypes';
+	import Preview from '$components/Modals/Preview.svelte';
+	import { orderStatusList } from '$lib/client/constants/index.js';
+	import { dateParser } from '$lib/client/functions/index.js';
 
 	export let data;
 
@@ -16,16 +22,26 @@
 
 	let loadingStreamedOrders = true;
 
+	$: drawerOrder =
+		$drawer &&
+		($drawer.action === 'edit' || $drawer.action === 'preview') &&
+		$drawer.type === 'order' &&
+		orders.find(
+			(order) =>
+				($drawer?.action === 'edit' || $drawer?.action === 'preview') && order.id === $drawer.id
+		);
+
 	const orderParser = (orders: DefaultOrderList) => {
 		return orders.reduce<OrderWithCustomer[]>((acc, row) => {
-			const { attachedCustomer, order } = row;
+			const { attachedDriver, attachedCustomer, order } = row;
 
 			if (attachedCustomer) {
 				return [
 					...acc,
 					{
 						...order,
-						attachedCustomer
+						attachedCustomer,
+						attachedDriver
 					}
 				];
 			} else {
@@ -57,17 +73,212 @@
 	// 		textCrusher(user.fullName).includes(textCrusher(searchInput))
 	// );
 
-	// let editDrawerUserId: string;
+	const columnHelper = (cell: TCell, row: Row, cellType: string | string[]) => {
+		const id = row.cells[0].data;
 
-	// $: editUserModal = users.find((user) => user.id === editDrawerUserId);
+		if (typeof cellType === 'string' && cellType !== typeof cell) {
+			return { id: null, errorText: '⚠️' };
+		}
 
-	// const getUserFromDrawer = () => {
-	// 	const drawerS = $drawer;
-	// 	if (drawerS && drawerS.action === 'edit' && drawerS.type === 'user') {
-	// 		const user = users.find((user) => user.id === drawerS.id);
-	// 		return user;
-	// 	}
-	// };
+		if (Array.isArray(cellType) && !cellType.includes(typeof cell)) {
+			return { id: null, errorText: '⚠️' };
+		}
+
+		if (typeof id === 'number' || typeof id === 'string') {
+			return { id, errorText: null };
+		} else {
+			return { id: null, errorText: '⚠️' };
+		}
+	};
+
+	// id,
+	// products: [productIds, productsQuantity],
+	// price: [price, discount],
+	// status: [status, paymentStatus, deliveryStatus],
+	// driver: [driverId],
+	// address,
+	// methods: [deliveryMethod, paymentMethod],
+	// created: [attachedCustomer, createdAt]
+
+	const columns: GridTableColumn[] = [
+		{
+			name: 'Id',
+			hidden: true
+		},
+		{
+			name: 'Produkty',
+			formatter: (cell, row) => {
+				const { errorText, id } = columnHelper(cell, row, 'object');
+				if (errorText !== null) {
+					return errorText;
+				}
+
+				if (!Array.isArray(cell)) {
+					return '🛑';
+				}
+
+				return h(
+					'button',
+					{
+						class: 'flex flex-col items-start hover:text-primary duration-150 text-left',
+						onClick: () =>
+							openDrawer({
+								type: 'order',
+								action: 'preview',
+								id,
+								key: 'productIds'
+							})
+					},
+					'Podgląd'
+				);
+			},
+			sort: false
+		},
+		{
+			name: 'Cena',
+			formatter: (cell, row) => {
+				const { errorText, id } = columnHelper(cell, row, 'object');
+				if (errorText !== null) {
+					return errorText;
+				}
+
+				if (!Array.isArray(cell)) {
+					return '🛑';
+				}
+
+				return h(
+					'button',
+					{
+						class: 'flex flex-col items-start hover:text-primary duration-150 text-left',
+						onClick: () =>
+							openDrawer({
+								type: 'order',
+								action: 'preview',
+								id,
+								key: 'productIds'
+							})
+					},
+					`${(Number(cell[0]) - Number(cell[1])).toFixed(2)} zł (Rabat: ${cell[1]} zł)`
+				);
+			},
+			sort: true
+		},
+		{
+			name: 'Status',
+			formatter: (cell, row) => {
+				const { errorText, id } = columnHelper(cell, row, 'object');
+				if (errorText !== null) {
+					return errorText;
+				}
+
+				if (!Array.isArray(cell)) {
+					return '🛑';
+				}
+
+				return h(
+					'button',
+					{
+						class: 'flex flex-col items-start hover:text-primary duration-150 text-left',
+						onClick: () =>
+							openDrawer({
+								type: 'order',
+								action: 'edit',
+								id,
+								key: 'status'
+							})
+					},
+					orderStatusList[cell[0] as OrderStatus]
+				);
+			},
+			sort: true
+		},
+		{
+			name: 'Kierowca',
+			formatter: (cell, row) => {
+				const { errorText, id } = columnHelper(cell, row, 'object');
+				if (errorText !== null) {
+					return errorText;
+				}
+
+				if (Array.isArray(cell)) {
+					return '🛑';
+				}
+
+				return h(
+					'button',
+					{
+						class: 'flex flex-col items-start hover:text-primary duration-150 text-left',
+						onClick: () =>
+							openDrawer({
+								type: 'order',
+								action: 'edit',
+								id,
+								key: 'driverId'
+							})
+					},
+					(cell as OrderWithCustomer['attachedDriver'])?.fullName ?? 'Brak'
+				);
+			},
+			sort: true
+		},
+		{
+			name: 'Płatność i dostawa',
+			formatter: (cell, row) => {
+				const { errorText, id } = columnHelper(cell, row, 'object');
+				if (errorText !== null) {
+					return errorText;
+				}
+
+				if (!Array.isArray(cell)) {
+					return '🛑';
+				}
+
+				return h(
+					'button',
+					{
+						class: 'flex flex-col items-start hover:text-primary duration-150 text-left',
+						onClick: () =>
+							openDrawer({
+								type: 'order',
+								action: 'edit',
+								id,
+								key: 'paymentMethod'
+							})
+					},
+					h('span', {}, cell[0] === 'personal-delivery' ? 'Kurier ALDO' : '⚠️'),
+					h(
+						'span',
+						{},
+						cell[1] === 'cash' ? 'Płatność gotówką' : cell[1] === 'transfer' ? 'Przelew' : '⚠️'
+					)
+				);
+			},
+			sort: true
+		},
+		{
+			name: 'Złożono',
+			formatter: (cell, row) => {
+				const { errorText } = columnHelper(cell, row, 'object');
+				if (errorText !== null) {
+					return errorText;
+				}
+
+				if (!Array.isArray(cell)) {
+					return '🛑';
+				}
+
+				// info: [enabled, perUserLimit, totalUseLimit],
+
+				return h(
+					'div',
+					{ class: 'flex flex-col' },
+					h('span', {}, 'Przez: ' + cell[0].fullName || '⚠️'),
+					h('span', {}, 'W dniu: ' + dateParser(cell[1], 'short'))
+				);
+			},
+			sort: false
+		}
+	];
 </script>
 
 <svelte:head>
@@ -79,24 +290,53 @@
 </svelte:head>
 
 <section class="w-full h-full p-2 space-y-3">
-	<TableHeader type="order" bind:searchInput />
+	<Grid
+		{columns}
+		language={plPL}
+		search
+		fixedHeader
+		className={{
+			td: 'text-base-content',
+			sort: 'text-base-content bg-base-content'
+		}}
+		data={orders.map((order) => {
+			const {
+				id,
+				price,
+				status,
+				createdAt,
+				address,
+				attachedCustomer,
+				deliveryMethod,
+				deliveryStatus,
+				discount,
+				attachedDriver,
+				productsQuantity,
+				productIds,
+				paymentMethod,
+				paymentStatus
+			} = order;
 
-	<Table
-		type="orders"
-		orderHeaders={['status', 'customer', 'products', 'action', 'createdAt']}
-		items={orders}
-		isLoading={loadingStreamedOrders}
+			const parsedOrders = {
+				id,
+				products: [productIds, productsQuantity],
+				price: [price, discount],
+				status: [status, paymentStatus, deliveryStatus],
+				driver: attachedDriver,
+				// address,
+				methods: [deliveryMethod, paymentMethod],
+				created: [attachedCustomer, createdAt]
+			};
+
+			return Object.values(parsedOrders);
+		})}
 	/>
 
 	<Drawer>
-		{#if $drawer && $drawer.type === 'user'}
-			<!-- {#if $drawer.action === 'add'}
-				<NewUser />
-			{:else if $drawer.action === 'edit'}
-				<EditUser user={getUserFromDrawer()} />
-			{:else if $drawer.action === 'filter'}
-				<FilterUsers bind:filter />
-			{/if} -->
+		{#if $drawer?.type === 'order'}
+			{#if $drawer?.action === 'preview' && drawerOrder}
+				<Preview order={drawerOrder} />
+			{/if}
 		{/if}
 	</Drawer>
 </section>

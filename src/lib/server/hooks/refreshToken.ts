@@ -43,7 +43,7 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 		return resolve(event);
 	}
 
-	// Verify both tokens
+	// Verify AT
 	const [atPayload, atPayloadError] = await trytm(verifyAccessToken(accessToken));
 
 	// Access token is valid, no need to refresh

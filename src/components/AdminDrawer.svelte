@@ -5,12 +5,7 @@
 
 	drawer.subscribe((value) => {
 		if (value && adminDrawerLabel) {
-			if (value.open === false) {
-				adminDrawerLabel.click();
-			}
-			if (!value) {
-				adminDrawerLabel.click();
-			}
+			adminDrawerLabel.click();
 		}
 	});
 </script>

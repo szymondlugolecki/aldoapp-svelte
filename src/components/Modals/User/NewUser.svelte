@@ -10,6 +10,7 @@
 	export let advisers: {
 		id: string;
 		fullName: string;
+		email: string;
 	}[];
 
 	let selectedRole: UserRole;

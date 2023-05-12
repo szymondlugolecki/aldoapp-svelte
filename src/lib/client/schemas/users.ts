@@ -59,4 +59,14 @@ export const addUserSchema = z.object({
 	assignedAdviser: userPropertySchemas.id.optional()
 });
 
-export const editUserSchema = z.object({});
+export const editUserSchema = z.object({
+	id: userPropertySchemas.id,
+	access: userPropertySchemas.access.optional(),
+	fullName: userPropertySchemas.fullName.optional(),
+	email: userPropertySchemas.email.optional(),
+	role: userPropertySchemas.role.optional(),
+	phone: userPropertySchemas.phone.optional(),
+	assignedAdviser: userPropertySchemas.id.optional()
+});
+
+export type EditUserSchema = z.infer<typeof editUserSchema>;

@@ -27,52 +27,56 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each $cart.productsQuantity as product}
-				<tr>
-					<td>
-						<a
-							href="/sklep/{product.encodedURL}"
-							class="rounded min-w-[4rem] w-16 h-16 xs:w-24 xs:h-24"
-						>
-							<img src={product.images[0]} width="96px" height="96px" alt={product.name} />
-						</a>
-					</td>
-					<td>
-						<div class="flex flex-col items-start flex-1 text-base-content space-y-1 max-w-[340px]">
-							<bold class="font-bold text-xs sm:text-sm lg:text-base truncate max-w-[300px]"
-								>{product.name}</bold
+			{#if $cart && Array.isArray($cart.productsQuantity)}
+				{#each $cart.productsQuantity as product}
+					<tr>
+						<td>
+							<a
+								href="/sklep/{product.encodedURL}"
+								class="rounded min-w-[4rem] w-16 h-16 xs:w-24 xs:h-24"
 							>
-							<small class="text-xs sm:text-sm lg:text-base">{product.symbol}</small>
-							<small class="text-xs sm:text-sm lg:text-base">{product.price} zł / szt.</small>
-						</div>
-					</td>
-					<td class="min-w-[130px]">{(product.quantity * Number(product.price)).toFixed(2)}</td>
-					<td>
-						<div class="flex">
-							<button class="btn btn-square" on:click={() => incrementProduct(product.id)}>
-								<Plus />
-							</button>
-
-							<div class="h-12 w-12 flex justify-center items-center text-center">
-								<span class="text-lg xl:text-xl">{product.quantity}</span>
+								<img src={product.images[0]} width="96px" height="96px" alt={product.name} />
+							</a>
+						</td>
+						<td>
+							<div
+								class="flex flex-col items-start flex-1 text-base-content space-y-1 max-w-[340px]"
+							>
+								<bold class="font-bold text-xs sm:text-sm lg:text-base truncate max-w-[300px]"
+									>{product.name}</bold
+								>
+								<small class="text-xs sm:text-sm lg:text-base">{product.symbol}</small>
+								<small class="text-xs sm:text-sm lg:text-base">{product.price} zł / szt.</small>
 							</div>
-							<button
-								class="btn btn-square btn-outline"
-								on:click={() => decrementProduct(product.id)}
-							>
-								<Minus />
-							</button>
-						</div>
-					</td>
-					<td
-						><button
-							class="btn btn-ghost"
-							on:click={() => removeProduct(product.id)}
-							aria-label="Usuń"><X /></button
-						></td
-					>
-				</tr>
-			{/each}
+						</td>
+						<td class="min-w-[130px]">{(product.quantity * Number(product.price)).toFixed(2)}</td>
+						<td>
+							<div class="flex">
+								<button class="btn btn-square" on:click={() => incrementProduct(product.id)}>
+									<Plus />
+								</button>
+
+								<div class="h-12 w-12 flex justify-center items-center text-center">
+									<span class="text-lg xl:text-xl">{product.quantity}</span>
+								</div>
+								<button
+									class="btn btn-square btn-outline"
+									on:click={() => decrementProduct(product.id)}
+								>
+									<Minus />
+								</button>
+							</div>
+						</td>
+						<td
+							><button
+								class="btn btn-ghost"
+								on:click={() => removeProduct(product.id)}
+								aria-label="Usuń"><X /></button
+							></td
+						>
+					</tr>
+				{/each}
+			{/if}
 		</tbody>
 	</table>
 </div>

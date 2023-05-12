@@ -1,5 +1,6 @@
 // import { db } from '$lib/server/db';
 // import { users } from '$lib/server/db/schemas/users';
+// import { trytm } from '@bdsqqq/try';
 // import { eq } from 'drizzle-orm';
 // import { orders } from '$lib/server/db/schemas/products.js';
 
@@ -11,7 +12,27 @@ export const load = async ({ locals, depends, url }) => {
 	// const v = await db.delete(orders);
 	// console.log('deleted', v);
 
-	// await db.update(users).set({ role: 'admin' }).where(eq(users.id, 'x0vanu2mbse0uayd3rwtvbgv'));
+	// const result = await db
+	// 	.select({
+	// 		id: users.id,
+	// 		role: users.role
+	// 	})
+	// 	.from(users)
+	// 	.where(eq(users.id, 'x0vanu2mbse0uayd3rwtvbgv'));
+
+	// console.log('result', result);
+
+	// const [result, err] = await trytm(
+	// 	db.update(users).set({ role: 'admin' }).where(eq(users.id, 'x0vanu2mbse0uayd3rwtvbgv'))
+	// );
+
+	// if (err) {
+	// 	console.log('error', err);
+	// }
+
+	// if (result) {
+	// 	console.log('result', result);
+	// }
 
 	// console.log('userid', locals.session?.user?.id);
 

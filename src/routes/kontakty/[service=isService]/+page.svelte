@@ -38,7 +38,9 @@
 						</th>
 						<td class="px-3 sm:px-6 py-4 space-y-4 whitespace-nowrap">
 							{#each data[1] as number}
-								<a href={`tel:+48${number}`} class="block">{number}</a>
+								<a href={`tel:+48${number}`} class="block hover:text-primary duration-150"
+									>{number}</a
+								>
 							{/each}
 						</td>
 						<!-- <td class="px-3 sm:px-6 py-4 space-y-4 whitespace-nowrap">

@@ -1,12 +1,14 @@
 <script lang="ts">
+	import { extendRow } from '$lib/client/stores/adminTableChanges';
+	import type { TableType } from '$types';
 	import { ArrowDownCircle } from 'lucide-svelte';
 	export let rowId: string;
-	export let extendRow: undefined | ((id: string) => void) = undefined;
+	export let table: TableType;
 </script>
 
-<button
-	on:click={() => {
-		if (extendRow) extendRow(rowId);
-	}}
-	class="text-primary hover:text-primary-focus"><ArrowDownCircle /></button
->
+{#if rowId && table}
+	<button
+		on:click={() => extendRow(table, rowId)}
+		class="text-primary hover:text-primary-focus p-1.5"><ArrowDownCircle /></button
+	>
+{/if}
