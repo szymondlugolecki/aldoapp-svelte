@@ -6,7 +6,7 @@ import { errorResponses } from '$lib/client/constants/errorResponses';
 import { removeProductSchema } from '$lib/client/schemas/products';
 import { db } from '$lib/server/db';
 import { products } from '$lib/server/db/schemas/products';
-import { eq } from 'drizzle-orm/expressions';
+import { eq } from 'drizzle-orm';
 import { isAtLeastModerator } from '$lib/client/functions';
 
 const remove: Action = async ({ request, locals }) => {

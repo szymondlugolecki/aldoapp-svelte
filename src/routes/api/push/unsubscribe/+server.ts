@@ -5,7 +5,7 @@ import { subscriptions } from '$lib/server/db/schemas/subscriptions';
 // import { p } from '$lib/server/clients/pClient';
 import { trytm } from '@bdsqqq/try';
 import { json, error } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm/expressions';
+import { eq } from 'drizzle-orm';
 
 export async function POST({ request }) {
 	// No need to be logged in to unsubscribe :)

@@ -1,7 +1,6 @@
-// db.ts
 // import { sql } from 'drizzle-orm';
 import { discountTypes, type ApplicableProducts } from '../../../client/constants/dbTypes';
-import type { InferModel } from 'drizzle-orm';
+import { relations, type InferModel } from 'drizzle-orm';
 import {
 	mysqlTable,
 	serial,
@@ -15,16 +14,15 @@ import {
 	decimal,
 	json
 } from 'drizzle-orm/mysql-core';
-import { sql } from 'drizzle-orm/sql';
+import { users } from './users';
 // import { users } from './users';
 
 export const promoCodes = mysqlTable(
 	'promo_codes',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at')
-			.default(sql`CURRENT_TIMESTAMP`)
-			.notNull(),
+		createdAt: timestamp('created_at').defaultNow().notNull(),
+		updatedAt: timestamp('updated_at').onUpdateNow().notNull(),
 
 		// Promo Code info
 		code: varchar('code', { length: 32 }).notNull(),
@@ -49,13 +47,19 @@ export const promoCodes = mysqlTable(
 	})
 );
 
-export const promoCodeUsages = mysqlTable(
-	'promo_code_usages',
+export const promoCodesRelations = relations(promoCodes, ({ one }) => ({
+	author: one(users, {
+		fields: [promoCodes.authorId],
+		references: [users.id]
+	})
+}));
+
+export const promoCodeUses = mysqlTable(
+	'promo_code_uses',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at')
-			.default(sql`CURRENT_TIMESTAMP`)
-			.notNull(),
+		createdAt: timestamp('created_at').defaultNow().notNull(),
+		updatedAt: timestamp('updated_at').onUpdateNow().notNull(),
 
 		promoCodeId: varchar('promocode_id', { length: 36 }).notNull(),
 		userId: char('user_id', { length: 255 }).notNull()
@@ -67,5 +71,12 @@ export const promoCodeUsages = mysqlTable(
 	})
 );
 
+export const promoCodesUsesRelations = relations(promoCodes, ({ one }) => ({
+	author: one(users, {
+		fields: [promoCodes.authorId],
+		references: [users.id]
+	})
+}));
+
 export type PromoCode = InferModel<typeof promoCodes>;
-export type PromoCodeUsage = InferModel<typeof promoCodeUsages>;
+export type PromoCodeUse = InferModel<typeof promoCodeUses>;

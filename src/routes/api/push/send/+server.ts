@@ -7,7 +7,7 @@ import { subscriptions } from '$lib/server/db/schemas/subscriptions';
 import { sendNotifications } from '$lib/server/functions/push';
 import { trytm } from '@bdsqqq/try';
 import { json, error } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm/expressions';
+import { eq } from 'drizzle-orm';
 import type { PushSubscription } from 'web-push';
 import type { Config } from '@sveltejs/adapter-vercel';
 import { isAtLeastModerator } from '$lib/client/functions';

@@ -245,7 +245,7 @@
 					</div>
 				</div>
 
-				{#if data.url.endsWith('/koszyk')}
+				<!-- {#if data.url.endsWith('/koszyk')}
 					<div class="w-full form-control">
 						<label for="promo-code" class="label">
 							<span class="label-text">Kod rabatowy</span>
@@ -261,7 +261,7 @@
 							<button class="btn btn-secondary md:px-2 lg:px-4" disabled>Potwierdź</button>
 						</div>
 					</div>
-				{/if}
+				{/if} -->
 
 				<div class="flex space-x-3">
 					{#if stageIndex > 0}

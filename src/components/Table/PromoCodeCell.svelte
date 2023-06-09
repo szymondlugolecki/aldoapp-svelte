@@ -1,10 +1,10 @@
 <script lang="ts">
 	import CellToolTip from '$components/CellToolTip.svelte';
 	import { dateParser } from '$lib/client/functions';
-	import { drawer } from '$lib/client/stores/adminDrawer';
-	import type { PromoCodeRowType, PromoCodeWithUsages } from '$types/PromoCodeTypes';
+	import { drawer, openDrawer } from '$lib/client/stores/adminDrawer';
+	import type { PromoCodeRowType, PromoCodeWithUses } from '$types/PromoCodeTypes';
 
-	export let promoCode: PromoCodeWithUsages;
+	export let promoCode: PromoCodeWithUses;
 	export let rowType: PromoCodeRowType;
 </script>
 
@@ -12,8 +12,8 @@
 	<span>{promoCode.code}</span>
 {:else if rowType === 'discount'}
 	<span>{promoCode.discount}{promoCode.discountType === 'fixed' ? ' PLN' : '%'}</span>
-{:else if rowType === 'usages'}
-	<span>{promoCode.usages.length} {promoCode.usages.length === 1 ? 'raz' : 'razy'}</span>
+{:else if rowType === 'uses'}
+	<span>{promoCode.uses.length} {promoCode.uses.length === 1 ? 'raz' : 'razy'}</span>
 {:else if rowType === 'extraInfo'}
 	<div class="flex flex-col">
 		<span>{promoCode.enabled ? 'Aktywowany 🟢' : 'Dezaktywowany 🔴'}</span>
@@ -40,20 +40,20 @@
 		class="btn btn-ghost btn-sm"
 		on:keypress={(e) => {
 			if (e.key === 'Enter') {
-				drawer.set({
-					open: true,
-					id: promoCode.id,
+				openDrawer({
+					type: 'promoCode',
 					action: 'edit',
-					type: 'promoCode'
+					id: promoCode.id,
+					key: 'action'
 				});
 			}
 		}}
 		on:click={() =>
-			drawer.set({
-				open: true,
-				id: promoCode.id,
+			openDrawer({
+				type: 'promoCode',
 				action: 'edit',
-				type: 'promoCode'
+				id: promoCode.id,
+				key: 'action'
 			})}
 	>
 		Edytuj

@@ -12,7 +12,7 @@ import {
 	type User,
 	type VerificationToken
 } from '$lib/server/db/schemas/users';
-import { eq } from 'drizzle-orm/expressions';
+import { eq } from 'drizzle-orm';
 import type { Optional } from '$types/UtilityTypes';
 
 const handleVerification: Action = async ({ request, cookies, locals }) => {

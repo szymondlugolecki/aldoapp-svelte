@@ -10,7 +10,7 @@ import { trytm } from '@bdsqqq/try';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { loginSchema } from '$lib/client/schemas/auth';
 import { db } from '$lib/server/db';
-import { eq } from 'drizzle-orm/expressions';
+import { eq } from 'drizzle-orm';
 import { users, verificationTokens, type VerificationToken } from '$lib/server/db/schemas/users';
 
 const handleLogin: Action = async ({ request }) => {

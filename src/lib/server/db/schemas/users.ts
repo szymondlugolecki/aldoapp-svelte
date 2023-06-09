@@ -1,8 +1,7 @@
 import { userRoles } from '../../../client/constants/dbTypes';
-import { sql, type InferModel } from 'drizzle-orm';
+import { relations, type InferModel } from 'drizzle-orm';
 import {
 	mysqlTable,
-	serial,
 	uniqueIndex,
 	varchar,
 	char,
@@ -11,15 +10,18 @@ import {
 	text,
 	index
 } from 'drizzle-orm/mysql-core';
+import { verificationTokens } from './verificationTokens';
+import { orders } from './orders';
+import { products } from './products';
+import { subscriptions } from './subscriptions';
+import { promoCodes } from './promoCodes';
 
 export const users = mysqlTable(
 	'users',
 	{
 		id: char('id', { length: 255 }).primaryKey(),
-		createdAt: timestamp('created_at')
-			.default(sql`CURRENT_TIMESTAMP`)
-			.notNull(),
-		// updatedAt: timestamp('created_at').notNull().defaultNow().onUpdateNow(),
+		createdAt: timestamp('created_at').defaultNow().notNull(),
+		updatedAt: timestamp('updated_at').onUpdateNow().notNull(),
 
 		// User data
 		email: varchar('email', { length: 320 }).notNull(),
@@ -38,32 +40,13 @@ export const users = mysqlTable(
 	})
 );
 
-export const verificationTokens = mysqlTable(
-	'verification_tokens',
-	{
-		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at')
-			.default(sql`CURRENT_TIMESTAMP`)
-			.notNull(),
-
-		// token data
-		token: varchar('token', { length: 72 }).notNull(),
-		code: char('code', { length: 4 }).notNull(),
-		userAgent: varchar('user_agent', { length: 400 }).notNull(),
-		// ipAddress: varchar('ip_address', { length: 46 }).notNull(),
-		expiresAt: timestamp('expires_at').notNull(),
-
-		// relations
-		userId: char('user_id', { length: 255 }).notNull()
-		// .references(() => users.id)
-	},
-	(verificationToken) => ({
-		// indexes
-		token: uniqueIndex('unique_tokenx').on(verificationToken.token),
-		code: index('codex').on(verificationToken.code),
-		userAgent: index('user_agentx').on(verificationToken.userAgent)
-	})
-);
+export const usersRelations = relations(users, ({ many }) => ({
+	verificationTokens: many(verificationTokens),
+	orders: many(orders),
+	products: many(products), // authored products
+	subscriptions: many(subscriptions),
+	promoCodes: many(promoCodes)
+}));
 
 export type User = InferModel<typeof users>;
 export type VerificationToken = InferModel<typeof verificationTokens>;

@@ -1,39 +1,24 @@
 import {
-	deliveryMethods,
-	deliveryStatus,
 	mainCategories,
-	orderStatus,
-	paymentMethods,
-	paymentStatus,
 	producents,
 	type DeliveryStatus,
 	type OrderStatus,
 	type PaymentStatus
 } from '../../../client/constants/dbTypes';
 // '$lib/client/constants/dbTypes';
-import { sql, type InferModel } from 'drizzle-orm';
+import { relations, type InferModel } from 'drizzle-orm';
 import {
 	mysqlTable,
 	serial,
 	varchar,
 	timestamp,
-	text,
 	int,
 	json,
 	index,
 	decimal
 } from 'drizzle-orm/mysql-core';
-
-type OrderProductObj = {
-	productId: number;
-	quantity: number;
-};
-
-export type Address = {
-	street: string;
-	zipCode: string;
-	city: string;
-};
+import { users } from './users';
+import { orders } from './orders';
 
 export type Customer = {
 	email: string;
@@ -51,10 +36,8 @@ export const products = mysqlTable(
 	'products',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at')
-			.default(sql`CURRENT_TIMESTAMP`)
-			.notNull(),
-		// updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+		createdAt: timestamp('created_at').defaultNow().notNull(),
+		updatedAt: timestamp('updated_at').onUpdateNow().notNull(),
 
 		// Product info
 		name: varchar('name', { length: 255 }).notNull(),
@@ -71,7 +54,6 @@ export const products = mysqlTable(
 
 		// relations
 		authorId: varchar('author_id', { length: 36 }).notNull() // user that added this product
-		// .references(() => users.id),
 	},
 	(product) => ({
 		// indexes
@@ -79,57 +61,12 @@ export const products = mysqlTable(
 	})
 );
 
-export const orders = mysqlTable(
-	'orders',
-	{
-		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at')
-			.default(sql`CURRENT_TIMESTAMP`)
-			.notNull(),
-		// updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
-
-		// Order data
-		price: decimal('price', { precision: 8, scale: 2 }).notNull(), // price with discount included
-		discount: decimal('discount', { precision: 8, scale: 2 }).notNull(),
-		paymentStatus: text('payment_status', {
-			enum: paymentStatus
-		}).notNull(),
-		status: text('status', {
-			enum: orderStatus
-		}).notNull(),
-		deliveryStatus: text('delivery_status', {
-			enum: deliveryStatus
-		}).notNull(),
-		address: json('address').$type<Address>(),
-
-		estimatedDeliveryDate: timestamp('estimated_delivery_date'),
-		deliveryMethod: text('delivery_method', { enum: deliveryMethods }).notNull(),
-		paymentMethod: text('payment_method', { enum: paymentMethods }).notNull(),
-
-		orderHistory: json('order_history').$type<OrderHistoryEvent[]>().notNull(),
-		productIds: json('product_ids').$type<Product['id'][]>().notNull(),
-		productsQuantity: json('products_quantity').$type<OrderProductObj[]>().notNull(),
-
-		// relations
-		customerId: varchar('customer_id', { length: 36 }).notNull(),
-		promoCodeId: int('promo_code_id'),
-		driverId: varchar('driver_id', { length: 36 })
-	},
-	(order) => ({
-		// indexes
-		customerId: index('customer_idx').on(order.customerId),
-		promoCodeId: index('promo_code_idx').on(order.promoCodeId),
-		driverId: index('driver_idx').on(order.driverId)
-	})
-);
+export const productsRelations = relations(products, ({ one, many }) => ({
+	author: one(users, {
+		fields: [products.authorId],
+		references: [users.id]
+	}),
+	orders: many(orders)
+}));
 
 export type Product = InferModel<typeof products>;
-export type Order = InferModel<typeof orders>;
-
-// export const orderProducts = mysqlTable('order_products', {
-// 	id: serial('id').primaryKey().autoincrement(),
-
-// 	// order product data
-// 	productId: int('product_id').references(() => products.id),
-// 	quantity: tinyint('quantity').notNull()
-// });

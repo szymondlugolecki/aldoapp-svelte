@@ -6,7 +6,7 @@ import remove from '$lib/server/actions/product/remove';
 import { db } from '$lib/server/db';
 import { products } from '$lib/server/db/schemas/products';
 import { users, type User } from '$lib/server/db/schemas/users';
-import { eq } from 'drizzle-orm/expressions';
+import { eq } from 'drizzle-orm';
 import type { Config } from '@sveltejs/adapter-vercel';
 
 export const config: Config = {

@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db';
 import add from '$lib/server/actions/promoCodes/add';
-import { promoCodeUsages, promoCodes } from '$lib/server/db/schemas/promoCodes';
-import { desc, eq } from 'drizzle-orm/expressions';
+import { promoCodeUses, promoCodes } from '$lib/server/db/schemas/promoCodes';
+import { desc, eq } from 'drizzle-orm';
 import { users } from '$lib/server/db/schemas/users';
 
 export const load = async () => {
@@ -10,7 +10,7 @@ export const load = async () => {
 			.select({
 				promoCode: promoCodes,
 				usage: {
-					userId: promoCodeUsages.userId
+					userId: promoCodeUses.userId
 				},
 				author: {
 					id: users.id,
@@ -19,7 +19,7 @@ export const load = async () => {
 				}
 			})
 			.from(promoCodes)
-			.leftJoin(promoCodeUsages, eq(promoCodes.id, promoCodeUsages.promoCodeId))
+			.leftJoin(promoCodeUses, eq(promoCodes.id, promoCodeUses.promoCodeId))
 			.leftJoin(users, eq(promoCodes.authorId, users.id))
 			.orderBy(desc(promoCodes.createdAt))
 			.limit(3),
@@ -28,7 +28,7 @@ export const load = async () => {
 				.select({
 					promoCode: promoCodes,
 					usage: {
-						userId: promoCodeUsages.userId
+						userId: promoCodeUses.userId
 					},
 					author: {
 						id: users.id,
@@ -37,7 +37,7 @@ export const load = async () => {
 					}
 				})
 				.from(promoCodes)
-				.leftJoin(promoCodeUsages, eq(promoCodes.id, promoCodeUsages.promoCodeId))
+				.leftJoin(promoCodeUses, eq(promoCodes.id, promoCodeUses.promoCodeId))
 				.leftJoin(users, eq(promoCodes.authorId, users.id))
 				.orderBy(desc(promoCodes.createdAt))
 				.offset(3)
