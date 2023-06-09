@@ -15,7 +15,7 @@ import {
 import { error, type Handle } from '@sveltejs/kit';
 import { trytm } from '@bdsqqq/try';
 import { db } from '../db';
-import { eq } from 'drizzle-orm/expressions';
+// import { eq } from 'drizzle-orm/expressions';
 import { users } from '../db/schemas/users';
 
 // Interesting fact:
@@ -94,6 +94,8 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 		2. Create new AT and RT
 		3. Update the session
 	*/
+
+	// wtf
 
 	const [dbUsers, getUserError] = await trytm(
 		db
