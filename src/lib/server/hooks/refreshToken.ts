@@ -15,10 +15,9 @@ import {
 import { error, type Handle } from '@sveltejs/kit';
 import { trytm } from '@bdsqqq/try';
 import { db } from '../db';
-// import { eq } from 'drizzle-orm/expressions';
+import { eq } from 'drizzle-orm';
 import { users } from '../db/schemas/users';
 
-// Interesting fact:
 // Hooks are used to modify a single request, and are not persisted between requests.
 // Setting locals does not persist between requests
 
@@ -84,7 +83,7 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 			joseErrName,
 			userId
 		);
-		throw error(500, 'Niespodziewany błąd sesji. Spróbuj zalogować się ponownie.');
+		throw error(500, 'Niespodziewany błąd sesji. Spróbuj zalogować się ponownie');
 	}
 
 	/*
@@ -115,19 +114,13 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 
 	if (getUserError) {
 		// Unexpected-error
-		console.error(
-			'Unexpected error. Błąd przy pobieraniu użytkownika do sesji z bazy danych',
-			getUserError
-		);
+		console.error('Błąd przy pobieraniu użytkownika do sesji z bazy danych', getUserError);
 		return resolve(event);
 	}
 	if (!dbUsers.length) {
 		// Unexpected-error
-		console.error(
-			'Unexpected error. Użytkownika z sesji nie ma w bazie danych. Czyżby został usunięty?',
-			dbUsers.length
-		);
-		throw error(500, 'Niespodziewany błąd sesji. Spróbuj zalogować się ponownie.');
+		console.error('Zalogowano jako nieistniejący użytkownik. Mógł zostać usunięty', dbUsers.length);
+		throw error(500, 'Niespodziewany błąd sesji. Spróbuj zalogować się ponownie');
 	}
 
 	const freshUser = dbUsers[0];
@@ -139,10 +132,7 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 
 	if (promiseError) {
 		// Unexpected-error
-		console.error(
-			'Unexpected error. Nie udało się utworzyć nowych tokenów do autoryzacji',
-			promiseError
-		);
+		console.error('Nie udało się utworzyć nowych tokenów do autoryzacji', promiseError);
 		throw error(500, 'Nie udało się odświeżyć sesji. Spróbuj zalogować się ponownie.');
 	}
 

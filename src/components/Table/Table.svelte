@@ -8,7 +8,7 @@
 		OrderRowType,
 		OrderWithCustomer
 	} from '$types';
-	import type { PromoCodeRowType, PromoCodeWithUsages } from '$types/PromoCodeTypes';
+	import type { PromoCodeRowType, PromoCodeWithUses } from '$types/PromoCodeTypes';
 	import OrderCell from './OrderCell.svelte';
 	import ProductCell from './ProductCell.svelte';
 	import PromoCodeCell from './PromoCodeCell.svelte';
@@ -25,7 +25,7 @@
 		| ProductWithAuthorAndImage[]
 		| User[]
 		| OrderWithCustomer[]
-		| PromoCodeWithUsages[];
+		| PromoCodeWithUses[];
 
 	const isProductItem = (
 		varType: typeof type,
@@ -57,7 +57,7 @@
 	const isPromoCodeItem = (
 		varType: typeof type,
 		varItem: (typeof items)[number]
-	): varItem is PromoCodeWithUsages => {
+	): varItem is PromoCodeWithUses => {
 		if (varType === 'promoCodes') {
 			return true;
 		}

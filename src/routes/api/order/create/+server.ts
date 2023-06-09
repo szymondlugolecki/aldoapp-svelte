@@ -9,12 +9,12 @@ import {
 	type Order,
 	type OrderHistoryEvent
 } from '$lib/server/db/schemas/products';
-import { promoCodes, promoCodeUsages } from '$lib/server/db/schemas/promoCodes';
+import { promoCodes, promoCodeUses } from '$lib/server/db/schemas/promoCodes';
 // import { sleep } from '$lib/server/functions/utils';
-import type { PromoCodeWithUsages } from '$types/PromoCodeTypes';
+import type { PromoCodeWithUses } from '$types/PromoCodeTypes';
 import { trytm } from '@bdsqqq/try';
 import { json, error } from '@sveltejs/kit';
-import { eq, inArray } from 'drizzle-orm/expressions';
+import { eq, inArray } from 'drizzle-orm';
 
 export async function POST({ request, locals }) {
 	// Only logged in users can order
@@ -104,38 +104,38 @@ export async function POST({ request, locals }) {
 
 	// Handle the promo code
 	if (order.promoCodeId) {
-		const [promoCodeWithUsages, promoCodeError] = await trytm(
+		const [PromoCodeWithUses, promoCodeError] = await trytm(
 			db
 				.select({
 					promoCode: promoCodes,
 					usage: {
-						userId: promoCodeUsages.userId
+						userId: promoCodeUses.userId
 					}
 				})
 				.from(promoCodes)
 				.where(eq(promoCodes.id, order.promoCodeId))
-				.leftJoin(promoCodeUsages, eq(promoCodes.id, promoCodeUsages.promoCodeId))
+				.leftJoin(promoCodeUses, eq(promoCodes.id, promoCodeUses.promoCodeId))
 		);
 
 		if (promoCodeError) {
 			throw error(500, 'Niespodziewany błąd. Nie udało się pobrać kodu rabatowego');
 		}
 
-		if (!promoCodeWithUsages.length) {
+		if (!PromoCodeWithUses.length) {
 			throw error(400, 'Nieprawidłowy kod rabatowy');
 		}
 
-		console.log('promoCodeWithUsages', promoCodeWithUsages);
+		console.log('PromoCodeWithUses', PromoCodeWithUses);
 
-		const parsedPromoCode = promoCodeWithUsages.reduce<PromoCodeWithUsages | null>((acc, row) => {
+		const parsedPromoCode = PromoCodeWithUses.reduce<PromoCodeWithUses | null>((acc, row) => {
 			const { promoCode, usage } = row;
 
 			if (!acc || Object.keys(acc).length === 0) {
-				acc = { ...promoCode, usages: [] };
+				acc = { ...promoCode, uses: [] };
 			}
 
 			if (usage && acc) {
-				acc.usages.push(usage.userId);
+				acc.uses.push(usage.userId);
 			}
 
 			return acc;
@@ -167,15 +167,15 @@ export async function POST({ request, locals }) {
 			// For now it takes the user that has placed the order as the customer
 			// but in the future it will be possible for employees to place orders
 			// on behalf of customers
-			const userCodeUsagesCount = parsedPromoCode.usages.filter(
+			const userCodeUsesCount = parsedPromoCode.uses.filter(
 				(userId) => userId === sessionUser.id
 			).length;
 
-			if (userCodeUsagesCount >= parsedPromoCode.perUserLimit) {
+			if (userCodeUsesCount >= parsedPromoCode.perUserLimit) {
 				throw error(400, 'Wykorzystałeś już maksymalną ilość zamówień z tym kodem rabatowym');
 			}
 
-			if (parsedPromoCode.usages.length >= parsedPromoCode.totalUseLimit) {
+			if (parsedPromoCode.uses.length >= parsedPromoCode.totalUseLimit) {
 				throw error(400, 'Kod rabatowy został wykorzystany maksymalną liczbę razy');
 			}
 
@@ -200,7 +200,6 @@ export async function POST({ request, locals }) {
 		paymentStatus: 'pending',
 		status: 'pending',
 		promoCodeId: null,
-		orderHistory: [orderHistoryEvent],
 		price: discountPrice.toString(),
 		discount: (noDiscountPrice - discountPrice).toString(),
 		productIds: productsList.map(({ id }) => id)

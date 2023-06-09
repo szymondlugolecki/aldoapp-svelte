@@ -5,7 +5,7 @@
 	import { mainCategories, type Producent } from '$lib/client/constants/dbTypes';
 	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 	import { handleFormResponse } from '$lib/client/functions/forms';
-	import { drawer } from '$lib/client/stores/adminDrawer';
+	import { closeDrawer, drawer } from '$lib/client/stores/adminDrawer';
 	import type {
 		Category,
 		FileInputEvent,
@@ -99,20 +99,10 @@
 	class="flex flex-col space-y-6"
 	method="post"
 	action="?/edit"
-	on:submit={() => {
-		drawer.update((value) => {
-			if (!value) return undefined;
-			return {
-				...value,
-				open: false
-			};
-		});
-	}}
 	use:enhance={() => {
 		const toastId = createLoadingToast('please-wait');
 		return async ({ result, update }) => {
 			handleFormResponse(result, toastId);
-			drawer.set(undefined);
 			update();
 		};
 	}}
@@ -145,7 +135,7 @@
 	{/if}
 	{#if key === 'producent'}
 		<div>
-			<label for="producent" class="label label-text"> Producent* </label>
+			<label for="producent" class="label label-text"> Producent </label>
 			<select
 				id="producent"
 				name="producent"
@@ -161,7 +151,7 @@
 	{/if}
 	{#if key === 'weight'}
 		<div class="flex-1">
-			<label for="weight" class="label label-text"> Waga (kg)* </label>
+			<label for="weight" class="label label-text"> Waga (kg) </label>
 			<input
 				name="weight"
 				placeholder="np. 25kg"
@@ -176,11 +166,12 @@
 	{/if}
 	{#if key === 'price'}
 		<div class="w-28 sm:w-36">
-			<label for="price" class="label label-text"> Cena (zł)* </label>
+			<label for="price" class="label label-text"> Cena (zł) </label>
 			<input
 				type="number"
 				name="price"
 				value={product.price}
+				step="0.01"
 				class="input input-bordered w-full text-base-content"
 				required
 			/>
@@ -306,7 +297,7 @@
 		</div> -->
 	{/if}
 
-	<button type="submit" class="btn btn-primary w-full">Dodaj</button>
+	<button type="submit" class="btn btn-primary w-full">Edytuj</button>
 
 	<input type="hidden" hidden value={product.id} name="id" />
 </form>

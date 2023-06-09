@@ -482,3 +482,23 @@
 		{/if}
 	</Drawer>
 </section>
+
+<style>
+	:global(.gridjs-wrapper:nth-last-of-type(2)) {
+		border-bottom: 0;
+	}
+
+	:global(th.gridjs-th) {
+		background-color: hsl(var(--b1) / var(--tw-bg-opacity)) !important;
+		color: hsl(var(--bc)) !important;
+	}
+
+	:global(td.gridjs-td) {
+		background-color: hsl(var(--b1) / var(--tw-bg-opacity)) !important;
+	}
+
+	:global(.gridjs-search > input) {
+		background-color: hsl(var(--b1) / var(--tw-bg-opacity)) !important;
+		color: hsl(var(--bc)) !important;
+	}
+</style>

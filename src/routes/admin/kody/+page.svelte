@@ -3,7 +3,7 @@
 	import Drawer from '$components/AdminDrawer.svelte';
 	import { drawer, openDrawer } from '$lib/client/stores/adminDrawer';
 	import toast from 'svelte-french-toast';
-	import type { PromoCodeWithUsages } from '$types/PromoCodeTypes';
+	import type { PromoCodeWithUses } from '$types/PromoCodeTypes';
 	import NewPromoCode from '$components/Modals/PromoCode/NewPromoCode.svelte';
 	import type { TCell } from 'gridjs/dist/src/types.js';
 	import { h, type Row } from 'gridjs';
@@ -21,7 +21,7 @@
 	let loadingStreamedPromoCodes = true;
 
 	const codesParser = (promoCodes: DefaultPromoCodesList) => {
-		const groupedPromoCodes = promoCodes.reduce<Record<number, PromoCodeWithUsages>>((acc, row) => {
+		const groupedPromoCodes = promoCodes.reduce<Record<number, PromoCodeWithUses>>((acc, row) => {
 			const { promoCode, usage, author } = row;
 
 			if (!author) return acc;
@@ -30,7 +30,7 @@
 				acc[promoCode.id] = {
 					...promoCode,
 					author: author,
-					usages: []
+					uses: []
 				};
 			}
 
@@ -39,7 +39,7 @@
 			}
 
 			if (usage) {
-				acc[promoCode.id].usages.push(usage.userId);
+				acc[promoCode.id].uses.push(usage.userId);
 			}
 
 			return acc;
@@ -125,12 +125,12 @@
 					return '🛑';
 				}
 
-				let usagesText = 'razy';
+				let usesText = 'razy';
 				if (cell) {
-					cell.length === 1 && (usagesText = 'raz');
+					cell.length === 1 && (usesText = 'raz');
 				}
 
-				return h('span', {}, `${isNaN(cell?.length) ? '⚠️' : cell.length} ${usagesText}`);
+				return h('span', {}, `${isNaN(cell?.length) ? '⚠️' : cell.length} ${usesText}`);
 			},
 			sort: false
 		},
@@ -290,7 +290,7 @@
 		promoCodesHeaders={[
 			'code',
 			'discount',
-			'usages',
+			'uses',
 			'action',
 			'extraInfo',
 			'validDateRange',
@@ -328,7 +328,7 @@
 					code,
 					discount,
 					discountType,
-					usages,
+					uses,
 					enabled,
 					perUserLimit,
 					totalUseLimit,
@@ -341,7 +341,7 @@
 					id,
 					code,
 					discount: [discount, discountType],
-					usages,
+					uses,
 					info: [enabled, perUserLimit, totalUseLimit],
 					validDateRange: [validSince, validUntil],
 					created: [author, createdAt]
@@ -358,3 +358,23 @@
 		{/if}
 	</Drawer>
 </section>
+
+<style>
+	:global(.gridjs-wrapper:nth-last-of-type(2)) {
+		border-bottom: 0;
+	}
+
+	:global(th.gridjs-th) {
+		background-color: hsl(var(--b1) / var(--tw-bg-opacity)) !important;
+		color: hsl(var(--bc)) !important;
+	}
+
+	:global(td.gridjs-td) {
+		background-color: hsl(var(--b1) / var(--tw-bg-opacity)) !important;
+	}
+
+	:global(.gridjs-search > input) {
+		background-color: hsl(var(--b1) / var(--tw-bg-opacity)) !important;
+		color: hsl(var(--bc)) !important;
+	}
+</style>

@@ -4,7 +4,7 @@ import { products as productsTable } from '$lib/server/db/schemas/products';
 import { sleep } from '$lib/server/functions/utils';
 import { trytm } from '@bdsqqq/try';
 import { json, error } from '@sveltejs/kit';
-import { eq, or } from 'drizzle-orm/expressions';
+import { eq, or } from 'drizzle-orm';
 
 export async function GET({ url }) {
 	// Get the products' ids from the query string

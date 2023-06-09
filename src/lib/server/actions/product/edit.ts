@@ -1,7 +1,9 @@
-import { error, type Action } from '@sveltejs/kit';
+import { type Action, fail } from '@sveltejs/kit';
 
 const edit: Action = async () => {
-	throw error(400, 'NARAZIE NIE DA SIE EDYTOWAC PRODUKTOW');
+	return fail(400, {
+		errors: ['NARAZIE NIE DA SIE EDYTOWAC PRODUKTOW']
+	});
 };
 
 export default edit;

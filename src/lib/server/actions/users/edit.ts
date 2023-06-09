@@ -7,7 +7,7 @@ import { users, type User } from '$lib/server/db/schemas/users';
 import { trytm } from '@bdsqqq/try';
 import { isCuid } from '@paralleldrive/cuid2';
 import { error, fail, type Action } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm/expressions';
+import { eq } from 'drizzle-orm';
 
 const edit: Action = async ({ request, locals }) => {
 	// Only moderators and admins are allowed to edit a user

@@ -6,7 +6,7 @@ import { subscriptions, type Subscription } from '$lib/server/db/schemas/subscri
 // import { p } from '$lib/server/clients/pClient';
 import { trytm } from '@bdsqqq/try';
 import { json, fail, error } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm/expressions';
+import { eq } from 'drizzle-orm';
 
 export async function POST({ request, locals }) {
 	if (!locals.session) {

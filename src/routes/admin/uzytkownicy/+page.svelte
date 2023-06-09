@@ -436,7 +436,7 @@
 	</Drawer>
 </section>
 
-<style global>
+<style>
 	:global(.gridjs-wrapper:nth-last-of-type(2)) {
 		border-bottom: 0;
 	}
