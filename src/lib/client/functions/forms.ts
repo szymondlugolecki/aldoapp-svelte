@@ -1,5 +1,5 @@
 import type { ActionResult } from '@sveltejs/kit';
-import { isValidObject } from '.';
+// import { isValidObject } from '.';
 import toast from 'svelte-french-toast';
 
 export const handleFormResponse = (
@@ -10,33 +10,40 @@ export const handleFormResponse = (
 ) => {
 	// console.log('result', result.type);
 
+	// if (isValidObject(result.data?.errors)) {
+	// 	errorList = Object.values(result.data?.errors).flatMap((x) => x);
+	// } else if (Array.isArray(result.data?.errors)) {
+	// 	errorList = result.data?.errors;
+	// }
+
+	// const formatErrors = '• ' + errorList.join('\n• ');
+	// toast.error('Wystąpił błąd:\n' + formatErrors, { duration: 3500, id });
+
+	const showErrorToast = (message: string) => {
+		toast.error(message, { duration: 3500, id });
+	};
+
 	switch (result.type) {
-		case 'failure':
-			if (result.data?.errors) {
-				let errorList: Array<unknown> = [];
-
-				if (isValidObject(result.data?.errors)) {
-					errorList = Object.values(result.data?.errors).flatMap((x) => x);
-				} else if (Array.isArray(result.data?.errors)) {
-					errorList = result.data?.errors;
-				}
-
-				if (errorList.length) {
-					const formatErrors = '• ' + errorList.join('\n• ');
-					toast.error('Wystąpił błąd:\n' + formatErrors, { duration: 3500, id });
-				} else {
-					toast.error('Wystąpił nieznany błąd', { duration: 3500, id });
-				}
+		case 'failure': {
+			if (!result.data || !('errors' in result.data)) {
+				showErrorToast('Wystąpił niespodziewany błąd');
+				return;
 			}
+
+			const { errors } = result.data;
+
+			if (!Array.isArray(errors) || !errors.length) {
+				showErrorToast('Wystąpił niespodziewany błąd');
+				return;
+			}
+
+			showErrorToast(errors[0]);
 			break;
+		}
 		case 'success': {
 			let message = 'Sukces';
-			if (result.data?.message && typeof result.data.message === 'string') {
-				message = result.data?.message;
-			}
-
-			if (customMessage) {
-				message = customMessage;
+			if (result.data && 'message' in result.data) {
+				message = result.data.message || customMessage;
 			}
 
 			toast.success(message, { id, duration: 2500 });

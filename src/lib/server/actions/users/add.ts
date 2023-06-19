@@ -8,7 +8,8 @@ import { createId } from '@paralleldrive/cuid2';
 import type { User } from '$types';
 import { db } from '$lib/server/db';
 import { users } from '$lib/server/db/schemas/users';
-import { isAtLeastModerator } from '$lib/client/functions';
+import { isAtLeastModerator, isJSON } from '$lib/client/functions';
+import type { Address } from '$lib/server/db/schemas/orders';
 
 const add = (async ({ request, locals }) => {
 	// Only moderators and admins are allowed to add a user
@@ -29,7 +30,8 @@ const add = (async ({ request, locals }) => {
 
 	const data = {
 		...Object.fromEntries(formData),
-		phone: Object.fromEntries(formData).phone.toString().replaceAll(' ', '') || null
+		phone: Object.fromEntries(formData).phone.toString().replaceAll(' ', '') || null,
+		address: isJSON<Address>(Object.fromEntries(formData).address) || null
 	};
 
 	console.log('new user data', data);
@@ -41,11 +43,25 @@ const add = (async ({ request, locals }) => {
 		});
 	}
 
+	if (newUserParsed.role === 'customer') {
+		if (!newUserParsed.address) {
+			return fail(400, {
+				errors: ['Adres jest wymagany dla klienta']
+			});
+		}
+
+		if (Object.values(newUserParsed.address).some((v) => !v)) {
+			return fail(400, {
+				errors: ['Nieprawidłowy adres']
+			});
+		}
+	}
+
 	const newUser = {
 		id: createId(),
 		...newUserParsed,
 		access: true
-	} satisfies Omit<User, 'createdAt' | 'assignedAdviser'>;
+	} satisfies Pick<User, 'id' | 'fullName' | 'email' | 'phone' | 'role' | 'access'>;
 
 	// Add the user to the database
 	const [, addUserError] = await trytm(db.insert(users).values(newUser));
@@ -62,12 +78,3 @@ const add = (async ({ request, locals }) => {
 }) satisfies Action;
 
 export default add;
-
-// p.user.create({
-// 	data: {
-// 		id: createId(),
-// 		email,
-// 		role,
-// 		fullName: name
-// 	}
-// })

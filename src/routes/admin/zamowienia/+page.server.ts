@@ -2,7 +2,7 @@
 // import edit from '$lib/server/actions/users/edit';
 // import { p } from '$lib/server/clients/pClient';
 import { db } from '$lib/server/db';
-import { orders } from '$lib/server/db/schemas/products';
+import { orders as ordersTable } from '$lib/server/db/schemas/orders';
 import { users } from '$lib/server/db/schemas/users';
 import { desc, eq } from 'drizzle-orm';
 // import { alias } from 'drizzle-orm/mysql-core/alias';
@@ -10,23 +10,23 @@ import { desc, eq } from 'drizzle-orm';
 export const load = () => {
 	// const drivers = alias(users, 'drivers');
 
-	const orders = db.query.orders.findMany({
-		with: {
-			promoCodes: true,
-			users: true,
-			products: true
-		}
-	});
+	// const orders = db.query.orders.findMany({
+	// 	limit: 20,
+	// 	with: {
+	// 		promoCodes: true,
+	// 		users: true,
+	// 		products: true
+	// 	},
+	// 	orderBy: (orders, { desc }) => [desc(ordersTable.createdAt)]
+	// });
 
-	orders.then((res) => {
-		res.forEach((order) => {
-			console.log(order.products);
-		});
-	});
+	// orders.then((res) => {
+	// 	res.forEach((order) => {
+	// 		console.log(order.products);
+	// 	});
+	// });
 
-	return {
-		orders
-	};
+	return {};
 
 	// return {
 	// 	// fetch with products in the future

@@ -2,6 +2,7 @@ import { getRoleRank, isAtLeastModerator } from '$lib/client/functions';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { editUserSchema, type EditUserSchema } from '$lib/client/schemas/users';
 import { db } from '$lib/server/db';
+import type { Address } from '$lib/server/db/schemas/orders';
 import { users, type User } from '$lib/server/db/schemas/users';
 // import { p } from '$lib/server/clients/pClient';
 import { trytm } from '@bdsqqq/try';
@@ -25,7 +26,15 @@ const edit: Action = async ({ request, locals }) => {
 			errors: ['Niepoprawne dane']
 		});
 	}
+
 	const data: Partial<EditUserSchema> = Object.fromEntries(formData);
+
+	// data.access is a string in reality - ts wont let me change the type tho
+	if (data.access !== undefined) {
+		data.access = JSON.parse(data.access.toString());
+	}
+
+	console.log('formData', formData, data);
 
 	// Only id is required, the rest is optional
 	if (!data.id) {
@@ -39,7 +48,9 @@ const edit: Action = async ({ request, locals }) => {
 		});
 	}
 
-	// Make sure anything else other than id was provided
+	console.log('data', data);
+
+	// Make sure something else other than id was provided
 	if (Object.keys(data).length === 1) {
 		return fail(400, {
 			errors: ['Brak danych do edycji']
@@ -54,7 +65,7 @@ const edit: Action = async ({ request, locals }) => {
 		});
 	}
 
-	const { id, email, fullName, role, access, phone, assignedAdviser } = editUserObj;
+	const { id, email, fullName, role, access, phone, adviserId, address } = editUserObj;
 
 	// Fetch the user from the database (before the edit)
 	const [usersBeforeEdit, usersBeforeEditError] = await trytm(
@@ -65,7 +76,8 @@ const edit: Action = async ({ request, locals }) => {
 				fullName: users.fullName,
 				role: users.role,
 				access: users.access,
-				phone: users.phone
+				phone: users.phone,
+				address: users.address
 			})
 			.from(users)
 			.where(eq(users.id, id))
@@ -113,7 +125,7 @@ const edit: Action = async ({ request, locals }) => {
 	}
 
 	const newUser: Partial<
-		Pick<User, 'email' | 'fullName' | 'access' | 'phone' | 'role' | 'assignedAdviser'>
+		Pick<User, 'email' | 'fullName' | 'access' | 'phone' | 'role' | 'adviserId' | 'address'>
 	> = {};
 
 	if (email) {
@@ -128,7 +140,7 @@ const edit: Action = async ({ request, locals }) => {
 		newUser.role = role;
 	}
 
-	if (access) {
+	if (access !== undefined) {
 		newUser.access = access;
 	}
 
@@ -136,8 +148,20 @@ const edit: Action = async ({ request, locals }) => {
 		newUser.phone = phone.toString().replaceAll(' ', '');
 	}
 
-	if (assignedAdviser) {
-		newUser.assignedAdviser = assignedAdviser;
+	if (adviserId) {
+		newUser.adviserId = adviserId;
+	}
+
+	function isAddress(str: unknown): str is Address {
+		return editUserSchema.shape.address.safeParse(str).success;
+	}
+
+	if (address) {
+		if (address && typeof address === 'string') {
+			newUser.address = JSON.parse(address);
+		} else if (isAddress(address)) {
+			newUser.address = address;
+		}
 	}
 
 	const [, editUserError] = await trytm(db.update(users).set(newUser).where(eq(users.id, id)));

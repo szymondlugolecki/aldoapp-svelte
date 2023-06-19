@@ -6,18 +6,18 @@ import { verificationCodeSchema } from '$lib/client/schemas/auth';
 import { accessTokenExpiryDate, jwtName, refreshTokenExpiryDate } from '$lib/server/constants/auth';
 import { createAccessToken, createRefreshToken } from '$lib/server/functions/auth';
 import { db } from '$lib/server/db';
-import {
-	users,
-	verificationTokens,
-	type User,
-	type VerificationToken
-} from '$lib/server/db/schemas/users';
-import { eq } from 'drizzle-orm';
-import type { Optional } from '$types/UtilityTypes';
 
 const handleVerification: Action = async ({ request, cookies, locals }) => {
 	// Validate the user input
-	const data = Object.fromEntries(await request.formData());
+	const [formData, formDataError] = await trytm(request.formData());
+	if (formDataError) {
+		console.error('formDataError', formDataError);
+		// Unexpected-error
+		return fail(400, {
+			errors: ['Podano nieprawidłowe dane']
+		});
+	}
+	const data = Object.fromEntries(formData);
 	const [codeParsed, codeParsingError] = betterZodParse(verificationCodeSchema, data);
 	if (codeParsingError) {
 		return fail(400, {
@@ -28,85 +28,52 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 	const { code } = codeParsed;
 
 	// Check if the token exists & is not expired
-	const [tokens, getTokenError] = await trytm(
-		db
-			.select({
-				// userId: verificationTokens.userId,
-				expiresAt: verificationTokens.expiresAt,
-				id: users.id,
-				email: users.email,
-				role: users.role,
-				fullName: users.fullName,
-				access: users.access
-			})
-			.from(verificationTokens)
-			.where(eq(verificationTokens.code, code))
-			.leftJoin(users, eq(verificationTokens.userId, users.id))
+	const [token, fetchTokenError] = await trytm(
+		db.query.verificationTokens.findFirst({
+			where: (verificationTokens, { eq }) => eq(verificationTokens.code, code),
+			columns: {
+				id: true,
+				expiresAt: true
+			},
+			with: {
+				user: {
+					columns: {
+						id: true,
+						email: true,
+						role: true,
+						fullName: true,
+						access: true,
+						phone: true,
+						address: true
+					}
+				}
+			}
+		})
 	);
 
-	if (getTokenError) {
+	if (fetchTokenError) {
 		// Unexpected-error
-		console.log('getTokenError', getTokenError);
+		console.log('fetchTokenError', fetchTokenError);
 		return fail(500, {
-			errors: ['Niespodziewany błąd']
+			errors: ['Niespodziewany błąd przy weryfikacji kodu']
 		});
 	}
-	const token = tokens[0];
+
 	if (!token || new Date() > token.expiresAt) {
 		return fail(400, {
 			errors: ['Podany kod nie istnieje lub jest przedawniony']
 		});
 	}
 
-	const dbQueryValuesCheck = <Q extends Record<string, unknown>, T>(
-		dbObj: Record<string, unknown>,
-		...keys: string[]
-	): dbObj is Q & Exclude<T, null> => {
-		let allCorrect = true;
-
-		keys.forEach((key) => {
-			if (!(key in dbObj) || dbObj[key] === null) {
-				allCorrect = false;
-			}
-		});
-
-		return allCorrect;
-	};
-
-	if (
-		!dbQueryValuesCheck<Pick<VerificationToken, 'expiresAt'>, Omit<User, 'createdAt'>>(
-			token,
-			...Object.keys(token).filter((key) => key !== 'createdAt')
-		)
-	) {
-		return fail(400, {
-			errors: ['Podany kod nie istnieje lub jest przedawniony']
-		});
-	}
-
-	// here properties from the user obj are still nullable
-
-	// Create a new session
-	const sessionUser = {
-		id: token.id,
-		email: token.email,
-		role: token.role,
-		fullName: token.fullName,
-		access: token.access,
-		phone: token.phone
-	} satisfies Optional<typeof token, 'expiresAt' | 'assignedAdviser'>;
-
-	console.log('verify', token.id);
-
 	const [createTokens, createTokensError] = await trytm(
-		Promise.all([createAccessToken(sessionUser), createRefreshToken({ userId: token.id })])
+		Promise.all([createAccessToken(token.user), createRefreshToken({ userId: token.user.id })])
 	);
 
 	if (createTokensError) {
 		// Unexpected-error
 		console.error('createTokensError', createTokensError);
 		return fail(500, {
-			errors: ['Niespodziewany błąd']
+			errors: ['Niespodziewany błąd przy tworzeniu tokenów autoryzacyjnych']
 		});
 	}
 
@@ -124,26 +91,12 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 		secure: false
 	});
 
-	const user: Optional<typeof token, 'expiresAt'> = { ...token };
-	delete user.expiresAt;
 	locals.session = {
 		expires: accessTokenExpiryDate(),
-		user
+		user: token.user
 	};
-	console.log('locals.session', locals.session);
 
 	throw redirect(303, '/');
 };
 
 export default handleVerification;
-
-// p.verificationToken.findUnique({
-// 	where: {
-// 		code
-// 	},
-// 	select: {
-// 		email: true,
-// 		user: true,
-// 		expires: true
-// 	}
-// })

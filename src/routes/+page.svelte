@@ -66,9 +66,9 @@
 		class="px-3 py-2 bg-gray-800 text-white text-lg">Nie chcę już otrzymywać powiadomień</button
 	> -->
 
-	<!-- <button on:click={createProgenitor} class="px-3 py-2 bg-gray-800 text-white text-lg"
+	<button on:click={createProgenitor} class="px-3 py-2 bg-gray-800 text-white text-lg"
 		>Utwórz protoplastę</button
-	> -->
+	>
 
 	<h3 class="my-4">Tech Stack</h3>
 

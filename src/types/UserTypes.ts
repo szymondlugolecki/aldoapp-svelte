@@ -23,3 +23,8 @@ export type ProductAuthor = {
 	fullName: string;
 	role: Role;
 };
+
+export type UserSortableColumn = keyof Pick<
+	User,
+	'fullName' | 'email' | 'role' | 'access' | 'createdAt'
+>;

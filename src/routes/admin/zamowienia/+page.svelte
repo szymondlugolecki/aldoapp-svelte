@@ -13,65 +13,35 @@
 	import { orderStatusList } from '$lib/client/constants/index.js';
 	import { dateParser } from '$lib/client/functions/index.js';
 
-	export let data;
-
-	type DefaultOrderList = typeof data.orders;
-
 	let searchInput = '';
-	let streamedOrders: DefaultOrderList = [];
 
-	let loadingStreamedOrders = true;
+	// $: drawerOrder =
+	// 	$drawer &&
+	// 	($drawer.action === 'edit' || $drawer.action === 'preview') &&
+	// 	$drawer.type === 'order' &&
+	// 	orders.find(
+	// 		(order) =>
+	// 			($drawer?.action === 'edit' || $drawer?.action === 'preview') && order.id === $drawer.id
+	// 	);
 
-	$: drawerOrder =
-		$drawer &&
-		($drawer.action === 'edit' || $drawer.action === 'preview') &&
-		$drawer.type === 'order' &&
-		orders.find(
-			(order) =>
-				($drawer?.action === 'edit' || $drawer?.action === 'preview') && order.id === $drawer.id
-		);
+	// const orderParser = (orders: DefaultOrderList) => {
+	// 	return orders.reduce<OrderWithCustomer[]>((acc, row) => {
+	// 		const { attachedDriver, attachedCustomer, order } = row;
 
-	const orderParser = (orders: DefaultOrderList) => {
-		return orders.reduce<OrderWithCustomer[]>((acc, row) => {
-			const { attachedDriver, attachedCustomer, order } = row;
-
-			if (attachedCustomer) {
-				return [
-					...acc,
-					{
-						...order,
-						attachedCustomer,
-						attachedDriver
-					}
-				];
-			} else {
-				return acc;
-			}
-		}, []);
-	};
-
-	data.promise.orders
-		.then((orders) => {
-			streamedOrders = orders;
-		})
-		.catch((err) => {
-			console.error(err);
-			toast.error('Nie udało się pobrać wszystkich zamówień');
-		})
-		.finally(() => {
-			loadingStreamedOrders = false;
-		});
-
-	$: orders = orderParser([...data.orders, ...streamedOrders]);
-	// .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-
-	$: console.log('orders', data.orders);
-
-	// .filter(
-	// 	(user) =>
-	// 		textCrusher(user.email).includes(textCrusher(searchInput)) ||
-	// 		textCrusher(user.fullName).includes(textCrusher(searchInput))
-	// );
+	// 		if (attachedCustomer) {
+	// 			return [
+	// 				...acc,
+	// 				{
+	// 					...order,
+	// 					attachedCustomer,
+	// 					attachedDriver
+	// 				}
+	// 			];
+	// 		} else {
+	// 			return acc;
+	// 		}
+	// 	}, []);
+	// };
 
 	const columnHelper = (cell: TCell, row: Row, cellType: string | string[]) => {
 		const id = row.cells[0].data;
@@ -90,15 +60,6 @@
 			return { id: null, errorText: '⚠️' };
 		}
 	};
-
-	// id,
-	// products: [productIds, productsQuantity],
-	// price: [price, discount],
-	// status: [status, paymentStatus, deliveryStatus],
-	// driver: [driverId],
-	// address,
-	// methods: [deliveryMethod, paymentMethod],
-	// created: [attachedCustomer, createdAt]
 
 	const columns: GridTableColumn[] = [
 		{
@@ -279,27 +240,9 @@
 			sort: false
 		}
 	];
-</script>
 
-<svelte:head>
-	<title>Zamówienia • Panel Administracyjny</title>
-	<meta
-		name="description"
-		content="Panel Administracyjny. Lista zamówień złożonych w Twoje ALDO."
-	/>
-</svelte:head>
-
-<section class="w-full h-full p-2 space-y-3">
-	<Grid
-		{columns}
-		language={plPL}
-		search
-		fixedHeader
-		className={{
-			td: 'text-base-content',
-			sort: 'text-base-content bg-base-content'
-		}}
-		data={orders.map((order) => {
+	/* 
+	data={orders.map((order) => {
 			const {
 				id,
 				price,
@@ -329,16 +272,76 @@
 			};
 
 			return Object.values(parsedOrders);
-		})}
+		})} 
+	*/
+
+	const server: {
+		url: string;
+		total: (data: any) => number;
+		then: (data: any) => any[];
+	} = {
+		url: '/api/orders/list',
+		total: (data) => data.count,
+		then: (data) => {
+			console.log('data', data);
+			return new Array(10).fill([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+		}
+	};
+
+	const pagination: {
+		enabled: boolean;
+		limit: number;
+		server: {
+			url: (prev: string, page: number) => string;
+		};
+	} = {
+		enabled: true,
+		limit: 10,
+		server: {
+			// https://github.com/grid-js/gridjs/issues/84
+			url: (prev, page) => {
+				console.log('prev', prev, 'page', page);
+				return `${prev}${prev.includes('?') ? '&' : '?'}page=${page + 1}`;
+			}
+		}
+	};
+
+	// const search = {
+	// 	enabled: true,
+	// 	server: {
+	// 		url: (prev, keyword) => `${prev}?search=${keyword}`
+	// 	}
+	// };
+</script>
+
+<svelte:head>
+	<title>Zamówienia • Panel Administracyjny</title>
+	<meta
+		name="description"
+		content="Panel Administracyjny. Lista zamówień złożonych w Twoje ALDO."
+	/>
+</svelte:head>
+
+<section class="w-full h-full p-2 space-y-3">
+	<Grid
+		{columns}
+		{pagination}
+		{server}
+		language={plPL}
+		fixedHeader
+		className={{
+			td: 'text-base-content',
+			sort: 'text-base-content bg-base-content'
+		}}
 	/>
 
-	<Drawer>
+	<!-- <Drawer>
 		{#if $drawer?.type === 'order'}
 			{#if $drawer?.action === 'preview' && drawerOrder}
 				<Preview order={drawerOrder} />
 			{/if}
 		{/if}
-	</Drawer>
+	</Drawer> -->
 </section>
 
 <style>

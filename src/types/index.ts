@@ -3,26 +3,17 @@ export * from './UserTypes';
 export * from './OrderTypes';
 export * from './AuthTypes';
 export * from './ApiTypes';
-import type { html, Row } from 'gridjs';
-import type { TCell, TColumn } from 'gridjs/dist/src/types';
-import type { ComponentType } from 'svelte';
+import type { TColumn } from 'gridjs/dist/src/types.js';
+import type { Optional } from './UtilityTypes';
+import type { Plugin } from 'gridjs/dist/src/plugin';
 
 export type ShortService = 'pasze' | 'komis' | 'market' | 'paliwa' | 'maszyny' | 'serwis';
 export type Outlets = 'surowe' | 'myszyniec' | 'ełk' | 'wójtowo';
 
-export type GridTableColumn = {
-	id?: string;
-	data?: any;
-	name: string;
-	width?: string;
-	sort?: boolean;
-	hidden?: boolean;
-	formatter?: (
-		cell: TCell,
-		row: Row,
-		column: TColumn
-	) => ComponentType | ReturnType<typeof html> | string;
-	attributes?: (cell: TCell, row: Row, column: TColumn) => any;
+// type NoIdPlugin = Omit<, 'id' | 'position'>;
+
+export type GridTableColumn = Omit<TColumn, 'plugin'> & {
+	plugin?: Optional<Plugin<any>, 'id' | 'position'>;
 };
 
 export type CellTypes = 'text' | 'date' | 'email' | 'checkbox' | 'phone' | 'adviser' | 'role';

@@ -1,308 +1,209 @@
 <script lang="ts">
-	import { Row, h } from 'gridjs';
-	import Grid from 'gridjs-svelte';
-	import NewUser from '$components/Modals/User/NewUser.svelte';
-
-	import { dateParser, getRoleRank, textCrusher } from '$lib/client/functions';
+	import { cn, dateParser, flexRender, isJSON } from '$lib/client/functions';
 	import { roleNames } from '$lib/client/constants';
-	import type { AdminUsersTableColumn, GridTableColumn, User, UserFilter } from '$types';
-	import { page } from '$app/stores';
-	import Drawer from '$components/AdminDrawer.svelte';
-	import { drawer, getPropertyKey, openDrawer } from '$lib/client/stores/adminDrawer';
-	import EditUser from '$components/Modals/User/EditUser.svelte';
-	import { userRoles, type UserRole } from '$lib/client/constants/dbTypes.js';
+	import type { Role, UserSortableColumn } from '$types';
+	import type { UserRole } from '$lib/client/constants/dbTypes.js';
 
-	import plPL from '$lib/client/constants/gridLocalePL';
-	import type { TCell } from 'gridjs/dist/src/types.js';
+	import {
+		createSvelteTable,
+		getCoreRowModel,
+		getPaginationRowModel,
+		type ColumnDef,
+		type TableOptions,
+		type CellContext,
+		type SortingState,
+		type SortingColumn
+	} from '@tanstack/svelte-table';
+	import { writable } from 'svelte/store';
+	import Pagination from '$components/Table/Pagination.svelte';
+	import AdminEditDialog from '$components/AdminEditDialog.svelte';
+	import AdminAddDialog from '$components/AdminAddDialog.svelte';
+
+	import {
+		Table,
+		TableBody,
+		TableCaption,
+		TableCell,
+		TableHead,
+		TableHeader,
+		TableRow
+	} from '$shadcn/table';
+	import { Input } from '$shadcn/input';
+	import type { Address } from '$lib/server/db/schemas/orders.js';
+	import Button from '$shadcn/button/Button.svelte';
+	import { userPropertySchemas } from '$lib/client/schemas/users.js';
+	import { betterZodParse } from '$lib/client/functions/betterZodParse.js';
+	import { goto } from '$app/navigation';
+	import { ArrowUpDown } from 'lucide-svelte';
+	import TableSortableHead from '$shadcn/table/TableSortableHead.svelte';
+	import { page } from '$app/stores';
 
 	export let data;
 
-	const filter: {
-		roles: {
-			[key in UserRole]: boolean;
+	type ParsedUser = (typeof data.users)[number];
+
+	$: console.log('users', data.users);
+	$: count = data.count[0].count;
+
+	const createUserProps = (info: CellContext<ParsedUser, unknown>, cellTextOverride?: string) => {
+		const cellValue = info.getValue();
+		const keyPublicName = info.column.columnDef.header;
+		const key = info.column.id;
+		const elementId = info.row._getAllCellsByColumnId().id.getValue();
+
+		return {
+			cellValue,
+			elementType: 'user',
+			keyPublicName,
+			key,
+			cellTextOverride,
+			elementId
 		};
-		createdSince: Date | null;
-		createdUntil: Date | null;
-	} = {
-		roles: {
-			customer: true,
-			adviser: true,
-			driver: true,
-			admin: true
-		},
-		createdSince: null,
-		createdUntil: null
 	};
 
-	$: parsedUsers = data.users
-		.reduce<AdminUsersTableColumn[]>((prev, acc) => {
-			if (!prev) {
-				prev = [];
-			}
+	const addressParser = (address: Address | string | null) => {
+		if (!address) return 'Brak';
+		const jsonAddress = typeof address === 'string' ? isJSON<Address>(address) : address;
+		const [correctAddress, addressErrors] = betterZodParse(
+			userPropertySchemas.address,
+			jsonAddress
+		);
 
-			prev.push({
-				...acc.user,
-				adviser: acc.adviser
-			});
-
-			return prev;
-		}, [])
-		.filter((user) => {
-			if (filter.createdSince) {
-				if (user.createdAt.getTime() < new Date(filter.createdSince).getTime()) {
-					return false;
-				}
-			}
-
-			if (filter.createdUntil) {
-				if (user.createdAt.getTime() >= new Date(filter.createdUntil).getTime()) {
-					return false;
-				}
-			}
-
-			const disabledRoles = Object.keys(filter.roles).filter(
-				(role) => filter.roles[role as UserRole] === false
-			) as UserRole[];
-
-			if (disabledRoles.includes(user.role)) {
-				return false;
-			}
-
-			return true;
-		});
-
-	$: drawerUser =
-		$drawer &&
-		$drawer.action === 'edit' &&
-		$drawer.type === 'user' &&
-		parsedUsers.find((user) => $drawer?.action === 'edit' && user.id === $drawer.id);
-
-	const columnHelper = (cell: TCell, row: Row, cellType: string | string[]) => {
-		const id = row.cells[0].data;
-		const fullName = row.cells[2].data;
-		const role = row.cells[4].data;
-
-		if (typeof cellType === 'string' && cellType !== typeof cell) {
-			return { id: null, fullName: null, errorText: '⚠️', role: null };
-		}
-		if (Array.isArray(cellType) && !cellType.includes(typeof cell)) {
-			return { id: null, fullName: null, errorText: '⚠️', role: null };
-		}
-		if (typeof id !== 'string' || typeof fullName !== 'string') {
-			return { id: null, fullName: null, errorText: '🛑', role: null };
-		}
-		if (typeof role !== 'string' || !Object.keys(roleNames).includes(role)) {
-			return { id: null, fullName: null, errorText: '🛑', role: null };
+		if (addressErrors || !correctAddress) {
+			return 'Brak';
 		}
 
-		return { id, fullName, errorText: null, role: role as UserRole };
+		if (Object.values(correctAddress).every((value) => !value)) return 'Brak';
+		const values = Object.values(correctAddress);
+		return `${values[0]} ${values[1]}, ${values[2]}`;
 	};
 
-	const columns: GridTableColumn[] = [
+	const defaultColumns: ColumnDef<ParsedUser>[] = [
 		{
-			name: 'Id',
-			hidden: true
+			id: 'id',
+			accessorKey: 'id',
+			enableSorting: false
 		},
 		{
-			name: 'Profil',
-			formatter: (cell, row) => {
-				return h(
-					'a',
-					{ href: `/uzytkownik/${row.cells[0].data}`, class: 'text-primary', target: '_blank' },
-					'Sprawdź'
-				);
-			},
-			sort: false
+			id: 'fullName',
+			header: 'Imię i nazwisko',
+			accessorKey: 'fullName',
+			cell: (info) => flexRender(AdminEditDialog, createUserProps(info)),
+			enableSorting: true
 		},
 		{
-			name: 'Imię i nazwisko',
-			sort: true,
-			formatter: (cell, row) => {
-				const { id, errorText } = columnHelper(cell, row, 'string');
-				if (errorText !== null) {
-					return errorText;
-				}
-
-				return h(
-					'button',
-					{
-						class: 'hover:text-primary duration-150',
-						onClick: () =>
-							openDrawer({
-								type: 'user',
-								action: 'edit',
-								id,
-								key: 'fullName'
-							})
-					},
-					cell
-				);
-			}
+			id: 'email',
+			header: 'Email',
+			accessorKey: 'email',
+			cell: (info) => flexRender(AdminEditDialog, createUserProps(info)),
+			enableSorting: true
 		},
 		{
-			name: 'Email',
-			sort: true,
-			formatter: (cell, row) => {
-				const { id, fullName, errorText } = columnHelper(cell, row, 'string');
-				if (errorText !== null) {
-					return errorText;
-				}
-
-				return h(
-					'button',
-					{
-						class: 'hover:text-primary duration-150',
-						// 'email', cell, 'Adres email', { key: 'email' }, id
-						onClick: () =>
-							openDrawer({
-								type: 'user',
-								action: 'edit',
-								id,
-								key: 'email'
-							})
-					},
-					cell
-				);
-			}
+			id: 'role',
+			header: 'Rola',
+			accessorKey: 'role',
+			cell: (info) =>
+				flexRender(AdminEditDialog, createUserProps(info, roleNames[info.getValue() as Role]))
 		},
 		{
-			name: 'Rola',
-			formatter: (cell, row) => {
-				const { id, fullName, errorText, role } = columnHelper(cell, row, 'string');
-				const moderator = $page.data.user;
-
-				if (errorText !== null) {
-					return errorText;
-				}
-
-				if (!moderator) {
-					return 'Błąd ⚠️';
-				}
-
-				if (!userRoles.includes(cell as UserRole)) return '⚠️';
-				if (getRoleRank(role) < getRoleRank(moderator.role) || moderator.id === id) {
-					return h(
-						'button',
-						{
-							class: 'hover:text-primary duration-150',
-							onClick: () =>
-								openDrawer({
-									type: 'user',
-									action: 'edit',
-									id,
-									key: 'role'
-								})
-						},
-						roleNames[cell as UserRole]
-					);
-				} else {
-					return h('span', {}, roleNames[cell as UserRole]);
-				}
-			},
-			sort: true
+			id: 'phone',
+			header: 'Telefon',
+			accessorKey: 'phone',
+			cell: (info) => flexRender(AdminEditDialog, createUserProps(info)),
+			enableSorting: false
 		},
 		{
-			name: 'Telefon',
-			formatter: (cell, row) => {
-				const { id, fullName, errorText } = columnHelper(cell, row, 'string');
-				if (errorText !== null) {
-					return errorText;
-				}
-
-				return h(
-					'button',
-					{
-						class: 'hover:text-primary duration-150',
-						onClick: () =>
-							openDrawer({
-								type: 'user',
-								action: 'edit',
-								id,
-								key: 'phone'
-							})
-					},
-					cell
-				);
-			},
-			sort: false
+			id: 'address',
+			header: 'Adres',
+			accessorKey: 'address',
+			cell: (info) =>
+				flexRender(
+					AdminEditDialog,
+					createUserProps(info, addressParser(info.getValue() as Address | string | null))
+				),
+			enableSorting: false
 		},
 		{
-			name: 'Przypisany doradca',
-			formatter: (adviser, row) => {
-				const { id, fullName, errorText, role } = columnHelper(adviser, row, ['null', 'object']);
-				if (errorText !== null) {
-					return errorText;
-				}
-
-				// @ts-expect-error
-				let adviserLabel = (typeof adviser === 'object' && adviser?.fullName) || 'Nieznany';
-
-				if (role === 'customer') {
-					return h(
-						'button',
-						{
-							class: 'hover:text-primary duration-150',
-							onClick: () =>
-								openDrawer({
-									type: 'user',
-									action: 'edit',
-									id,
-									key: 'assignedAdviser'
-								})
-						},
-						adviser ? adviserLabel : 'Brak'
-					);
-				} else {
-					return h('span', {}, '-');
-				}
-			},
-			sort: false
+			id: 'access',
+			header: 'Dostęp',
+			accessorKey: 'access',
+			cell: (info) =>
+				flexRender(AdminEditDialog, createUserProps(info, info.getValue() ? 'Tak 🟢' : 'Nie 🔴'))
 		},
 		{
-			name: 'Dostęp',
-			formatter: (access, row) => {
-				const { id, fullName, errorText, role } = columnHelper(access, row, 'boolean');
-				const moderator = $page.data.user;
-
-				if (errorText !== null) {
-					return errorText;
-				}
-
-				if (!moderator) {
-					return 'Błąd ⚠️';
-				}
-
-				// editing user with role lower than them or themself
-				if (getRoleRank(role) < getRoleRank(moderator.role) || moderator.id === id) {
-					return h(
-						'button',
-						{
-							class: 'hover:text-primary duration-150',
-							onClick: () =>
-								openDrawer({
-									type: 'user',
-									action: 'edit',
-									id,
-									key: 'access'
-								})
-						},
-						access ? '🟢' : '🔴'
-					);
-				} else {
-					return h('span', {}, access ? '🟢' : '🔴');
-				}
-			},
-			sort: true
-		},
-		{
-			name: 'Dodano',
-			formatter: (cell) => {
-				if (!(cell instanceof Date)) return '⚠️';
-				return dateParser(new Date(cell), 'medium');
-			},
-			sort: true
+			id: 'createdAt',
+			header: 'Dołączył',
+			accessorKey: 'createdAt',
+			cell: (info) => dateParser(info.getValue() as Date, 'short')
 		}
 	];
+
+	let sorting: SortingState = [];
+
+	const setSorting = (updater: any) => {
+		console.log('sorting');
+		if (updater instanceof Function) {
+			sorting = updater(sorting);
+		} else {
+			sorting = updater;
+		}
+
+		options.update((options) => ({
+			...options,
+			state: {
+				...options.state,
+				sorting
+			}
+		}));
+	};
+
+	$: options = writable<TableOptions<ParsedUser>>({
+		data: data.users,
+		columns: defaultColumns,
+		getCoreRowModel: getCoreRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+		state: {
+			columnVisibility: {
+				id: false
+			},
+			sorting
+		},
+		enableSorting: true,
+		onSortingChange: setSorting,
+		manualSorting: true
+	});
+
+	$: table = createSvelteTable(options);
+
+	// const rerender = () => {
+	// 	options.update((options) => ({
+	// 		...options,
+	// 		data: parsedUsers
+	// 	}));
+	// };
+
+	// $: {
+	// 	const sortOptions = $options?.state?.sorting;
+	// 	if (sortOptions && sortOptions[0] && sortOptions[0].id) {
+	// 		const { desc } = sortOptions[0];
+	// 		goto(`?strona=${currentPage}&sort=${sortOptions[0].id}&desc=${desc.toString()}`);
+	// 	}
+	// }
+
+	$: pageParam = $page.url.searchParams.get('strona');
+	$: currentPage = !isNaN(Number(pageParam)) ? Math.max(Number(pageParam), 1) : 1;
+
+	$: linkToPage = () => {
+		const url = $page.url.searchParams;
+		const sortingOpts = $options.state?.sorting;
+		if (sortingOpts && sortingOpts[0]) {
+			url.set('sort', sorting[0].id);
+			url.set('desc', sorting[0].desc.toString());
+		}
+		url.set('strona', currentPage.toString());
+		console.log('link to page =>', `?${url.toString()}`);
+		return `?${url.toString()}`;
+	};
 </script>
 
 <svelte:head>
@@ -314,7 +215,7 @@
 </svelte:head>
 
 <section class="w-full h-full p-2 space-y-3">
-	<div class="collapse border border-base-300 rounded-box">
+	<!-- <div class="collapse border border-base-300 rounded-box">
 		<input type="checkbox" />
 		<div class="collapse-title text-xl font-medium">Filtrowanie</div>
 		<div class="collapse-content">
@@ -355,7 +256,6 @@
 						<span class="label-text">Admin</span>
 					</label>
 				</div>
-				<!-- Created date -->
 
 				<span class="block label">Data utworzenia</span>
 
@@ -381,21 +281,55 @@
 				</div>
 			</div>
 		</div>
+	</div> -->
+
+	<div class="flex justify-between space-x-3 lg:space-x-0">
+		<Input class="max-w-xl" type="text" placeholder="Wyszukaj..." />
+		<Button variant="secondary"><AdminAddDialog elementType="user" /></Button>
 	</div>
 
-	<div class="">
-		<button
-			class="btn btn-primary"
-			on:click={() => {
-				openDrawer({
-					action: 'add',
-					type: 'user'
-				});
-			}}>Dodaj nowego użytkownika</button
-		>
-	</div>
+	<Table>
+		<TableCaption>Lista użytkowników</TableCaption>
+		<TableHeader>
+			{#each $table.getHeaderGroups() as headerGroup}
+				<TableRow changeBgOnHover={false}>
+					{#each headerGroup.headers as header}
+						{#if !header.isPlaceholder}
+							<TableHead
+								onClick={header.column.getToggleSortingHandler()}
+								class={cn(
+									`w-[100px]`,
+									header.column.getCanSort() &&
+										'cursor-pointer transition-colors hover:bg-muted/10 hover:rounded-md'
+								)}
+							>
+								<TableSortableHead href={linkToPage()} sortable={header.column.getCanSort()}>
+									<svelte:component
+										this={flexRender(header.column.columnDef.header, header.getContext())}
+									/>
+								</TableSortableHead>
+							</TableHead>
+						{/if}
+					{/each}
+				</TableRow>
+			{/each}
+		</TableHeader>
+		<TableBody>
+			{#each $table.getRowModel().rows as row, bodyRowIndex}
+				<TableRow key={bodyRowIndex}>
+					{#each row.getVisibleCells() as cell}
+						<TableCell class="font-medium"
+							><svelte:component
+								this={flexRender(cell.column.columnDef.cell, cell.getContext())}
+							/></TableCell
+						>
+					{/each}
+				</TableRow>
+			{/each}
+		</TableBody>
+	</Table>
 
-	<Grid
+	<!-- <Grid
 		{columns}
 		language={plPL}
 		search
@@ -419,39 +353,7 @@
 			};
 			return Object.values(parsedUser);
 		})}
-	/>
+	/> -->
 
-	<!-- <AdminModal advisers={parsedUsers.filter(({ role }) => role === 'adviser')} /> -->
-
-	<!-- <NewTable data={data.users} {columns} tableType="users" /> -->
-
-	<Drawer>
-		{#if $drawer && $drawer.type === 'user'}
-			{#if $drawer.action === 'add'}
-				<NewUser advisers={parsedUsers.filter(({ role }) => role === 'adviser')} />
-			{:else if $drawer.action === 'edit' && drawerUser}
-				<EditUser user={drawerUser} />
-			{/if}
-		{/if}
-	</Drawer>
+	<Pagination {currentPage} rowsPerPage={data.pageLimit} totalRows={count} />
 </section>
-
-<style>
-	:global(.gridjs-wrapper:nth-last-of-type(2)) {
-		border-bottom: 0;
-	}
-
-	:global(th.gridjs-th) {
-		background-color: hsl(var(--b1) / var(--tw-bg-opacity)) !important;
-		color: hsl(var(--bc)) !important;
-	}
-
-	:global(td.gridjs-td) {
-		background-color: hsl(var(--b1) / var(--tw-bg-opacity)) !important;
-	}
-
-	:global(.gridjs-search > input) {
-		background-color: hsl(var(--b1) / var(--tw-bg-opacity)) !important;
-		color: hsl(var(--bc)) !important;
-	}
-</style>

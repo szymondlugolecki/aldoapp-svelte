@@ -48,7 +48,29 @@ export const userPropertySchemas = {
 			invalid_type_error: 'Nieprawidłowy numer telefonu'
 		})
 		.min(9, { message: 'Nieprawidłowy numer telefonu' })
-		.max(20, { message: 'Nieprawidłowy numer telefonu' })
+		.max(20, { message: 'Nieprawidłowy numer telefonu' }),
+	address: z.object({
+		street: z
+			.string({
+				required_error: 'Ulica i numer jest wymagana'
+			})
+			// .min(3, { message: 'Nieprawidłowa ulica i numer' })
+			.trim(),
+		zipCode: z
+			.string({
+				required_error: 'Kod pocztowy jest wymagana'
+			})
+			// .min(4, { message: 'Nieprawidłowy kod pocztowy' }) // should be of length 6
+			// .max(8, { message: 'Nieprawidłowy kod pocztowy' })
+			.trim(),
+		city: z
+			.string({
+				required_error: 'Kod pocztowy jest wymagana'
+			})
+			// .min(4, { message: 'Nieprawidłowy kod pocztowy' }) // should be of length 6
+			// .max(8, { message: 'Nieprawidłowy kod pocztowy' })
+			.trim()
+	})
 };
 
 export const addUserSchema = z.object({
@@ -56,7 +78,8 @@ export const addUserSchema = z.object({
 	email: userPropertySchemas.email,
 	role: userPropertySchemas.role,
 	phone: userPropertySchemas.phone,
-	assignedAdviser: userPropertySchemas.id.optional()
+	adviserId: userPropertySchemas.id.optional(),
+	address: userPropertySchemas.address
 });
 
 export const editUserSchema = z.object({
@@ -66,7 +89,8 @@ export const editUserSchema = z.object({
 	email: userPropertySchemas.email.optional(),
 	role: userPropertySchemas.role.optional(),
 	phone: userPropertySchemas.phone.optional(),
-	assignedAdviser: userPropertySchemas.id.optional()
+	adviserId: userPropertySchemas.id.optional(),
+	address: userPropertySchemas.address.optional()
 });
 
 export type EditUserSchema = z.infer<typeof editUserSchema>;

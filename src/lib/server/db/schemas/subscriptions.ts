@@ -14,8 +14,8 @@ export const subscriptions = mysqlTable(
 	'subscriptions',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').defaultNow().notNull(),
-		updatedAt: timestamp('updated_at').onUpdateNow().notNull(),
+		createdAt: timestamp('created_at').defaultNow(),
+		updatedAt: timestamp('updated_at').onUpdateNow(),
 
 		// subscription data
 		subscription: json('subscription').$type<PushSubscriptionJSON>().notNull(),

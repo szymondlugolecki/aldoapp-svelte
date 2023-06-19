@@ -13,12 +13,13 @@ import {
 	varchar,
 	timestamp,
 	int,
-	json,
 	index,
 	decimal
 } from 'drizzle-orm/mysql-core';
 import { users } from './users';
 import { orders } from './orders';
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
+import { images } from './images';
 
 export type Customer = {
 	email: string;
@@ -36,8 +37,8 @@ export const products = mysqlTable(
 	'products',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').defaultNow().notNull(),
-		updatedAt: timestamp('updated_at').onUpdateNow().notNull(),
+		createdAt: timestamp('created_at').defaultNow(),
+		updatedAt: timestamp('updated_at').onUpdateNow(),
 
 		// Product info
 		name: varchar('name', { length: 255 }).notNull(),
@@ -50,14 +51,16 @@ export const products = mysqlTable(
 		amountLeft: int('amount_left').notNull(),
 		producent: varchar('producent', { length: 255, enum: producents }).notNull(),
 		encodedURL: varchar('encoded_url', { length: 512 }).notNull(),
-		images: json('images').$type<string[]>().default([]).notNull(),
 
 		// relations
-		authorId: varchar('author_id', { length: 36 }).notNull() // user that added this product
+		authorId: varchar('author_id', { length: 36 }).notNull(), // user that added this product
+		imagesId: int('images_id')
 	},
 	(product) => ({
 		// indexes
-		authorId: index('author_idx').on(product.authorId)
+		authorId: index('author_idx').on(product.authorId),
+		name: index('name_idx').on(product.name),
+		symbol: index('symbol_idx').on(product.symbol)
 	})
 );
 
@@ -66,7 +69,11 @@ export const productsRelations = relations(products, ({ one, many }) => ({
 		fields: [products.authorId],
 		references: [users.id]
 	}),
-	orders: many(orders)
+	orders: many(orders),
+	images: many(images)
 }));
+
+export const createProductSchema = createInsertSchema(products);
+export const selectProductSchema = createSelectSchema(products);
 
 export type Product = InferModel<typeof products>;

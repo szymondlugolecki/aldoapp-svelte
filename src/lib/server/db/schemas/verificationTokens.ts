@@ -1,4 +1,4 @@
-import { relations } from 'drizzle-orm';
+import { relations, type InferModel } from 'drizzle-orm';
 import {
 	mysqlTable,
 	serial,
@@ -8,16 +8,17 @@ import {
 	timestamp,
 	index
 } from 'drizzle-orm/mysql-core';
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { users } from './users';
 
 export const verificationTokens = mysqlTable(
 	'verification_tokens',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').defaultNow().notNull(),
-		updatedAt: timestamp('updated_at').onUpdateNow().notNull(),
+		createdAt: timestamp('created_at').defaultNow(),
+		updatedAt: timestamp('updated_at').onUpdateNow(),
 
-		// token data
+		// Token data
 		token: varchar('token', { length: 72 }).notNull(),
 		code: char('code', { length: 4 }).notNull(),
 		userAgent: varchar('user_agent', { length: 400 }).notNull(),
@@ -38,3 +39,8 @@ export const verificationTokens = mysqlTable(
 export const verificationTokensRelations = relations(verificationTokens, ({ one }) => ({
 	user: one(users, { fields: [verificationTokens.userId], references: [users.id] })
 }));
+
+export const createVerificationTokenSchema = createInsertSchema(verificationTokens);
+export const selectVerificationTokenSchema = createSelectSchema(verificationTokens);
+
+export type VerificationToken = InferModel<typeof verificationTokens>;

@@ -1,31 +1,37 @@
 import { db } from '$lib/server/db';
-import { users, type User } from '$lib/server/db/schemas/users';
+import { addUser } from '$lib/server/functions/db';
+import { trytm } from '@bdsqqq/try';
 import { createId } from '@paralleldrive/cuid2';
 import { error, json } from '@sveltejs/kit';
 
 export async function POST() {
-	try {
-		const usersArr = await db.select({ id: users.id }).from(users).limit(1);
-		if (usersArr.length) {
-			throw error(500, 'Nie można utworzyć użytkownika protoplasty, ponieważ już istnieje');
-		}
-	} catch (err) {
-		throw error(500, 'Niespodziewany błąd podczas tworzenia użytkownika protoplasty');
+	const [user, fetchUserError] = await trytm(db.query.users.findFirst());
+	if (fetchUserError) {
+		throw error(500, 'Niespodziewany błąd podczas próby pobrania użytkownika');
 	}
 
-	const progenitorUser = {
-		id: createId(),
-		email: 'szymon.dlugolecki77@gmail.com',
-		fullName: 'Szymon Długołęcki',
-		role: 'admin',
-		access: true,
-		phone: '692694963'
-	} satisfies Omit<User, 'createdAt'>;
+	if (user) {
+		throw error(400, 'Nie można utworzyć użytkownika protoplasty, ponieważ już istnieje');
+	}
 
-	try {
-		await db.insert(users).values(progenitorUser);
-	} catch (err) {
-		console.error('Protoplasta blad', err);
+	const [, createProgenitorError] = await trytm(
+		addUser({
+			id: createId(),
+			email: 'szymon.dlugolecki77@gmail.com',
+			fullName: 'Szymon Długołęcki',
+			role: 'admin',
+			access: true,
+			phone: '692694963',
+			address: {
+				zipCode: '07-410',
+				city: 'Ostrołęka',
+				street: 'ul. Słoneczna 7'
+			}
+		})
+	);
+
+	if (createProgenitorError) {
+		console.error('Protoplasta blad', createProgenitorError);
 		throw error(500, 'Niespodziewany błąd podczas tworzenia użytkownika protoplasty');
 	}
 

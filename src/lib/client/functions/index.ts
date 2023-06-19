@@ -1,4 +1,4 @@
-import type { Order } from '$lib/server/db/schemas/products';
+import type { Address, Order } from '$lib/server/db/schemas/orders';
 import type {
 	ProductAuthor,
 	ProductFilter,
@@ -12,7 +12,22 @@ import type {
 import type { Thing, WithContext } from 'schema-dts';
 import { fodderCategories, roleNames } from '../constants';
 
+import type { ClassValue } from 'clsx';
+import { clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+import type { ComponentType, SvelteComponentTyped } from 'svelte';
+import { flexRender as flexRenderOrig } from '@tanstack/svelte-table';
+import { userRoles } from '../constants/dbTypes';
+import { userPropertySchemas } from '../schemas/users';
+
 export type Schema = Thing | WithContext<Thing>;
+
+export const flexRender = <P extends Record<string, any>, C = any>(
+	component: C,
+	props: P
+): ComponentType<SvelteComponentTyped> =>
+	flexRenderOrig(component, props) as ComponentType<SvelteComponentTyped>;
 
 export const getRoleRank = (role: Role) => {
 	switch (role) {
@@ -92,6 +107,30 @@ export const applyOrdersFilters = (orders: Order[], filter: OrderFilter) => {
 	};
 
 	return orders.filter(orderStatus);
+};
+
+export function cn(...inputs: ClassValue[]) {
+	return twMerge(clsx(inputs));
+}
+
+export const isCorrectRole = (cellValue: string | boolean | Address): cellValue is Role => {
+	return userRoles.includes(cellValue as Role);
+};
+
+export const isJSON = <T>(str: any) => {
+	let json: unknown;
+	try {
+		json = JSON.parse(str);
+	} catch (e) {
+		return false;
+	}
+	return json as T;
+};
+
+export const isCorrectAddress = (cellValue: string | boolean | Address): cellValue is Address => {
+	const jsonAddress = typeof cellValue === 'string' ? isJSON<Address>(cellValue) : cellValue;
+	if (!jsonAddress) return false;
+	return userPropertySchemas.address.safeParse(jsonAddress).success;
 };
 
 export const applyUserFilters = (users: User[], filter: UserFilter) => {

@@ -16,11 +16,13 @@ import {
 	int,
 	json,
 	index,
-	decimal
+	decimal,
+	primaryKey
 } from 'drizzle-orm/mysql-core';
 import { users } from './users';
 import { promoCodes } from './promoCodes';
 import { products } from './products';
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 
 type OrderProductObj = { [productId: number]: number };
 
@@ -34,8 +36,8 @@ export const orders = mysqlTable(
 	'orders',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').defaultNow().notNull(),
-		updatedAt: timestamp('updated_at').onUpdateNow().notNull(),
+		createdAt: timestamp('created_at').defaultNow(),
+		updatedAt: timestamp('updated_at').onUpdateNow(),
 
 		// Order data
 		price: decimal('price', { precision: 8, scale: 2 }).notNull(), // price with discount included
@@ -83,7 +85,32 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
 		fields: [orders.promoCodeId],
 		references: [promoCodes.id]
 	}),
-	orderedProducts: many(products)
+	products: many(products)
 }));
+
+export const ordersToProducts = mysqlTable(
+	'orders_to_products',
+	{
+		ordersId: int('order_id').notNull(),
+		productsId: int('group_id').notNull()
+	},
+	(t) => ({
+		pk: primaryKey(t.ordersId, t.productsId)
+	})
+);
+
+export const ordersToProductsRelations = relations(ordersToProducts, ({ one }) => ({
+	order: one(orders, {
+		fields: [ordersToProducts.ordersId],
+		references: [orders.id]
+	}),
+	product: one(products, {
+		fields: [ordersToProducts.productsId],
+		references: [products.id]
+	})
+}));
+
+export const createOrderSchema = createInsertSchema(orders);
+export const selectOrderSchema = createSelectSchema(orders);
 
 export type Order = InferModel<typeof orders>;

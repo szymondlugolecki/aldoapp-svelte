@@ -10,41 +10,45 @@ import { trytm } from '@bdsqqq/try';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { loginSchema } from '$lib/client/schemas/auth';
 import { db } from '$lib/server/db';
-import { eq } from 'drizzle-orm';
-import { users, verificationTokens, type VerificationToken } from '$lib/server/db/schemas/users';
+import { addVerificationToken } from '$lib/server/functions/db';
 
 const handleLogin: Action = async ({ request }) => {
 	// Validate the user input
-	const data = Object.fromEntries(await request.formData());
+	const [formData, formDataError] = await trytm(request.formData());
+	if (formDataError) {
+		console.error('formDataError', formDataError);
+		// Unexpected-error
+		return fail(400, {
+			errors: ['Podano nieprawidłowe dane']
+		});
+	}
+	const data = Object.fromEntries(formData);
 	const [result, parseError] = betterZodParse(loginSchema, data);
 	if (parseError) {
 		return fail(400, {
 			errors: parseError
 		});
 	}
-	// const { email } = result;
-	const email = result.email.toLowerCase();
 
+	const email = result.email.toLowerCase();
 	console.log('email', email);
 
 	// Check if the user exists (was invited)
-	const [usersQuery, fetchUserError] = await trytm(
-		db.select({ id: users.id }).from(users).where(eq(users.email, email))
+	const [user, fetchUserError] = await trytm(
+		db.query.users.findFirst({ where: (user, { eq }) => eq(user.email, email) })
 	);
 
 	if (fetchUserError) {
 		console.error('fetchUserError', fetchUserError);
 		// Unexpected-error
 		return fail(500, {
-			errors: ['Niespodziewany błąd']
+			errors: ['Niespodziewany błąd przy szukaniu użytkownika']
 		});
 	}
 
-	const user = usersQuery[0];
-
 	if (!user) {
-		return fail(401, {
-			errors: ['Podany adres email nie uzyskał dostępu']
+		return fail(400, {
+			errors: ['Konto z podanym adresem email nie istnieje']
 		});
 	}
 
@@ -53,23 +57,21 @@ const handleLogin: Action = async ({ request }) => {
 
 	const userAgent = uaParser(request.headers.get('User-Agent'));
 
-	const newVerificationToken: Omit<VerificationToken, 'createdAt' | 'id'> = {
-		code,
-		token,
-		userAgent,
-		userId: user.id,
-		expiresAt: new Date(Date.now() + verificationKeysExpirationTime)
-	};
-
 	const [, createTokenError] = await trytm(
-		db.insert(verificationTokens).values(newVerificationToken)
+		addVerificationToken({
+			code,
+			token,
+			userAgent,
+			userId: user.id,
+			expiresAt: new Date(Date.now() + verificationKeysExpirationTime)
+		})
 	);
 
 	if (createTokenError) {
 		// Unexpected-error
 		console.log('createTokenError', createTokenError);
 		return fail(500, {
-			errors: ['Niespodziewany błąd']
+			errors: ['Niespodziewany błąd przy tworzeniu tokenu weryfikacyjnego']
 		});
 	}
 
@@ -85,37 +87,12 @@ const handleLogin: Action = async ({ request }) => {
 		// Unexpected-error
 		return fail(500, {
 			errors: [
-				'Przepraszamy, nie udało się wysłać maila weryfikacyjnego. Proszę spróbować ponownie.'
+				'Przepraszamy, nie udało się wysłać maila weryfikacyjnego. Proszę spróbować ponownie'
 			]
 		});
 	}
 
-	throw redirect(303, '/login/weryfikacja');
+	throw redirect(303, '/login/weryfikacja?success=true');
 };
 
 export default handleLogin;
-
-// p.user.findUnique({
-// 	where: {
-// 		email
-// 	}
-// })
-
-// p.verificationToken.upsert({
-// 	create: {
-// 		code: verificationCode,
-// 		email,
-// 		expires: new Date(Date.now() + verificationKeysExpirationTime), // 12 hours from now
-// 		userAgent: ''
-// 	},
-// 	update: {
-// 		code: verificationCode,
-// 		expires: new Date(Date.now() + verificationKeysExpirationTime) // 12 hours from now
-// 	},
-// 	where: {
-// 		email
-// 	},
-// 	select: {
-// 		verificationToken: true
-// 	}
-// })

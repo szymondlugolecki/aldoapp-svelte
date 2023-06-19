@@ -5,7 +5,7 @@ import type {
 	PaymentMethod,
 	PaymentStatus
 } from '$lib/client/constants/dbTypes';
-import type { Order } from '$lib/server/db/schemas/products';
+import type { Order } from '$lib/server/db/schemas/orders';
 import type { User } from './UserTypes';
 
 export type { Order };

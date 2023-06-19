@@ -1,1 +1,62 @@
-{"version":"5","dialect":"mysql","entries":[]}
+{
+  "version": "5",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1686581336330,
+      "tag": "0000_heavy_deathbird",
+      "breakpoints": false
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1686587468916,
+      "tag": "0001_slimy_clint_barton",
+      "breakpoints": false
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1686587700562,
+      "tag": "0002_old_lady_ursula",
+      "breakpoints": false
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1686587784563,
+      "tag": "0003_common_juggernaut",
+      "breakpoints": false
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1686594112034,
+      "tag": "0004_magical_eternals",
+      "breakpoints": false
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1686839419271,
+      "tag": "0005_wonderful_vulcan",
+      "breakpoints": false
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1687023723335,
+      "tag": "0006_wandering_photon",
+      "breakpoints": false
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1687025595201,
+      "tag": "0007_dry_black_tom",
+      "breakpoints": false
+    }
+  ]
+}

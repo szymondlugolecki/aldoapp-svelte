@@ -1,21 +1,69 @@
+import { isJSON } from '$lib/client/functions/index.js';
 import add from '$lib/server/actions/users/add';
 import edit from '$lib/server/actions/users/edit';
 import { db } from '$lib/server/db';
 import { users } from '$lib/server/db/schemas/users';
-import { eq } from 'drizzle-orm';
+import type { UserSortableColumn } from '$types';
+import { sql } from 'drizzle-orm';
 
-export const load = async () => {
-	// const adviser = alias(users, 'advisers');
+const sortableColumns: UserSortableColumn[] = ['fullName', 'email', 'role', 'access', 'createdAt'];
+
+export const load = async ({ url }) => {
+	const pageLimit = 2;
+
+	const page = !isNaN(Number(url.searchParams.get('strona')))
+		? Math.max(Number(url.searchParams.get('strona')), 1)
+		: 1;
+	const sort = url.searchParams.get('sort');
+	const desc = url.searchParams.get('desc');
+
+	const descBool = desc && ['true', 'false'].includes(desc) ? isJSON<boolean>(desc) : null;
+	const properSort = (sort: string | null): sort is UserSortableColumn => {
+		return !!sort && sortableColumns.includes(sort as UserSortableColumn);
+	};
+
+	console.log('page', page, sort);
 
 	return {
-		users: Promise.resolve([])
-		// db
-		// 	.select({
-		// 		user: users,
-		// 		adviser: { id: adviser.id, email: adviser.email, fullName: adviser.fullName }
-		// 	})
-		// 	.from(users)
-		// 	.leftJoin(adviser, eq(adviser.id, users.assignedAdviser))
+		users: db.query.users.findMany({
+			with: {
+				adviser: {
+					columns: {
+						id: true,
+						email: true,
+						fullName: true
+					}
+				}
+			},
+			columns: {
+				id: true,
+				email: true,
+				fullName: true,
+				access: true,
+				role: true,
+				phone: true,
+				createdAt: true,
+				address: true
+			},
+			limit: pageLimit,
+			offset: (page - 1) * pageLimit,
+			...(descBool !== null && properSort(sort)
+				? {
+						orderBy: (users, { asc, desc }) => (descBool ? desc(users[sort]) : asc(users[sort]))
+				  }
+				: {})
+			// ...(search
+			// 	? {
+			// 			where: (users, { sql }) => sql`MATCH(${users.email}) AGAINST(${search} IN BOOLEAN MODE)`
+			// 	  }
+			// 	: {}),
+		}),
+		count: db
+			.select({
+				count: sql<number>`count(*)`.mapWith(Number)
+			})
+			.from(users),
+		pageLimit
 	};
 };
 

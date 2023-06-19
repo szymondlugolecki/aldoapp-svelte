@@ -9,10 +9,16 @@
 	import { getRoleRank } from '$lib/client/functions';
 	import AdviserSelection from './AdviserSelection.svelte';
 
-	export let user: User;
+	export let user: Omit<User, 'adviserId' | 'updatedAt'> & {
+		adviser: {
+			id: string;
+			fullName: string;
+			email: string;
+		} | null;
+	};
 	$: key = $drawer?.action === 'edit' && $drawer?.type === 'user' && $drawer.key;
 
-	$: console.log('key', key);
+	$: console.log('drawer key', key);
 
 	// role of the person that is editing the user
 	const editorRole = $page.data.user?.role;
@@ -104,11 +110,11 @@
 					/>
 				</label>
 			</div>
-		{:else if key === 'assignedAdviser'}
+		{:else if key === 'adviserId'}
 			<AdviserSelection />
 		{/if}
 
-		{#if key !== 'assignedAdviser'}
+		{#if key !== 'adviserId'}
 			<button type="submit" class="btn btn-primary w-full">Edytuj</button>
 		{/if}
 		<input type="hidden" hidden value={user.id} name="id" />

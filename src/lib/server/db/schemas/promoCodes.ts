@@ -21,8 +21,8 @@ export const promoCodes = mysqlTable(
 	'promo_codes',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').defaultNow().notNull(),
-		updatedAt: timestamp('updated_at').onUpdateNow().notNull(),
+		createdAt: timestamp('created_at').defaultNow(),
+		updatedAt: timestamp('updated_at').onUpdateNow(),
 
 		// Promo Code info
 		code: varchar('code', { length: 32 }).notNull(),
@@ -58,15 +58,15 @@ export const promoCodeUses = mysqlTable(
 	'promo_code_uses',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').defaultNow().notNull(),
-		updatedAt: timestamp('updated_at').onUpdateNow().notNull(),
+		createdAt: timestamp('created_at').defaultNow(),
+		updatedAt: timestamp('updated_at').defaultNow().onUpdateNow(),
 
-		promoCodeId: varchar('promocode_id', { length: 36 }).notNull(),
+		promoCodeId: varchar('promocode_used_id', { length: 36 }).notNull(),
 		userId: char('user_id', { length: 255 }).notNull()
 	},
 	(promoCodeUsage) => ({
 		// indexes
-		promoCodeId: index('promo_code_id_idx').on(promoCodeUsage.promoCodeId),
+		promoCodeId: index('promo_code_use_idx').on(promoCodeUsage.promoCodeId),
 		userId: index('user_id_idx').on(promoCodeUsage.userId)
 	})
 );
