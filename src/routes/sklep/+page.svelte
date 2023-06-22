@@ -99,7 +99,7 @@
 	/>
 </svelte:head>
 
-<div class="w-full flex items-center py-1 sticky top-0 bg-base-100 z-20 h-fit">
+<div class="w-full flex items-center py-1 sticky top-0 z-20 h-fit">
 	<div
 		class="flex-1 flex items-center pl-2 rounded-lg border border-transparent focus-within:border-primary duration-200 group w-full"
 	>
@@ -107,7 +107,7 @@
 		<input
 			bind:value={searchInput}
 			type="text"
-			class="border-none rounded-r-lg outline-none focus:outline-none focus:ring-0 py-2 bg-base-100 w-full"
+			class="border-none rounded-r-lg outline-none focus:outline-none focus:ring-0 py-2 w-full"
 			placeholder="Szukaj produktów..."
 		/>
 	</div>

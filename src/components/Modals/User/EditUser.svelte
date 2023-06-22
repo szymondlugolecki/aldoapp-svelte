@@ -7,7 +7,6 @@
 	import ModalHeader from '../ModalHeader.svelte';
 	import type { User } from '$types';
 	import { getRoleRank } from '$lib/client/functions';
-	import AdviserSelection from './AdviserSelection.svelte';
 
 	export let user: Omit<User, 'adviserId' | 'updatedAt'> & {
 		adviser: {
@@ -111,7 +110,7 @@
 				</label>
 			</div>
 		{:else if key === 'adviserId'}
-			<AdviserSelection />
+			<div>Tutaj wybiera sie doradce</div>
 		{/if}
 
 		{#if key !== 'adviserId'}

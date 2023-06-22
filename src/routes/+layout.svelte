@@ -1,31 +1,26 @@
 <script lang="ts">
 	import '../app.css';
-	import 'gridjs/dist/theme/mermaid.css';
 
 	import Navbar from '../components/Layout/Navbar.svelte';
 	import Footer from '../components/Layout/Footer.svelte';
 	import { fade } from 'svelte/transition';
 	import toast, { Toaster } from 'svelte-french-toast';
 
-	import { onMount } from 'svelte';
-	import { themeChange } from 'theme-change';
+	import { onDestroy, onMount } from 'svelte';
 	import { settings } from '$lib/client/stores/settings';
 	import { base64StringToUint8Arr } from '$lib/client/functions/base64StringToUint8Arr';
 	import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public';
 	import type { BeforeInstallPromptEvent } from '../app';
+	import type { Unsubscriber } from 'svelte/store';
 
 	let deferredInstallEvent: BeforeInstallPromptEvent | undefined = undefined;
 
-	// NOTE: the element that is using one of the theme attributes must be in the DOM on mount
-	onMount(async () => {
-		themeChange(false);
-		// 👆 false parameter is required for svelte
+	let unsubscribe: Unsubscriber | undefined;
 
+	onMount(async () => {
 		// setInterval(() => {
 		// 	toast('Jaroslaw wlasnie kupil Pasze ALDO Premium', { icon: '🔔' });
 		// }, 1000 * 30);
-
-		console.log('mount');
 
 		window.addEventListener('beforeinstallprompt', (e) => {
 			console.log('before install prompt', e);
@@ -33,6 +28,31 @@
 			toast.success('Before install prompt!');
 			deferredInstallEvent = e as BeforeInstallPromptEvent;
 		});
+
+		unsubscribe = settings.subscribe(({ theme }) => {
+			switch (theme) {
+				case 'light':
+					document.documentElement.classList.remove('dark');
+					break;
+				case 'dark':
+					document.documentElement.classList.add('dark');
+					break;
+				default:
+					const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+					if (prefersDark) {
+						document.documentElement.classList.add('dark');
+					} else {
+						document.documentElement.classList.remove('dark');
+					}
+					break;
+			}
+		});
+	});
+
+	onDestroy(() => {
+		if (unsubscribe) {
+			unsubscribe();
+		}
 	});
 
 	async function handleInstall() {
@@ -54,10 +74,7 @@
 	export let data;
 </script>
 
-<div
-	class="min-h-screen flex flex-col justify-between max-w-screen bg-base-100"
-	data-theme={$settings.theme}
->
+<div class="min-h-screen flex flex-col justify-between max-w-screen bg-background">
 	<Toaster position="bottom-right" />
 
 	<div class="flex flex-col w-full h-full">

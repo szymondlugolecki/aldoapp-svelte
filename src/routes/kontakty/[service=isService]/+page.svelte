@@ -22,7 +22,7 @@
 	</header>
 
 	<div class="relative overflow-x-auto flex justify-center">
-		<table class="w-full lg:w-3/4 text-sm text-left text-base-content bg-base-100">
+		<table class="w-full lg:w-3/4 text-sm text-left text-base-content">
 			<thead class="text-xs uppercase">
 				<tr>
 					<th scope="col" class="px-3 sm:px-6 py-3"> Punkt sprzedaży </th>

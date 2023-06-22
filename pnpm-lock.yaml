@@ -29,8 +29,6 @@ specifiers:
   eslint: ^8.35.0
   eslint-config-prettier: ^8.7.0
   eslint-plugin-svelte3: ^4.0.0
-  gridjs: ^5.1.0
-  gridjs-svelte: ^2.1.1
   jose: ^4.13.1
   lucide-svelte: ^0.113.0
   postcss: ^8.4.21
@@ -45,8 +43,6 @@ specifiers:
   tailwind-merge: ^1.13.2
   tailwindcss: ^3.2.7
   tailwindcss-animate: ^1.0.6
-  theme-change: ^2.5.0
-  tozod: ^3.0.0
   typescript: ^4.9.5
   ua-parser-js: 2.0.0-alpha.1
   vite: ^4.1.4
@@ -69,8 +65,6 @@ dependencies:
   dotenv: 16.0.3
   drizzle-orm: 0.26.5_x5zvu6yhqtclhr76ddvo6x3wgi
   drizzle-zod: 0.4.1_5rdlibgfvkxg6f6pkw7dwz4olq
-  gridjs: 5.1.0
-  gridjs-svelte: 2.1.1_gridjs@5.1.0+svelte@3.59.1
   jose: 4.13.1
   lucide-svelte: 0.113.0_svelte@3.59.1
   radix-svelte: 0.7.1_svelte@3.59.1
@@ -80,8 +74,6 @@ dependencies:
   svelte-outclick: 3.5.0_svelte@3.59.1
   tailwind-merge: 1.13.2
   tailwindcss-animate: 1.0.6_tailwindcss@3.2.7
-  theme-change: 2.5.0
-  tozod: 3.0.0_zod@3.21.4
   ua-parser-js: 2.0.0-alpha.1
   web-push: 3.5.0
   wretch: 2.5.1
@@ -4006,22 +3998,6 @@ packages:
     resolution: {integrity: sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==}
     dev: true
 
-  /gridjs-svelte/2.1.1_gridjs@5.1.0+svelte@3.59.1:
-    resolution: {integrity: sha512-tYkgdqNKSnfmAYYc8EP4axn/Xlugp7VLwAlpNkP4SBLHHYD/ejD2DJ+FMatDNqcJ1Z1kuMnJWO+VBcAOirEByw==}
-    peerDependencies:
-      gridjs: '>=5.0.0'
-      svelte: '>=3.30.0'
-    dependencies:
-      gridjs: 5.1.0
-      svelte: 3.59.1
-    dev: false
-
-  /gridjs/5.1.0:
-    resolution: {integrity: sha512-ElT4RccHVZXR6mAn0Neh7jRv0yLPYLl9tWr9EC1tIJ7UC035kScGc/VMSJlPmOTyUU6qPUz1mtmzg/i8+IT24g==}
-    dependencies:
-      preact: 10.13.2
-    dev: false
-
   /hanji/0.0.5:
     resolution: {integrity: sha512-Abxw1Lq+TnYiL4BueXqMau222fPSPMFtya8HdpWsz/xVAhifXou71mPh/kY2+08RgFcVccjG3uZHs6K5HAe3zw==}
     dependencies:
@@ -5010,10 +4986,6 @@ packages:
       picocolors: 1.0.0
       source-map-js: 1.0.2
 
-  /preact/10.13.2:
-    resolution: {integrity: sha512-q44QFLhOhty2Bd0Y46fnYW0gD/cbVM9dUVtNTDKPcdXSMA7jfY+Jpd6rk3GB0lcQss0z5s/6CmVP0Z/hV+g6pw==}
-    dev: false
-
   /prebuild-install/7.1.1:
     resolution: {integrity: sha512-jAXscXWMcCK8GgCoHOfIr0ODh5ai8mj63L2nWrjuAgXE6tDyYGnx4/8o/rCgU+B4JSyZBKbeZqzhtwtC3ovxjw==}
     engines: {node: '>=10'}
@@ -5768,10 +5740,6 @@ packages:
     resolution: {integrity: sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==}
     dev: true
 
-  /theme-change/2.5.0:
-    resolution: {integrity: sha512-B/UdsgdHAGhSKHTAQnxg/etN0RaMDpehuJmZIjLMDVJ6DGIliRHGD6pODi1CXLQAN9GV0GSyB3G6yCuK05PkPQ==}
-    dev: false
-
   /timers-ext/0.1.7:
     resolution: {integrity: sha512-b85NUNzTSdodShTIbky6ZF02e8STtVVfD+fu4aXXShEELpozH+bCpJLYMPZbsABN2wDH7fJpqIoXxJpzbf0NqQ==}
     dependencies:
@@ -5821,14 +5789,6 @@ packages:
     resolution: {integrity: sha512-eM+pCBxXO/njtF7vdFsHuqb+ElbxqtI4r5EAvk6grfAFyJ6IvWlSkfZ5T9ozC6xWw3Fj1fGoSmrl0gUs46JVIw==}
     engines: {node: '>=6'}
     dev: true
-
-  /tozod/3.0.0_zod@3.21.4:
-    resolution: {integrity: sha512-R03/moNPEGgWKoTdCsEJuyEoP6NtXyhWg9L9lJhF2XyCR2Ce9XE+yXaswaVmqyBpHsRPC2Pk38mK8Ex7iHaXcg==}
-    peerDependencies:
-      zod: ^3.0.0-alpha.2
-    dependencies:
-      zod: 3.21.4
-    dev: false
 
   /tr46/0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}

@@ -52,7 +52,7 @@
 	<h1 class="text-3xl sm:text-3xl font-bold mb-3 mt-2 text-center">Ustawienia</h1>
 
 	<div class="overflow-x-auto">
-		<table class="table w-full table-compact xs:table-normal">
+		<table class="w-full">
 			<!-- head -->
 			<thead>
 				<tr>
@@ -90,9 +90,3 @@
 		</table>
 	</div>
 </div>
-
-<style>
-	.table th:first-child {
-		position: static;
-	}
-</style>

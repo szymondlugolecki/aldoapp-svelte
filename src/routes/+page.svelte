@@ -1,9 +1,5 @@
 <script lang="ts">
 	import toast from 'svelte-french-toast';
-	import { onMount } from 'svelte';
-	import { subscribe, unsubscribe } from '$lib/client/functions/push';
-	// import { Grid } from "gridjs";
-	import Grid from 'gridjs-svelte';
 
 	let sessionData: import('./$types').PageData['user'] | undefined = undefined;
 
@@ -76,17 +72,13 @@
 		<li>SvelteKit + TypeScript</li>
 		<li>TailwindCSS + DaisyUI</li>
 		<li>PlanetScale (MySQL) + DrizzleORM</li>
-		<li>Inne: zod, jose, gridjs, cloudinary, lucide-svelte, sendgrid</li>
+		<li>Inne: zod, jose, tanstack table, lucide-svelte, sendgrid</li>
 	</ul>
 
 	<div class="my-4">
 		<span class="block"
 			>Wersja Alpha - nic nie było testowane, brak połączenia z Navireo, można składać zamówienia do
 			testów, antywirus może blokować maile</span
-		>
-		<span class="block"
-			>Edytowanie, dodawanie, usuwanie i filtrowanie elementów w panelu administracyjnym może nie
-			działać po migracji tabel do GridJs</span
 		>
 	</div>
 

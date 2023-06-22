@@ -34,9 +34,9 @@
 				<slot />
 			</div>
 		</div>
-		<div class="drawer-side h-full bg-base-100 bg-opacity-95 w-72 ss:w-80 md:w-64">
+		<div class="drawer-side h-full bg-opacity-95 w-72 ss:w-80 md:w-64">
 			<label for="categories-drawer" class="drawer-overlay" />
-			<div class="flex flex-col px-2 py-1 bg-base-100 sticky top-0">
+			<div class="flex flex-col px-2 py-1 sticky top-0">
 				<div class="flex justify-between items-center">
 					<h2 class=" text-xl font-medium p-0 text-base-content">Kategorie</h2>
 					<!-- svelte-ignore a11y-no-noninteractive-tabindex -->

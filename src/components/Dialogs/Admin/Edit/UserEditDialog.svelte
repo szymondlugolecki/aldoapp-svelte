@@ -23,19 +23,11 @@
 	import type { Address } from '$lib/server/db/schemas/orders';
 	import { isCorrectAddress, isCorrectRole } from '$lib/client/functions';
 
-	export let elementType: 'user' | 'product' | 'promoCode' | 'order';
 	export let keyPublicName: string;
 	export let key: string;
 	export let cellValue: string | boolean | Address;
 	export let cellTextOverride: string | undefined = undefined;
 	export let elementId: string | number;
-
-	const elementTitles = {
-		user: 'Edytuj użytkownika',
-		product: 'Edytuj produkt',
-		promoCode: 'Edytuj kod rabatowy',
-		order: 'Edytuj zamówienie'
-	};
 
 	let keyType: 'text' | 'access' | 'role' | 'address' = 'text';
 
@@ -92,7 +84,7 @@
 			}}
 		>
 			<DialogHeader>
-				<DialogTitle>{elementTitles[elementType]}</DialogTitle>
+				<DialogTitle>Edytuj użytkownika</DialogTitle>
 				<DialogDescription>Kliknij przycisk poniżej, aby zapisać zmiany.</DialogDescription>
 			</DialogHeader>
 			<div class="py-4">

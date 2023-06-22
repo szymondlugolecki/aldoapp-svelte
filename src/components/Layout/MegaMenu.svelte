@@ -5,7 +5,7 @@
 
 <div
 	id="megamenu"
-	class="border-base-content border mb-4 dropdown-content menu shadow bg-base-100 rounded-box w-[576px] -translate-x-1/2"
+	class="border-base-content border mb-4 dropdown-content menu shadow bg-background rounded-box w-[576px] -translate-x-1/2"
 >
 	<div class="mx-auto px-4 sm:px-3 lg:px-8">
 		<div class="p-4 sm:px-2">

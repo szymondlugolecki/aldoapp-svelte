@@ -1,5 +1,4 @@
 import { z } from 'zod';
-// import type { toZod } from 'tozod';
 
 export const pushSubscriptionJSONSchema = z.object({
 	endpoint: z.string().url(),

@@ -14,6 +14,7 @@ export const load = async ({ url }) => {
 	const page = !isNaN(Number(url.searchParams.get('strona')))
 		? Math.max(Number(url.searchParams.get('strona')), 1)
 		: 1;
+
 	const sort = url.searchParams.get('sort');
 	const desc = url.searchParams.get('desc');
 
@@ -22,7 +23,7 @@ export const load = async ({ url }) => {
 		return !!sort && sortableColumns.includes(sort as UserSortableColumn);
 	};
 
-	console.log('page', page, sort);
+	console.log('page', page, sort, 'desc', descBool);
 
 	return {
 		users: db.query.users.findMany({
@@ -45,13 +46,13 @@ export const load = async ({ url }) => {
 				createdAt: true,
 				address: true
 			},
-			limit: pageLimit,
 			offset: (page - 1) * pageLimit,
 			...(descBool !== null && properSort(sort)
 				? {
 						orderBy: (users, { asc, desc }) => (descBool ? desc(users[sort]) : asc(users[sort]))
 				  }
-				: {})
+				: {}),
+			limit: pageLimit
 			// ...(search
 			// 	? {
 			// 			where: (users, { sql }) => sql`MATCH(${users.email}) AGAINST(${search} IN BOOLEAN MODE)`

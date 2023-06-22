@@ -12,12 +12,14 @@
 		type TableOptions,
 		type CellContext,
 		type SortingState,
-		type SortingColumn
+		type SortingColumn,
+		type Updater,
+		type PaginationState
 	} from '@tanstack/svelte-table';
 	import { writable } from 'svelte/store';
 	import Pagination from '$components/Table/Pagination.svelte';
-	import AdminEditDialog from '$components/AdminEditDialog.svelte';
-	import AdminAddDialog from '$components/AdminAddDialog.svelte';
+	import AdminEditDialog from '$components/Dialogs/Admin/Edit/UserEditDialog.svelte';
+	import AdminAddDialog from '$components/Dialogs/Admin/Add/UserAddDialog.svelte';
 
 	import {
 		Table,
@@ -33,10 +35,9 @@
 	import Button from '$shadcn/button/Button.svelte';
 	import { userPropertySchemas } from '$lib/client/schemas/users.js';
 	import { betterZodParse } from '$lib/client/functions/betterZodParse.js';
-	import { goto } from '$app/navigation';
-	import { ArrowUpDown } from 'lucide-svelte';
 	import TableSortableHead from '$shadcn/table/TableSortableHead.svelte';
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 
 	export let data;
 
@@ -53,7 +54,6 @@
 
 		return {
 			cellValue,
-			elementType: 'user',
 			keyPublicName,
 			key,
 			cellTextOverride,
@@ -139,25 +139,69 @@
 	];
 
 	let sorting: SortingState = [];
+	let pagination: PaginationState = {
+		pageIndex: 0,
+		pageSize: data.pageLimit
+	};
+
+	const rerender = () => {
+		options.update((options) => ({
+			...options,
+			data: data.users
+		}));
+	};
 
 	const setSorting = (updater: any) => {
-		console.log('sorting');
 		if (updater instanceof Function) {
 			sorting = updater(sorting);
 		} else {
 			sorting = updater;
 		}
 
-		options.update((options) => ({
-			...options,
-			state: {
-				...options.state,
-				sorting
+		const url = new URLSearchParams($page.url.searchParams);
+		if (sorting && sorting[0]) {
+			url.set('sort', sorting[0].id);
+			url.set('desc', sorting[0].desc.toString());
+			if (url.get('strona')) {
+				url.set('strona', currentPage.toString());
 			}
-		}));
+		}
+
+		goto(`?${url.toString()}`).then(() => {
+			options.update((options) => ({
+				...options,
+				state: {
+					...options.state,
+					data: data.users,
+					sorting
+				}
+			}));
+		});
 	};
 
-	$: options = writable<TableOptions<ParsedUser>>({
+	const setPagination = (updater: Updater<PaginationState>) => {
+		if (updater instanceof Function) {
+			pagination = updater(pagination);
+		} else {
+			pagination = updater;
+		}
+
+		const url = new URLSearchParams($page.url.searchParams);
+		if (pagination) {
+			url.set('strona', (pagination.pageIndex + 1).toString());
+			goto(`?${url.toString()}`).then(() => rerender());
+		}
+	};
+
+	let currentPage = 1;
+
+	const setPage = (pageIndex: number) => {
+		currentPage = pageIndex + 1;
+		console.log('setting page index to', pageIndex);
+		$table.setPageIndex(pageIndex);
+	};
+
+	let options = writable<TableOptions<ParsedUser>>({
 		data: data.users,
 		columns: defaultColumns,
 		getCoreRowModel: getCoreRowModel(),
@@ -170,40 +214,15 @@
 		},
 		enableSorting: true,
 		onSortingChange: setSorting,
-		manualSorting: true
+		onPaginationChange: setPagination,
+		manualSorting: true,
+		manualPagination: true
 	});
 
 	$: table = createSvelteTable(options);
 
-	// const rerender = () => {
-	// 	options.update((options) => ({
-	// 		...options,
-	// 		data: parsedUsers
-	// 	}));
-	// };
-
-	// $: {
-	// 	const sortOptions = $options?.state?.sorting;
-	// 	if (sortOptions && sortOptions[0] && sortOptions[0].id) {
-	// 		const { desc } = sortOptions[0];
-	// 		goto(`?strona=${currentPage}&sort=${sortOptions[0].id}&desc=${desc.toString()}`);
-	// 	}
-	// }
-
 	$: pageParam = $page.url.searchParams.get('strona');
 	$: currentPage = !isNaN(Number(pageParam)) ? Math.max(Number(pageParam), 1) : 1;
-
-	$: linkToPage = () => {
-		const url = $page.url.searchParams;
-		const sortingOpts = $options.state?.sorting;
-		if (sortingOpts && sortingOpts[0]) {
-			url.set('sort', sorting[0].id);
-			url.set('desc', sorting[0].desc.toString());
-		}
-		url.set('strona', currentPage.toString());
-		console.log('link to page =>', `?${url.toString()}`);
-		return `?${url.toString()}`;
-	};
 </script>
 
 <svelte:head>
@@ -215,77 +234,9 @@
 </svelte:head>
 
 <section class="w-full h-full p-2 space-y-3">
-	<!-- <div class="collapse border border-base-300 rounded-box">
-		<input type="checkbox" />
-		<div class="collapse-title text-xl font-medium">Filtrowanie</div>
-		<div class="collapse-content">
-			<div class="space-y-0.5">
-				<span class="block label">Rola</span>
-
-				<div class="grid grid-cols-2 sm:grid-cols-4">
-					<label class="cursor-pointer label justify-start space-x-2">
-						<input
-							type="checkbox"
-							bind:checked={filter.roles.customer}
-							class="checkbox checkbox-info"
-						/>
-						<span class="label-text">Klient</span>
-					</label>
-					<label class="cursor-pointer label justify-start space-x-2">
-						<input
-							type="checkbox"
-							bind:checked={filter.roles.driver}
-							class="checkbox checkbox-success"
-						/>
-						<span class="label-text">Kierowca</span>
-					</label>
-					<label class="cursor-pointer label justify-start space-x-2">
-						<input
-							type="checkbox"
-							bind:checked={filter.roles.adviser}
-							class="checkbox checkbox-success"
-						/>
-						<span class="label-text">Doradca</span>
-					</label>
-					<label class="cursor-pointer label justify-start space-x-2">
-						<input
-							type="checkbox"
-							bind:checked={filter.roles.admin}
-							class="checkbox checkbox-error"
-						/>
-						<span class="label-text">Admin</span>
-					</label>
-				</div>
-
-				<span class="block label">Data utworzenia</span>
-
-				<div class="grid grid-cols-1 xs:grid-cols-3 gap-2">
-					<div class="w-full">
-						<label for="joined-date-from" class="block text-sm text-base-content">Od</label>
-						<input
-							class="w-full sm:w-auto p-2 rounded-md"
-							type="date"
-							name="joined-date-from"
-							bind:value={filter.createdSince}
-						/>
-					</div>
-					<div class="w-full">
-						<label for="joined-date-to" class="block text-sm text-base-content">Do</label>
-						<input
-							type="date"
-							name="joined-date-to"
-							class="w-full sm:w-auto p-2 rounded-md"
-							bind:value={filter.createdUntil}
-						/>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div> -->
-
 	<div class="flex justify-between space-x-3 lg:space-x-0">
 		<Input class="max-w-xl" type="text" placeholder="Wyszukaj..." />
-		<Button variant="secondary"><AdminAddDialog elementType="user" /></Button>
+		<Button variant="secondary"><AdminAddDialog /></Button>
 	</div>
 
 	<Table>
@@ -303,7 +254,7 @@
 										'cursor-pointer transition-colors hover:bg-muted/10 hover:rounded-md'
 								)}
 							>
-								<TableSortableHead href={linkToPage()} sortable={header.column.getCanSort()}>
+								<TableSortableHead sortable={header.column.getCanSort()}>
 									<svelte:component
 										this={flexRender(header.column.columnDef.header, header.getContext())}
 									/>
@@ -329,31 +280,5 @@
 		</TableBody>
 	</Table>
 
-	<!-- <Grid
-		{columns}
-		language={plPL}
-		search
-		fixedHeader
-		className={{
-			td: 'text-base-content',
-			sort: 'text-base-content bg-base-content'
-		}}
-		data={parsedUsers.map((user) => {
-			const { id, createdAt, email, fullName, role, access, phone, adviser } = user;
-			const parsedUser = {
-				id,
-				profile: null,
-				fullName,
-				email,
-				role,
-				phone,
-				adviser,
-				access,
-				createdAt
-			};
-			return Object.values(parsedUser);
-		})}
-	/> -->
-
-	<Pagination {currentPage} rowsPerPage={data.pageLimit} totalRows={count} />
+	<Pagination {currentPage} {setPage} rowsPerPage={data.pageLimit} totalRows={count} />
 </section>

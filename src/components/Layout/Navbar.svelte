@@ -23,6 +23,9 @@
 	import { isAtLeastModerator, productURLParser } from '$lib/client/functions';
 	export let user: SessionUser | undefined;
 
+	import { HoverCard, HoverCardContent, HoverCardTrigger } from '$shadcn/hover-card';
+	import Separator from '$shadcn/separator/Separator.svelte';
+
 	$: activeUrl = $page.url.pathname.toLowerCase();
 
 	// If the parent menu is closed, close the submenu as well
@@ -52,7 +55,7 @@
 	$: console.log('cart', $cart);
 </script>
 
-<nav class="navbar bg-base-100 border-b border-base-content rounded flex flex-col relative">
+<nav class="navbar border-b border-base-content rounded flex flex-col relative">
 	<div class="w-full h-full flex justify-between items-center">
 		<div class="flex">
 			<a href="/" class="btn btn-ghost normal-case text-lg sm:text-xl"
@@ -85,20 +88,6 @@
 			</div>
 		</div>
 		<div class="flex-none flex items-center">
-			<!-- <button
-				aria-label="Zmień szatę graficzną"
-				on:click={nextTheme}
-				tabindex="0"
-				class="btn btn-ghost btn-circle"
-			>
-				<div class="w-10 rounded-full flex justify-center items-center">
-					{#if $settings.theme === 'light'}
-						<Sun class="swap-on text-amber-500" />
-					{:else}
-						<Moon class="swap-off text-sky-500" />
-					{/if}
-				</div>
-			</button> -->
 			{#if user}
 				<div class="dropdown dropdown-end">
 					<label for="cart" tabindex="-1" class="btn btn-ghost btn-circle">
@@ -124,7 +113,7 @@
 					<div
 						id="cart"
 						tabindex="-1"
-						class="mt-3 card card-compact dropdown-content w-64 bg-base-100 shadow left-[-128px] sm:left-auto"
+						class="mt-3 card card-compact dropdown-content w-64 shadow bg-card border-border border left-[-128px] sm:left-auto"
 					>
 						<div class="card-body">
 							<span class="font-bold text-lg">{productsCountTitle}</span>
@@ -181,16 +170,15 @@
 					<ul
 						id="user-menu"
 						tabindex="-1"
-						class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
+						class="menu menu-compact dropdown-content mt-3 p-2 bg-background border border-border shadow rounded-box w-52"
 					>
-						<li
-							class="border-b border-dashed border-base-content py-2 px-4 flex flex-col justify-center items-center space-x-0.5 mb-0.5"
-						>
-							<a class="py-1" href="/uzytkownik/ja">{user.fullName}</a>
-							<span class="badge {roleBadgeColors[user.role]} text-white">
+						<div class="py-1 pl-4 text-sm">
+							<span>Witaj, {user.fullName.split(' ')[0]}</span>
+						</div>
+						<Separator class="my-1" />
+						<!-- <span class="badge {roleBadgeColors[user.role]} text-white">
 								{roleNames[user.role]}</span
-							>
-						</li>
+							> -->
 						{#if isAtLeastModerator(user.role)}
 							<li class="">
 								<a href="/admin"><Lock /> Panel administracyjny </a>
