@@ -26,4 +26,7 @@ export interface JWTRefreshTokenResult extends JWTVerifyResult {
 	payload: RTPayloadWithUserEmail;
 }
 
-export type SessionUser = Pick<User, 'id' | 'email' | 'fullName' | 'role' | 'access' | 'phone'>;
+export type SessionUser = Pick<
+	User,
+	'id' | 'email' | 'fullName' | 'role' | 'access' | 'phone' | 'address'
+>;

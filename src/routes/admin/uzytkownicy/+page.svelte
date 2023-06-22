@@ -74,8 +74,7 @@
 		}
 
 		if (Object.values(correctAddress).every((value) => !value)) return 'Brak';
-		const values = Object.values(correctAddress);
-		return `${values[0]} ${values[1]}, ${values[2]}`;
+		return `${correctAddress.street}\n${correctAddress.city}, ${correctAddress.zipCode}`;
 	};
 
 	const defaultColumns: ColumnDef<ParsedUser>[] = [
@@ -269,7 +268,7 @@
 			{#each $table.getRowModel().rows as row, bodyRowIndex}
 				<TableRow key={bodyRowIndex}>
 					{#each row.getVisibleCells() as cell}
-						<TableCell class="font-medium"
+						<TableCell class="font-medium whitespace-pre-line"
 							><svelte:component
 								this={flexRender(cell.column.columnDef.cell, cell.getContext())}
 							/></TableCell

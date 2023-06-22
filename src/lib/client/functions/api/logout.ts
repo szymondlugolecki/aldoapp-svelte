@@ -1,7 +1,7 @@
 import { invalidate } from '$app/navigation';
 import { trytm } from '@bdsqqq/try';
 import toast from 'svelte-french-toast';
-import createLoadingToast from './createLoadingToast';
+import createLoadingToast from '../createLoadingToast';
 
 const logout = async () => {
 	const id = createLoadingToast('please-wait');

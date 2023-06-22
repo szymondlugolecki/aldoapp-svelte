@@ -45,6 +45,7 @@
 	"type": "module",
 	"dependencies": {
 		"@bdsqqq/try": "^2.3.1",
+		"@melt-ui/svelte": "^0.12.0",
 		"@neoconfetti/svelte": "^1.0.0",
 		"@paralleldrive/cuid2": "^2.2.0",
 		"@planetscale/database": "^1.7.0",

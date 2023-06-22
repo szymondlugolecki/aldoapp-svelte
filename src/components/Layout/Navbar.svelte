@@ -16,7 +16,7 @@
 	import type { Role, SessionUser } from '../../types';
 	import Img from '@zerodevx/svelte-img';
 	import logo from '$lib/assets/logo.png?run&width=110&height=80&format=webp';
-	import logout from '$lib/client/functions/logout';
+	import logout from '$lib/client/functions/api/logout';
 	import MegaMenu from './MegaMenu.svelte';
 	import { slide } from 'svelte/transition';
 	import { cart } from '$lib/client/stores/cart';

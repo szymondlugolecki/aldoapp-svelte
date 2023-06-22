@@ -31,7 +31,8 @@ export async function POST({ request }) {
 	);
 
 	if (deleteSubscriptionError) {
-		throw error(400, 'Błąd przy anulowaniu subskrypcji powiadomień');
+		console.log('deleteSubscriptionError', deleteSubscriptionError);
+		throw error(500, 'Błąd przy anulowaniu subskrypcji powiadomień');
 	}
 
 	return json({
@@ -39,9 +40,3 @@ export async function POST({ request }) {
 		message: 'Pomyślnie anulowano subskrypcję powiadomień'
 	});
 }
-
-// p.subscription.delete({
-// 	where: {
-// 		endpoint: result.endpoint
-// 	}
-// })

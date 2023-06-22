@@ -1,8 +1,9 @@
 import { VAPID_PRIVATE_KEY, VAPID_SUBJECT } from '$env/static/private';
 import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public';
 import webpush from 'web-push';
-import type { PushSubscription } from 'web-push';
 import type { NotificationContent } from '$types';
+import { pushSubscriptionJSONSchema } from '$lib/client/schemas/pushSubscription';
+import { betterZodParse } from '$lib/client/functions/betterZodParse';
 
 const vapidDetails = {
 	publicKey: PUBLIC_VAPID_PUBLIC_KEY,
@@ -11,7 +12,7 @@ const vapidDetails = {
 };
 
 export const sendNotifications = (
-	subscriptions: PushSubscription[],
+	subscriptions: PushSubscriptionJSON[],
 	notification: NotificationContent
 ) => {
 	// Create the notification content.
@@ -28,7 +29,12 @@ export const sendNotifications = (
 		vapidDetails: vapidDetails
 	};
 	// Send a push message to each client specified in the subscriptions array.
-	subscriptions.forEach((subscription) => {
+	subscriptions.forEach((sub) => {
+		const [subscription, subscriptionParseErr] = betterZodParse(pushSubscriptionJSONSchema, sub);
+		if (subscriptionParseErr) {
+			console.log('subscriptionParseErr', subscriptionParseErr);
+			return;
+		}
 		const endpoint = subscription.endpoint;
 		const id = endpoint.slice(endpoint.length - 8);
 		console.log('endpoint', endpoint, 'id', id);

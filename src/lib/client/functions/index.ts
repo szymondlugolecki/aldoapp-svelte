@@ -1,8 +1,8 @@
 import type { Address, Order } from '$lib/server/db/schemas/orders';
 import type {
 	ProductAuthor,
-	ProductFilter,
-	ProductWithAuthorAndImage,
+	// ProductFilter,
+	// ProductWithAuthorAndImage,
 	User,
 	UserFilter,
 	OrderFilter,
@@ -117,10 +117,10 @@ export const isCorrectRole = (cellValue: string | boolean | Address): cellValue 
 	return userRoles.includes(cellValue as Role);
 };
 
-export const isJSON = <T>(str: any) => {
+export const isJSON = <T>(str: unknown) => {
 	let json: unknown;
 	try {
-		json = JSON.parse(str);
+		json = JSON.parse(str as string);
 	} catch (e) {
 		return false;
 	}
@@ -158,6 +158,7 @@ export const applyUserFilters = (users: User[], filter: UserFilter) => {
 
 	const dateFilter = (user: User) => {
 		if (!sinceDate) return true;
+		if (!user.createdAt) return false;
 		// Since date was provided
 		// Check if user is in the right range
 		if (user.createdAt >= sinceDate && user.createdAt <= untilDate) return true;
@@ -167,38 +168,38 @@ export const applyUserFilters = (users: User[], filter: UserFilter) => {
 	return users.filter(bannedFilter).filter(roleFilter).filter(dateFilter);
 };
 
-export const applyProductFilters = (
-	products: ProductWithAuthorAndImage[],
-	filter: ProductFilter,
-	searchInput: string
-) => {
-	const authorsFilter = (product: ProductWithAuthorAndImage) => {
-		if (!filter.excludedUserIds.includes(product.author.id)) return true;
-		return false;
-	};
+// export const applyProductFilters = (
+// 	products: ProductWithAuthorAndImage[],
+// 	filter: ProductFilter,
+// 	searchInput: string
+// ) => {
+// 	const authorsFilter = (product: ProductWithAuthorAndImage) => {
+// 		if (!filter.excludedUserIds.includes(product.author.id)) return true;
+// 		return false;
+// 	};
 
-	// Since date should be the very first milisecond of the day
-	const sinceDate = filter.since ? new Date(new Date(filter.since).setHours(0, 0, 0, 1)) : null;
-	// Until date should be the very last milisecond of the day
-	const untilDate = filter.until
-		? new Date(new Date(filter.until).setHours(23, 59, 59, 999))
-		: new Date(new Date().setHours(23, 59, 59, 999));
+// 	// Since date should be the very first milisecond of the day
+// 	const sinceDate = filter.since ? new Date(new Date(filter.since).setHours(0, 0, 0, 1)) : null;
+// 	// Until date should be the very last milisecond of the day
+// 	const untilDate = filter.until
+// 		? new Date(new Date(filter.until).setHours(23, 59, 59, 999))
+// 		: new Date(new Date().setHours(23, 59, 59, 999));
 
-	const dateFilter = (product: ProductWithAuthorAndImage) => {
-		if (!sinceDate) return true;
-		// Since date was provided
-		// Check if user is in the right range
-		if (product.createdAt >= sinceDate && product.createdAt <= untilDate) return true;
-		return false;
-	};
+// 	const dateFilter = (product: ProductWithAuthorAndImage) => {
+// 		if (!sinceDate) return true;
+// 		// Since date was provided
+// 		// Check if user is in the right range
+// 		if (product.createdAt >= sinceDate && product.createdAt <= untilDate) return true;
+// 		return false;
+// 	};
 
-	const productSearchFilter = (product: ProductWithAuthorAndImage) =>
-		textCrusher(product.name).includes(textCrusher(searchInput)) ||
-		textCrusher(product.description || '').includes(textCrusher(searchInput)) ||
-		textCrusher(product.symbol).includes(textCrusher(searchInput));
+// 	const productSearchFilter = (product: ProductWithAuthorAndImage) =>
+// 		textCrusher(product.name).includes(textCrusher(searchInput)) ||
+// 		textCrusher(product.description || '').includes(textCrusher(searchInput)) ||
+// 		textCrusher(product.symbol).includes(textCrusher(searchInput));
 
-	return products.filter(dateFilter).filter(authorsFilter).filter(productSearchFilter);
-};
+// 	return products.filter(dateFilter).filter(authorsFilter).filter(productSearchFilter);
+// };
 
 export const arrayUniqueByKey = <T>(arr: T[], key: keyof T) =>
 	[

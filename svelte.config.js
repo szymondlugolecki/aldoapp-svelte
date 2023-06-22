@@ -25,7 +25,8 @@ const config = {
 		alias: {
 			'$components/*': 'src/components',
 			$types: './src/types',
-			'$shadcn/*': 'src/lib/components/ui/*'
+			'$shadcn/*': 'src/lib/components/ui/*',
+			'$meltui/*': 'src/lib/components/meltui/*'
 		},
 		prerender: {
 			entries: [...shortServices.map((service) => `/kontakty/${service}`)]

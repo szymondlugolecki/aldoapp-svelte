@@ -13,7 +13,7 @@ export async function POST({ request, locals }) {
 		throw error(...errorResponses[401]);
 	}
 
-	const [data, dataError] = await trytm(request.json());
+	const [data, dataError] = await trytm<PushSubscriptionJSON>(request.json());
 	console.log('data', data);
 
 	if (dataError) {
@@ -30,25 +30,25 @@ export async function POST({ request, locals }) {
 	}
 
 	// Check if subscription exists
-	const [currentSubscriptions, fetchSubscriptionError] = await trytm(
-		db.select().from(subscriptions).where(eq(subscriptions.endpoint, result.endpoint))
+	const [currentSubscription, fetchSubscriptionError] = await trytm(
+		db.query.subscriptions.findFirst({
+			where: (subscription, { eq }) => eq(subscription.endpoint, result.endpoint)
+		})
 	);
 
 	if (fetchSubscriptionError) {
-		throw fail(400, {
+		throw fail(500, {
 			errors: 'Błąd przy szukaniu subskrypcji'
 		});
 	}
-
-	const currentSubscription = currentSubscriptions[0];
 
 	// Subscription exists - update
 	if (currentSubscription) {
 		const updatedSubscription = {
 			subscription: result,
-			userId: locals.session?.user.id,
+			userId: locals.session.user.id,
 			endpoint: result.endpoint
-		} satisfies Omit<Subscription, 'id' | 'createdAt'>;
+		} satisfies Omit<Subscription, 'id' | 'createdAt' | 'updatedAt'>;
 
 		const [, updateSubscriptionError] = await trytm(
 			db
@@ -58,7 +58,7 @@ export async function POST({ request, locals }) {
 		);
 
 		if (updateSubscriptionError) {
-			throw fail(400, {
+			throw fail(500, {
 				errors: 'Błąd przy aktualizacji subskrypcji powiadomień'
 			});
 		}
@@ -74,12 +74,12 @@ export async function POST({ request, locals }) {
 		subscription: result,
 		userId: locals.session.user.id,
 		endpoint: result.endpoint
-	} satisfies Omit<Subscription, 'id' | 'createdAt'>;
+	} satisfies Omit<Subscription, 'id' | 'createdAt' | 'updatedAt'>;
 
 	const [, addSubscriptionError] = await trytm(db.insert(subscriptions).values(newSubscription));
 
 	if (addSubscriptionError) {
-		throw fail(400, {
+		throw fail(500, {
 			errors: 'Błąd przy dodawaniu subskrypcji powiadomień'
 		});
 	}
@@ -89,18 +89,3 @@ export async function POST({ request, locals }) {
 		message: 'Pomyślnie dodano subskrypcję'
 	});
 }
-
-// p.subscription.upsert({
-// 	where: {
-// 		endpoint: result.endpoint
-// 	},
-// 	create: {
-// 		subscription: JSON.stringify(result),
-// 		userId: locals.session?.user.id,
-// 		endpoint: result.endpoint
-// 	},
-// 	update: {
-// 		subscription: JSON.stringify(result),
-// 		userId: locals.session?.user.id
-// 	}
-// })

@@ -29,6 +29,8 @@
 			deferredInstallEvent = e as BeforeInstallPromptEvent;
 		});
 
+		$settings.theme = 'dark';
+
 		unsubscribe = settings.subscribe(({ theme }) => {
 			switch (theme) {
 				case 'light':

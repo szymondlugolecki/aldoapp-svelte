@@ -2,12 +2,10 @@ import { errorResponses } from '$lib/client/constants/errorResponses';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { pushNotificationRequest } from '$lib/client/schemas/pushSubscription';
 import { db } from '$lib/server/db';
-import { subscriptions } from '$lib/server/db/schemas/subscriptions';
 // import { p } from '$lib/server/clients/pClient';
 import { sendNotifications } from '$lib/server/functions/push';
 import { trytm } from '@bdsqqq/try';
 import { json, error } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
 import type { PushSubscription } from 'web-push';
 import type { Config } from '@sveltejs/adapter-vercel';
 import { isAtLeastModerator } from '$lib/client/functions';
@@ -17,10 +15,12 @@ export const config: Config = {
 };
 
 export async function POST({ request, locals }) {
-	if (!locals.session) {
+	const { session } = locals;
+
+	if (!session) {
 		throw error(...errorResponses[401]);
 	}
-	if (!isAtLeastModerator(locals.session.user.role)) {
+	if (!isAtLeastModerator(session.user.role)) {
 		throw error(...errorResponses[403]);
 	}
 
@@ -35,18 +35,18 @@ export async function POST({ request, locals }) {
 		throw error(400, parseError[0]);
 	}
 
-	const [subscriptionArr, findSubscriptionError] = await trytm(
-		db.select().from(subscriptions).where(eq(subscriptions.userId, locals.session.user.id))
+	const [subscription, findSubscriptionError] = await trytm(
+		db.query.subscriptions.findFirst({
+			where: (subscription, { eq }) => eq(subscription.userId, session.user.id)
+		})
 	);
 
 	if (findSubscriptionError) {
 		throw error(
-			400,
+			500,
 			'Niespodziewany błąd. Spróbuj ponownie włączyć powiadomienia w ustawieniach w aplikacji'
 		);
 	}
-
-	const subscription = subscriptionArr[0];
 
 	if (!subscription) {
 		throw error(
@@ -70,12 +70,6 @@ export async function POST({ request, locals }) {
 
 	return json({
 		success: true,
-		message: 'Powiadomienia są wysyłane 🔔'
+		message: 'Powiadomienie zostało wysłane...'
 	});
 }
-
-// p.subscription.findFirst({
-// 	where: {
-// 		userId: locals.session.user.id
-// 	}
-// })

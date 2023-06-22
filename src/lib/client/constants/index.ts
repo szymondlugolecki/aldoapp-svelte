@@ -136,31 +136,6 @@ export const fodderCategories = {
 	backyard: []
 } as const;
 
-// export const appData = {
-//     "title": "Navillus: Jamstack developers for hire",
-//     "description": "We specialize in finding simple solutions to complex software problems. We value data-driven decisions and accessibility over this month's latest tech trends.",
-//     "url": "https://navillus.dev",
-//     "author": "Navillus",
-//     "social": {
-//         "twitter": "navillus_dev",
-//         "twitter_card": "summary_large_image"
-//     },
-//     "company": {
-//         "name": "Navillus"
-//     }
-// }
-
-// export const websiteSchema = {
-//     '@context': 'https://schema.org',
-//     '@type': 'WebSite',
-//     name: appData.title,
-//     url: appData.url,
-//     description: appData.description,
-//     sameAs: [
-//         `https://twitter.com/${appData.social.twitter}`
-//     ],
-// }
-
 export const salesmenMenu: SalesmenMenuType[] = [
 	{
 		name: 'Dział pasz',
