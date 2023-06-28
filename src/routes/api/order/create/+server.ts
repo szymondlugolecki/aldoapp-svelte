@@ -1,24 +1,15 @@
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { serverOrderValidation } from '$lib/client/schemas/order';
 import { sendOrderConfirmationEmail } from '$lib/server/clients/sendGridClient';
-// import { p } from '$lib/server/clients/pClient';
 import { db } from '$lib/server/db';
-import {
-	orders,
-	products,
-	type Order,
-	type OrderHistoryEvent
-} from '$lib/server/db/schemas/products';
-import { promoCodes, promoCodeUses } from '$lib/server/db/schemas/promoCodes';
-// import { sleep } from '$lib/server/functions/utils';
-import type { PromoCodeWithUses } from '$types/PromoCodeTypes';
+import { products } from '$lib/server/db/schemas/products';
 import { trytm } from '@bdsqqq/try';
 import { json, error } from '@sveltejs/kit';
-import { eq, inArray } from 'drizzle-orm';
+import { inArray } from 'drizzle-orm';
+import { addOrder, addOrderProducts } from '$lib/server/functions/db.js';
 
 export async function POST({ request, locals }) {
 	// Only logged in users can order
-
 	const sessionUser = locals.session?.user;
 
 	if (!sessionUser) {
@@ -48,11 +39,11 @@ export async function POST({ request, locals }) {
 	// };
 	// delete order.promoCodeId;
 
-	const orderHistoryEvent: OrderHistoryEvent = {
-		date: new Date(),
-		status: 'created',
-		type: 'event'
-	};
+	// const orderHistoryEvent: OrderHistoryEvent = {
+	// 	date: new Date(),
+	// 	status: 'created',
+	// 	type: 'event'
+	// };
 
 	// Fetch all the products for their current price
 	const [productsList, productsError] = await trytm(
@@ -102,97 +93,103 @@ export async function POST({ request, locals }) {
 
 	let discountPrice = noDiscountPrice;
 
+	const { promoCodeId } = order;
+
 	// Handle the promo code
-	if (order.promoCodeId) {
-		const [PromoCodeWithUses, promoCodeError] = await trytm(
-			db
-				.select({
-					promoCode: promoCodes,
-					usage: {
-						userId: promoCodeUses.userId
-					}
-				})
-				.from(promoCodes)
-				.where(eq(promoCodes.id, order.promoCodeId))
-				.leftJoin(promoCodeUses, eq(promoCodes.id, promoCodeUses.promoCodeId))
+	if (promoCodeId) {
+		const [promoCodeWithUses, promoCodeError] = await trytm(
+			db.query.promoCodes.findFirst({
+				with: {
+					uses: true
+				},
+				where: (promoCodes, { eq }) => eq(promoCodes.id, promoCodeId)
+			})
 		);
+
+		// db
+		// .select({
+		// 	promoCode: promoCodes,
+		// 	usage: {
+		// 		userId: promoCodeUses.userId
+		// 	}
+		// })
+		// .from(promoCodes)
+		// .where(eq(promoCodes.id, order.promoCodeId))
+		// .leftJoin(promoCodeUses, eq(promoCodes.id, promoCodeUses.promoCodeId))
 
 		if (promoCodeError) {
 			throw error(500, 'Niespodziewany błąd. Nie udało się pobrać kodu rabatowego');
 		}
 
-		if (!PromoCodeWithUses.length) {
+		if (!promoCodeWithUses) {
 			throw error(400, 'Nieprawidłowy kod rabatowy');
 		}
 
-		console.log('PromoCodeWithUses', PromoCodeWithUses);
+		console.log('promoCodeWithUses', promoCodeWithUses);
 
-		const parsedPromoCode = PromoCodeWithUses.reduce<PromoCodeWithUses | null>((acc, row) => {
-			const { promoCode, usage } = row;
+		// const parsedPromoCode = promoCodeWithUses.reduce<PromoCodeWithUses | null>((acc, row) => {
+		// 	const { promoCode, usage } = row;
 
-			if (!acc || Object.keys(acc).length === 0) {
-				acc = { ...promoCode, uses: [] };
-			}
+		// 	if (!acc || Object.keys(acc).length === 0) {
+		// 		acc = { ...promoCode, uses: [] };
+		// 	}
 
-			if (usage && acc) {
-				acc.uses.push(usage.userId);
-			}
+		// 	if (usage && acc) {
+		// 		acc.uses.push(usage.userId);
+		// 	}
 
-			return acc;
-		}, null);
+		// 	return acc;
+		// }, null);
 
-		console.log('parsedPromoCode', parsedPromoCode);
+		console.log('promoCodeWithUses', promoCodeWithUses);
 
-		if (parsedPromoCode) {
-			if (!parsedPromoCode.enabled) {
+		if (promoCodeWithUses) {
+			if (!promoCodeWithUses.enabled) {
 				throw error(400, 'Kod rabatowy został dezaktywowany');
 			}
 
 			// discountPrice or noDiscountPrice?
-			if (Number(parsedPromoCode.minCartValue) < noDiscountPrice) {
+			if (Number(promoCodeWithUses.minCartValue) < noDiscountPrice) {
 				throw error(
 					400,
-					`Podany kod rabatowy działa tylko na koszyk o minimalnej kwocie ${parsedPromoCode.minCartValue} zł`
+					`Podany kod rabatowy działa tylko na koszyk o minimalnej kwocie ${promoCodeWithUses.minCartValue} zł`
 				);
 			}
 
-			if (parsedPromoCode.validSince > new Date()) {
+			if (promoCodeWithUses.validSince > new Date()) {
 				throw error(400, 'Kod rabatowy jest jeszcze nieaktywny');
 			}
 
-			if (parsedPromoCode.validUntil < new Date()) {
+			if (promoCodeWithUses.validUntil < new Date()) {
 				throw error(400, 'Kod rabatowy wygasł');
 			}
 
 			// For now it takes the user that has placed the order as the customer
 			// but in the future it will be possible for employees to place orders
 			// on behalf of customers
-			const userCodeUsesCount = parsedPromoCode.uses.filter(
-				(userId) => userId === sessionUser.id
+			const userCodeUsesCount = promoCodeWithUses.uses.filter(
+				({ userId }) => userId === sessionUser.id
 			).length;
 
-			if (userCodeUsesCount >= parsedPromoCode.perUserLimit) {
+			if (userCodeUsesCount >= promoCodeWithUses.perUserLimit) {
 				throw error(400, 'Wykorzystałeś już maksymalną ilość zamówień z tym kodem rabatowym');
 			}
 
-			if (parsedPromoCode.uses.length >= parsedPromoCode.totalUseLimit) {
+			if (promoCodeWithUses.uses.length >= promoCodeWithUses.totalUseLimit) {
 				throw error(400, 'Kod rabatowy został wykorzystany maksymalną liczbę razy');
 			}
 
 			// Calculate the discount
-			if (parsedPromoCode.discountType === 'fixed') {
-				discountPrice = noDiscountPrice - Number(parsedPromoCode.discount);
-			} else if (parsedPromoCode.discountType === 'percentage') {
+			if (promoCodeWithUses.discountType === 'fixed') {
+				discountPrice = noDiscountPrice - Number(promoCodeWithUses.discount);
+			} else if (promoCodeWithUses.discountType === 'percentage') {
 				discountPrice =
-					noDiscountPrice - (noDiscountPrice * Number(parsedPromoCode.discount)) / 100;
+					noDiscountPrice - (noDiscountPrice * Number(promoCodeWithUses.discount)) / 100;
 			}
 		}
 	}
 
-	const newOrder: Omit<
-		Order,
-		'id' | 'createdAt' | 'updatedAt' | 'estimatedDeliveryDate' | 'driverId'
-	> = {
+	const newOrder: Parameters<typeof addOrder>[0] = {
 		...order,
 		address: order.address,
 		customerId: sessionUser.id,
@@ -201,15 +198,13 @@ export async function POST({ request, locals }) {
 		status: 'pending',
 		promoCodeId: null,
 		price: discountPrice.toString(),
-		discount: (noDiscountPrice - discountPrice).toString(),
-		productIds: productsList.map(({ id }) => id)
+		discount: (noDiscountPrice - discountPrice).toString()
 	};
 
 	console.log('putting this order into the db', newOrder);
 
 	// Insert the order into the database
-	const [query, insertOrderError] = await trytm(db.insert(orders).values(newOrder));
-	console.log('query', query);
+	const [query, insertOrderError] = await trytm(addOrder(newOrder));
 	if (insertOrderError) {
 		// Unexpected-error
 		console.error('insertOrderError', insertOrderError);
@@ -222,6 +217,23 @@ export async function POST({ request, locals }) {
 	// await sleep(3);
 
 	const orderId = Number(query.insertId);
+
+	const [, insertOrderProductsError] = await trytm(
+		addOrderProducts(
+			order.productsQuantity.map((pList) => ({
+				...pList,
+				orderId
+			}))
+		)
+	);
+	if (insertOrderError) {
+		// Unexpected-error
+		console.error('insertOrderProductsError', insertOrderProductsError);
+		throw error(
+			500,
+			'Niespodziewany błąd. Zamówienie jest poprawne, ale nie udało się zapisać zamówionych produktów'
+		);
+	}
 
 	const [, sendEmailError] = await trytm(
 		sendOrderConfirmationEmail({

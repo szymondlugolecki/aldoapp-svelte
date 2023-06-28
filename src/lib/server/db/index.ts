@@ -8,6 +8,7 @@ import { DATABASE_HOST, DATABASE_USERNAME, DATABASE_PASSWORD } from '$env/static
 import * as users from './schemas/users';
 import * as orders from './schemas/orders';
 import * as products from './schemas/products';
+import * as orderProducts from './schemas/orderProducts';
 import * as promoCodes from './schemas/promoCodes';
 import * as subscriptions from './schemas/subscriptions';
 import * as verificationTokens from './schemas/verificationTokens';
@@ -26,6 +27,7 @@ export const db = drizzle(connection, {
 		...users,
 		...orders,
 		...products,
+		...orderProducts,
 		...promoCodes,
 		...subscriptions,
 		...verificationTokens,

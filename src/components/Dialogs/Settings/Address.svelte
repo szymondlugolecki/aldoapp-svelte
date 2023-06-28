@@ -42,7 +42,7 @@
 		<form
 			method="post"
 			action="?/address"
-			use:enhance={({ data }) => {
+			use:enhance={({ formData }) => {
 				const toastId = createLoadingToast('please-wait');
 
 				const [parsedAddress, addressParsingError] = betterZodParse(
@@ -55,7 +55,7 @@
 					return;
 				}
 
-				data.append('address', JSON.stringify(parsedAddress));
+				formData.append('address', JSON.stringify(parsedAddress));
 
 				return async ({ result, update }) => {
 					modalOpen = false;

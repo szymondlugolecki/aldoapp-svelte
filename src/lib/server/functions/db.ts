@@ -1,7 +1,7 @@
 import type { z } from 'zod';
 import { images, type createImageSchema } from '../db/schemas/images';
 import { db } from '../db';
-import { createOrderSchema, orders } from '../db/schemas/orders';
+import { createOrderSchema, orderProducts, orders } from '../db/schemas/orders';
 import { createProductSchema, products } from '../db/schemas/products';
 import { users, type createUserSchema } from '../db/schemas/users';
 import {
@@ -16,9 +16,14 @@ export const addImage = (image: z.infer<typeof createImageSchema>) => {
 export const addOrder = (order: z.infer<typeof createOrderSchema>) => {
 	return db.insert(orders).values({
 		...order,
-		productsQuantity: JSON.parse(order.productsQuantity?.toString() || 'null'),
 		address: JSON.parse(order.address?.toString() || 'null')
 	});
+};
+
+export const addOrderProducts = (
+	orderProductsArr: { orderId: number; quantity: number; productId: number }[]
+) => {
+	return db.insert(orderProducts).values(orderProductsArr);
 };
 
 export const addProduct = (product: z.infer<typeof createProductSchema>) => {

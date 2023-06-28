@@ -1,0 +1,1 @@
+DROP INDEX `order_idx` ON `order_products`;

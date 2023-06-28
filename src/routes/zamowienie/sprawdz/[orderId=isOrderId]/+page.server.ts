@@ -2,7 +2,7 @@ import { getRoleRank } from '$lib/client/functions';
 import { db } from '$lib/server/db/index.js';
 import { orders, products } from '$lib/server/db/schemas/products.js';
 import { error } from '@sveltejs/kit';
-import { eq, inArray } from 'drizzle-orm/expressions.js';
+import { eq, inArray } from 'drizzle-orm';
 
 export const load = async ({ params, locals }) => {
 	const sessionUser = locals.session?.user;

@@ -11,6 +11,7 @@ import type {
 } from '$types';
 import type { Thing, WithContext } from 'schema-dts';
 import { fodderCategories, roleNames } from '../constants';
+import { cubicOut } from 'svelte/easing';
 
 import type { ClassValue } from 'clsx';
 import { clsx } from 'clsx';
@@ -20,6 +21,8 @@ import type { ComponentType, SvelteComponentTyped } from 'svelte';
 import { flexRender as flexRenderOrig } from '@tanstack/svelte-table';
 import { userRoles } from '../constants/dbTypes';
 import { userPropertySchemas } from '../schemas/users';
+import { styleToString } from '@melt-ui/svelte/internal/helpers';
+import type { TransitionConfig } from 'svelte/transition';
 
 export type Schema = Thing | WithContext<Thing>;
 
@@ -125,6 +128,42 @@ export const isJSON = <T>(str: unknown) => {
 		return false;
 	}
 	return json as T;
+};
+
+const scaleConversion = (valueA: number, scaleA: [number, number], scaleB: [number, number]) => {
+	const [minA, maxA] = scaleA;
+	const [minB, maxB] = scaleB;
+
+	const percentage = (valueA - minA) / (maxA - minA);
+	const valueB = percentage * (maxB - minB) + minB;
+
+	return valueB;
+};
+
+type FlyAndScaleOptions = {
+	y: number;
+	start: number;
+	duration?: number;
+};
+
+export const flyAndScale = (node: HTMLElement, options: FlyAndScaleOptions): TransitionConfig => {
+	const style = getComputedStyle(node);
+	const transform = style.transform === 'none' ? '' : style.transform;
+
+	return {
+		duration: options.duration ?? 150,
+		delay: 0,
+		css: (t) => {
+			const y = scaleConversion(t, [0, 1], [options.y, 0]);
+			const scale = scaleConversion(t, [0, 1], [options.start, 1]);
+
+			return styleToString({
+				transform: `${transform} translate3d(0, ${y}px, 0) scale(${scale})`,
+				opacity: t
+			});
+		},
+		easing: cubicOut
+	};
 };
 
 export const isCorrectAddress = (cellValue: string | boolean | Address): cellValue is Address => {

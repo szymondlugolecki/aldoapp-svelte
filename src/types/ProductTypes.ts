@@ -66,5 +66,10 @@ export type CartProductWithQuantity = Pick<
 
 export type CartProduct = Pick<
 	Product,
-	'id' | 'name' | 'symbol' | 'price' | 'images' | 'amountLeft' | 'encodedURL'
+	'id' | 'name' | 'symbol' | 'price' | 'imagesId' | 'amountLeft' | 'encodedURL'
+>;
+
+export type ProductSortableColumn = keyof Pick<
+	Product,
+	'name' | 'price' | 'weight' | 'producent' | 'amountLeft' | 'category' | 'subcategory'
 >;

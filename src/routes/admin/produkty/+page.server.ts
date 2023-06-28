@@ -5,42 +5,59 @@ import edit from '$lib/server/actions/product/edit';
 import remove from '$lib/server/actions/product/remove';
 import { db } from '$lib/server/db';
 import { products } from '$lib/server/db/schemas/products';
-import { users, type User } from '$lib/server/db/schemas/users';
-import { eq, sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import type { Config } from '@sveltejs/adapter-vercel';
+import { isJSON } from '$lib/client/functions';
+import type { ProductSortableColumn } from '$types';
 
 export const config: Config = {
 	runtime: 'nodejs18.x'
 };
 
 const pageLimit = 10;
+const sortableColumns: ProductSortableColumn[] = [
+	'name',
+	'price',
+	'weight',
+	'amountLeft',
+	'producent',
+	'category',
+	'subcategory'
+];
 
-export const load = async () => {
-	// const productsArr = await db
-	// 	.select({
-	// 		products: products,
-	// 		author: {
-	// 			id: users.id,
-	// 			fullName: users.fullName,
-	// 			email: users.email,
-	// 			role: users.role
-	// 		}
-	// 	})
-	// 	.from(products)
-	// 	.leftJoin(users, eq(products.authorId, users.id))
-	// 	.limit(10);
+export const load = async ({ url }) => {
+	const page = !isNaN(Number(url.searchParams.get('strona')))
+		? Math.max(Number(url.searchParams.get('strona')), 1)
+		: 1;
 
-	// 	productsArr.map((product) => ({
-	// 		...product.products,
-	// 		author: product.author as Pick<User, 'id' | 'fullName' | 'email' | 'role'>
-	// 	})),
+	const sort = url.searchParams.get('sort');
+	const desc = url.searchParams.get('desc');
+
+	const descBool = desc && ['true', 'false'].includes(desc) ? isJSON<boolean>(desc) : null;
+	const properSort = (sort: string | null): sort is ProductSortableColumn => {
+		return !!sort && sortableColumns.includes(sort as ProductSortableColumn);
+	};
 
 	return {
 		products: db.query.products.findMany({
 			with: {
-				author: true,
+				author: {
+					columns: {
+						id: true,
+						fullName: true,
+						email: true
+					}
+				},
 				images: true
-			}
+			},
+			offset: (page - 1) * pageLimit,
+			...(descBool !== null && properSort(sort)
+				? {
+						orderBy: (products, { asc, desc }) =>
+							descBool ? desc(products[sort]) : asc(products[sort])
+				  }
+				: {}),
+			limit: pageLimit
 		}),
 		pageLimit,
 		count: db

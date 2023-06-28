@@ -54,21 +54,20 @@ export const userPropertySchemas = {
 			.string({
 				required_error: 'Ulica i numer jest wymagana'
 			})
-			// .min(3, { message: 'Nieprawidłowa ulica i numer' })
+			.min(3, { message: 'Nieprawidłowa ulica i numer' })
 			.trim(),
 		zipCode: z
 			.string({
-				required_error: 'Kod pocztowy jest wymagana'
+				required_error: 'Kod pocztowy jest wymagany'
 			})
-			// .min(4, { message: 'Nieprawidłowy kod pocztowy' }) // should be of length 6
-			// .max(8, { message: 'Nieprawidłowy kod pocztowy' })
+			.min(4, { message: 'Nieprawidłowy kod pocztowy' }) // should be of length 6
+			.max(8, { message: 'Nieprawidłowy kod pocztowy' })
 			.trim(),
 		city: z
 			.string({
-				required_error: 'Kod pocztowy jest wymagana'
+				required_error: 'Miasto jest wymagane'
 			})
-			// .min(4, { message: 'Nieprawidłowy kod pocztowy' }) // should be of length 6
-			// .max(8, { message: 'Nieprawidłowy kod pocztowy' })
+			.min(3, { message: 'Nieprawidłowe miasto' })
 			.trim()
 	})
 };
@@ -79,7 +78,9 @@ export const addUserSchema = z.object({
 	role: userPropertySchemas.role,
 	phone: userPropertySchemas.phone,
 	adviserId: userPropertySchemas.id.optional(),
-	address: userPropertySchemas.address
+	city: userPropertySchemas.address.shape.city.nullish(),
+	street: userPropertySchemas.address.shape.street.nullish(),
+	zipCode: userPropertySchemas.address.shape.zipCode.nullish()
 });
 
 export const editUserSchema = z.object({
@@ -90,7 +91,9 @@ export const editUserSchema = z.object({
 	role: userPropertySchemas.role.optional(),
 	phone: userPropertySchemas.phone.optional(),
 	adviserId: userPropertySchemas.id.optional(),
-	address: userPropertySchemas.address.optional()
+	city: userPropertySchemas.address.shape.city.nullish(),
+	street: userPropertySchemas.address.shape.street.nullish(),
+	zipCode: userPropertySchemas.address.shape.zipCode.nullish()
 });
 
 export type EditUserSchema = z.infer<typeof editUserSchema>;

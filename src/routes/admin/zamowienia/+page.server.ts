@@ -1,32 +1,86 @@
-// import add from '$lib/server/actions/users/add';
-// import edit from '$lib/server/actions/users/edit';
-// import { p } from '$lib/server/clients/pClient';
 import { db } from '$lib/server/db';
-import { orders as ordersTable } from '$lib/server/db/schemas/orders';
 import { users } from '$lib/server/db/schemas/users';
-import { desc, eq } from 'drizzle-orm';
-// import { alias } from 'drizzle-orm/mysql-core/alias';
+import type { OrderSortableColumn } from '$types';
+import { sql } from 'drizzle-orm';
+import { isJSON } from '$lib/client/functions';
 
-export const load = () => {
-	// const drivers = alias(users, 'drivers');
+const sortableColumns: OrderSortableColumn[] = [
+	'status',
+	'paymentStatus',
+	'deliveryStatus',
+	'deliveryMethod',
+	'deliveryStatus',
+	'price',
+	'estimatedDeliveryDate',
+	'createdAt'
+];
 
-	// const orders = db.query.orders.findMany({
-	// 	limit: 20,
-	// 	with: {
-	// 		promoCodes: true,
-	// 		users: true,
-	// 		products: true
-	// 	},
-	// 	orderBy: (orders, { desc }) => [desc(ordersTable.createdAt)]
-	// });
+const pageLimit = 10;
 
-	// orders.then((res) => {
-	// 	res.forEach((order) => {
-	// 		console.log(order.products);
-	// 	});
-	// });
+export const load = ({ url }) => {
+	const page = !isNaN(Number(url.searchParams.get('strona')))
+		? Math.max(Number(url.searchParams.get('strona')), 1)
+		: 1;
 
-	return {};
+	const sort = url.searchParams.get('sort');
+	const desc = url.searchParams.get('desc');
+
+	const descBool = desc && ['true', 'false'].includes(desc) ? isJSON<boolean>(desc) : null;
+	const properSort = (sort: string | null): sort is OrderSortableColumn => {
+		return !!sort && sortableColumns.includes(sort as OrderSortableColumn);
+	};
+
+	console.log('page', page, sort, 'desc', descBool);
+
+	return {
+		orders: db.query.orders.findMany({
+			with: {
+				orderProducts: {
+					columns: {
+						quantity: true,
+						productId: true
+					},
+					with: {
+						product: {
+							columns: {
+								id: true,
+								symbol: true,
+								name: true,
+								encodedURL: true,
+								price: true
+							}
+						}
+					}
+				}
+			},
+			columns: {
+				id: true,
+				price: true,
+				discount: true,
+				status: true,
+				paymentStatus: true,
+				deliveryStatus: true,
+				address: true,
+				estimatedDeliveryDate: true,
+				deliveryMethod: true,
+				paymentMethod: true,
+				createdAt: true
+			},
+			offset: (page - 1) * pageLimit,
+			...(descBool !== null && properSort(sort)
+				? {
+						orderBy: (orders, { asc, desc }) => (descBool ? desc(orders[sort]) : asc(orders[sort]))
+				  }
+				: {}),
+			limit: pageLimit
+		}),
+		count: db
+			.select({
+				count: sql<number>`count(*)`.mapWith(Number)
+			})
+			.from(users),
+		pageLimit
+	};
 
 	// return {
 	// 	// fetch with products in the future

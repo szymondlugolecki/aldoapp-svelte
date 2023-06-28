@@ -15,6 +15,7 @@ import {
 	json
 } from 'drizzle-orm/mysql-core';
 import { users } from './users';
+import { orders } from './orders';
 // import { users } from './users';
 
 export const promoCodes = mysqlTable(
@@ -47,11 +48,13 @@ export const promoCodes = mysqlTable(
 	})
 );
 
-export const promoCodesRelations = relations(promoCodes, ({ one }) => ({
+export const promoCodesRelations = relations(promoCodes, ({ one, many }) => ({
 	author: one(users, {
 		fields: [promoCodes.authorId],
 		references: [users.id]
-	})
+	}),
+	orders: many(orders),
+	uses: many(promoCodeUses)
 }));
 
 export const promoCodeUses = mysqlTable(
@@ -62,6 +65,7 @@ export const promoCodeUses = mysqlTable(
 		updatedAt: timestamp('updated_at').defaultNow().onUpdateNow(),
 
 		promoCodeId: varchar('promocode_used_id', { length: 36 }).notNull(),
+		orderId: varchar('order_id', { length: 36 }).notNull(),
 		userId: char('user_id', { length: 255 }).notNull()
 	},
 	(promoCodeUsage) => ({
@@ -71,9 +75,17 @@ export const promoCodeUses = mysqlTable(
 	})
 );
 
-export const promoCodesUsesRelations = relations(promoCodes, ({ one }) => ({
-	author: one(users, {
-		fields: [promoCodes.authorId],
+export const promoCodesUsesRelations = relations(promoCodeUses, ({ one }) => ({
+	order: one(orders, {
+		fields: [promoCodeUses.orderId],
+		references: [orders.id]
+	}),
+	promoCode: one(promoCodes, {
+		fields: [promoCodeUses.promoCodeId],
+		references: [promoCodes.id]
+	}),
+	user: one(users, {
+		fields: [promoCodeUses.userId],
 		references: [users.id]
 	})
 }));

@@ -1,13 +1,11 @@
 import { addProductSchema } from '$lib/client/schemas/products';
 // import { p } from '$lib/server/clients/pClient';
 import { error, fail, type Action } from '@sveltejs/kit';
-import { cloudinary } from '$lib/server/clients/cloudinaryClient';
 import { trytm } from '@bdsqqq/try';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
 import { errorResponses } from '$lib/client/constants/errorResponses';
 import { isAtLeastModerator, productURLParser } from '$lib/client/functions';
-import { db } from '$lib/server/db';
-import { products, type Product } from '$lib/server/db/schemas/products';
+import { addProduct } from '$lib/server/functions/db';
 
 const add: Action = async ({ request, locals }) => {
 	// Only moderators and admins are allowed to add a product
@@ -29,23 +27,28 @@ const add: Action = async ({ request, locals }) => {
 
 	// Need to extract the images from the formData before using Object.fromEntries
 	// Because then images overwrite each other
-	const imageArray = formData.getAll('images');
+	// const imageArray = formData.getAll('images');
+
+	const entries = Object.fromEntries(formData);
 
 	const data = {
-		...Object.fromEntries(formData),
-		weight: Number(formData.get('weight')?.toString().replace(',', '.')),
-		price: Number(formData.get('price')?.toString().replace(',', '.')),
-		images: imageArray
+		...entries,
+		...(entries.weight && typeof entries.weight === 'string'
+			? { weight: Number(entries.weight.replace(',', '.')) }
+			: {}),
+		...(entries.price && typeof entries.price === 'string'
+			? { price: Number(entries.price.replace(',', '.')) }
+			: {})
 	};
 
-	if (isNaN(data.price)) {
+	if (!data.price || isNaN(data.price)) {
 		return fail(400, {
-			errors: ['Niepoprawna cena']
+			errors: ['Nieprawidłowa cena']
 		});
 	}
-	if (isNaN(data.weight)) {
+	if (!data.weight || isNaN(data.weight)) {
 		return fail(400, {
-			errors: ['Niepoprawna waga']
+			errors: ['Nieprawidłowa waga']
 		});
 	}
 
@@ -57,84 +60,27 @@ const add: Action = async ({ request, locals }) => {
 			errors: addProductParseError
 		});
 	}
-	const { name, symbol, description, images, category, subcategory, price, weight, producent } =
-		addProductObj;
-
-	// Handle the thumbnail
-	let imagesURL: string[] = [];
-
-	if (images && images.length) {
-		const totalImagesSize = images.reduce((acc, curr) => acc + curr.size, 0) / 1024 / 1024; // in MiB
-
-		console.log('Total Images Size', totalImagesSize);
-
-		if (totalImagesSize > 10) {
-			return fail(400, {
-				errors: ['Maksymalny rozmiar zdjęć to 10MB']
-			});
-		}
-
-		// Move the thumbnail to the first position
-		// images.unshift(images.splice(thumbnail, 1)[0]);
-
-		try {
-			const uploadPromises = images
-				.filter((image) => image.size > 0)
-				.map(async (image, index) => {
-					console.log('Image nr', index, ':', image.name, image.size, image.type);
-					const imageArrayBuffer = await image.arrayBuffer();
-					const imageBuffer = Buffer.from(imageArrayBuffer).toString('base64');
-					return await cloudinary.uploader.upload(`data:${image.type};base64,${imageBuffer}`, {
-						public_id: `products/${name}/${symbol}/${index}`,
-						// background_removal: 'cloudinary_ai',
-						overwrite: true
-					});
-				});
-
-			const result = await Promise.all(uploadPromises);
-
-			// Sort the images by their index
-			result.sort(
-				(a, b) => Number(a.public_id.split('/').pop()) - Number(b.public_id.split('/').pop())
-			);
-
-			console.log(
-				'after sort result',
-				result.map((image) => image.public_id)
-			);
-
-			imagesURL = result.map((image) => image.secure_url);
-		} catch (error) {
-			console.error('image upload error', error);
-			return fail(400, {
-				errors: ['Wystąpił błąd poczas przesyłania zdjęć']
-			});
-		}
-	}
-
-	console.log('imagesURL', imagesURL);
+	const { name, symbol, category, subcategory, price, weight, producent } = addProductObj;
 
 	const encodedURL = productURLParser(name, symbol);
 
-	const newProduct = {
-		authorId: locals.session.user.id,
-		name,
-		symbol,
-		description: description || null,
-		images: imagesURL,
-		category,
-		subcategory: subcategory ?? '',
-		price: price.toFixed(2),
-		weight: weight.toFixed(2),
-		producent,
-		encodedURL,
-		amountLeft: Math.floor(Math.random() * 5) // 0 - 5
-	} satisfies Omit<Product, 'id' | 'createdAt'>;
-
-	console.log('newProduct', newProduct);
-
 	// Add the product to the database
-	const [, addProductError] = await trytm(db.insert(products).values(newProduct));
+	const [, addProductError] = await trytm(
+		addProduct({
+			authorId: locals.session.user.id,
+			name,
+			symbol,
+			// description: description || null,
+			// images: imagesURL,
+			category,
+			subcategory: subcategory ?? '',
+			price: price.toFixed(2),
+			weight: weight.toFixed(2),
+			producent,
+			encodedURL,
+			amountLeft: Math.floor(Math.random() * 5) // 0 - 5
+		})
+	);
 	if (addProductError) {
 		// Unexpected-error
 		console.log('addProductError', addProductError);
@@ -147,27 +93,3 @@ const add: Action = async ({ request, locals }) => {
 };
 
 export default add;
-
-// p.product.create({
-// 	data: {
-// 		id: productId,
-// 		userId: locals.session.user.id,
-// 		name,
-// 		symbol,
-// 		description,
-// 		images: {
-// 			createMany: {
-// 				data: imagesURL.map((url) => ({
-// 					url
-// 				}))
-// 			}
-// 		},
-// 		category,
-// 		subcategory: subcategory ?? '',
-// 		price,
-// 		weight,
-// 		producent,
-// 		encodedURL,
-// 		amountLeft: Math.floor(Math.random() * 5) // 0 - 5
-// 	}
-// })

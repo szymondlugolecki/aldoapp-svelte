@@ -26,3 +26,15 @@ export type OrderWithCustomer = Order & {
 	attachedDriver: Pick<User, 'id' | 'fullName' | 'email'> | null;
 	// productsList: Pick<Product, 'id' | 'symbol' | 'name' | 'encodedURL'>[];
 };
+
+export type OrderSortableColumn = keyof Pick<
+	Order,
+	| 'status'
+	| 'paymentStatus'
+	| 'deliveryStatus'
+	| 'estimatedDeliveryDate'
+	| 'price'
+	| 'paymentMethod'
+	| 'deliveryMethod'
+	| 'createdAt'
+>;

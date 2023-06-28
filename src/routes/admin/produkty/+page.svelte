@@ -1,9 +1,14 @@
 <script lang="ts">
 	import { cn, dateParser, flexRender } from '$lib/client/functions';
-	import type { ProductFilter } from '$types';
+	import type { ProductFilter, Subcategory } from '$types';
 	import { imagesSorting } from '$lib/client/functions/sorting';
 	import type { MainCategory, Producent } from '$lib/client/constants/dbTypes.js';
-	import { fodderCategories, fodderNames, producentsList } from '$lib/client/constants/index.js';
+	import {
+		fodderCategories,
+		fodderCategories2,
+		fodderNames,
+		producentsList
+	} from '$lib/client/constants/index.js';
 
 	import {
 		createSvelteTable,
@@ -19,8 +24,10 @@
 	} from '@tanstack/svelte-table';
 	import { writable } from 'svelte/store';
 	import Pagination from '$components/Table/Pagination.svelte';
-	import AdminProductEditDialog from '$components/Dialogs/Admin/Edit/ProductEditDialog.svelte';
-	import AdminAddDialog from '$components/Dialogs/Admin/Add/ProductAddDialog.svelte';
+	import TableHyperlink from '$components/Table/TableHyperlink.svelte';
+
+	import AdminProductEditDialog from '$components/Dialogs/Admin/Edit/Product.svelte';
+	import AdminAddDialog from '$components/Dialogs/Admin/Add/Product.svelte';
 
 	import {
 		Table,
@@ -37,6 +44,7 @@
 	import TableSortableHead from '$shadcn/table/TableSortableHead.svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import type { Image } from '$lib/server/db/schemas/images.js';
 
 	export let data;
 
@@ -77,6 +85,14 @@
 
 	// id, link, produkt, zdjecia, cena, dodatkowe informacje, kategorie, opis, dodany
 
+	const subCategoriesList = Object.values(fodderCategories2).reduce<Record<Subcategory, string>>(
+		(acc, curr) => {
+			acc = { ...acc, ...curr };
+			return acc;
+		},
+		{} as Record<Subcategory, string>
+	);
+
 	const defaultColumns: ColumnDef<ParsedProduct>[] = [
 		{
 			id: 'id',
@@ -87,7 +103,8 @@
 			id: 'encodedURL',
 			header: 'Podgląd',
 			accessorKey: 'encodedURL',
-			cell: (info) => flexRender(AdminProductEditDialog, createProductProps(info)),
+			cell: (info) =>
+				flexRender(TableHyperlink, { href: `/sklep/${info.getValue()}`, text: 'Sprawdź' }),
 			enableSorting: false
 		},
 		{
@@ -102,20 +119,42 @@
 			header: 'Kod produktu',
 			accessorKey: 'symbol',
 			cell: (info) => flexRender(AdminProductEditDialog, createProductProps(info)),
-			enableSorting: true
+			enableSorting: false
 		},
 		{
 			id: 'imagesId',
 			header: 'Zdjęcia',
 			accessorKey: 'imagesId',
-			cell: (info) => flexRender(AdminProductEditDialog, createProductProps(info)),
+			cell: (info) =>
+				flexRender(
+					AdminProductEditDialog,
+					createProductProps(
+						info,
+						info.getValue() ? `${(info.getValue() as Image[]).length} zdjęć` : 'Brak'
+					)
+				),
 			enableSorting: false
 		},
 		{
 			id: 'category',
 			header: 'Kategoria',
 			accessorKey: 'category',
-			cell: (info) => flexRender(AdminProductEditDialog, createProductProps(info)),
+			cell: (info) =>
+				flexRender(
+					AdminProductEditDialog,
+					createProductProps(info, fodderNames[info.getValue() as MainCategory])
+				),
+			enableSorting: true
+		},
+		{
+			id: 'subcategory',
+			header: 'Podkategoria',
+			accessorKey: 'subcategory',
+			cell: (info) =>
+				flexRender(
+					AdminProductEditDialog,
+					createProductProps(info, subCategoriesList[info.getValue() as Subcategory] || '-')
+				),
 			enableSorting: true
 		},
 		{
@@ -136,14 +175,18 @@
 			id: 'producent',
 			header: 'Producent',
 			accessorKey: 'producent',
-			cell: (info) => flexRender(AdminProductEditDialog, createProductProps(info)),
+			cell: (info) =>
+				flexRender(
+					AdminProductEditDialog,
+					createProductProps(info, producentsList[info.getValue() as Producent])
+				),
 			enableSorting: true
 		},
 		{
 			id: 'description',
 			header: 'Opis',
 			accessorKey: 'description',
-			cell: (info) => flexRender(AdminProductEditDialog, createProductProps(info)),
+			cell: (info) => flexRender(AdminProductEditDialog, createProductProps(info, '...')),
 			enableSorting: false
 		},
 		{
@@ -216,7 +259,7 @@
 		}
 	};
 
-	let options = writable<TableOptions<ParsedProduct>>({
+	$: options = writable<TableOptions<ParsedProduct>>({
 		data: data.products,
 		columns: defaultColumns,
 		getCoreRowModel: getCoreRowModel(),
@@ -297,7 +340,8 @@
 								class={cn(
 									`w-[100px]`,
 									header.column.getCanSort() &&
-										'cursor-pointer transition-colors hover:bg-muted/10 hover:rounded-md'
+										'cursor-pointer transition-colors hover:bg-muted/10 hover:rounded-md',
+									header.column.columnDef.id === 'name' && 'w-[150px]'
 								)}
 							>
 								<TableSortableHead sortable={header.column.getCanSort()}>

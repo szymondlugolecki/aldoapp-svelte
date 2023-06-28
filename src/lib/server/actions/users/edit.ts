@@ -1,8 +1,11 @@
 import { getRoleRank, isAtLeastModerator } from '$lib/client/functions';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
-import { editUserSchema, type EditUserSchema } from '$lib/client/schemas/users';
+import {
+	editUserSchema,
+	userPropertySchemas,
+	type EditUserSchema
+} from '$lib/client/schemas/users';
 import { db } from '$lib/server/db';
-import type { Address } from '$lib/server/db/schemas/orders';
 import { users, type User } from '$lib/server/db/schemas/users';
 // import { p } from '$lib/server/clients/pClient';
 import { trytm } from '@bdsqqq/try';
@@ -51,7 +54,7 @@ const edit: Action = async ({ request, locals }) => {
 	console.log('data', data);
 
 	// Make sure something else other than id was provided
-	if (Object.keys(data).length === 1) {
+	if (Object.keys(data).length <= 1) {
 		return fail(400, {
 			errors: ['Brak danych do edycji']
 		});
@@ -65,39 +68,37 @@ const edit: Action = async ({ request, locals }) => {
 		});
 	}
 
-	const { id, email, fullName, role, access, phone, adviserId, address } = editUserObj;
+	const { id, email, fullName, role, access, phone, adviserId, city, zipCode, street } =
+		editUserObj;
 
 	// Fetch the user from the database (before the edit)
-	const [usersBeforeEdit, usersBeforeEditError] = await trytm(
-		db
-			.select({
-				id: users.id,
-				email: users.email,
-				fullName: users.fullName,
-				role: users.role,
-				access: users.access,
-				phone: users.phone,
-				address: users.address
-			})
-			.from(users)
-			.where(eq(users.id, id))
+	const [userBeforeEdit, userBeforeEditError] = await trytm(
+		db.query.users.findFirst({
+			columns: {
+				id: true,
+				email: true,
+				fullName: true,
+				role: true,
+				access: true,
+				phone: true,
+				address: true
+			},
+			where: (users, { eq }) => eq(users.id, id)
+		})
 	);
 
 	// Check if the user exists
-	if (usersBeforeEditError) {
+	if (userBeforeEditError) {
 		return fail(500, {
 			errors: ['Błąd serwera. Nie udało się znaleźć tego użytkownika']
 		});
 	}
-	if (!usersBeforeEdit.length) {
+	if (!userBeforeEdit) {
 		return fail(400, {
 			errors: ['Nie udało się znaleźć użytkownika, którego próbujesz edytować']
 		});
 	}
 
-	const userBeforeEdit = usersBeforeEdit[0];
-
-	// ! Handling permissions
 	// If the user is trying to edit themself
 	if (userBeforeEdit.id === locals.session.user.id) {
 		// It's ok as long as they are not trying to block themself
@@ -109,13 +110,6 @@ const edit: Action = async ({ request, locals }) => {
 	}
 	// If the user is trying to edit another user
 	else {
-		// // The other user is an admin
-		// if (userBeforeEdit.role === 'admin') {
-		// 	return fail(403, {
-		// 		errors: ['Nikt nie może edytować admina']
-		// 	});
-		// }
-
 		// User is trying to edit a user with higher or equal role
 		if (getRoleRank(locals.session.user.role) <= getRoleRank(userBeforeEdit.role)) {
 			return fail(403, {
@@ -152,16 +146,18 @@ const edit: Action = async ({ request, locals }) => {
 		newUser.adviserId = adviserId;
 	}
 
-	function isAddress(str: unknown): str is Address {
-		return editUserSchema.shape.address.safeParse(str).success;
-	}
-
-	if (address) {
-		if (address && typeof address === 'string') {
-			newUser.address = JSON.parse(address);
-		} else if (isAddress(address)) {
-			newUser.address = address;
+	if (city && street && zipCode) {
+		const [address, addressParseError] = betterZodParse(userPropertySchemas.address, {
+			city,
+			street,
+			zipCode
+		});
+		if (addressParseError) {
+			return fail(400, {
+				errors: [addressParseError[0]]
+			});
 		}
+		newUser.address = address;
 	}
 
 	const [, editUserError] = await trytm(db.update(users).set(newUser).where(eq(users.id, id)));

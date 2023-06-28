@@ -1,0 +1,1 @@
+ALTER TABLE `promo_code_uses` ADD `order_id` varchar(36) NOT NULL;

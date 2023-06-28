@@ -70,6 +70,30 @@ export const fodderNames: Record<MainCategory, string> = {
 	backyard: '🐶 Hodowla przydomowa'
 } as const;
 
+export const fodderCategories2 = {
+	cattle: {
+		'milk-cows-fodder': 'Pasze dla krów mlecznych',
+		'cow-fodder-mixes': 'Mieszanki paszowe dla bydła',
+		'cow-premixes': 'Premiksy dla bydła',
+		'cow-concentrates': 'Koncentraty dla krów mlecznych i opasów',
+		'calfs-fodder': 'Pasze dla cieląt',
+		'calfs-milk-replacements': 'Preparaty mlekozastępcze dla cieląt / mleko dla cieląt'
+	},
+	poultry: {
+		'layer-chickens-fodder': 'Pasze dla niosek',
+		'geese-and-ducks-fodder': 'Pasze dla gęsi i kaczek',
+		'broilers-fodder': 'Pasze dla brojlerów',
+		'turkeys-fodder': 'Pasze dla indyków'
+	},
+	pigs: {
+		'porkers-fodder': 'Pasze dla tuczników',
+		'liquid-pig-feed': 'Płynne żywienie świń',
+		'piglets-fodder': 'Pasze dla prosiąt',
+		'sows-fodder': 'Pasze dla loch'
+	},
+	backyard: {}
+} as const;
+
 export const fodderCategories = {
 	cattle: [
 		{

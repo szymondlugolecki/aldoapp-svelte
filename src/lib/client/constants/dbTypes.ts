@@ -19,7 +19,12 @@ export const paymentMethods: [PaymentMethod, ...PaymentMethod[]] = ['cash', 'tra
 export const deliveryMethods: [DeliveryMethod, ...DeliveryMethod[]] = ['personal-delivery'];
 
 export const producents: [Producent, ...Producent[]] = ['deheus', 'unknown'];
-export const mainCategories: [MainCategory, ...MainCategory[]] = ['cattle', 'poultry', 'backyard'];
+export const mainCategories: [MainCategory, ...MainCategory[]] = [
+	'cattle',
+	'pigs',
+	'poultry',
+	'backyard'
+];
 
 export const orderStatus: [OrderStatus, ...OrderStatus[]] = ['pending', 'completed', 'canceled'];
 

@@ -18,8 +18,8 @@
 	} from '@tanstack/svelte-table';
 	import { writable } from 'svelte/store';
 	import Pagination from '$components/Table/Pagination.svelte';
-	import AdminEditDialog from '$components/Dialogs/Admin/Edit/UserEditDialog.svelte';
-	import AdminAddDialog from '$components/Dialogs/Admin/Add/UserAddDialog.svelte';
+	import AdminEditDialog from '$components/Dialogs/Admin/Edit/User.svelte';
+	import AdminAddDialog from '$components/Dialogs/Admin/Add/User.svelte';
 
 	import {
 		Table,
@@ -200,7 +200,7 @@
 		$table.setPageIndex(pageIndex);
 	};
 
-	let options = writable<TableOptions<ParsedUser>>({
+	$: options = writable<TableOptions<ParsedUser>>({
 		data: data.users,
 		columns: defaultColumns,
 		getCoreRowModel: getCoreRowModel(),

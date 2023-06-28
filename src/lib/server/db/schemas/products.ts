@@ -17,7 +17,7 @@ import {
 	decimal
 } from 'drizzle-orm/mysql-core';
 import { users } from './users';
-import { orders } from './orders';
+import { orderProducts } from './orderProducts';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { images } from './images';
 
@@ -44,7 +44,7 @@ export const products = mysqlTable(
 		name: varchar('name', { length: 255 }).notNull(),
 		description: varchar('description', { length: 2048 }),
 		symbol: varchar('symbol', { length: 255 }).notNull(),
-		subcategory: varchar('subcategory', { length: 255 }).notNull(),
+		subcategory: varchar('subcategory', { length: 255 }),
 		category: varchar('category', { length: 255, enum: mainCategories }).notNull(),
 		price: decimal('price', { precision: 8, scale: 2 }).notNull(),
 		weight: decimal('weight', { precision: 8, scale: 2 }).notNull(),
@@ -69,7 +69,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
 		fields: [products.authorId],
 		references: [users.id]
 	}),
-	orders: many(orders),
+	orderProducts: many(orderProducts),
 	images: many(images)
 }));
 

@@ -1,44 +1,68 @@
 <script lang="ts">
-	import { CheckIcon, ChevronDownIcon } from 'lucide-svelte';
-	import { Select } from 'radix-svelte';
-	import type { ResolvedProps } from 'radix-svelte/internal/helpers';
-	// These are internal icons, but they're not exported from the package.
-	// Use your own icons instead.
+	import { fodderNames, fodderCategories2 } from '$lib/client/constants';
+	import type { MainCategory } from '$lib/client/constants/dbTypes';
+	import Select from '$meltui/Select.svelte';
+	import Label from '$shadcn/label/Label.svelte';
+	import type { Subcategory } from '$types';
+	import { writable } from 'svelte/store';
+
+	export let defaultCategory: MainCategory | undefined = undefined;
+	export let defaultSubcategory: Subcategory | undefined = undefined;
+
+	let selectedCategory = writable<MainCategory | null>(defaultCategory || null);
+	let selectedSubcategory: Subcategory | null = defaultSubcategory || null;
+
+	const categoriesOptions = {
+		all: fodderNames as Record<string, string>
+	};
+
+	$: subcategoriesOptions = {
+		all: $selectedCategory ? fodderCategories2[$selectedCategory] : []
+	};
+
+	selectedCategory.subscribe(() => {
+		selectedSubcategory = null;
+	});
 </script>
 
-<Select.Root>
-	<Select.Trigger class="flex items-center gap-2 rounded-md bg-white px-4 py-2 text-vermilion-800">
-		<Select.Value placeholder="Select a fruit..." />
-		<Select.Icon><ChevronDownIcon /></Select.Icon>
-	</Select.Trigger>
+<fieldset class="space-y-2">
+	<div class="grid grid-cols-6 items-center gap-4">
+		<Label
+			for="category"
+			class="text-right flex justify-end col-span-2 text-xs xss:text-sm xs:text-base"
+			>Kategoria
+			<span class="text-red-500">*</span>
+		</Label>
+		<div class="col-span-4">
+			<Select
+				bind:selectedValue={$selectedCategory}
+				options={categoriesOptions}
+				placeholder="Wybierz kategorię"
+				ariaLabel="Kategoria"
+				name="category"
+			/>
+		</div>
+	</div>
 
-	<Select.Content class="overflow-hidden rounded-md bg-white shadow-md">
-		<Select.ScrollUpButton />
-		<Select.Viewport class="px-4 py-2">
-			<Select.Item value="apple" class="flex items-center">
-				<p class="text-vermilion-800" slot="text">Apple</p>
-				<CheckIcon slot="indicator" />
-			</Select.Item>
-			<Select.Item value="banana" class="flex items-center">
-				<p class="text-vermilion-800" slot="text">Banana</p>
-				<CheckIcon slot="indicator" />
-			</Select.Item>
-			<Select.Item value="grape" class="flex items-center">
-				<p class="text-vermilion-800" slot="text">Grape</p>
-				<CheckIcon slot="indicator" />
-			</Select.Item>
-
-			<Select.Group>
-				<Select.Label />
-				<Select.Item value="kiwi" class="flex items-center">
-					<p class="text-vermilion-800" slot="text">Kiwi</p>
-					<CheckIcon slot="indicator" />
-				</Select.Item>
-			</Select.Group>
-
-			<Select.Separator />
-		</Select.Viewport>
-		<Select.ScrollDownButton />
-		<Select.Arrow />
-	</Select.Content>
-</Select.Root>
+	{#key $selectedCategory}
+		{#if $selectedCategory && $selectedCategory !== 'backyard'}
+			<div class="grid grid-cols-6 items-center gap-4">
+				<Label
+					for="subcategory"
+					class="text-right flex justify-end col-span-2 text-xs xss:text-sm xs:text-base"
+					>Podkategoria
+					<span class="text-red-500">*</span>
+				</Label>
+				<div class="col-span-4">
+					<Select
+						bind:selectedValue={selectedSubcategory}
+						options={subcategoriesOptions}
+						placeholder="Wybierz podkategorię"
+						ariaLabel="Podkategoria"
+						name="subcategory"
+					/>
+				</div>
+			</div>
+		{/if}
+	{/key}
+</fieldset>

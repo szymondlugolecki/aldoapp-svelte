@@ -8,9 +8,9 @@ import { sql } from 'drizzle-orm';
 
 const sortableColumns: UserSortableColumn[] = ['fullName', 'email', 'role', 'access', 'createdAt'];
 
-export const load = async ({ url }) => {
-	const pageLimit = 2;
+const pageLimit = 10;
 
+export const load = async ({ url }) => {
 	const page = !isNaN(Number(url.searchParams.get('strona')))
 		? Math.max(Number(url.searchParams.get('strona')), 1)
 		: 1;

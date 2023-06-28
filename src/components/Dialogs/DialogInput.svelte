@@ -9,11 +9,11 @@
 	export let value: string | undefined = undefined;
 </script>
 
-<div class="grid grid-cols-4 items-center gap-4">
-	<Label for={name} class="text-right"
+<fieldset class="grid grid-cols-6 items-center gap-4">
+	<Label for={name} class="text-right text-xs xxs:text-sm col-span-2"
 		>{keyPublicName}{#if required}
 			<span class="text-red-500">*</span>
 		{/if}</Label
 	>
-	<Input {value} id={name} {name} {type} class="col-span-3" />
-</div>
+	<Input {value} id={name} {name} {type} class="col-span-4" />
+</fieldset>

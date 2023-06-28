@@ -90,7 +90,7 @@
 			};
 		});
 	}}
-	use:enhance={({ data }) => {
+	use:enhance={({ formData }) => {
 		const toastId = createLoadingToast('please-wait');
 
 		// Add images to form data
@@ -98,14 +98,14 @@
 			.filter(([, image]) => image.size > 0)
 			.forEach(([, image]) => {
 				delete image.base64;
-				data.append(`images`, image, image['name']);
+				formData.append(`images`, image, image['name']);
 			});
 
 		// Remove unnecessary fields
-		// As all images are already appended to the form data
-		data.delete('add-new-image');
+		// As all images are already appended to the form formData
+		formData.delete('add-new-image');
 		Object.keys(images).forEach((imageId) => {
-			data.delete(`image-${imageId}`);
+			formData.delete(`image-${imageId}`);
 		});
 
 		return async ({ result, update }) => {

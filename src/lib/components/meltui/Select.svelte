@@ -2,38 +2,50 @@
 	import { createSelect } from '@melt-ui/svelte';
 	import { Check, ChevronDown } from 'lucide-svelte';
 
-	const { trigger, menu, option, isSelected } = createSelect();
+	export let options: Record<string, Record<string, string>>;
+	export let placeholder: string;
+	export let ariaLabel: string;
+	export let showSections = false;
+	export let selectedValue: string | null = null;
+	export let name: string | undefined = undefined;
 
-	const options = {
-		fruits: ['Apple', 'Banana', 'Pineapple'],
-		vegetables: ['Broccoli', 'Potato', 'Tomato']
-	};
+	const { trigger, menu, option, isSelected, label, value } = createSelect({
+		required: true,
+		value: selectedValue
+	});
+
+	value.subscribe((v) => {
+		selectedValue = v as string | null;
+	});
 </script>
 
 <button
-	class="flex h-10 w-[180px] items-center justify-between rounded-md bg-white px-3 py-2 text-magnum-700 outline-none hover:opacity-75 focus:ring focus:ring-magnum-400"
+	class="trigger xxs:w-[200px] xs:w-[260px] w-[150px] text-xs xs:text-base truncate"
+	type="button"
 	{...$trigger}
-	aria-label="Food"
+	aria-label={ariaLabel}
 >
-	{'Select an option'}
-	<!-- $selectedText ||  -->
+	{$label || placeholder}
 	<ChevronDown />
 </button>
 
+{#if name}
+	<input type="hidden" aria-hidden="true" {name} value={$value} />
+{/if}
+
 <ul
-	class="z-10 flex max-h-[360px] flex-col gap-2 overflow-y-auto rounded-md bg-white p-1"
+	class="flex rounded-md p-1 max-h-[360px] flex-col gap-2 overflow-y-auto z-40 bg-background border border-border"
 	{...$menu}
 >
 	{#each Object.entries(options) as [key, arr]}
-		<li class="py-1 pl-4 pr-4 font-semibold capitalize text-neutral-800">{key}</li>
-		{#each arr as item}
-			<li
-				class="relative cursor-pointer rounded-md py-1 pl-8 pr-4 text-neutral-800 outline-none focus:bg-magnum-100 focus:text-magnum-700"
-				{...$option({ value: item })}
-			>
-				{#if $isSelected(item)}
-					<div class="check absolute left-2 top-1/2 text-magnum-500">
-						<Check />
+		{#if showSections}
+			<li class="py-1 px-4 font-semibold capitalize">{key}</li>
+		{/if}
+		{#each Object.entries(arr) as [key, item]}
+			<li class="option" {...$option({ value: key })}>
+				{#if $isSelected(key)}
+					<div class="check absolute left-2 top-1/2 text-primary">
+						<Check size={20} />
 					</div>
 				{/if}
 				{item}
@@ -43,6 +55,18 @@
 </ul>
 
 <style lang="postcss">
+	.label {
+		@apply py-1 pl-4 pr-4 font-semibold capitalize text-foreground;
+	}
+
+	.option {
+		@apply relative cursor-pointer rounded-md py-1 pl-8 pr-4 text-foreground;
+		@apply focus:bg-background focus:text-foreground;
+	}
+	.trigger {
+		@apply flex h-10 items-center justify-between rounded-md px-3;
+		@apply py-2 text-foreground hover:opacity-75;
+	}
 	.check {
 		translate: 0 calc(-50% + 1px);
 	}

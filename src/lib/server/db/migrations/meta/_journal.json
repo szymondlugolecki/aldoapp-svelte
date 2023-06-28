@@ -57,6 +57,41 @@
       "when": 1687025595201,
       "tag": "0007_dry_black_tom",
       "breakpoints": false
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1687865501662,
+      "tag": "0008_hard_swordsman",
+      "breakpoints": false
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1687975096581,
+      "tag": "0009_powerful_hulk",
+      "breakpoints": false
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1687976554801,
+      "tag": "0010_flashy_tiger_shark",
+      "breakpoints": false
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1687988671182,
+      "tag": "0011_useful_rocket_raccoon",
+      "breakpoints": false
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1687989322374,
+      "tag": "0012_silky_virginia_dare",
+      "breakpoints": false
     }
   ]
 }

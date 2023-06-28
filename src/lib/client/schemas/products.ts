@@ -122,8 +122,6 @@ export const thumnbnailIndexValidation = z.number({
 export const addProductSchema = z.object({
 	name: nameValidation,
 	symbol: symbolValidation,
-	description: descriptionValidation,
-	images: imagesValidation,
 	category: categoryValidation,
 	subcategory: subcategoryValidation,
 	price: priceValidation,
@@ -133,13 +131,15 @@ export const addProductSchema = z.object({
 
 export const editProductSchema = z.object({
 	id: idValidation,
-	name: nameValidation,
-	symbol: symbolValidation,
-	description: descriptionValidation,
-	images: imagesValidation,
-	category: categoryValidation,
-	subcategory: subcategoryValidation,
-	price: priceValidation
+	name: nameValidation.optional(),
+	symbol: symbolValidation.optional(),
+	description: descriptionValidation.optional(),
+	images: imagesValidation.optional(),
+	category: categoryValidation.optional(),
+	subcategory: subcategoryValidation.optional(),
+	price: priceValidation.optional(),
+	weight: weightValidation.optional(),
+	producent: producentValidation.optional()
 });
 
 export const removeProductSchema = z.object({

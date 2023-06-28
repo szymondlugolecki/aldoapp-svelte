@@ -1,6 +1,7 @@
 import { getRoleRank } from '$lib/client/functions';
 import { db } from '$lib/server/db/index.js';
 import { trytm } from '@bdsqqq/try';
+import { isCuid } from '@paralleldrive/cuid2';
 import { error } from '@sveltejs/kit';
 
 export const load = async ({ params, locals }) => {
@@ -16,17 +17,34 @@ export const load = async ({ params, locals }) => {
 
 	const roleRank = getRoleRank(sessionUser.role);
 
-	let userId = params.userId;
-
-	if (params.userId === 'ja') {
-		userId = sessionUser.id;
+	const userId = params.userId === 'ja' ? sessionUser.id : params.userId;
+	if (!isCuid(userId)) {
+		throw error(400, 'Szukany użytkownik nie istnieje');
 	}
 
 	const [user, fetchUserError] = await trytm(
-		db.query.users.findFirst({ where: (user, { eq }) => eq(user.id, userId) })
+		db.query.users.findFirst({
+			where: (user, { eq }) => eq(user.id, userId),
+			with: {
+				orders: {
+					columns: {
+						id: true
+					}
+				},
+				adviser: {
+					columns: {
+						id: true,
+						fullName: true,
+						email: true
+					}
+				}
+			}
+		})
 	);
 
 	if (fetchUserError) {
+		// Unexpected-error
+		console.error('fetchUserError', fetchUserError);
 		throw error(500, 'Wystąpił błąd podczas pobierania danych użytkownika');
 	}
 
