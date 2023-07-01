@@ -1,4 +1,4 @@
-import type { Address } from '$lib/server/db/schemas/products';
+import type { Address } from '$lib/server/db/schemas/orders';
 import type { CartProductWithQuantity, StoreProduct } from '$types';
 import { persisted } from 'svelte-local-storage-store';
 import type { DeliveryMethod, PaymentMethod } from '../constants/dbTypes';
@@ -71,7 +71,7 @@ export const incrementProduct = (productId: number) => {
 	});
 };
 
-export const addProduct = (product: StoreProduct) => {
+export const addProductToCart = (product: StoreProduct) => {
 	cart.update((cartObj) => {
 		const { productsQuantity } = cartObj;
 		// if already exists, just increment quantity

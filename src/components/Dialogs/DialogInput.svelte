@@ -7,6 +7,7 @@
 	export let name: string | undefined = undefined;
 	export let type = 'text';
 	export let value: string | undefined = undefined;
+	export let step: string | undefined = undefined;
 </script>
 
 <fieldset class="grid grid-cols-6 items-center gap-4">
@@ -15,5 +16,5 @@
 			<span class="text-red-500">*</span>
 		{/if}</Label
 	>
-	<Input {value} id={name} {name} {type} class="col-span-4" />
+	<Input {value} id={name} {name} {type} {step} class="col-span-4" />
 </fieldset>

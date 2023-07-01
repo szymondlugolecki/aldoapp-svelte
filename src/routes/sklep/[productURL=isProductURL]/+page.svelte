@@ -1,7 +1,9 @@
 <script lang="ts">
-	import { producentsList } from '$lib/client/constants';
-	import { addProduct } from '$lib/client/stores/cart';
-	import { ShoppingCart } from 'lucide-svelte';
+	import { fodderCategories2, fodderNames, producentsList } from '$lib/client/constants';
+	import { addProductToCart } from '$lib/client/stores/cart';
+	import Button from '$shadcn/button/Button.svelte';
+	import Separator from '$shadcn/separator/Separator.svelte';
+	import { Package, PlusCircle, ShoppingCart } from 'lucide-svelte';
 	import toast from 'svelte-french-toast';
 
 	export let data;
@@ -17,34 +19,40 @@
 	});
 
 	let selectedImagePreview = 0;
+	const productImgUrl =
+		'https://res.cloudinary.com/dzcuq1b2u/image/upload/v1680687127/products/Lacto%20Start%20IPC%20pasza%20rozdojeniowa%20De%20Heus%2025kg/DB4A2X00G-W00/0.webp';
 </script>
 
 {#if product}
-	<section class="w-full flex flex-col items-center justify-start pt-6 xl:pt-8">
+	<section class="w-full flex flex-col items-center justify-start">
 		<div class="mx-auto px-4 w-full">
 			<!-- Breadcrumbs -->
 			<div class="text-sm breadcrumbs max-w-[260px] xxs:max-w-none">
 				<ul>
-					<li><a href="/sklep">Sklep</a></li>
+					<li><a href="/sklep">{fodderNames[product.category]}</a></li>
+					{#if product.subcategory}
+						<li><a href="/sklep">{fodderCategories2[product.category][product.subcategory]}</a></li>
+					{/if}
 					<li>{product.name}</li>
 				</ul>
 			</div>
-			<!-- w-72 ss:w-80 md:w-64 -->
+
 			<div
-				class="mt-8 flex flex-col lg:flex-row items-center lg:items-start justify-start lg:justify-center 2xl:mr-64"
+				class="mt-4 flex flex-col lg:flex-row items-center lg:items-start justify-start lg:justify-center"
 			>
 				<div class="lg:col-span-3 lg:row-end-1">
 					<!-- All images -->
 					<div class="lg:flex lg:items-start">
 						<!-- Main Image -->
-						<div class="lg:order-2 lg:ml-5">
-							<div class="max-w-xl overflow-hidden rounded-lg">
+
+						<div class="overflow-hidden rounded-md max-w-xl">
+							<a href={`/sklep/${product.encodedURL}`}>
 								<img
-									class="h-[500px] w-full max-w-full object-cover"
-									src={product.images[selectedImagePreview]}
+									src={productImgUrl}
 									alt=""
+									class="scale-[1.1] object-cover hover:scale-[1.15] duration-150"
 								/>
-							</div>
+							</a>
 						</div>
 
 						<!-- Left Side Images -->
@@ -61,7 +69,11 @@
 										class="flex-0 aspect-square h-20 overflow-hidden rounded-lg outline outline-offset-2 outline-base-content text-center"
 										on:click={() => (selectedImagePreview = product.images.indexOf(image))}
 									>
-										<img class="h-full w-full object-cover" src={image} alt={product.name} />
+										<img
+											class="h-full w-full object-cover"
+											src={image && image.url}
+											alt={product.name}
+										/>
 									</button>
 								{/each}
 							</div>
@@ -71,62 +83,53 @@
 
 				<div class="divider divider-horizontal xl:mx-16" />
 
-				<div class="max-w-[576px] lg:max-w-[340px] lg:w-[300px] xl:w-auto">
-					<h1 class="text-2xl font-bold sm:text-3xl">{product.name}</h1>
-					<h2 class="text-lg mt-1">Kod produktu: {product.symbol}</h2>
+				<div class="max-w-3xl lg:max-w-[340px] lg:w-[300px] xl:w-auto">
+					<!-- <h1 class="text-2xl font-bold sm:text-3xl"></h1> -->
+					<h1 class="scroll-m-20 text-2xl font-extrabold tracking-tight lg:text-3xl">
+						{product.name}
+					</h1>
+					<!-- <h3 class="scroll-m-20 text-xl font-semibold tracking-tight">
+						
+					</h3> -->
+
+					<h3 class="text-base font-semibold mt-1">{product.price} PLN</h3>
 
 					<div class="flex flex-col space-y-1 lg:text-base md:text-sm mt-5">
-						<div class="flex justify-between items-center">
+						<!-- <div class="flex justify-between items-center">
 							<span class="text-base">Cena</span>
-							<bold class="font-semibold text-base">{product.price} PLN</bold>
-						</div>
+							<bold class="text-base">{product.price} PLN</bold>
+						</div> -->
 						<div class="flex justify-between items-center">
 							<span class="text-base">Waga</span>
-							<bold class="font-semibold text-base">{product.weight} kg</bold>
+							<bold class="text-base">{product.weight} kg</bold>
 						</div>
 						<div class="flex justify-between items-center">
 							<span class="text-base">Producent</span>
-							<bold class="font-semibold text-base">{producentsList[product.producent]}</bold>
+							<bold class="text-base">{producentsList[product.producent]}</bold>
+						</div>
+						<div class="flex justify-between items-center">
+							<span class="text-base">Kod produktu</span>
+							<bold class="text-base">{product.symbol}</bold>
 						</div>
 					</div>
 
 					<div>
-						<div
-							class="mt-6 w-full flex space-y-2 flex-col xs:space-x-4 xs:space-y-0 xs:flex-row lg:space-x-0 lg:space-y-2 lg:flex-col xl:space-x-4 xl:space-y-0 xl:flex-row"
-						>
-							<button
-								type="button"
-								class="btn btn-primary flex-1 w-full"
-								on:click={() => {
-									addProduct(product);
-									toast('Dodano do koszyka', { icon: '🛒' });
-								}}>Dodaj do koszyka</button
-							>
-
-							<a type="button" class="btn btn-md" href="/zamowienie/koszyk"
-								>Otwórz koszyk <ShoppingCart class="ml-2.5" /></a
-							>
+						<div class="mt-6 w-full flex space-y-2 flex-col">
+							<Button on:click={() => addProductToCart(product)}>
+								<PlusCircle class="mr-2 h-4 w-4" />
+								Dodaj do koszyka
+							</Button>
+							<Button href="/zamowienie/koszyk" variant="secondary">
+								<ShoppingCart class="mr-2 h-4 w-4" />
+								Otwórz koszyk
+							</Button>
 						</div>
 
 						<div class="divider" />
 
 						<ul>
 							<li class="flex items-center text-left text-sm font-medium text-gray-600">
-								<svg
-									class="mr-2 block h-5 w-5 align-middle text-gray-500"
-									xmlns="http://www.w3.org/2000/svg"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-										class=""
-									/>
-								</svg>
+								<Package class="mr-2" />
 								Darmowa dostawa
 							</li>
 						</ul>
@@ -137,6 +140,13 @@
 					<h3 class="text-lg">Opis produktu</h3>
 					<p>{product.description || 'Brak opisu...'}</p>
 				</div> -->
+			</div>
+
+			<Separator class="my-4 xl:my-16" orientation="horizontal" />
+
+			<div>
+				<h3 class="text-lg">Opis produktu</h3>
+				<p class="text-sm mt-1">{product.description || ''}</p>
 			</div>
 		</div>
 		<!-- <div class="divider hidden md:flex md:divider-horizontal" /> -->

@@ -50,6 +50,7 @@
 		"@paralleldrive/cuid2": "^2.2.0",
 		"@planetscale/database": "^1.7.0",
 		"@tanstack/svelte-table": "^8.9.2",
+		"@uploadthing/react": "^5.1.0",
 		"class-variance-authority": "^0.6.0",
 		"cloudinary": "^1.35.0",
 		"clsx": "^1.2.1",
@@ -57,6 +58,7 @@
 		"dotenv": "^16.0.3",
 		"drizzle-orm": "^0.26.5",
 		"drizzle-zod": "^0.4.1",
+		"filedrop-svelte": "^0.1.2",
 		"jose": "^4.13.1",
 		"lucide-svelte": "^0.113.0",
 		"radix-svelte": "^0.7.1",
@@ -67,6 +69,7 @@
 		"tailwind-merge": "^1.13.2",
 		"tailwindcss-animate": "^1.0.6",
 		"ua-parser-js": "2.0.0-alpha.1",
+		"uploadthing": "^5.1.0",
 		"web-push": "^3.5.0",
 		"wretch": "^2.5.1",
 		"zod": "^3.21.4"

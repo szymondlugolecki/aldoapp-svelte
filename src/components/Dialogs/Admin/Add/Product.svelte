@@ -68,7 +68,7 @@
 			<div class="flex flex-col space-y-2">
 				<DialogInput name="name" keyPublicName="Nazwa" required />
 				<DialogInput name="symbol" keyPublicName="Kod produktu" required />
-				<DialogInput name="price" keyPublicName="Cena" type="number" required />
+				<DialogInput name="price" keyPublicName="Cena" type="number" step="0.01" required />
 				<DialogInput name="weight" keyPublicName="Waga (kg)" type="number" required />
 
 				<fieldset class="grid grid-cols-6 items-center gap-4">

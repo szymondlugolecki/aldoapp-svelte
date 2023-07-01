@@ -45,6 +45,9 @@ module.exports = {
 			},
 			fontFamily: {
 				opensans: ["'Open Sans'", 'sans-serif']
+			},
+			scale: {
+				115: '1.15'
 			}
 		},
 		fontFamily: {

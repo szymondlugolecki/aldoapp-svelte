@@ -64,10 +64,10 @@ export const userTable = {
 } as const;
 
 export const fodderNames: Record<MainCategory, string> = {
-	cattle: '🐮 Bydło',
-	poultry: '🐣 Drób',
-	pigs: '🐷 Trzoda',
-	backyard: '🐶 Hodowla przydomowa'
+	cattle: 'Bydło',
+	poultry: 'Drób',
+	pigs: 'Trzoda',
+	backyard: 'Hodowla przydomowa'
 } as const;
 
 export const fodderCategories2 = {
