@@ -21,7 +21,8 @@
 
 	import { Button } from '$shadcn/button/index.js';
 	import CategoryIcon from '$components/CategoryIcon.svelte';
-	import { mainCategories } from '$lib/client/constants/dbTypes.js';
+	import type { MainCategory } from '$lib/client/constants/dbTypes.js';
+	import { page } from '$app/stores';
 
 	export let data;
 
@@ -108,6 +109,13 @@
 	// $: console.log(data.products);
 	const productImgUrl =
 		'https://res.cloudinary.com/dzcuq1b2u/image/upload/v1680687127/products/Lacto%20Start%20IPC%20pasza%20rozdojeniowa%20De%20Heus%2025kg/DB4A2X00G-W00/0.webp';
+
+	$: selectedCategoryName = Object.fromEntries(
+		Object.values(fodderCategories2).flatMap((x) => Object.entries(x))
+	) as Record<Subcategory, string>;
+
+	$: selectedCategory = $page.url.searchParams.get('kategoria') as MainCategory | null;
+	$: selectedSubcategory = $page.url.searchParams.get('podkategoria') as Subcategory | null;
 </script>
 
 <svelte:head>
@@ -120,16 +128,21 @@
 
 <div class="py-2 px-1 mb-3">
 	<div class="flex justify-between items-center px-1 pb-2.5">
-		<!-- <h1 class="text-xl xs:text-2xl">Wszystkie produkty</h1> -->
 		<h1 class="scroll-m-20 text-2xl font-extrabold tracking-tight lg:text-3xl">
-			Wszystkie produkty
+			{#if selectedSubcategory}
+				{selectedCategoryName[selectedSubcategory]}
+			{:else if selectedCategory}
+				{fodderNames[selectedCategory]}
+			{:else}
+				Wszystkie produkty
+			{/if}
 		</h1>
 	</div>
 
 	<div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-10">
 		{#each fakeProducts as product}
 			<Card>
-				<CardHeader>
+				<CardHeader class="h-[110px]">
 					<CardTitle>
 						<a href={`/sklep/${product.encodedURL}`}>
 							{product.name}

@@ -10,6 +10,7 @@
 	import { Button } from '$shadcn/button';
 	import Collapsible from '$meltui/CategoryCollapsible.svelte';
 	import { page } from '$app/stores';
+	import CategoryIcon from '$components/CategoryIcon.svelte';
 
 	// the reason why main is both Category and string is because
 	// types seem to not work in the markup 🤔
@@ -28,27 +29,46 @@
 	<div class="flex w-full px-2 md:px-0 md:max-w-[1520px]">
 		<div class="border-r border-border h-full hidden md:flex md:w-80 flex-col p-1">
 			<h2 class="scroll-m-20 text-lg font-semibold tracking-tight">Kategorie</h2>
-			<!-- {@const abc = 'elo'} -->
+
+			<button
+				on:click={() => goto(`/sklep`)}
+				class="h-10 py-3 px-4 text-left text-base underline-offset-4 hover:underline text-primary flex"
+			>
+				Zobacz wszystko
+			</button>
+
 			{#each fodderEntries as [category, subcategoriesSet]}
-				<!-- <button
-					class="h-10 py-2 px-4 text-left text-base underline-offset-4 hover:underline text-primary"
-					>{categoryVisibleName}</button
-				> -->
-				<Collapsible categoryVisibleName={fodderNames[category]} {category}>
-					<div class="flex flex-col gap-0.5 mt-2 indent-1">
-						{#each Object.entries(subcategoriesSet) as subcategories}
-							<button
-								on:click={() => {
-									const url = new URLSearchParams($page.url.searchParams);
-									url.set('podkategoria', subcategories[0]);
-									goto(`?${url.toString()}`);
-								}}
-								class="py-1 px-4 text-left text-sm underline-offset-4 hover:underline text-primary"
-								>{subcategories[1]}</button
-							>
-						{/each}
-					</div>
-				</Collapsible>
+				{#if category === 'backyard'}
+					<button
+						on:click={() => {
+							const url = new URLSearchParams($page.url.searchParams);
+							url.set('kategoria', category);
+							url.delete('podkategoria');
+							goto(`?${url.toString()}`);
+						}}
+						class="h-10 py-3 px-4 text-left text-base underline-offset-4 hover:underline text-primary flex"
+					>
+						<CategoryIcon class="mr-2" size={24} category="backyard" />
+						Hodowla przydomowa
+					</button>
+				{:else}
+					<Collapsible categoryVisibleName={fodderNames[category]} {category}>
+						<div class="flex flex-col gap-0.5 mt-2 indent-1">
+							{#each Object.entries(subcategoriesSet) as subcategories}
+								<button
+									on:click={() => {
+										const url = new URLSearchParams($page.url.searchParams);
+										url.set('podkategoria', subcategories[0]);
+										url.delete('kategoria');
+										goto(`?${url.toString()}`);
+									}}
+									class="py-1 px-4 text-left text-sm underline-offset-4 hover:underline text-primary"
+									>{subcategories[1]}</button
+								>
+							{/each}
+						</div>
+					</Collapsible>
+				{/if}
 			{/each}
 			<!-- <h4>Filtry</h4> -->
 		</div>
