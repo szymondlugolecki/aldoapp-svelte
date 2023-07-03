@@ -41,7 +41,7 @@
 	export let cellTextOverride: string | undefined = undefined;
 	export let elementId: string | number;
 
-	const { trigger, portal, overlay, content, close, open } = createDialog();
+	const { trigger, portal, overlay, content, close, open, title, description } = createDialog();
 
 	let keyType: 'text' | 'longtext' | 'hyperlink' | 'categories' | 'number' | 'producent' = 'text';
 
@@ -73,8 +73,9 @@
 <div>
 	<DialogTrigger {trigger}>{cellTextOverride || cellValue}</DialogTrigger>
 	<Dialog {content} {overlay} {close} {portal} {open}>
-		<DialogTitle>Edytuj użytkownika</DialogTitle>
-		<DialogDescription>Kliknij przycisk poniżej, aby zapisać zmiany</DialogDescription>
+		<DialogTitle {title}>Edytuj użytkownika</DialogTitle>
+		<DialogDescription {description}>Kliknij przycisk poniżej, aby zapisać zmiany</DialogDescription
+		>
 
 		<form
 			method="post"

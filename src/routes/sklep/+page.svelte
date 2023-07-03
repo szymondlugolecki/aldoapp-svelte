@@ -103,7 +103,7 @@
 		.filter((product) => categoryFilter($selectedCategories, product));
 	// Sort the images by their index
 
-	const fakeProducts = new Array(100).fill(null).map(() => data.products[0]);
+	$: fakeProducts = [].concat(...Array(4).fill(data.products)) as typeof data.products;
 
 	// $: console.log(data.products);
 	const productImgUrl =

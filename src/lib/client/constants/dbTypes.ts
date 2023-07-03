@@ -1,3 +1,6 @@
+import type { Subcategory } from '$types';
+import { fodderCategories2 } from '.';
+
 export type UserRole = 'customer' | 'adviser' | 'driver' | 'admin';
 
 export type Producent = 'deheus' | 'unknown';
@@ -42,3 +45,7 @@ export const deliveryStatus: [DeliveryStatus, ...DeliveryStatus[]] = [
 ];
 
 export const discountTypes: [DiscountType, ...DiscountType[]] = ['percentage', 'fixed'];
+
+export const subcategories = Object.values(fodderCategories2).flatMap((c) =>
+	Object.keys(c)
+) as Subcategory[];
