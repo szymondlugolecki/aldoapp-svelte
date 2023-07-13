@@ -1,7 +1,9 @@
 <script lang="ts">
 	import type { DeliveryMethod } from '$lib/client/constants/dbTypes';
-	import { cart } from '$lib/client/stores/cart';
+	import type { CartLayoutData } from '$types';
+	import type { Writable } from 'svelte/store';
 
+	export let cartData: Writable<CartLayoutData>;
 	export let name: string;
 	export let description: string;
 	export let id: DeliveryMethod;
@@ -15,8 +17,8 @@
 	value={id}
 	class="hidden peer"
 	required
-	bind:group={$cart.deliveryMethod}
-	checked={id === $cart.deliveryMethod}
+	bind:group={$cartData.deliveryMethod}
+	checked={id === $cartData.deliveryMethod}
 />
 
 <label

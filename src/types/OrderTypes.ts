@@ -6,6 +6,7 @@ import type {
 	PaymentStatus
 } from '$lib/client/constants/dbTypes';
 import type { Order } from '$lib/server/db/schemas/orders';
+import type { Product } from '$lib/server/db/schemas/products';
 import type { User } from './UserTypes';
 
 export type { Order };
@@ -38,3 +39,26 @@ export type OrderSortableColumn = keyof Pick<
 	| 'deliveryMethod'
 	| 'createdAt'
 >;
+
+export type OrderSummary = Pick<
+	Order,
+	| 'id'
+	| 'createdAt'
+	| 'updatedAt'
+	| 'deliveryMethod'
+	| 'paymentMethod'
+	| 'address'
+	| 'price'
+	| 'discount'
+	| 'noDiscountPrice'
+	| 'deliveryStatus'
+	| 'paymentStatus'
+	| 'status'
+> & {
+	products: (Pick<Product, 'id' | 'name' | 'symbol' | 'price' | 'encodedURL'> & {
+		quantity: number;
+	})[];
+	customer: Pick<User, 'id' | 'fullName' | 'email' | 'phone' | 'address'>;
+	cartOwner: Pick<User, 'id' | 'fullName' | 'email' | 'phone' | 'role'>;
+	driver: Pick<User, 'id' | 'fullName' | 'email' | 'phone'> | null;
+};

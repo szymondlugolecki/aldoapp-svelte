@@ -18,6 +18,7 @@ import { subscriptions } from './subscriptions';
 import { promoCodes } from './promoCodes';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
+import { carts } from './carts';
 
 export const users = mysqlTable(
 	'users',
@@ -35,13 +36,15 @@ export const users = mysqlTable(
 		address: json('address').$type<Address>(),
 
 		// relations
-		adviserId: char('adviser_id', { length: 255 })
+		adviserId: char('adviser_id', { length: 255 }),
+		cartId: char('cart_id', { length: 255 })
 		// advisedId: char('advised_id', { length: 255 })
 		// users_fulltext: text('fulltext').fulltextIndex()
 	},
 	(user) => ({
 		email: uniqueIndex('unique_emailx').on(user.email),
-		adviserId: index('adviser_idx').on(user.adviserId)
+		adviserId: index('adviser_idx').on(user.adviserId),
+		cartId: index('cart_idx').on(user.cartId)
 		// fullText: index('full_text').on(user.fullName, user.email, user.phone).using('fulltext')
 	})
 );
@@ -52,6 +55,10 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 	products: many(products), // authored products
 	subscriptions: many(subscriptions),
 	promoCodes: many(promoCodes),
+	carts: one(carts, {
+		fields: [users.cartId],
+		references: [carts.id]
+	}),
 	adviser: one(users, {
 		fields: [users.adviserId],
 		references: [users.id]

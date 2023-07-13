@@ -1,0 +1,1 @@
+ALTER TABLE `orders` ADD `no_discount_price` decimal(8,2) NOT NULL;

@@ -48,6 +48,9 @@ module.exports = {
 			},
 			scale: {
 				115: '1.15'
+			},
+			aspectRatio: {
+				'3/4': '3 / 4'
 			}
 		},
 		fontFamily: {
@@ -93,22 +96,19 @@ module.exports = {
 			{
 				dark: {
 					...require('daisyui/src/colors/themes')['[data-theme=dark]'],
-					primary: '#1d4ed8',
-					secondary: '#0284c7',
-					accent: '#f43f5e',
-					neutral: '#1c1917',
-					'base-100': '#121212'
+					primary: '#F8FAFC',
+					secondary: '#0F172A',
+					accent: '#1D283A',
+					'base-100': '#030711'
 				}
 			},
 			{
 				light: {
 					...require('daisyui/src/colors/themes')['[data-theme=light]'],
-					primary: '#1d4ed8',
-					secondary: '#0284c7',
-					accent: '#f43f5e',
-					'accent-content': '#ffffff',
-					neutral: '#1c1917',
-					'base-100': '#f8f9fa'
+					primary: '#0F172A',
+					secondary: '#F1F5F9',
+					accent: '#F1F5F9',
+					'base-100': '#FFFFFF'
 				}
 			}
 		]

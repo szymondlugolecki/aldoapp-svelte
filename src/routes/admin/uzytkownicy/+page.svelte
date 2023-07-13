@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { cn, dateParser, flexRender, isJSON } from '$lib/client/functions';
+	import { addressParser, cn, dateParser, flexRender, isJSON } from '$lib/client/functions';
 	import { roleNames } from '$lib/client/constants';
 	import type { Role, UserSortableColumn } from '$types';
 	import type { UserRole } from '$lib/client/constants/dbTypes.js';
@@ -46,35 +46,21 @@
 	$: console.log('users', data.users);
 	$: count = data.count[0].count;
 
-	const createUserProps = (info: CellContext<ParsedUser, unknown>, cellTextOverride?: string) => {
-		const cellValue = info.getValue();
+	const createUserProps = (info: CellContext<ParsedUser, unknown>) => {
+		const value = info.getValue();
 		const keyPublicName = info.column.columnDef.header;
 		const key = info.column.id;
-		const elementId = info.row._getAllCellsByColumnId().id.getValue();
 
-		return {
-			cellValue,
-			keyPublicName,
-			key,
-			cellTextOverride,
-			elementId
-		};
-	};
-
-	const addressParser = (address: Address | string | null) => {
-		if (!address) return 'Brak';
-		const jsonAddress = typeof address === 'string' ? isJSON<Address>(address) : address;
-		const [correctAddress, addressErrors] = betterZodParse(
-			userPropertySchemas.address,
-			jsonAddress
+		const user = info.table.options.data.find(
+			(user) => user.id === info.row._getAllCellsByColumnId().id.getValue()
 		);
 
-		if (addressErrors || !correctAddress) {
-			return 'Brak';
-		}
-
-		if (Object.values(correctAddress).every((value) => !value)) return 'Brak';
-		return `${correctAddress.street}\n${correctAddress.city}, ${correctAddress.zipCode}`;
+		return {
+			value,
+			keyPublicName,
+			key,
+			user
+		};
 	};
 
 	const defaultColumns: ColumnDef<ParsedUser>[] = [
@@ -102,7 +88,7 @@
 			header: 'Rola',
 			accessorKey: 'role',
 			cell: (info) =>
-				flexRender(AdminEditDialog, createUserProps(info, roleNames[info.getValue() as Role]))
+				flexRender(AdminEditDialog, createUserProps(info))
 		},
 		{
 			id: 'phone',
@@ -115,19 +101,20 @@
 			id: 'address',
 			header: 'Adres',
 			accessorKey: 'address',
-			cell: (info) =>
-				flexRender(
-					AdminEditDialog,
-					createUserProps(info, addressParser(info.getValue() as Address | string | null))
-				),
+			cell: (info) => flexRender(AdminEditDialog, createUserProps(info)),
 			enableSorting: false
+		},
+		{
+			id: 'adviser',
+			header: 'Doradca',
+			accessorKey: 'adviser',
+			cell: (info) => flexRender(AdminEditDialog, createUserProps(info))
 		},
 		{
 			id: 'access',
 			header: 'Dostęp',
 			accessorKey: 'access',
-			cell: (info) =>
-				flexRender(AdminEditDialog, createUserProps(info, info.getValue() ? 'Tak 🟢' : 'Nie 🔴'))
+			cell: (info) => flexRender(AdminEditDialog, createUserProps(info))
 		},
 		{
 			id: 'createdAt',

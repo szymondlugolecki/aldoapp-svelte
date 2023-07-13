@@ -12,6 +12,7 @@ export type DeliveryMethod = 'personal-delivery'; // 'personal-pickup' |
 export type OrderStatus = 'pending' | 'completed' | 'canceled';
 export type PaymentStatus = 'pending' | 'completed' | 'canceled';
 export type DeliveryStatus = 'pending' | 'shipped' | 'delivered' | 'canceled';
+export type CartStatus = 'active' | 'inactive';
 
 export type DiscountType = 'percentage' | 'fixed';
 export type ApplicableProducts = string[];
@@ -43,6 +44,8 @@ export const deliveryStatus: [DeliveryStatus, ...DeliveryStatus[]] = [
 	'delivered',
 	'canceled'
 ];
+
+export const cartStatus: [CartStatus, ...CartStatus[]] = ['active', 'inactive'];
 
 export const discountTypes: [DiscountType, ...DiscountType[]] = ['percentage', 'fixed'];
 

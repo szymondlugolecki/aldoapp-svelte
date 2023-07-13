@@ -1,7 +1,6 @@
-import { getRoleRank } from '$lib/client/functions';
+import { isAtLeastModerator } from '$lib/client/functions';
 import { db } from '$lib/server/db/index.js';
 import { trytm } from '@bdsqqq/try';
-import { isCuid } from '@paralleldrive/cuid2';
 import { error } from '@sveltejs/kit';
 
 export const load = async ({ params, locals }) => {
@@ -15,27 +14,20 @@ export const load = async ({ params, locals }) => {
 		throw error(401, 'Nie jesteś zalogowany');
 	}
 
-	const roleRank = getRoleRank(sessionUser.role);
+	const isMod = isAtLeastModerator(sessionUser.role);
 
 	const userId = params.userId === 'ja' ? sessionUser.id : params.userId;
-	if (!isCuid(userId)) {
-		throw error(400, 'Szukany użytkownik nie istnieje');
-	}
 
 	const [user, fetchUserError] = await trytm(
 		db.query.users.findFirst({
 			where: (user, { eq }) => eq(user.id, userId),
 			with: {
-				orders: {
-					columns: {
-						id: true
-					}
-				},
 				adviser: {
 					columns: {
 						id: true,
 						fullName: true,
-						email: true
+						email: true,
+						phone: true
 					}
 				}
 			}
@@ -52,11 +44,32 @@ export const load = async ({ params, locals }) => {
 		throw error(404, 'Podany użytkownik nie istnieje');
 	}
 
-	if (sessionUser.id !== user.id && roleRank < 1) {
-		throw error(401, 'Nie masz uprawnień do przeglądania tego profilu');
+	if (sessionUser.id !== user.id && !isMod) {
+		throw error(401, 'Nie masz uprawnień do przeglądania profilu tego użytkownika');
+	}
+
+	const [orders, fetchOrdersError] = await trytm(
+		db.query.orders.findFirst({
+			where: (orders, { eq }) => eq(orders.customerId, params.userId),
+			columns: {
+				id: true,
+				price: true,
+				createdAt: true,
+				status: true,
+				paymentStatus: true,
+				deliveryStatus: true
+			}
+		})
+	);
+
+	if (fetchOrdersError) {
+		// Unexpected-error
+		console.error('fetchOrdersError', fetchOrdersError);
+		throw error(500, 'Wystąpił błąd podczas pobierania zamówień użytkownika');
 	}
 
 	return {
-		user
+		user,
+		orders
 	};
 };

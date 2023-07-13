@@ -16,7 +16,7 @@
 <div {...$root} class="mx-auto w-full max-w-md">
 	<button
 		{...$trigger}
-		use:trigger.action
+		use:trigger
 		class="h-10 py-3 px-4 text-left text-base underline-offset-4 hover:underline text-primary flex"
 	>
 		<CategoryIcon class="mr-2" size={24} {category} />
@@ -27,7 +27,7 @@
 		<span class="text-sm leading-6 text-white"> {triggerButtonText} </span>
 		<button
 			{...$trigger}
-			use:trigger.action
+			use:trigger
 			class="relative h-6 w-6 place-items-center rounded-full bg-white text-sm text-magnum-700
         shadow-lg hover:opacity-75
         data-[disabled]:cursor-not-allowed data-[disabled]:opacity-75"

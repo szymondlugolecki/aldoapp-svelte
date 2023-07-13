@@ -46,7 +46,7 @@
 
 <button
 	{...$root}
-	use:root.action
+	use:root
 	class="relative h-6 w-11 cursor-default rounded-full transition-colors outline-none
 			focus:ring focus:ring-magnum-400 data-[state=unchecked]:bg-input data-[state=checked]:bg-primary border-transparent"
 	{id}

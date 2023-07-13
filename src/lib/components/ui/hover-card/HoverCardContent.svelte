@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { cn } from '$lib/client/functions';
 	import type { HoverCardContentProps } from 'radix-svelte';
 	import { HoverCard as HoverCardPrimitive } from 'radix-svelte';
+	import { cn } from '$lib/client/functions';
 
 	let className: string | undefined | null = undefined;
 	export { className as class };

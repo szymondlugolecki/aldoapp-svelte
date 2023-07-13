@@ -1,7 +1,6 @@
 <script lang="ts">
 	import toast from 'svelte-french-toast';
 	import type { PromoCodeWithUses } from '$types/PromoCodeTypes';
-	import NewPromoCode from '$components/Modals/PromoCode/NewPromoCode.svelte';
 
 	import { roleNames } from '$lib/client/constants/index.js';
 	import type { userRoles, UserRole, discountTypes } from '$lib/client/constants/dbTypes.js';

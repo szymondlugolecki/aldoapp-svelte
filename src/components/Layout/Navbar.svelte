@@ -13,18 +13,19 @@
 		Contact,
 		Settings
 	} from 'lucide-svelte';
-	import type { Role, SessionUser } from '../../types';
+	import type { Cart, Role, SessionUser } from '../../types';
 	import Img from '@zerodevx/svelte-img';
 	import logo from '$lib/assets/logo.png?run&width=110&height=80&format=webp';
 	import logout from '$lib/client/functions/api/logout';
 	import MegaMenu from './MegaMenu.svelte';
 	import { slide } from 'svelte/transition';
-	import { cart } from '$lib/client/stores/cart';
-	import { isAtLeastModerator, productURLParser } from '$lib/client/functions';
+	import { cn, isAtLeastModerator, productURLParser } from '$lib/client/functions';
 	export let user: SessionUser | undefined;
 
 	import { HoverCard, HoverCardContent, HoverCardTrigger } from '$shadcn/hover-card';
 	import Separator from '$shadcn/separator/Separator.svelte';
+	import type { Product } from '$lib/server/db/schemas/products';
+	import Button from '$shadcn/button/Button.svelte';
 
 	$: activeUrl = $page.url.pathname.toLowerCase();
 
@@ -34,6 +35,9 @@
 	// 		miniMenuExpanded = false;
 	// 	}
 	// }
+
+	export let cart: Cart | undefined;
+
 	const roleBadgeColors: Record<Role, string> = {
 		admin: 'badge-error',
 		driver: 'badge-success',
@@ -43,16 +47,18 @@
 
 	let menuOpen = false;
 	let miniMenuExpanded = false;
-	$: productsCountTitle =
-		$cart?.productsQuantity && $cart.productsQuantity.length > 0
-			? $cart.productsQuantity.length === 1
-				? '1 produkt'
-				: $cart.productsQuantity.length < 5
-				? `${$cart.productsQuantity.length} produkty`
-				: `${$cart.productsQuantity.length} produktów`
-			: 'Pusty koszyk';
+	$: productsCountTitle = cart?.products.length
+		? cart.products.length === 1
+			? '1 produkt'
+			: cart.products.length < 5
+			? `${cart.products.length} produkty`
+			: `${cart.products.length} produktów`
+		: 'Pusty koszyk';
 
-	$: console.log('cart', $cart);
+	$: console.log('cart', cart);
+
+	const productImgUrl =
+		'https://res.cloudinary.com/dzcuq1b2u/image/upload/v1680687127/products/Lacto%20Start%20IPC%20pasza%20rozdojeniowa%20De%20Heus%2025kg/DB4A2X00G-W00/0.webp';
 </script>
 
 <nav class="navbar border-b border-base-content rounded flex flex-col relative">
@@ -105,9 +111,7 @@
 									d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
 								/></svg
 							>
-							<span class="badge badge-sm indicator-item"
-								>{($cart?.productsQuantity && $cart.productsQuantity.length) || 0}</span
-							>
+							<span class="badge badge-sm indicator-item">{cart?.products.length || 0}</span>
 						</div>
 					</label>
 					<div
@@ -117,14 +121,14 @@
 					>
 						<div class="card-body">
 							<span class="font-bold text-lg">{productsCountTitle}</span>
-							{#each $cart?.productsQuantity ? $cart.productsQuantity.slice(0, 7) : [] as product}
+							{#each cart?.products ? cart.products.slice(0, 7) : [] as product}
 								<div class="flex flex-grow">
 									<div class="flex items-start flex-1 space-x-2">
 										<a
 											href="/sklep/{productURLParser(product.name, product.symbol)}"
 											class="h-full flex items-center"
 										>
-											<img src={product.images[0]} width="32px" height="32px" alt={product.name} />
+											<img src={productImgUrl} width="32px" height="32px" alt={product.name} />
 										</a>
 										<div class="flex flex-col items-start">
 											<span class="text-xs truncate max-w-[144px]">{product.name}</span>
@@ -136,14 +140,14 @@
 									</div>
 								</div>
 							{/each}
-							{#if $cart?.productsQuantity && $cart.productsQuantity.length > 7}
+							{#if cart && cart.products.length > 7}
 								<div class="flex flex-col justify-center items-center text-center">
-									<span>...+{$cart.productsQuantity.length - 7} więcej 🛒</span>
+									<span>...+{cart.products.length - 7} więcej 🛒</span>
 								</div>
 							{/if}
 							<span class="text-info"
-								>Suma: {$cart?.productsQuantity
-									? $cart.productsQuantity
+								>Suma: {cart
+									? cart.products
 											.map(({ price, quantity }) => [price, quantity])
 											.reduce(
 												(prev, [price, quantity]) => prev + Number(price) * Number(quantity),
@@ -153,8 +157,7 @@
 									: 0} PLN</span
 							>
 							<div class="card-actions">
-								<a href="/zamowienie/koszyk" class="btn btn-primary btn-block">Przejdź do koszyka</a
-								>
+								<Button class="w-full" href="/zamowienie/koszyk">Przejdź do koszyka</Button>
 							</div>
 						</div>
 					</div>
@@ -218,9 +221,10 @@
 		>
 			{#if !user}
 				<a
-					class="p-2 w-full rounded {activeUrl === '/login'
-						? 'bg-primary text-primary-content'
-						: ''}"
+					class={cn(
+						'p-2 w-full rounded',
+						activeUrl === '/rejestracja' ? 'bg-primary text-primary-content' : ''
+					)}
 					href="/login"
 					on:click={() => (menuOpen = false)}
 				>
@@ -229,23 +233,26 @@
 			{/if}
 
 			<a
-				class="p-2 w-full rounded {activeUrl === '/' ? 'bg-primary text-primary-content' : ''}"
+				class={cn('p-2 w-full rounded', activeUrl === '/' ? 'bg-primary text-primary-content' : '')}
 				href="/"
 				on:click={() => (menuOpen = false)}
 			>
 				<span class="flex"><Home class="mr-2" /> Strona główna</span></a
 			>
+
 			<a
-				class="p-2 w-full rounded {activeUrl.startsWith('/sklep')
-					? 'bg-primary text-primary-content'
-					: ''}"
+				class={cn(
+					'p-2 w-full rounded',
+					activeUrl.startsWith('/sklep') ? 'bg-primary text-primary-content' : ''
+				)}
 				on:click={() => (menuOpen = false)}
 				href="/sklep"><span class="flex"><ShoppingCart class="mr-2" /> Sklep</span></a
 			>
 			<button
-				class="p-2 w-full rounded text-left {activeUrl.startsWith('/kontakty/')
-					? 'bg-primary text-primary-content'
-					: ''}"
+				class={cn(
+					'p-2 w-full rounded text-left',
+					activeUrl.startsWith('/kontakty') ? 'bg-primary text-primary-content' : ''
+				)}
 				on:click={() => (miniMenuExpanded = !miniMenuExpanded)}
 				><span class="flex">
 					<Contact class="mr-2" />
@@ -258,9 +265,12 @@
 					{#each salesmenMenu as element}
 						<a
 							href="/kontakty/{element.href}"
-							class="{activeUrl === `/kontakty/${element.href}`
-								? 'bg-secondary text-secondary-content'
-								: ''} w-full rounded border-b border-gray-700 pb-2 px-2 duration-150 py-1 last:mb-2"
+							class={cn(
+								'w-full rounded border-b border-gray-700 pb-2 px-2 duration-150 py-1 last:mb-2',
+								activeUrl === `/kontakty/${element.href}`
+									? 'bg-secondary text-secondary-content'
+									: ''
+							)}
 							on:click={() => (menuOpen = false)}
 						>
 							<h3 class="text-base leading-6 font-medium">{element.name}</h3>

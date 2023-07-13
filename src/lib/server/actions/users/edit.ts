@@ -36,6 +36,9 @@ const edit: Action = async ({ request, locals }) => {
 	if (data.access !== undefined) {
 		data.access = JSON.parse(data.access.toString());
 	}
+	if (data.claimAdviser !== undefined) {
+		data.claimAdviser = JSON.parse(data.claimAdviser.toString());
+	}
 
 	console.log('formData', formData, data);
 
@@ -68,7 +71,7 @@ const edit: Action = async ({ request, locals }) => {
 		});
 	}
 
-	const { id, email, fullName, role, access, phone, adviserId, city, zipCode, street } =
+	const { id, email, fullName, role, access, phone, city, zipCode, street, claimAdviser } =
 		editUserObj;
 
 	// Fetch the user from the database (before the edit)
@@ -82,6 +85,15 @@ const edit: Action = async ({ request, locals }) => {
 				access: true,
 				phone: true,
 				address: true
+			},
+			with: {
+				adviser: {
+					columns: {
+						id: true,
+						fullName: true,
+						email: true
+					}
+				}
 			},
 			where: (users, { eq }) => eq(users.id, id)
 		})
@@ -142,8 +154,16 @@ const edit: Action = async ({ request, locals }) => {
 		newUser.phone = phone.toString().replaceAll(' ', '');
 	}
 
-	if (adviserId) {
-		newUser.adviserId = adviserId;
+	// if (adviserId) {
+	// 	newUser.adviserId = adviserId;
+	// }
+
+	if (claimAdviser !== undefined) {
+		if (claimAdviser) {
+			newUser.adviserId = locals.session.user.id;
+		} else {
+			newUser.adviserId = null;
+		}
 	}
 
 	if (city && street && zipCode) {
@@ -159,6 +179,8 @@ const edit: Action = async ({ request, locals }) => {
 		}
 		newUser.address = address;
 	}
+
+	console.log('newUser', newUser);
 
 	const [, editUserError] = await trytm(db.update(users).set(newUser).where(eq(users.id, id)));
 

@@ -22,15 +22,16 @@
 	import toast from 'svelte-french-toast';
 	import { addProductSchema } from '$lib/client/schemas/products';
 
-	const { trigger, portal, overlay, content, close, open } = createDialog();
+	const { trigger, portal, overlay, content, close, open, title, description } = createDialog();
 </script>
 
 <div>
 	<DialogTrigger {trigger}>Dodaj produkt</DialogTrigger>
 	<Dialog {content} {overlay} {close} {portal} {open}>
-		<DialogTitle>Dodaj produkt</DialogTitle>
+		<DialogTitle {title}>Dodaj produkt</DialogTitle>
 
-		<DialogDescription>Kliknij przycisk poniżej, aby zapisać zmiany</DialogDescription>
+		<DialogDescription {description}>Kliknij przycisk poniżej, aby zapisać zmiany</DialogDescription
+		>
 
 		<form
 			method="post"

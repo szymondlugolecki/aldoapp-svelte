@@ -6,7 +6,8 @@ export const handleFormResponse = (
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	result: ActionResult<Record<string, any>, Record<string, any>>,
 	id: string,
-	customMessage?: string
+	customMessage?: string,
+	justLoading = false
 ) => {
 	// console.log('result', result.type);
 
@@ -41,15 +42,29 @@ export const handleFormResponse = (
 			break;
 		}
 		case 'success': {
-			let message = 'Sukces';
+			let message = customMessage;
 			if (result.data && 'message' in result.data) {
 				message = result.data.message || customMessage;
+			}
+
+			if (justLoading) {
+				toast.dismiss(id);
+				return;
+			}
+
+			if (!message) {
+				message = 'Sukces 🎉';
 			}
 
 			toast.success(message, { id, duration: 2500 });
 			break;
 		}
 		case 'redirect':
+			if (justLoading) {
+				toast.dismiss(id);
+				return;
+			}
+
 			toast.success(customMessage || 'Przekierowano 🙂', { id, duration: 2000 });
 			break;
 		case 'error':

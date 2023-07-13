@@ -25,13 +25,13 @@
             shadow-lg bg-background border border-border"
 			transition:flyAndScale|local={{ duration: 150, y: 8, start: 0.96 }}
 			{...$content}
-			use:content.action
+			use:content
 		>
 			<slot />
 
 			<button
 				{...close}
-				use:close.action
+				use:close
 				class="absolute right-[10px] top-[10px] inline-flex h-[25px] w-[25px] appearance-none items-center justify-center rounded-full
             hover:bg-magnum-100 focus:shadow-magnum-400"
 			>

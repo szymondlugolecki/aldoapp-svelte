@@ -80,7 +80,7 @@
 	<Toaster position="bottom-right" />
 
 	<div class="flex flex-col w-full h-full">
-		<Navbar user={data.user} />
+		<Navbar user={data.user} cart={data.cart} />
 		<main
 			in:fade
 			class="w-full min-h-[calc(100vh-65px)] flex px-1.5 xs:px-2 sm:px-3 pt-1 sm:pt-2 pb-[65px] relative items-stretch"

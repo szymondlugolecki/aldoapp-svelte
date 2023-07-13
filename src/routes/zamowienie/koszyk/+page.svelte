@@ -1,84 +1,155 @@
 <script lang="ts">
-	import { cart, decrementProduct, incrementProduct, removeProduct } from '$lib/client/stores/cart';
+	import { handleFormResponse } from '$lib/client/functions/forms.js';
+	import { cn } from '$lib/client/functions/index.js';
+	import { Button } from '$shadcn/button/index.js';
+	import { enhance } from '$app/forms';
+	import createLoadingToast from '$lib/client/functions/createLoadingToast.js';
+	// import {  } from '$lib/client/stores/settings.js';
 	import { Minus, Plus, X } from 'lucide-svelte';
+
+	import {
+		Table,
+		TableBody,
+		TableCaption,
+		TableCell,
+		TableHead,
+		TableHeader,
+		TableRow
+	} from '$shadcn/table';
+
+	export let data;
+
+	const productImgUrl =
+		'https://res.cloudinary.com/dzcuq1b2u/image/upload/v1680687127/products/Lacto%20Start%20IPC%20pasza%20rozdojeniowa%20De%20Heus%2025kg/DB4A2X00G-W00/0.webp';
 </script>
 
 <svelte:head>
-	<title
-		>Koszyk {$cart?.productsQuantity && $cart.productsQuantity.length
-			? `(${$cart.productsQuantity.length}) `
-			: ''}• Twoje ALDO</title
-	>
+	<title>Koszyk {data.cart ? `(${data.cart.products.length})` : ''} • Twoje ALDO</title>
 	<meta name="description" content="Twój koszyk. Dokończ zamówienie." />
 </svelte:head>
 
-<h1 class="text-3xl font-bold">Twój koszyk 🛒</h1>
+<div class="flex justify-between">
+	<h1 class="text-3xl font-bold">Twój koszyk</h1>
 
-<div class="overflow-x-auto">
-	<table class="table w-full">
-		<!-- head -->
-		<thead>
-			<tr>
-				<th>Zdjęcie</th>
-				<th>Produkt</th>
-				<th>Cena (PLN)</th>
-				<th>Ilość</th>
-				<th>Usuń</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#if $cart && Array.isArray($cart.productsQuantity)}
-				{#each $cart.productsQuantity as product}
-					<tr>
-						<td>
-							<a
+	<form
+		method="post"
+		action="?/clearCart"
+		use:enhance={() => {
+			const toastId = createLoadingToast('please-wait');
+
+			return async ({ result, update }) => {
+				handleFormResponse(result, toastId, 'Pomyślnie wyczyszczono koszyk');
+				update();
+			};
+		}}
+	>
+		<Button class="py-0 px-2 xxs:py-2 xxs:px-4" variant="destructive" size="sm" type="submit"
+			>Wyczyść <span class="hidden xs:grid xxs:ml-1"> koszyk</span>
+		</Button>
+	</form>
+</div>
+
+<div class="flex w-full">
+	<Table>
+		<TableHeader>
+			<TableRow>
+				<TableHead>Zdjęcie</TableHead>
+				<TableHead>Produkt</TableHead>
+				<TableHead>Cena</TableHead>
+				<TableHead>Ilość</TableHead>
+				<TableHead>Usuń</TableHead>
+			</TableRow>
+		</TableHeader>
+		<TableBody class="h-52">
+			{#if data.cart}
+				{#each data.cart.products as product}
+					<form
+						method="post"
+						id={product.id.toString()}
+						use:enhance={({ formData }) => {
+							const toastId = createLoadingToast('please-wait');
+
+							formData.append('productId', product.id.toString());
+
+							return async ({ result, update }) => {
+								handleFormResponse(result, toastId, undefined, true);
+								update();
+							};
+						}}
+					/>
+					<TableRow>
+						<TableCell class="p-2 min-w-[120px]"
+							><a
 								href="/sklep/{product.encodedURL}"
-								class="rounded min-w-[4rem] w-16 h-16 xs:w-24 xs:h-24"
+								class="rounded w-16 h-16 xs:w-24 xs:h-24 max-w-[6rem] max-h-[6rem] overflow-hidden"
 							>
-								<img src={product.images[0]} width="96px" height="96px" alt={product.name} />
-							</a>
-						</td>
-						<td>
-							<div
-								class="flex flex-col items-start flex-1 text-base-content space-y-1 max-w-[340px]"
-							>
+								<img
+									class="scale-100 object-cover aspect-3/4"
+									src={productImgUrl}
+									width="96px"
+									height="96px"
+									alt={product.name}
+								/>
+							</a></TableCell
+						>
+
+						<TableCell class="align-baseline grid grid-rows-3">
+							<div class="flex flex-col items-start max-w-[340px]">
 								<bold class="font-bold text-xs sm:text-sm lg:text-base truncate max-w-[300px]"
 									>{product.name}</bold
 								>
 								<small class="text-xs sm:text-sm lg:text-base">{product.symbol}</small>
-								<small class="text-xs sm:text-sm lg:text-base">{product.price} zł / szt.</small>
 							</div>
-						</td>
-						<td class="min-w-[130px]">{(product.quantity * Number(product.price)).toFixed(2)}</td>
-						<td>
-							<div class="flex">
-								<button class="btn btn-square" on:click={() => incrementProduct(product.id)}>
-									<Plus />
-								</button>
+							<small class="text-xs sm:text-sm lg:text-base row-start-3 align-text-bottom"
+								>{product.price} zł / szt.</small
+							>
+						</TableCell>
+						<TableCell class="max-w-[120px]"
+							>{(product.quantity * Number(product.price)).toFixed(2)}</TableCell
+						>
 
-								<div class="h-12 w-12 flex justify-center items-center text-center">
-									<span class="text-lg xl:text-xl">{product.quantity}</span>
+						<TableCell>
+							<div class="flex items-center">
+								<Button
+									form={product.id.toString()}
+									variant="ghost"
+									type="submit"
+									formaction="?/addToCart"
+								>
+									<Plus />
+								</Button>
+
+								<div class="h-12 mx-2 flex justify-center items-center text-center">
+									<span>{product.quantity}</span>
 								</div>
-								<button
-									class="btn btn-square btn-outline"
-									on:click={() => decrementProduct(product.id)}
+
+								<Button
+									form={product.id.toString()}
+									variant="ghost"
+									type="submit"
+									formaction="?/decrementProductFromCart"
 								>
 									<Minus />
-								</button>
+								</Button>
 							</div>
-						</td>
-						<td
-							><button
-								class="btn btn-ghost"
-								on:click={() => removeProduct(product.id)}
-								aria-label="Usuń"><X /></button
-							></td
-						>
-					</tr>
+						</TableCell>
+
+						<TableCell class="max-w-[70px] text-left">
+							<Button
+								form={product.id.toString()}
+								aria-label="Usuń produkt"
+								variant="ghost"
+								type="submit"
+								formaction="?/removeFromCart"
+							>
+								<X />
+							</Button>
+						</TableCell>
+					</TableRow>
 				{/each}
 			{/if}
-		</tbody>
-	</table>
+		</TableBody>
+	</Table>
 </div>
 
 <!-- <div class="flex flex-col space-y-3">
@@ -137,8 +208,3 @@
 	</div> -->
 
 <!-- {/if} -->
-<style>
-	.table th:first-child {
-		position: static;
-	}
-</style>

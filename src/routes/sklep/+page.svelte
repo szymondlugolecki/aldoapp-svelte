@@ -2,8 +2,7 @@
 	import { fodderCategories, fodderCategories2, fodderNames } from '$lib/client/constants';
 	import { textCrusher } from '$lib/client/functions';
 	import { imagesSorting } from '$lib/client/functions/sorting';
-	import { addProductToCart } from '$lib/client/stores/cart';
-	import { selectedCategories, type CategoryChoice } from '$lib/client/stores/shopCategories';
+	import type { CategoryChoice } from '$lib/client/stores/shopCategories';
 	import type { Category, StoreProduct, Subcategory } from '$types';
 	import { Component, List, Search, X } from 'lucide-svelte';
 	import { slide } from 'svelte/transition';
@@ -23,6 +22,9 @@
 	import CategoryIcon from '$components/CategoryIcon.svelte';
 	import type { MainCategory } from '$lib/client/constants/dbTypes.js';
 	import { page } from '$app/stores';
+	import { enhance } from '$app/forms';
+	import createLoadingToast from '$lib/client/functions/createLoadingToast.js';
+	import { handleFormResponse } from '$lib/client/functions/forms.js';
 
 	export let data;
 
@@ -85,23 +87,23 @@
 		return false;
 	};
 
-	$: productsFiltered = data.products
-		// .map((product) => ({
-		// 	...product,
-		// 	images: product.images.sort(imagesSorting)
-		// }))
-		.filter((product) => {
-			if (!searchInput.length) return true;
+	// $: productsFiltered = data.products
+	// .map((product) => ({
+	// 	...product,
+	// 	images: product.images.sort(imagesSorting)
+	// }))
+	// .filter((product) => {
+	// 	if (!searchInput.length) return true;
 
-			const searchInputFormatted = textCrusher(searchInput);
-			return (
-				textCrusher(product.name).includes(searchInputFormatted) ||
-				textCrusher(product.symbol).includes(searchInputFormatted) ||
-				textCrusher(product.description || '').includes(searchInputFormatted) ||
-				textCrusher(product.producent).includes(searchInputFormatted)
-			);
-		})
-		.filter((product) => categoryFilter($selectedCategories, product));
+	// 	const searchInputFormatted = textCrusher(searchInput);
+	// 	return (
+	// 		textCrusher(product.name).includes(searchInputFormatted) ||
+	// 		textCrusher(product.symbol).includes(searchInputFormatted) ||
+	// 		textCrusher(product.description || '').includes(searchInputFormatted) ||
+	// 		textCrusher(product.producent).includes(searchInputFormatted)
+	// 	);
+	// })
+	// .filter((product) => categoryFilter($selectedCategories, product));
 	// Sort the images by their index
 
 	$: fakeProducts = [].concat(...Array(4).fill(data.products)) as typeof data.products;
@@ -156,7 +158,7 @@
 						<a href={`/sklep/${product.encodedURL}`}>
 							<img
 								src={productImgUrl}
-								alt=""
+								alt="Zdjęcie produktu"
 								class="scale-[1.1] object-cover hover:scale-[1.15] duration-150"
 							/>
 						</a>
@@ -178,11 +180,24 @@
 							</Tooltip>
 						</TooltipProvider>
 					</div>
-					<Button
-						class="p-0 xxs:py-2 xxs:px-4"
-						variant="default"
-						on:click={() => addProductToCart(product)}>Dodaj do koszyka</Button
+					<form
+						method="post"
+						action="?/addToCart"
+						use:enhance={({ formData }) => {
+							const toastId = createLoadingToast('please-wait');
+
+							formData.append('productId', product.id.toString());
+
+							return async ({ result, update }) => {
+								handleFormResponse(result, toastId, 'Pomyślnie dodano produkt do koszyka');
+								update();
+							};
+						}}
 					>
+						<Button class="p-0 xxs:py-2 xxs:px-4" variant="default" type="submit"
+							>Dodaj do koszyka</Button
+						>
+					</form>
 				</CardFooter>
 			</Card>
 			<!-- <div
@@ -215,7 +230,7 @@
 		{/each}
 	</div>
 </div>
-{#if !productsFiltered.length}
+{#if !data.products.length}
 	<div class="flex flex-col justify-center items-center pb-3 mb-3" in:slide={{ axis: 'y' }}>
 		<h2 class="text-2xl text-center">🤔 Brak wyników...</h2>
 		<h3 class="text-lg text-center">Spróbuj wybrać inną kategorię</h3>

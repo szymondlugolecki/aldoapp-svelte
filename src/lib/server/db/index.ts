@@ -9,6 +9,8 @@ import * as users from './schemas/users';
 import * as orders from './schemas/orders';
 import * as products from './schemas/products';
 import * as orderProducts from './schemas/orderProducts';
+import * as carts from './schemas/carts';
+import * as cartProducts from './schemas/cartProducts';
 import * as promoCodes from './schemas/promoCodes';
 import * as subscriptions from './schemas/subscriptions';
 import * as verificationTokens from './schemas/verificationTokens';
@@ -28,6 +30,8 @@ export const db = drizzle(connection, {
 		...orders,
 		...products,
 		...orderProducts,
+		...carts,
+		...cartProducts,
 		...promoCodes,
 		...subscriptions,
 		...verificationTokens,

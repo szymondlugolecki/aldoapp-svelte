@@ -2,10 +2,10 @@
 	class="footer footer-center p-6 sm:p-10 text-base-content rounded border-t border-base-content gap-y-6 sm:gap-y-8"
 >
 	<div class="grid grid-flow-col gap-4 text-xs sm:text-sm">
-		<a class="link link-hover" href="/">O nas</a>
-		<a class="link link-hover" href="/">Polityka prywatności</a>
-		<a class="link link-hover" href="/">Zasady użytkowania</a>
-		<a class="link link-hover" href="/">Kontakt</a>
+		<!-- <a class="link link-hover" href="/">O nas</a> -->
+		<a class="link link-hover" href="/polityka-prywatnosci">Polityka prywatności</a>
+		<a class="link link-hover" href="/zasady-uzytkowania">Zasady użytkowania</a>
+		<a class="link link-hover" href="/kontakt">Kontakt</a>
 	</div>
 	<div>
 		<div class="grid grid-flow-col gap-4">

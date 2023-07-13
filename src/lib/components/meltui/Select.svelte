@@ -23,7 +23,7 @@
 	class="trigger xxs:w-[200px] xs:w-[260px] w-[150px] text-xs xs:text-base truncate"
 	type="button"
 	{...$trigger}
-	use:trigger.action
+	use:trigger
 	aria-label={ariaLabel}
 >
 	{$label || placeholder}
@@ -37,14 +37,14 @@
 <ul
 	class="flex rounded-md p-1 max-h-[360px] flex-col gap-2 overflow-y-auto z-40 bg-background border border-border"
 	{...$menu}
-	use:menu.action
+	use:menu
 >
 	{#each Object.entries(options) as [key, arr]}
 		{#if showSections}
 			<li class="py-1 px-4 font-semibold capitalize">{key}</li>
 		{/if}
 		{#each Object.entries(arr) as [key, item]}
-			<li use:option.action class="option" {...$option({ value: key, label: item })}>
+			<li use:option class="option" {...$option({ value: key, label: item })}>
 				{#if $isSelected(key)}
 					<div class="check absolute left-2 top-1/2 text-primary">
 						<Check size={20} />

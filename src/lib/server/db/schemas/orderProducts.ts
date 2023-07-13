@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { mysqlTable, serial, int, smallint } from 'drizzle-orm/mysql-core';
+import { mysqlTable, serial, int, smallint, decimal } from 'drizzle-orm/mysql-core';
 import { products } from './products';
 // import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { orders } from './orders';
@@ -8,6 +8,7 @@ export const orderProducts = mysqlTable('order_products', {
 	id: serial('id').primaryKey().autoincrement(),
 
 	quantity: smallint('quantity').notNull(),
+	price: decimal('price', { precision: 8, scale: 2 }).notNull(),
 
 	// relations
 	productId: int('product_id').notNull(),

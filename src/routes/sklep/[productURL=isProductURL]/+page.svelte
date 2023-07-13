@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { fodderCategories2, fodderNames, producentsList } from '$lib/client/constants';
-	import { addProductToCart } from '$lib/client/stores/cart';
 	import Button from '$shadcn/button/Button.svelte';
 	import Separator from '$shadcn/separator/Separator.svelte';
 	import { Package, PlusCircle, ShoppingCart } from 'lucide-svelte';
@@ -115,7 +114,7 @@
 
 					<div>
 						<div class="mt-6 w-full flex space-y-2 flex-col">
-							<Button on:click={() => addProductToCart(product)}>
+							<Button>
 								<PlusCircle class="mr-2 h-4 w-4" />
 								Dodaj do koszyka
 							</Button>

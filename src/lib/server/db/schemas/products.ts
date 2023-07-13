@@ -18,6 +18,7 @@ import {
 } from 'drizzle-orm/mysql-core';
 import { users } from './users';
 import { orderProducts } from './orderProducts';
+import { cartProducts } from './cartProducts';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { images } from './images';
 
@@ -70,6 +71,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
 		references: [users.id]
 	}),
 	orderProducts: many(orderProducts),
+	cartProducts: many(cartProducts),
 	images: many(images)
 }));
 

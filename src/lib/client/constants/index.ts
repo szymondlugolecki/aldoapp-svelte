@@ -1,9 +1,9 @@
-import wretch from 'wretch';
+// import wretch from 'wretch';
 import type { Role } from '$lib/server/db/schemas/users';
 import type { ShortService, Outlets, OrderRowType } from '$types';
 import type { PromoCodeRowType } from '$types/PromoCodeTypes';
 import type { DeliveryStatus, MainCategory, OrderStatus, PaymentStatus } from './dbTypes';
-import toast from 'svelte-french-toast';
+// import toast from 'svelte-french-toast';
 
 type SalesmenMenuType = {
 	name: string;
@@ -276,12 +276,12 @@ export const roleNames: Record<Role, string> = {
 
 export const services: ShortService[] = ['pasze', 'komis', 'market', 'paliwa', 'maszyny', 'serwis'];
 
-export const wretchClient = wretch('/api')
-	.resolve((_) => _.forbidden(() => toast.error('Nie masz uprawnień')))
-	.resolve((_) => _.notFound(() => toast.error('Nie znaleziono')))
-	.resolve((_) => _.unauthorized(() => toast.error('Nie jesteś zalogowany')))
-	.resolve((_) =>
-		_.error(400, (e) => {
-			toast.error(e.json.message || 'Niespodziewany błąd');
-		})
-	);
+// export const wretchClient = wretch('/api')
+// 	.resolve((_) => _.forbidden(() => toast.error('Nie masz uprawnień')))
+// 	.resolve((_) => _.notFound(() => toast.error('Nie znaleziono')))
+// 	.resolve((_) => _.unauthorized(() => toast.error('Nie jesteś zalogowany')))
+// 	.resolve((_) =>
+// 		_.error(400, (e) => {
+// 			toast.error(e.json.message || 'Niespodziewany błąd');
+// 		})
+// 	);

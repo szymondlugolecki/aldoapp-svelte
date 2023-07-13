@@ -6,6 +6,8 @@ import { verificationCodeSchema } from '$lib/client/schemas/auth';
 import { accessTokenExpiryDate, jwtName, refreshTokenExpiryDate } from '$lib/server/constants/auth';
 import { createAccessToken, createRefreshToken } from '$lib/server/functions/auth';
 import { db } from '$lib/server/db';
+import { verificationTokens as verificationTokensTable } from '$lib/server/db/schemas/verificationTokens';
+import { eq } from 'drizzle-orm';
 
 const handleVerification: Action = async ({ request, cookies, locals }) => {
 	// Validate the user input
@@ -44,7 +46,8 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 						fullName: true,
 						access: true,
 						phone: true,
-						address: true
+						address: true,
+						adviserId: true
 					}
 				}
 			}
@@ -95,6 +98,17 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 		expires: accessTokenExpiryDate(),
 		user: token.user
 	};
+
+	const [, deleteTokenError] = await trytm(
+		db.delete(verificationTokensTable).where(eq(verificationTokensTable.id, token.id))
+	);
+
+	if (deleteTokenError) {
+		console.error('deleteTokenError', deleteTokenError);
+		// Unexpected-error
+		// not that big of a deal
+		// just continue
+	}
 
 	throw redirect(303, '/');
 };

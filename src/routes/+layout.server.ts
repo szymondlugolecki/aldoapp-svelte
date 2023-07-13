@@ -4,40 +4,82 @@
 // import { eq } from 'drizzle-orm';
 // import { orders } from '$lib/server/db/schemas/products.js';
 
+import { isAtLeastModerator } from '$lib/client/functions/index.js';
+import { db } from '$lib/server/db';
+import type { Cart } from '$types';
+import { trytm } from '@bdsqqq/try';
+
 export const load = async ({ locals, depends, url }) => {
 	depends('session');
+	const sessionUser = locals.session?.user;
 
-	// console.log('load function', 'session user', locals.session?.user);
+	const cartFetchPromise = sessionUser
+		? db.query.carts.findFirst({
+				where: (carts, { eq }) => eq(carts.ownerId, sessionUser.id),
+				with: {
+					customer: {
+						columns: {
+							id: true,
+							fullName: true,
+							email: true,
+							phone: true,
+							address: true
+						}
+					},
+					products: {
+						columns: {
+							quantity: true
+						},
+						with: {
+							product: {
+								columns: {
+									id: true,
+									name: true,
+									price: true,
+									symbol: true,
+									encodedURL: true
+								}
+							}
+						}
+					}
+				}
+		  })
+		: undefined;
 
-	// const v = await db.delete(orders);
-	// console.log('deleted', v);
+	let cart: Cart | undefined;
 
-	// const result = await db
-	// 	.select({
-	// 		id: users.id,
-	// 		role: users.role
-	// 	})
-	// 	.from(users)
-	// 	.where(eq(users.id, 'x0vanu2mbse0uayd3rwtvbgv'));
+	if (sessionUser && cartFetchPromise) {
+		const [fetchedCart] = await trytm(cartFetchPromise);
 
-	// console.log('result', result);
+		if (fetchedCart) {
+			const fixedCart = {
+				...fetchedCart,
+				products: fetchedCart.products.map(({ product, quantity }) => ({
+					...product,
+					quantity
+				}))
+			};
 
-	// const [result, err] = await trytm(
-	// 	db.update(users).set({ role: 'admin' }).where(eq(users.id, 'x0vanu2mbse0uayd3rwtvbgv'))
-	// );
-
-	// if (err) {
-	// 	console.log('error', err);
-	// }
-
-	// if (result) {
-	// 	console.log('result', result);
-	// }
-
-	// console.log('userid', locals.session?.user?.id);
+			cart = fixedCart;
+		}
+	}
 
 	return {
 		user: locals.session?.user,
-		url: url.href
+		cart,
+		url: url.href,
+		customers:
+			sessionUser && isAtLeastModerator(sessionUser.role)
+				? db.query.users.findMany({
+						where: (users, { eq, and }) =>
+							and(eq(users.role, 'customer'), eq(users.adviserId, sessionUser.id)),
+						columns: {
+							id: true,
+							fullName: true,
+							email: true,
+							phone: true
+						}
+				  })
+				: undefined
 	};
 };

@@ -2,7 +2,6 @@
 	import type { OrderFilter, OrderWithCustomer } from '$types';
 	import toast from 'svelte-french-toast';
 	import type { OrderStatus } from '$lib/client/constants/dbTypes';
-	import Preview from '$components/Modals/Preview.svelte';
 	import { orderStatusList } from '$lib/client/constants/index.js';
 	import { cn, dateParser, flexRender } from '$lib/client/functions';
 

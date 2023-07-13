@@ -28,5 +28,5 @@ export interface JWTRefreshTokenResult extends JWTVerifyResult {
 
 export type SessionUser = Pick<
 	User,
-	'id' | 'email' | 'fullName' | 'role' | 'access' | 'phone' | 'address'
+	'id' | 'email' | 'fullName' | 'role' | 'access' | 'phone' | 'address' | 'adviserId'
 >;

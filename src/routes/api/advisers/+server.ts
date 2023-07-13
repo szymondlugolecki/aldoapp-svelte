@@ -1,18 +1,30 @@
+import { errorResponses } from '$lib/client/constants/errorResponses';
 import { db } from '$lib/server/db/index.js';
-import { users } from '$lib/server/db/schemas/users';
 import { trytm } from '@bdsqqq/try';
 import { error, json } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
 
-export async function GET({ setHeaders, url }) {
+export async function GET({ locals }) {
+	const sessionUser = locals.session?.user;
+
+	if (!sessionUser) {
+		throw error(...errorResponses[401]);
+	}
+
+	// Fetch all users with role 'customer' and adviserId equal to sessionUser.id
 	const [advisers, fetchAdvisersError] = await trytm(
-		db
-			.select({ id: users.id, fullName: users.fullName, email: users.email })
-			.from(users)
-			.where(eq(users.role, 'adviser'))
+		db.query.users.findMany({
+			where: (users, { eq, and }) =>
+				and(eq(users.role, 'customer'), eq(users.adviserId, sessionUser.id)),
+			columns: {
+				id: true,
+				fullName: true,
+				email: true,
+				phone: true
+			}
+		})
 	);
 
-	if (fetchAdvisersError || !advisers) {
+	if (fetchAdvisersError) {
 		throw error(500, 'Nie udało się pobrać listy doradców');
 	}
 

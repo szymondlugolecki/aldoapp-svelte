@@ -23,6 +23,7 @@ import { userRoles } from '../constants/dbTypes';
 import { userPropertySchemas } from '../schemas/users';
 import { styleToString } from '@melt-ui/svelte/internal/helpers';
 import type { TransitionConfig } from 'svelte/transition';
+import { betterZodParse } from './betterZodParse';
 
 export type Schema = Thing | WithContext<Thing>;
 
@@ -31,6 +32,19 @@ export const flexRender = <P extends Record<string, any>, C = any>(
 	props: P
 ): ComponentType<SvelteComponentTyped> =>
 	flexRenderOrig(component, props) as ComponentType<SvelteComponentTyped>;
+
+export const addressParser = (address: Address | string | null) => {
+	if (!address) return 'Brak';
+	const jsonAddress = typeof address === 'string' ? isJSON<Address>(address) : address;
+	const [correctAddress, addressErrors] = betterZodParse(userPropertySchemas.address, jsonAddress);
+
+	if (addressErrors || !correctAddress) {
+		return 'Brak';
+	}
+
+	if (Object.values(correctAddress).every((value) => !value)) return 'Brak';
+	return `${correctAddress.street}\n${correctAddress.city}, ${correctAddress.zipCode}`;
+};
 
 export const getRoleRank = (role: Role) => {
 	switch (role) {
@@ -46,12 +60,12 @@ export const getRoleRank = (role: Role) => {
 };
 
 export const getGeneralRole = (role: Role) => {
-	if (isModerator(role)) return 'moderator';
+	if (isJustModerator(role)) return 'moderator';
 	if (role === 'admin') return 'admin';
 	return 'customer';
 };
 
-export const isModerator = (role: Role) => {
+export const isJustModerator = (role: Role) => {
 	if (getRoleRank(role) > 0 && role !== 'admin') return true;
 	return false;
 };

@@ -70,7 +70,7 @@
 
 	<ul class="list-disc ml-6">
 		<li>SvelteKit + TypeScript</li>
-		<li>TailwindCSS + DaisyUI</li>
+		<li>TailwindCSS + shadcn-svelte + meltui + (DaisyUI)</li>
 		<li>PlanetScale (MySQL) + DrizzleORM</li>
 		<li>Inne: zod, jose, tanstack table, lucide-svelte, sendgrid</li>
 	</ul>
@@ -85,59 +85,47 @@
 	<h4 class="my-4">TODO List:</h4>
 
 	<ul class="list-disc ml-6">
-		<li>Usuwanie użytych kodów weryfikacyjnych z bazy danych po pomyślnym logowaniu</li>
-		<li>
-			Sprawdzanie IP/UserAgent w celu uniknięcia szansy na powtórzenie się kodu weryfikacyjnego
-		</li>
-		<li>
-			Dodać/naprawić/przetestować dodawanie i edytowanie: produktów, użytkowników, kodów
-			promocyjnych i zamówień
-		</li>
-		<li>Poprawić słaby design panelu administracyjnego</li>
+		<!-- <li>Usuwanie użytych kodów weryfikacyjnych z bazy danych po pomyślnym logowaniu</li> -->
+
 		<li>
 			Strona główna (pomysły: karuzela zdjęć/powiadomienia/featured wybrane produkty ze sklepu/itp.)
 		</li>
-		<li>Filtry do sklepu (price range, producent, ...)</li>
-		<li>Możliwość użycia kodów rabatowych w koszyku</li>
-		<li>Możliwość przypisywania kodów rabatowych konkretnym produktom</li>
-		<li>Poprawić cały admin panel: design, dodać filtry, itp.</li>
-		<li>Dodać możliwość wysyłania powiadomień push wszystkim użytkownikom z panelu admina</li>
-		<li>Poprawić design strony z podglądem zamówienia</li>
-		<li>Poprawić design profilu użytkownika</li>
-		<li>Dodać cacheowanie API requestów przez Redis (Upstash)</li>
-		<li>Poprawić tryb offline</li>
-		<li>Dodać możliwość wysyłania wiadomości do konkretnych działów (mailowo)</li>
-		<li>Integracja z Navireo (produkty)</li>
-		<li>Możliwość płatności online (Dotpay/Przelewy24/Stripe/Paypal????)</li>
-		<li>Poprawienie a11y, SEO (bez i18n w dającej sie przewidziec przyszlosci)</li>
-		<li>Page Transition z nowym API Chrome</li>
+		<li>Dodać caching</li>
 		<li>Custom error page (lepszy design)</li>
-		<li>Poprawic UX: animacje, itp.</li>
 		<li>Dodać możliwość potwórzenia zamówienia</li>
 		<li>Dodać możliwość doradcom złożenia zamówienia w imieniu klienta (przypisanego do nich)</li>
-		<li>Dodać analitykę strony</li>
-		<li>Dodać statystyki sprzedawców, sprzedaży itp.</li>
 		<li>
-			Dodać strony widoczne w footerze (About us, Privacy, ToS, Contact) + Linki do social media
+			Dodać strony widoczne we stopce (About us, Privacy, ToS, Contact) + Linki do social media
 		</li>
 		<li>Poprawić wysyłane maile (design, treść) + zmienić domenę na aldo.agro.pl</li>
 		<li>Powiadomienie przed dostawą z telefonem do kierowcy</li>
+		<li>Optymalizacja SEO i a11y</li>
+	</ul>
+
+	<!-- <h5>Kiedyś:</h5>
+	<ul class="list-disc ml-6">
+		<li>Integracja z Navireo (produkty)</li>
+		<li>Filtry do sklepu (price range, producent, ...) i admin panelu</li>
+		<li>Możliwość użycia kodu rabatowego w koszyku</li>
+		<li>Poprawic UX: animacje, itp.</li>
+		<li>Możliwość przypisywania kodów rabatowych konkretnym produktom</li>
+		<li>Dodać analitykę strony</li>
+		<li>Dodać statystyki sprzedawców, sprzedaży itp.</li>
+		<li>Dodać możliwość wysyłania wiadomości do konkretnych działów (mailowo)</li>
 		<li>
-			Naprawić bug: Kontakty są prerendered, więc navbar pokazuje przycisk Zaloguj (mimo istnienia
-			sesji)
+			Sprawdzanie IP/UserAgent w celu uniknięcia szansy na powtórzenie się kodu weryfikacyjnego
 		</li>
 	</ul>
 
-	<h5 class="my-4">Do przemyślenia:</h5>
+	<h6 class="my-4">Do przemyślenia:</h6>
 
 	<ul class="list-disc ml-6">
-		<li>
-			Zrobienie koszyka w pełni server-side (persistance na kiku urządzeniach, łatwiej sprawdzić
-			synchronizować zmiany w produktach)
-		</li>
 		<li>
 			Na małych urządzeniach mobilnych dodać panel nawigacyjny na dół + gesture detection do
 			zmieniania strony (swipe)
 		</li>
-	</ul>
+		<li>Przyjrzeć sie trybowi offline</li>
+		<li>Możliwość płatności online (Dotpay/Przelewy24/Stripe/Paypal????)</li>
+		<li>Page Transition z nowym API Chrome</li>
+	</ul> -->
 </section>

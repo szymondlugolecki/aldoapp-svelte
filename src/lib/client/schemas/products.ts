@@ -51,10 +51,12 @@ export const subcategoryValidation = z
 	})
 	.optional();
 
-export const idValidation = z.number({
-	invalid_type_error: 'Nieprawidłowe id produktu',
-	required_error: 'Id produktu jest wymagane'
-});
+export const idValidation = z
+	.number({
+		invalid_type_error: 'Nieprawidłowe id produktu',
+		required_error: 'Id produktu jest wymagane'
+	})
+	.min(0, { message: 'Nieprawidłowe id produktu' });
 
 export const nameValidation = z
 	.string({

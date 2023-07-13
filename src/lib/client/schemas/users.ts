@@ -69,6 +69,10 @@ export const userPropertySchemas = {
 			})
 			.min(3, { message: 'Nieprawidłowe miasto' })
 			.trim()
+	}),
+	claimAdviser: z.boolean({
+		invalid_type_error: "Nieprawidłowa wartość dla 'doradca'",
+		required_error: "Brak wartości dla 'doradca'"
 	})
 };
 
@@ -93,7 +97,8 @@ export const editUserSchema = z.object({
 	adviserId: userPropertySchemas.id.optional(),
 	city: userPropertySchemas.address.shape.city.nullish(),
 	street: userPropertySchemas.address.shape.street.nullish(),
-	zipCode: userPropertySchemas.address.shape.zipCode.nullish()
+	zipCode: userPropertySchemas.address.shape.zipCode.nullish(),
+	claimAdviser: userPropertySchemas.claimAdviser.optional()
 });
 
 export type EditUserSchema = z.infer<typeof editUserSchema>;

@@ -9,7 +9,7 @@
 
 <button
 	{...$trigger}
-	use:trigger.action
+	use:trigger
 	class={cn(
 		'inline-flex items-center justify-center rounded-md px-4 py-2 font-medium leading-none text-magnum-700 shadow-lg hover:opacity-75',
 		className
