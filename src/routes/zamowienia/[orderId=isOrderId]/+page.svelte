@@ -1,11 +1,6 @@
 <script lang="ts">
 	import { confetti } from '@neoconfetti/svelte';
 	import { addressParser, cn, dateParser, flexRender } from '$lib/client/functions/index.js';
-	import { Button } from '$shadcn/button';
-	import { Input } from '$shadcn/input';
-	import { Label } from '$shadcn/label';
-	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$shadcn/tabs';
-	import TableHyperlink from '$components/Table/TableHyperlink.svelte';
 	import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '$shadcn/table';
 	import { createTabs } from '@melt-ui/svelte';
 	import {
@@ -13,16 +8,12 @@
 		getCoreRowModel,
 		type ColumnDef,
 		type TableOptions,
-		type CellContext
 	} from '@tanstack/svelte-table';
 	import { writable } from 'svelte/store';
-	import TableSortableHead from '$shadcn/table/TableSortableHead.svelte';
 	import { page } from '$app/stores';
 	import TableImage from '$components/Table/TableImage.svelte';
 	import TableTextColumn from '$components/Table/TableTextColumn.svelte';
 	import { orderStatusList } from '$lib/client/constants/index.js';
-	import type { Address } from '$lib/server/db/schemas/orders.js';
-	import OrderSummaryRow from '$components/OrderSummaryRow.svelte';
 	import {
 		BatteryFull,
 		BatteryCharging,
@@ -37,7 +28,6 @@
 		Landmark,
 		Banknote,
 		BookmarkMinus,
-		CheckCircle,
 		CheckCircle2
 	} from 'lucide-svelte';
 
@@ -180,7 +170,6 @@
 	$: defaultTab = justOrdered ? 'thankyou' : 'info';
 	const { root, list, content, trigger } = createTabs({ value: defaultTab });
 	let innerWidth: number;
-	let innerHeight: number;
 </script>
 
 <!-- <div class="flex flex-col">
@@ -213,7 +202,7 @@
 	</div>
 {/if}
 
-<svelte:window bind:innerWidth bind:innerHeight />
+<svelte:window bind:innerWidth />
 <div class="w-full flex justify-center items-start">
 	<div {...$root} class="root">
 		<div {...$list} class="list" aria-label="Zobacz swoje zamówienie">

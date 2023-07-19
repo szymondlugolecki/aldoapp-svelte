@@ -6,13 +6,8 @@ import remove from '$lib/server/actions/product/remove';
 import { db } from '$lib/server/db';
 import { products } from '$lib/server/db/schemas/products';
 import { sql } from 'drizzle-orm';
-import type { Config } from '@sveltejs/adapter-vercel';
 import { isJSON } from '$lib/client/functions';
 import type { ProductSortableColumn } from '$types';
-
-export const config: Config = {
-	runtime: 'nodejs18.x'
-};
 
 const pageLimit = 10;
 const sortableColumns: ProductSortableColumn[] = [

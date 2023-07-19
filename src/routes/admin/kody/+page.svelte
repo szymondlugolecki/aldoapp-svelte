@@ -8,9 +8,9 @@
 	import { page } from '$app/stores';
 	import { dateParser, getRoleRank } from '$lib/client/functions/index.js';
 
-	export let data;
+	// export let data;
 
-	type PromoCode = (typeof data.promoCodes)[number];
+	// type PromoCode = (typeof data.promoCodes)[number];
 
 	// const codesParser = (promoCodes: DefaultPromoCodesList) => {
 	// 	const groupedPromoCodes = promoCodes.reduce<Record<number, PromoCodeWithUses>>((acc, row) => {

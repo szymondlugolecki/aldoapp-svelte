@@ -35,28 +35,28 @@
 		return true;
 	};
 
-	const sendMeANotification = async () => {
-		const response = await fetch('/api/push/send', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				title: 'Test',
-				options: {
-					body: 'Test'
-				}
-			})
-		});
+	// const sendMeANotification = async () => {
+	// 	const response = await fetch('/api/push/send', {
+	// 		method: 'POST',
+	// 		headers: {
+	// 			'Content-Type': 'application/json'
+	// 		},
+	// 		body: JSON.stringify({
+	// 			title: 'Test',
+	// 			options: {
+	// 				body: 'Test'
+	// 			}
+	// 		})
+	// 	});
 
-		const data = await response.json();
+	// 	const data = await response.json();
 
-		if (response.ok) {
-			toast.success(data.message);
-		} else {
-			toast.error(data.message);
-		}
-	};
+	// 	if (response.ok) {
+	// 		toast.success(data.message);
+	// 	} else {
+	// 		toast.error(data.message);
+	// 	}
+	// };
 
 	const themeSwitchChange = (isChecked: boolean) => {
 		if (isChecked) {
