@@ -17,7 +17,7 @@ import type { ClassValue } from 'clsx';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-import type { ComponentType, SvelteComponentTyped } from 'svelte';
+import type { ComponentType, SvelteComponent } from 'svelte';
 import { flexRender as flexRenderOrig } from '@tanstack/svelte-table';
 import { userRoles } from '../constants/dbTypes';
 import { userPropertySchemas } from '../schemas/users';
@@ -30,8 +30,8 @@ export type Schema = Thing | WithContext<Thing>;
 export const flexRender = <P extends Record<string, any>, C = any>(
 	component: C,
 	props: P
-): ComponentType<SvelteComponentTyped> =>
-	flexRenderOrig(component, props) as ComponentType<SvelteComponentTyped>;
+): ComponentType<SvelteComponent> =>
+	flexRenderOrig(component, props) as ComponentType<SvelteComponent>;
 
 export const addressParser = (address: Address | string | null) => {
 	if (!address) return 'Brak';

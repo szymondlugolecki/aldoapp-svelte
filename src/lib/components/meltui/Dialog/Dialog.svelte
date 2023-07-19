@@ -17,13 +17,13 @@
 		<div
 			{...$overlay}
 			class="fixed inset-0 z-20 bg-background/90"
-			transition:fade|local={{ duration: 150 }}
+			transition:fade={{ duration: 150 }}
 		/>
 		<div
 			class="fixed left-[50%] top-[50%] z-30 max-h-[85vh] w-[90vw] max-w-[450px]
             translate-x-[-50%] translate-y-[-50%] rounded-md p-[20px] xxs:p-[25px]
             shadow-lg bg-background border border-border"
-			transition:flyAndScale|local={{ duration: 150, y: 8, start: 0.96 }}
+			transition:flyAndScale={{ duration: 150, y: 8, start: 0.96 }}
 			{...$content}
 			use:content
 		>

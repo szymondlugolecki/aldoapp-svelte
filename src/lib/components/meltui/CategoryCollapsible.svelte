@@ -9,7 +9,7 @@
 	const { open, root, content, trigger } = createCollapsible();
 
 	export let categoryVisibleName: string;
-	export let previewComponent: typeof SvelteComponent | undefined = undefined;
+	// export let previewComponent: typeof SvelteComponent<any> | undefined = undefined;
 	export let category: MainCategory;
 </script>
 
@@ -42,7 +42,7 @@
 		</button>
 	</div> -->
 
-	<svelte:component this={previewComponent} />
+	<!-- <svelte:component this={previewComponent} /> -->
 	<!-- <div class="my-2 rounded bg-white p-3 shadow-lg">
 		<span class="text-base leading-[25px] text-magnum-800">melt-ui/melt-ui</span>
 	</div> -->
