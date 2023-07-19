@@ -14,3 +14,4 @@
 </svelte:head>
 
 <span>profil uzytkownika {data.user.fullName}</span>
+<span>tutaj beda zamowienia uzytkownika itp</span>

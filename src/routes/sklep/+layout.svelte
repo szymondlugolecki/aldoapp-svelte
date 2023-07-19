@@ -44,7 +44,8 @@
 							const url = new URLSearchParams($page.url.searchParams);
 							url.set('kategoria', category);
 							url.delete('podkategoria');
-							goto(`?${url.toString()}`);
+							console.log('url', url, url.toString());
+							goto(`/sklep?${url.toString()}`);
 						}}
 						class="h-10 py-3 px-4 text-left text-base underline-offset-4 hover:underline text-primary flex"
 					>
@@ -60,7 +61,8 @@
 										const url = new URLSearchParams($page.url.searchParams);
 										url.set('podkategoria', subcategories[0]);
 										url.delete('kategoria');
-										goto(`?${url.toString()}`);
+										console.log('url', url, url.toString());
+										goto(`/sklep?${url.toString()}`);
 									}}
 									class="py-1 px-4 text-left text-sm underline-offset-4 hover:underline text-primary"
 									>{subcategories[1]}</button

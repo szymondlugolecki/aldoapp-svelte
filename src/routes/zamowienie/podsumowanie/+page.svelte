@@ -5,6 +5,7 @@
 	import type { CartLayoutData } from '$types';
 	import { getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
+	import { paymentMethodsList } from '$lib/client/constants/index.js';
 
 	export let data;
 	const cartData = getContext<Writable<CartLayoutData>>('cartData');
@@ -17,12 +18,20 @@
 	<meta name="description" content="Podsumowanie zamówienia. Dokończ zamówienie." />
 </svelte:head>
 
-<div class="text-left h-full flex flex-col flex-1">
+<div class="text-left h-full flex flex-col flex-1 space-y-4">
 	{#if data.cart}
-		<h1 class="text-3xl font-bold">Podsumowanie zamówienia</h1>
-		<h2 class="mb-5 text-lg font-medium">Metoda dostawy</h2>
-		<p>{data.cart.deliveryMethod}</p>
-		<h3 class="mb-5 text-lg font-medium">Metoda płatności</h3>
-		<p>{data.cart.paymentMethod}</p>
+		<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+			Potwierdzenie zamówienia
+		</h1>
+
+		<div>
+			<b class="mb-5 text-lg font-medium">Metoda dostawy</b>
+			<p>{data.cart.deliveryMethod === 'personal-delivery' ? 'Kierowca ALDO' : '?'}</p>
+		</div>
+
+		<div>
+			<b class="mb-5 text-lg font-medium">Metoda płatności</b>
+			<p>{paymentMethodsList[data.cart.paymentMethod]}</p>
+		</div>
 	{/if}
 </div>

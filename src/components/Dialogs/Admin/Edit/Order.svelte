@@ -16,14 +16,14 @@
 	import Select from '$meltui/Select.svelte';
 
 	import { page } from '$app/stores';
-	import type { Role } from '$types';
+	import type { Order, Role } from '$types';
 	import { userRoles } from '$lib/client/constants/dbTypes';
 	import { enhance } from '$app/forms';
 	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import { Switch } from '$shadcn/switch';
 	import type { Address } from '$lib/server/db/schemas/orders';
-	import { isCorrectAddress, isCorrectRole } from '$lib/client/functions';
+	import { addressParser, isCorrectAddress, isCorrectRole } from '$lib/client/functions';
 	import type { Product } from '$lib/server/db/schemas/products';
 	import SelectCategory from '../SelectCategory.svelte';
 	import DialogButton from '$meltui/Dialog/DialogButton.svelte';
@@ -33,49 +33,81 @@
 	import DialogTrigger from '$meltui/Dialog/DialogTrigger.svelte';
 	import { createDialog } from '@melt-ui/svelte';
 	import DialogFooter from '$meltui/Dialog/DialogFooter.svelte';
-	import { producentsList } from '$lib/client/constants';
+	import { orderStatusList, paymentMethodsList, statusIcon } from '$lib/client/constants';
 
-	export let keyPublicName: string;
-	export let key: keyof Product;
-	export let cellValue: string | boolean | Address;
-	export let cellTextOverride: string | undefined = undefined;
-	export let elementId: string | number;
+	type ExtendedOrder = Pick<
+		Order,
+		| 'id'
+		| 'status'
+		| 'deliveryStatus'
+		| 'deliveryMethod'
+		| 'paymentStatus'
+		| 'paymentMethod'
+		| 'address'
+		| 'price'
+		| 'discount'
+		| 'createdAt'
+	> & {
+		orderProducts: {
+			quantity: number;
+			productId: number;
+			product: Pick<Product, 'id' | 'name' | 'symbol' | 'price' | 'encodedURL'>;
+		};
+	};
 
-	const { trigger, portal, overlay, content, close, open } = createDialog();
+	export let key: keyof ExtendedOrder;
+	export let value: ExtendedOrder[keyof ExtendedOrder];
+	// export let cellTextOverride: string | undefined = undefined;
+	export let order: ExtendedOrder;
 
-	let keyType: 'text' | 'longtext' | 'hyperlink' | 'categories' | 'number' | 'producent' = 'text';
+	let keyType: 'address' | 'status' | 'delivery' | 'payment' | null = null;
 
-	$: switch (key) {
-		case 'encodedURL':
-			keyType = 'hyperlink';
+	const { trigger, portal, overlay, content, close, open, title, description } = createDialog();
+
+	console.log('key', key);
+
+	switch (key) {
+		case 'address':
+			keyType = 'address';
 			break;
-		case 'description':
-			keyType = 'longtext';
+		case 'status':
+			keyType = 'status';
 			break;
-		case 'price':
-			keyType = 'number';
+		case 'deliveryStatus':
+			keyType = 'delivery';
 			break;
-		case 'category':
-			keyType = 'categories';
-			break;
-		case 'subcategory':
-			keyType = 'categories';
-			break;
-		case 'weight':
-			keyType = 'number';
-			break;
-		case 'producent':
-			keyType = 'producent';
+		case 'paymentStatus':
+			keyType = 'payment';
 			break;
 	}
+
+	let cellValueOverride = undefined as string | undefined;
+	if (keyType === 'address') {
+		cellValueOverride = addressParser(order.address);
+	} else if (keyType === 'status') {
+		cellValueOverride = `${statusIcon[order.paymentStatus]} ${orderStatusList[order.status]}`;
+	} else if (keyType === 'delivery') {
+		cellValueOverride = `${
+			order.deliveryMethod === 'personal-delivery' ? 'Kierowca ALDO' : '?'
+		}\n\n${statusIcon[order.deliveryStatus]} ${orderStatusList[order.deliveryStatus]}`;
+	} else if (keyType === 'payment') {
+		cellValueOverride = `${paymentMethodsList[order.paymentMethod]}\n\n${
+			statusIcon[order.paymentStatus]
+		} ${orderStatusList[order.paymentStatus]}`;
+	}
+	let address: Address = {
+		street: order.address.street || '',
+		zipCode: order.address.zipCode || '',
+		city: order.address.city || ''
+	};
 </script>
 
 <div>
-	<DialogTrigger {trigger}>{cellTextOverride || cellValue}</DialogTrigger>
+	<DialogTrigger {trigger}>{cellValueOverride || value}</DialogTrigger>
 	<Dialog {content} {overlay} {close} {portal} {open}>
-		<DialogTitle>Edytuj użytkownika</DialogTitle>
-		<DialogDescription>Kliknij przycisk poniżej, aby zapisać zmiany</DialogDescription>
-
+		<DialogTitle {title}>Edytuj zamówienie</DialogTitle>
+		<DialogDescription {description}>Kliknij przycisk poniżej, aby zapisać zmiany</DialogDescription
+		>
 		<form
 			method="post"
 			action="?/edit"
@@ -92,47 +124,21 @@
 			}}
 		>
 			<div class="flex flex-col space-y-2">
-				{#if keyType === 'text'}
-					<div class="grid grid-cols-4 items-center gap-4">
-						<Label class="text-right">{keyPublicName}</Label>
-						<Input id={key} name={key} value={cellTextOverride || cellValue} class="col-span-3" />
-					</div>
-				{:else if keyType === 'hyperlink' && typeof cellValue === 'string'}
-					<a href={cellValue}>Link</a>
-				{:else if keyType === 'number' && typeof cellValue === 'string'}
-					<div class="grid grid-cols-4 items-center gap-4">
-						<Label class="text-right">{keyPublicName}</Label>
-						<Input
-							id={key}
-							name={key}
-							value={cellTextOverride || cellValue}
-							type="number"
-							class="col-span-3"
-							step="0.01"
-						/>
-					</div>
-				{:else if keyType === 'longtext' && (cellValue === null || typeof cellValue === 'string')}
-					<Textarea value={cellValue} name={key} id={key} placeholder="Tu wpisz opis produktu..." />
-				{:else if keyType === 'categories' && typeof cellValue === 'string'}
-					<SelectCategory />
-				{:else if keyType === 'producent' && typeof cellValue === 'string'}
-					<fieldset class="space-y-2">
-						<div class="grid grid-cols-6 items-center gap-4">
-							<Label
-								for="producent"
-								class="text-right flex justify-end col-span-2 text-xs xss:text-sm xs:text-base"
-								>Producent
-								<span class="text-red-500">*</span>
-							</Label>
-							<div class="col-span-4">
-								<Select
-									selectedValue={cellValue}
-									options={{ all: producentsList }}
-									placeholder="Wybierz producenta"
-									ariaLabel="Producent"
-									name="producent"
-								/>
-							</div>
+				<!-- {#if keyType === 'hyperlink'}
+					<a href="/zamowienia/{order.id}">Szczegóły</a> -->
+				{#if keyType === 'address'}
+					<fieldset class="grid gap-4 py-4">
+						<div class="grid grid-cols-4 items-center gap-4">
+							<Label class="text-right">Miasto</Label>
+							<Input id="city" name="city" bind:value={address.city} class="col-span-3" />
+						</div>
+						<div class="grid grid-cols-4 items-center gap-4">
+							<Label class="text-right">Kod pocztowy</Label>
+							<Input id="zipCode" name="zipCode" bind:value={address.zipCode} class="col-span-3" />
+						</div>
+						<div class="grid grid-cols-4 items-center gap-4">
+							<Label class="text-right">Ulica i numer domu</Label>
+							<Input id="street" name="street" bind:value={address.street} class="col-span-3" />
 						</div>
 					</fieldset>
 				{/if}
@@ -141,7 +147,7 @@
 					<DialogButton>Zapisz</DialogButton>
 				</DialogFooter>
 			</div>
-			<input type="hidden" hidden value={elementId} name="id" />
+			<input type="hidden" hidden value={order.id} name="id" />
 		</form>
 	</Dialog>
 </div>

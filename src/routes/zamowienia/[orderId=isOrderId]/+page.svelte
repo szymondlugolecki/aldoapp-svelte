@@ -244,10 +244,9 @@
 				>.
 			</p> -->
 			<blockquote class="mt-2 border-l-2 pl-6 italic">
-				Będziemy informować cię o zmianach w statusie zamówienia przez powiadomienia w aplikacji,
-				więc nie zapomnij ich włączyć w <a class="text-blue-700" href="/ustawienia"
-					>ustawieniach aplikacji</a
-				>. <br /> Zespół ALDO
+				Będziemy Cię informować o zmianach w statusie zamówienia przez powiadomienia w aplikacji.
+				Nie zapomnij ich włączyć w <a class="text-blue-700" href="/ustawienia">ustawieniach</a>.
+				<br /> Zespół ALDO
 			</blockquote>
 			<!-- <p class="leading-7 [&:not(:first-child)]:mt-6">
 				

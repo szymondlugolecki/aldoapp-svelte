@@ -1,8 +1,13 @@
 // import wretch from 'wretch';
 import type { Role } from '$lib/server/db/schemas/users';
-import type { ShortService, Outlets, OrderRowType } from '$types';
-import type { PromoCodeRowType } from '$types/PromoCodeTypes';
-import type { DeliveryStatus, MainCategory, OrderStatus, PaymentStatus } from './dbTypes';
+import type { ShortService, Outlets } from '$types';
+import type {
+	DeliveryStatus,
+	MainCategory,
+	OrderStatus,
+	PaymentMethod,
+	PaymentStatus
+} from './dbTypes';
 // import toast from 'svelte-french-toast';
 
 type SalesmenMenuType = {
@@ -17,16 +22,18 @@ export const producentsList = {
 	unknown: 'Nieznany'
 } as const;
 
-export const productTable = {
-	image: 'Zdjęcie',
-	name: 'Nazwa i symbol',
-	description: 'Opis',
-	author: 'Dodał(a)',
-	action: 'Akcja',
-	addedAt: 'Dodano',
-	extra: 'Dodatkowe informacje',
-	category: 'Kategoria'
+export const paymentMethodsList: Record<PaymentMethod, string> = {
+	cash: 'Gotówka/Przedpłata',
+	transfer: 'Przelew bankowy'
 } as const;
+
+export const statusIcon: Record<OrderStatus | PaymentStatus | DeliveryStatus, string> = {
+	canceled: '🔴',
+	pending: '🟠',
+	delivered: '🟢',
+	shipped: '🔵',
+	completed: '🟢'
+};
 
 export const orderStatusList: Record<OrderStatus | PaymentStatus | DeliveryStatus, string> = {
 	canceled: 'Anulowano',
@@ -34,33 +41,6 @@ export const orderStatusList: Record<OrderStatus | PaymentStatus | DeliveryStatu
 	delivered: 'Dostarczono',
 	shipped: 'Wysłano',
 	completed: 'Zakończono'
-} as const;
-
-export const orderTable: Record<OrderRowType, string> = {
-	products: 'Produkty',
-	customer: 'Klient',
-	status: 'Status',
-	action: 'Akcja',
-	createdAt: 'Złożył(a)'
-};
-
-export const promoCodesTable: Record<PromoCodeRowType, string> = {
-	code: 'Kod',
-	discount: 'Rabat',
-	uses: 'Użyty',
-	createdAt: 'Utworzony',
-	action: 'Akcja',
-	extraInfo: 'Dodatkowe informacje',
-	validDateRange: 'Aktywny od - do'
-};
-
-export const userTable = {
-	user: 'Użytkownik',
-	role: 'Rola',
-	action: 'Akcja',
-	access: 'Dostęp',
-	joined: 'Dołączył(a)',
-	profile: 'Profil'
 } as const;
 
 export const fodderNames: Record<MainCategory, string> = {
@@ -236,35 +216,6 @@ export const serviceNames: Record<ShortService, Service> = {
 	paliwa: 'stacja paliw',
 	pasze: 'dział pasz',
 	serwis: 'serwis'
-};
-
-export const shopMenu = [
-	{
-		name: 'Pasze i koncentraty dla bydła',
-		description: 'Wolne od GMO',
-		locations: ['Online', 'surowe']
-	},
-	{
-		name: 'Pasze dla trzody chlewnej',
-		description: 'Wolne od GMO',
-		locations: ['Online', 'surowe']
-	},
-	{
-		name: 'Pasze dla drobiu',
-		description: 'Wolne od GMO',
-		locations: ['Online', 'surowe']
-	},
-	{
-		name: 'Dodatki i surowce żywieniowe',
-		description: 'Wolne od GMO',
-		locations: ['Online', 'surowe']
-	}
-];
-
-export const badgeRoleColors = {
-	customer: 'badge-info',
-	moderator: 'badge-success',
-	admin: 'badge-error'
 };
 
 export const roleNames: Record<Role, string> = {

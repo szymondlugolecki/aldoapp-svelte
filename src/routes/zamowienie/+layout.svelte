@@ -121,6 +121,8 @@
 	});
 
 	setContext('cartData', cartData);
+
+	let allowAdviserOrdering = false;
 </script>
 
 <section class="w-full flex flex-col items-center justify-center">
@@ -232,7 +234,8 @@
 						{/if}
 					</div>
 
-					{#if data.user && isAtLeastModerator(data.user.role)}
+					<!-- remove the false when ready -->
+					{#if data.user && isAtLeastModerator(data.user.role) && allowAdviserOrdering}
 						{#if stageIndex === 0}
 							<div class="w-full">
 								<button

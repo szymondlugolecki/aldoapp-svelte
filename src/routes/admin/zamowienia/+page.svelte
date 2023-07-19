@@ -4,6 +4,7 @@
 	import type { OrderStatus } from '$lib/client/constants/dbTypes';
 	import { orderStatusList } from '$lib/client/constants/index.js';
 	import { cn, dateParser, flexRender } from '$lib/client/functions';
+	import TableHyperlink from '$components/Table/TableHyperlink.svelte';
 
 	import {
 		createSvelteTable,
@@ -44,37 +45,99 @@
 	$: console.log('orders', data.orders);
 	$: count = data.count[0].count;
 
-	const createOrderProps = (info: CellContext<ParsedOrder, unknown>, cellTextOverride?: string) => {
-		const cellValue = info.getValue();
+	const createOrderProps = (info: CellContext<ParsedOrder, unknown>) => {
+		const value = info.getValue();
 		const keyPublicName = info.column.columnDef.header;
 		const key = info.column.id;
-		const elementId = info.row._getAllCellsByColumnId().id.getValue();
+
+		const order = info.table.options.data.find(
+			(order) => order.id === info.row._getAllCellsByColumnId().id.getValue()
+		);
 
 		return {
-			cellValue,
+			value,
 			keyPublicName,
 			key,
-			cellTextOverride,
-			elementId
+			order
 		};
 	};
 
 	const defaultColumns: ColumnDef<ParsedOrder>[] = [
 		{
 			id: 'id',
+			header: 'Szczegóły',
 			accessorKey: 'id',
+			cell: (info) =>
+				flexRender(TableHyperlink, {
+					href: `/zamowienia/${info.getValue() as string}`,
+					text: 'Sprawdź'
+				}),
 			enableSorting: false
 		},
 		{
-			id: 'price',
-			header: 'Kwota',
-			accessorKey: 'price',
+			id: 'status',
+			header: 'Status',
+			accessorKey: 'status',
 			cell: (info) => flexRender(AdminEditDialog, createOrderProps(info)),
 			enableSorting: true
 		},
 		{
+			id: 'deliveryStatus',
+			header: 'Dostawa',
+			accessorKey: 'deliveryStatus',
+			cell: (info) => flexRender(AdminEditDialog, createOrderProps(info)),
+			enableSorting: true
+		},
+		{
+			id: 'paymentStatus',
+			header: 'Płatność',
+			accessorKey: 'paymentStatus',
+			cell: (info) => flexRender(AdminEditDialog, createOrderProps(info)),
+			enableSorting: true
+		},
+		{
+			id: 'price',
+			header: 'Kwota (z rabatem)',
+			accessorKey: 'price',
+			cell: (info) => info.getValue(),
+			enableSorting: true
+		},
+		{
+			id: 'discount',
+			header: 'Rabat',
+			accessorKey: 'discount',
+			cell: (info) => info.getValue(),
+			enableSorting: true
+		},
+		{
+			id: 'orderProducts',
+			header: 'Produkty',
+			accessorKey: 'orderProducts',
+			cell: (info) => {
+				console.log('info', info.getValue(), typeof info.getValue());
+				const products = info.getValue() as (typeof data.orders)[number]['orderProducts'];
+				if (!Array.isArray(products)) return '?';
+
+				// 2x'name',
+
+				const parsedProducts = products
+					.map((p) => (p.quantity === 1 ? p.product.name : `${p.quantity}x ${p.product.name}`))
+					.join(', ');
+
+				return parsedProducts.length > 47 ? parsedProducts.slice(0, 47) + '...' : parsedProducts;
+			},
+			enableSorting: false
+		},
+		{
+			id: 'address',
+			header: 'Adres',
+			accessorKey: 'address',
+			cell: (info) => flexRender(AdminEditDialog, createOrderProps(info)),
+			enableSorting: false
+		},
+		{
 			id: 'createdAt',
-			header: 'Dołączył',
+			header: 'Złożono',
 			accessorKey: 'createdAt',
 			cell: (info) => dateParser(info.getValue() as Date, 'short')
 		}
@@ -149,9 +212,6 @@
 		getCoreRowModel: getCoreRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
 		state: {
-			columnVisibility: {
-				id: false
-			},
 			sorting
 		},
 		enableSorting: true,

@@ -11,6 +11,8 @@ import { sendNotifications } from '$lib/server/functions/push';
 const sendPush: Action = async ({ locals, request }) => {
 	const sessionUser = locals.session?.user;
 
+	console.log('send push');
+
 	if (!sessionUser) {
 		throw error(401, 'Nie jesteś zalogowany');
 	}
@@ -31,6 +33,12 @@ const sendPush: Action = async ({ locals, request }) => {
 	const entries = Object.fromEntries(formData);
 
 	console.log('push send', 'entries', entries);
+
+	if (!entries.targets) {
+		return fail(400, {
+			errors: ['Musisz wybrać przynajmniej jednego odbiorcę powiadomienia']
+		});
+	}
 
 	// Validate the request body
 	const [data, parseError] = betterZodParse(pushNotificationRequest, entries);
