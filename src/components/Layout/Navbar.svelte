@@ -14,7 +14,7 @@
 		Settings
 	} from 'lucide-svelte';
 	import type { Cart, Role, SessionUser } from '../../types';
-	import Img from '@zerodevx/svelte-img';
+	// import Img from '@zerodevx/svelte-img';
 	import logo from '$lib/assets/logo.png?run&width=110&height=80&format=webp';
 	import logout from '$lib/client/functions/api/logout';
 	import MegaMenu from './MegaMenu.svelte';
@@ -66,7 +66,8 @@
 		<div class="flex">
 			<a href="/" class="btn btn-ghost normal-case text-lg sm:text-xl"
 				><span class="mr-2">Twoje</span>
-				<Img src={logo} height={40} width={55} alt="Logo ALDO" /></a
+				<!-- <Img src={logo} height={40} width={55} alt="Logo ALDO" /> -->
+				</a
 			>
 		</div>
 		<div class="hidden space-x-6 md:flex justify-center items-center">

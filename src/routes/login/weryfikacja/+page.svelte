@@ -4,7 +4,7 @@
 	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import logo from '$lib/assets/logo.png?run&width=110&height=80&format=webp';
-	import Img from '@zerodevx/svelte-img';
+	// import Img from '@zerodevx/svelte-img';
 </script>
 
 <svelte:head>
@@ -25,7 +25,7 @@
 
 		<div class="flex items-center mt-6 text-2xl font-semibold text-base-content select-none">
 			Twoje
-			<Img class="ml-2" src={logo} width={55} height={40} alt="Logo ALDO" />
+			<!-- <Img class="ml-2" src={logo} width={55} height={40} alt="Logo ALDO" /> -->
 		</div>
 
 		<!-- <div class="h-0 w-full border-t border-dashed border-gray-300" /> -->
@@ -61,7 +61,7 @@
 						<input
 							type="number"
 							name="code"
-							class="bg-base placeholder:text-bg-base-content border border-base-300 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+							class="bg-base placeholder:text-bg-base-content border border-base-300 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:focus:ring-blue-500 dark:focus:border-blue-500"
 							required
 						/>
 					</div>

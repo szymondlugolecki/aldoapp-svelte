@@ -9,7 +9,8 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		adapter: adapter({
-			runtime: 'edge'
+			runtime: 'edge',
+			external: ['crypto']
 		}),
 		alias: {
 			'$components/*': 'src/components',
