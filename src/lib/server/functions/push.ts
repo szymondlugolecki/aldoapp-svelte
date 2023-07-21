@@ -1,6 +1,6 @@
 import { VAPID_PRIVATE_KEY, VAPID_SUBJECT } from '$env/static/private';
 import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public';
-import webpush from 'web-push';
+// import webpush from 'web-push';
 import type { NotificationContent } from '$types';
 import { pushSubscriptionJSONSchema } from '$lib/client/schemas/pushSubscription';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
@@ -38,15 +38,15 @@ export const sendNotifications = (
 		const endpoint = subscription.endpoint;
 		const id = endpoint.slice(endpoint.length - 8);
 		console.log('endpoint', endpoint, 'id', id);
-		webpush
-			.sendNotification(subscription, JSON.stringify(notification), options)
-			.then((result) => {
-				console.log(`Endpoint ID: ${id}`);
-				console.log(`Result: ${result.statusCode}`);
-			})
-			.catch((error) => {
-				console.log(`Endpoint ID: ${id}`);
-				console.log(`Error: ${error} `);
-			});
+		// webpush
+		// 	.sendNotification(subscription, JSON.stringify(notification), options)
+		// 	.then((result) => {
+		// 		console.log(`Endpoint ID: ${id}`);
+		// 		console.log(`Result: ${result.statusCode}`);
+		// 	})
+		// 	.catch((error) => {
+		// 		console.log(`Endpoint ID: ${id}`);
+		// 		console.log(`Error: ${error} `);
+		// 	});
 	});
 };

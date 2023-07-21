@@ -8,11 +8,11 @@ import { isAtLeastModerator } from '$lib/client/functions/index.js';
 import { db } from '$lib/server/db';
 import type { Cart } from '$types';
 import { trytm } from '@bdsqqq/try';
-import type { Config } from '@sveltejs/adapter-vercel';
+// import type { Config } from '@sveltejs/adapter-vercel';
 
-export const config: Config = {
-	runtime: 'edge'
-};
+// export const config: Config = {
+// 	runtime: 'edge'
+// };
 
 export const load = async ({ locals, depends, url }) => {
 	depends('session');
