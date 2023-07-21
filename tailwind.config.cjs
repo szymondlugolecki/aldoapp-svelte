@@ -1,3 +1,6 @@
+const plugin = require('tailwindcss/plugin');
+const typography = require('@tailwindcss/typography');
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
 	content: ['./src/app.html', './src/**/*.{html,js,svelte,ts}'],
@@ -87,9 +90,36 @@ module.exports = {
 			screens: {
 				'2xl': '1400px'
 			}
-		}
+		},
+		typography: (theme) => ({
+			DEFAULT: {
+				css: {
+					code: {
+						position: 'relative',
+						borderRadius: theme('borderRadius.md')
+					}
+				}
+			}
+		})
 	},
-	plugins: [require('daisyui'), require('tailwindcss-animate')],
+	plugins: [
+		typography,
+		require('daisyui'),
+		require('tailwindcss-animate'),
+		plugin(function ({ addVariant, matchUtilities, theme }) {
+			addVariant('hocus', ['&:hover', '&:focus']);
+			// Square utility
+			matchUtilities(
+				{
+					square: (value) => ({
+						width: value,
+						height: value
+					})
+				},
+				{ values: theme('spacing') }
+			);
+		})
+	],
 	darkMode: 'class',
 	daisyui: {
 		themes: [

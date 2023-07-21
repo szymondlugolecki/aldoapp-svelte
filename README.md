@@ -49,7 +49,7 @@ You can preview the production build with `npm run preview`.
 
 [] Add backend check to make sure product quantity is not above 127
 
-[ ] Add a secure and httpOnly (with restriced path: '/login/weryfikacja')
+[ ] Add a secure and httpOnly (with restriced path: '/zaloguj/weryfikacja')
 cookie that would prevent logging in with someone else's verification code. > User wants to login > Enters their email > It's written into the cookie & verification email is sent > Under the verification API route it is checked whether the account email is the same as in the cookie
 
 [✅] Add store page with all the products

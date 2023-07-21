@@ -41,7 +41,7 @@
 				<a href="/api/logout" class="text-primary hover:text-primary-focus">Wyloguj się</a>
 			{:else}
 				<a
-					href="/login"
+					href="/zaloguj"
 					class="text-white hover:bg-primary-focus duration-200 bg-primary rounded-md px-3 py-2"
 					>Zaloguj się</a
 				>

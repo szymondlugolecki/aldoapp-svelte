@@ -62,15 +62,15 @@
 		class="px-3 py-2 bg-gray-800 text-white text-lg">Nie chcę już otrzymywać powiadomień</button
 	> -->
 
-	<button on:click={createProgenitor} class="px-3 py-2 bg-gray-800 text-white text-lg"
+	<!-- <button on:click={createProgenitor} class="px-3 py-2 bg-gray-800 text-white text-lg"
 		>Utwórz protoplastę</button
-	>
+	> -->
 
 	<h3 class="my-4">Tech Stack</h3>
 
 	<ul class="list-disc ml-6">
 		<li>SvelteKit + TypeScript</li>
-		<li>TailwindCSS + shadcn-svelte + meltui + (DaisyUI)</li>
+		<li>TailwindCSS + shadcn-svelte + meltui (+ DaisyUI)</li>
 		<li>PlanetScale (MySQL) + DrizzleORM</li>
 		<li>Inne: zod, jose, tanstack table, lucide-svelte, sendgrid</li>
 	</ul>
@@ -87,19 +87,14 @@
 	<ul class="list-disc ml-6">
 		<!-- <li>Usuwanie użytych kodów weryfikacyjnych z bazy danych po pomyślnym logowaniu</li> -->
 
-		<li>
-			Strona główna (pomysły: karuzela zdjęć/powiadomienia/featured wybrane produkty ze sklepu/itp.)
-		</li>
-		<li>Dodać caching</li>
-		<li>Custom error page (lepszy design)</li>
-		<li>Dodać możliwość potwórzenia zamówienia</li>
-		<li>Dodać możliwość doradcom złożenia zamówienia w imieniu klienta (przypisanego do nich)</li>
-		<li>
-			Dodać strony widoczne we stopce (About us, Privacy, ToS, Contact) + Linki do social media
-		</li>
+		<li>Zrobić podstrony: główną, profil użytkownika</li>
+		<li>Poprawić design strony z błędami</li>
+		<li>Przycisk "Potwórz zamówienie"</li>
+		<li>Dodać strony widoczne we stopce + ew. Linki do social media</li>
 		<li>Poprawić wysyłane maile (design, treść) + zmienić domenę na aldo.agro.pl</li>
-		<li>Powiadomienie przed dostawą z telefonem do kierowcy</li>
+		<li>Powiadomienia związane z zamówieniem</li>
 		<li>Optymalizacja SEO i a11y</li>
+		<li>Cachowanie requestów</li>
 	</ul>
 
 	<!-- <h5>Kiedyś:</h5>

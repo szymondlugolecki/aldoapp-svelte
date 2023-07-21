@@ -14,13 +14,12 @@
 		Settings
 	} from 'lucide-svelte';
 	import type { Cart, Role, SessionUser } from '../../types';
-	// import Img from '@zerodevx/svelte-img';
+	import Img from '@zerodevx/svelte-img';
 	import logo from '$lib/assets/logo.png?run&width=110&height=80&format=webp';
 	import logout from '$lib/client/functions/api/logout';
 	import MegaMenu from './MegaMenu.svelte';
 	import { slide } from 'svelte/transition';
 	import { cn, isAtLeastModerator, productURLParser } from '$lib/client/functions';
-	export let user: SessionUser | undefined;
 
 	import { HoverCard, HoverCardContent, HoverCardTrigger } from '$shadcn/hover-card';
 	import Separator from '$shadcn/separator/Separator.svelte';
@@ -61,33 +60,23 @@
 		'https://res.cloudinary.com/dzcuq1b2u/image/upload/v1680687127/products/Lacto%20Start%20IPC%20pasza%20rozdojeniowa%20De%20Heus%2025kg/DB4A2X00G-W00/0.webp';
 </script>
 
-<nav class="navbar border-b border-base-content rounded flex flex-col relative">
+<nav class="navbar border-b rounded flex flex-col relative">
 	<div class="w-full h-full flex justify-between items-center">
 		<div class="flex">
 			<a href="/" class="btn btn-ghost normal-case text-lg sm:text-xl"
 				><span class="mr-2">Twoje</span>
-				<!-- <Img src={logo} height={40} width={55} alt="Logo ALDO" /> -->
-				</a
-			>
+				<Img src={logo} height={40} width={55} alt="Logo ALDO" />
+			</a>
 		</div>
 		<div class="hidden space-x-6 md:flex justify-center items-center">
-			<a class="hover:text-primary duration-150 {activeUrl === '/' ? 'text-primary' : ''}" href="/"
-				>Strona główna</a
-			>
-			<a
-				class="hover:text-primary duration-150 {activeUrl.startsWith('/sklep')
-					? 'text-primary'
-					: ''}"
-				href="/sklep">Sklep</a
-			>
+			<a class=" duration-150 {activeUrl === '/' ? '' : ''}" href="/">Strona główna</a>
+			<a class=" duration-150 {activeUrl.startsWith('/sklep') ? '' : ''}" href="/sklep">Sklep</a>
 			<div class="dropdown static">
 				<label
 					for="megamenu"
 					tabindex="-1"
-					class="hover:text-primary duration-150 flex items-center cursor-pointer {activeUrl.startsWith(
-						'/kontakty/'
-					)
-						? 'text-primary'
+					class=" duration-150 flex items-center cursor-pointer {activeUrl.startsWith('/kontakty/')
+						? ''
 						: ''}">Kontakty <ChevronDown size={20} class="ml-1" /></label
 				>
 
@@ -95,7 +84,8 @@
 			</div>
 		</div>
 		<div class="flex-none flex items-center">
-			{#if user}
+			<!-- Cart -->
+			{#if $page.data.user}
 				<div class="dropdown dropdown-end">
 					<label for="cart" tabindex="-1" class="btn btn-ghost btn-circle">
 						<div class="indicator">
@@ -118,7 +108,7 @@
 					<div
 						id="cart"
 						tabindex="-1"
-						class="mt-3 card card-compact dropdown-content w-64 shadow bg-card border-border border left-[-128px] sm:left-auto"
+						class="bg-background mt-3 card card-compact dropdown-content w-64 shadow border-border border left-[-128px] sm:left-auto"
 					>
 						<div class="card-body">
 							<span class="font-bold text-lg">{productsCountTitle}</span>
@@ -164,9 +154,11 @@
 					</div>
 				</div>
 			{/if}
-			{#if user}
+
+			<!-- User Menu -->
+			{#if $page.data.user}
 				<div class="dropdown dropdown-end">
-					<label for="user-menu" tabindex="-1" class="btn btn-ghost btn-circle ">
+					<label for="user-menu" tabindex="-1" class="btn btn-ghost btn-circle">
 						<div class="w-10 rounded-full flex justify-center items-center">
 							<User />
 						</div>
@@ -177,13 +169,13 @@
 						class="menu menu-compact dropdown-content mt-3 p-2 bg-background border border-border shadow rounded-box w-52"
 					>
 						<div class="py-1 pl-4 text-sm">
-							<span>Witaj, {user.fullName.split(' ')[0]}</span>
+							<span>Witaj, {$page.data.user.fullName.split(' ')[0]}</span>
 						</div>
 						<Separator class="my-1" />
 						<!-- <span class="badge {roleBadgeColors[user.role]} text-white">
 								{roleNames[user.role]}</span
 							> -->
-						{#if isAtLeastModerator(user.role)}
+						{#if isAtLeastModerator($page.data.user.role)}
 							<li class="">
 								<a href="/admin"><Lock /> Panel administracyjny </a>
 							</li>
@@ -198,9 +190,7 @@
 					</ul>
 				</div>
 			{:else}
-				<a href="/login" tabindex="0" class="btn btn-outline btn-primary ml-1 hidden md:flex">
-					Zaloguj się
-				</a>
+				<Button href="/zaloguj" variant="default" class="hidden md:flex mr-1">Zaloguj się</Button>
 			{/if}
 			<button
 				on:click={() => (menuOpen = !menuOpen)}
@@ -220,13 +210,13 @@
 			out:slide={{ duration: 100 }}
 			class="w-full flex flex-col justify-center items-start md:hidden mt-2 text-base-content"
 		>
-			{#if !user}
+			{#if !$page.data.user}
 				<a
 					class={cn(
-						'p-2 w-full rounded',
-						activeUrl === '/rejestracja' ? 'bg-primary text-primary-content' : ''
+						'p-2 w-full rounded bg-background',
+						activeUrl.startsWith('/zaloguj') && 'bg-muted'
 					)}
-					href="/login"
+					href="/zaloguj"
 					on:click={() => (menuOpen = false)}
 				>
 					<span class="flex"><LogIn class="mr-2" /> Zaloguj się</span></a
@@ -234,7 +224,7 @@
 			{/if}
 
 			<a
-				class={cn('p-2 w-full rounded', activeUrl === '/' ? 'bg-primary text-primary-content' : '')}
+				class={cn('p-2 w-full rounded bg-background', activeUrl === '/' && 'bg-muted')}
 				href="/"
 				on:click={() => (menuOpen = false)}
 			>
@@ -242,17 +232,14 @@
 			>
 
 			<a
-				class={cn(
-					'p-2 w-full rounded',
-					activeUrl.startsWith('/sklep') ? 'bg-primary text-primary-content' : ''
-				)}
+				class={cn('p-2 w-full rounded bg-background', activeUrl.startsWith('/sklep') && 'bg-muted')}
 				on:click={() => (menuOpen = false)}
 				href="/sklep"><span class="flex"><ShoppingCart class="mr-2" /> Sklep</span></a
 			>
 			<button
 				class={cn(
-					'p-2 w-full rounded text-left',
-					activeUrl.startsWith('/kontakty') ? 'bg-primary text-primary-content' : ''
+					'p-2 w-full rounded text-left bg-background',
+					activeUrl.startsWith('/kontakty') && 'bg-background'
 				)}
 				on:click={() => (miniMenuExpanded = !miniMenuExpanded)}
 				><span class="flex">

@@ -180,24 +180,30 @@
 							</Tooltip>
 						</TooltipProvider>
 					</div>
-					<form
-						method="post"
-						action="?/addToCart"
-						use:enhance={({ formData }) => {
-							const toastId = createLoadingToast('please-wait');
+					{#if $page.data.user}
+						<form
+							method="post"
+							action="?/addToCart"
+							use:enhance={({ formData }) => {
+								const toastId = createLoadingToast('please-wait');
 
-							formData.append('productId', product.id.toString());
+								formData.append('productId', product.id.toString());
 
-							return async ({ result, update }) => {
-								handleFormResponse(result, toastId, 'Pomyślnie dodano produkt do koszyka');
-								update();
-							};
-						}}
-					>
-						<Button class="p-0 xxs:py-2 xxs:px-4" variant="default" type="submit"
-							>Dodaj do koszyka</Button
+								return async ({ result, update }) => {
+									handleFormResponse(result, toastId, 'Pomyślnie dodano produkt do koszyka');
+									update();
+								};
+							}}
 						>
-					</form>
+							<Button class="p-0 xxs:py-2 xxs:px-4" variant="default" type="submit"
+								>Dodaj do koszyka</Button
+							>
+						</form>
+					{:else}
+						<Button class="p-0 xxs:py-2 xxs:px-4" variant="default" disabled
+							>Musisz się zalogować</Button
+						>
+					{/if}
 				</CardFooter>
 			</Card>
 			<!-- <div

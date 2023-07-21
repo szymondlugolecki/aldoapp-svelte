@@ -1,5 +1,9 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { fodderCategories2, fodderNames, producentsList } from '$lib/client/constants';
+	import Alert from '$shadcn/alert/Alert.svelte';
+	import AlertTitle from '$shadcn/alert/AlertTitle.svelte';
+	import AlertDescription from '$shadcn/alert/AlertDescription.svelte';
 	import Button from '$shadcn/button/Button.svelte';
 	import Separator from '$shadcn/separator/Separator.svelte';
 	import { Package, PlusCircle, ShoppingCart } from 'lucide-svelte';
@@ -114,14 +118,26 @@
 
 					<div>
 						<div class="mt-6 w-full flex space-y-2 flex-col">
-							<Button>
-								<PlusCircle class="mr-2 h-4 w-4" />
-								Dodaj do koszyka
-							</Button>
-							<Button href="/zamowienie/koszyk" variant="secondary">
-								<ShoppingCart class="mr-2 h-4 w-4" />
-								Otwórz koszyk
-							</Button>
+							{#if $page.data.user}
+								<Button>
+									<PlusCircle class="mr-2 h-4 w-4" />
+									Dodaj do koszyka
+								</Button>
+								<Button href="/zamowienie/koszyk" variant="secondary">
+									<ShoppingCart class="mr-2 h-4 w-4" />
+									Otwórz koszyk
+								</Button>
+							{:else}
+								<Alert variant="default">
+									<AlertTitle>Zaloguj się</AlertTitle>
+									<AlertDescription>
+										Musisz być zalogowany, żeby dodać produkt do koszyka.
+										<br /><Button variant="link" href="/zaloguj" class="p-0"
+											>Kliknij tutaj, aby się zalogować</Button
+										>
+									</AlertDescription>
+								</Alert>
+							{/if}
 						</div>
 
 						<div class="divider" />

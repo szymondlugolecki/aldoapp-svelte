@@ -17,7 +17,7 @@ export const createVerificationKeys = () => ({
 });
 
 export const createVerificationLink = (token: string) =>
-	`${PUBLIC_WEBSITE_URL}/login/weryfikacja/${token}`;
+	`${PUBLIC_WEBSITE_URL}/zaloguj/weryfikacja/${token}`;
 
 export const createRefreshToken = (payload: { userId: string }) =>
 	new SignJWT(payload)

@@ -92,7 +92,7 @@ const handleLogin: Action = async ({ request }) => {
 		});
 	}
 
-	throw redirect(303, '/login/weryfikacja?success=true');
+	throw redirect(303, '/zaloguj/weryfikacja?success=true');
 };
 
 export default handleLogin;
