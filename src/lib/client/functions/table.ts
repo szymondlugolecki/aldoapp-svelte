@@ -1,11 +1,10 @@
 import type { CellContext, SortingState } from '@tanstack/svelte-table';
 import type { SuperValidated } from 'sveltekit-superforms';
-import type { ZodObject } from 'zod';
+import type { AnyZodObject } from 'zod';
 
 export const createProps = <
 	T extends Record<string, unknown> & { id: string | number },
-	Q extends Record<string, never>,
-	Y extends SuperValidated<ZodObject<Q>>
+	Y extends SuperValidated<AnyZodObject>
 >(
 	info: CellContext<T, unknown>,
 	form: Y

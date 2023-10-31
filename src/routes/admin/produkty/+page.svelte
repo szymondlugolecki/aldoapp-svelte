@@ -85,7 +85,11 @@
 			id: 'name',
 			header: 'Nazwa',
 			accessorKey: 'name',
-			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedProduct>(info, data.editForm)),
+			cell: (info) =>
+				flexRender(
+					AdminEditDialog,
+					createProps<ParsedProduct, EditProductForm>(info, data.editForm)
+				),
 			enableSorting: true
 		},
 		{
