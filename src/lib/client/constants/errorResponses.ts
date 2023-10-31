@@ -1,5 +1,5 @@
 export const errorResponses: Record<number, [number, string]> = {
 	401: [401, 'Nie jesteś zalogowany'],
 	403: [403, 'Nie masz wystarczających uprawień'],
-	404: [404, 'Nie znaleziono strony']
+	404: [404, 'Nic nie znaleziono']
 };

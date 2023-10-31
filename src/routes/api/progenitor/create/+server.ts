@@ -20,13 +20,8 @@ export async function POST() {
 			email: 'szymon.dlugolecki77@gmail.com',
 			fullName: 'Szymon Długołęcki',
 			role: 'admin',
-			access: true,
 			phone: '692694963',
-			address: {
-				zipCode: '07-410',
-				city: 'Ostrołęka',
-				street: 'ul. Słoneczna 7'
-			}
+			createdAt: new Date()
 		})
 	);
 

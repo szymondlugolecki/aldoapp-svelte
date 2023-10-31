@@ -1,15 +1,8 @@
-import {
-	mainCategories,
-	subcategories,
-	type MainCategory,
-	type Producent,
-	producents
-} from '$lib/client/constants/dbTypes.js';
-import { isJSON } from '$lib/client/functions';
 import { db } from '$lib/server/db';
 import { products } from '$lib/server/db/schemas/products';
-import type { ProductSortableColumn, Subcategory } from '$types';
-import { sql } from 'drizzle-orm';
+import { clauseConcat, extractParams } from '$lib/server/functions/utils';
+import type { ProductSortableColumn } from '$types';
+import { eq, gte, lte, or, sql } from 'drizzle-orm';
 
 const pageLimit = 10;
 const sortableColumns: ProductSortableColumn[] = [
@@ -23,50 +16,29 @@ const sortableColumns: ProductSortableColumn[] = [
 ];
 
 export const load = ({ url }) => {
-	const page = !isNaN(Number(url.searchParams.get('strona')))
-		? Math.max(Number(url.searchParams.get('strona')), 1)
-		: 1;
+	const { page, sort, product } = extractParams<ProductSortableColumn>(url, sortableColumns);
+	const defaultWhereClause = or();
+	// eq(products.customerId, userId),
+	// eq(products.cartOwnerId, userId)
 
-	const category = url.searchParams.get('kategoria');
-	const subcategory = url.searchParams.get('podkategoria');
-	const producent = url.searchParams.get('producent');
+	const producentClause = product.producent && eq(products.producent, product.producent);
+	const categoryClause = product.category && eq(products.category, product.category);
+	const subcategoryClause = product.subcategory && eq(products.subcategory, product.subcategory);
+	const priceMinClause = product.priceMin && gte(products.price, product.priceMin.toString());
+	const priceMaxClause = product.priceMax && lte(products.price, product.priceMax.toString());
 
-	const sort = url.searchParams.get('sort');
-	const desc = url.searchParams.get('desc');
+	// console.log('Status', product.status);
 
-	const descBool = desc && ['true', 'false'].includes(desc) ? isJSON<boolean>(desc) : null;
-	const properSort = (sort: string | null): sort is ProductSortableColumn => {
-		return !!sort && sortableColumns.includes(sort as ProductSortableColumn);
-	};
+	const clausesArr = [
+		defaultWhereClause,
+		producentClause,
+		categoryClause,
+		subcategoryClause,
+		priceMinClause,
+		priceMaxClause
+	];
 
-	const isProperCategory = (category: unknown): category is MainCategory => {
-		return (
-			!!category &&
-			typeof category === 'string' &&
-			mainCategories.includes(category.toLowerCase() as MainCategory)
-		);
-	};
-
-	const isProperSubategory = (subcategory: unknown): subcategory is Subcategory => {
-		return (
-			!!subcategory &&
-			typeof subcategory === 'string' &&
-			subcategories.includes(subcategory.toLowerCase() as Subcategory)
-		);
-	};
-
-	const isProperProducent = (producent: unknown): producent is Producent => {
-		return (
-			!!producent &&
-			typeof producent === 'string' &&
-			producents.includes(producent.toLowerCase() as Producent)
-		);
-	};
-
-	const atLeastOneWhereCondition =
-		isProperCategory(category) || isProperSubategory(subcategory) || isProperProducent(producent);
-
-	console.log('atLeastOneWhereCondition', atLeastOneWhereCondition);
+	const extendedWhereClause = clauseConcat(...clausesArr);
 
 	return {
 		products: db.query.products.findMany({
@@ -83,16 +55,7 @@ export const load = ({ url }) => {
 				encodedURL: true,
 				amountLeft: true
 			},
-			...(atLeastOneWhereCondition
-				? {
-						where: (products, { eq, and }) =>
-							and(
-								isProperCategory(category) ? eq(products.category, category) : undefined,
-								isProperSubategory(subcategory) ? eq(products.subcategory, subcategory) : undefined,
-								isProperProducent(producent) ? eq(products.producent, producent) : undefined
-							)
-				  }
-				: {}),
+			where: extendedWhereClause,
 			with: {
 				author: {
 					columns: {
@@ -104,10 +67,10 @@ export const load = ({ url }) => {
 				images: true
 			},
 			offset: (page - 1) * pageLimit,
-			...(descBool !== null && properSort(sort)
+			...(sort
 				? {
-						orderBy: (products, { asc, desc }) =>
-							descBool ? desc(products[sort]) : asc(products[sort])
+						orderBy: (orders, { asc, desc }) =>
+							sort.descending ? desc(orders[sort.by]) : asc(orders[sort.by])
 				  }
 				: {}),
 			limit: pageLimit

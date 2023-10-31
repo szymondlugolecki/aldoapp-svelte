@@ -1,25 +1,11 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import createLoadingToast from '$lib/client/functions/createLoadingToast';
-	import { handleFormResponse } from '$lib/client/functions/forms';
-	import { userPropertySchemas } from '$lib/client/schemas/users';
-	import toast from 'svelte-french-toast';
-	import Input from '$shadcn/input/Input.svelte';
-	import Button from '$shadcn/button/Button.svelte';
-	import {
-		Card,
-		CardContent,
-		CardDescription,
-		CardFooter,
-		CardHeader,
-		CardTitle
-	} from '$shadcn/card';
-	import { Key, Send } from 'lucide-svelte';
-	import { Label } from '$shadcn/label';
+	import { Send, Lock } from 'lucide-svelte';
 
-	let emailInput = '';
-
-	$: validEmail = userPropertySchemas.email.safeParse(emailInput).success;
+	import * as Form from '$shadcn/form';
+	import { auth$ } from '$lib/client/schemas/index.js';
+	import MessageAlert from '$components/custom/Form/MessageAlert.svelte';
+	import Spinner from '$components/custom/Util/Spinner.svelte';
+	export let data;
 </script>
 
 <svelte:head>
@@ -27,45 +13,39 @@
 	<meta name="description" content="Zaloguj się do aplikacji Twoje ALDO." />
 </svelte:head>
 
-<section class="w-full flex justify-center items-center">
-	<form
-		method="post"
-		use:enhance={() => {
-			if (!validEmail) {
-				toast.error('Nieprawidłowy adres email');
-				return;
-			}
+<section class="flex justify-center w-full pb-48 pt-44 sm:pt-48 sm:pb-64">
+	<div class="flex flex-col px-8 sm:px-0 sm:w-full sm:max-w-xs gap-y-4">
+		<div>
+			<h1 class="text-xl font-semibold">Zaloguj się</h1>
+			<p class="flex items-center text-sm text-muted-foreground">
+				Bezpieczne bezhasłowe logowanie <Lock size={14} class="ml-1" />
+			</p>
+		</div>
+		<Form.Root
+			schema={auth$.login}
+			form={data.form}
+			let:config
+			let:submitting
+			method="POST"
+			class="flex flex-col gap-y-6"
+		>
+			<Form.Field {config} name="email">
+				<Form.Item>
+					<Form.Label>Adres email</Form.Label>
+					<Form.Input type="email" required minlength={3} />
+					<Form.Description>Wyślemy Ci 4 cyfrowy kod weryfikacyjny</Form.Description>
+					<Form.Validation />
+				</Form.Item>
+			</Form.Field>
 
-			const toastId = createLoadingToast('redirecting');
-
-			return async ({ result, update }) => {
-				handleFormResponse(result, toastId);
-				update();
-			};
-		}}
-	>
-		<Card class="w-[312px] xs:w-[400px]">
-			<CardHeader>
-				<CardTitle>Logowanie</CardTitle>
-				<CardDescription>Podaj email, na który mamy wysłać kod weryfikacyjny</CardDescription>
-			</CardHeader>
-			<CardContent class="grid gap-4">
-				<div class="grid w-full max-w-sm items-center gap-1.5">
-					<Label for="email">Email<span class="text-red-500">*</span></Label>
-					<Input
-						type="email"
-						id="email"
-						name="email"
-						placeholder="twoj.email@gmail.com"
-						bind:value={emailInput}
-					/>
-				</div>
-			</CardContent>
-			<CardFooter>
-				<Button class="w-full" type="submit" disabled={!validEmail}>
-					<Send class="mr-2 h-4 w-4" /> Wyślij kod
-				</Button>
-			</CardFooter>
-		</Card>
-	</form>
+			<MessageAlert />
+			<Form.Button disabled={submitting}>
+				{#if submitting}
+					<Spinner />
+				{:else}
+					<Send class="w-4 h-4 mr-2" /> Wyślij kod
+				{/if}
+			</Form.Button>
+		</Form.Root>
+	</div>
 </section>

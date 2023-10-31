@@ -1,28 +1,16 @@
 import { z } from 'zod';
-import { idValidation } from './products';
-import {
-	orderAddressValidation,
-	orderDeliveryMethodValidation,
-	orderPaymentMethodValidation
-} from './order';
+import { id as productId } from './products';
+import { id as userId } from './user';
 
-export const nameValidation = z
-	.string({
-		required_error: 'Nazwa produktu jest wymagana',
-		invalid_type_error: 'Nieprawidłowa nazwa produktu'
-	})
-	.min(1, { message: 'Niepoprawna nazwa produktu' })
-	.trim();
-
-export const changeDeliveryMethodRequestSchema = z.object({
-	deliveryMethod: orderDeliveryMethodValidation,
-	customAddress: orderAddressValidation.optional().nullable()
+export const changeProductQuantity = z.object({
+	productId,
+	quantity: z
+		.number({ invalid_type_error: 'Nieprawidłowa ilość', required_error: 'Ilość jest wymagana' })
+		.min(0, { message: 'Minimalna wartość to 0' })
+		.max(9, { message: 'Maksymalna wartość to 9' }),
+	add: z.boolean().optional()
 });
 
-export const changePaymentMethodRequestSchema = z.object({
-	paymentMethod: orderPaymentMethodValidation
-});
-
-export const changeProductQuantityRequestSchema = z.object({
-	productId: idValidation
+export const changeCartCustomer = z.object({
+	customerId: userId
 });

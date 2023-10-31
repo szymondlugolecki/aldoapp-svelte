@@ -19,7 +19,7 @@ const logout = async () => {
 	}
 
 	invalidate('session');
-	toast.success('Pomyślnie wylogowano 🙂', { id, duration: 2500 });
+	toast.success('Wylogowano', { id, duration: 2500 });
 };
 
 export default logout;

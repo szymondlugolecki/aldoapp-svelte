@@ -7,14 +7,13 @@ export const images = mysqlTable(
 	'images',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').defaultNow(),
-		updatedAt: timestamp('updated_at').onUpdateNow(),
+		createdAt: timestamp('created_at').notNull(),
 
 		url: varchar('url', { length: 512 }).notNull(),
 
 		// relations
 		productId: varchar('product_id', { length: 36 }).notNull(),
-		authorId: varchar('author_id', { length: 36 }).notNull() // user that added this image
+		authorId: varchar('author_id', { length: 36 }).notNull() // user who added the image
 	},
 	(product) => ({
 		// indexes
@@ -24,8 +23,8 @@ export const images = mysqlTable(
 
 export const imagesRelations = relations(images, ({ one }) => ({
 	images: one(products, {
-		fields: [images.id],
-		references: [products.imagesId]
+		fields: [images.productId],
+		references: [products.id]
 	})
 }));
 

@@ -1,25 +1,50 @@
-// import { db } from '$lib/server/db';
-// import { products } from '$lib/server/db/schemas/products';
+import { db } from '$lib/server/db';
+import { trytm } from '@bdsqqq/try';
+import { error } from '@sveltejs/kit';
 
-export const load = ({ params }) => {
-	console.log('params', params);
+import changeProductQuantity from '$lib/server/actions/cart/changeProductQuantity';
+import { superValidate } from 'sveltekit-superforms/server';
+import { cart$ } from '$lib/client/schemas';
+
+export const actions = {
+	changeProductQuantity
+};
+
+export const load = async ({ params }) => {
+	const addProductForm = await superValidate(cart$.changeProductQuantity);
+
+	const encodedURL = encodeURIComponent(params.productURL);
+	const [product, findProductError] = await trytm(
+		db.query.products.findFirst({
+			columns: {
+				id: true,
+				name: true,
+				symbol: true,
+				description: true,
+				weight: true,
+				price: true,
+				category: true,
+				subcategory: true,
+				producent: true,
+				encodedURL: true,
+				amountLeft: true
+			},
+			where: (product, { eq }) => eq(product.encodedURL, encodedURL)
+		})
+	);
+
+	if (findProductError) {
+		// Unexpected-error
+		console.log('findProductError', findProductError);
+		throw error(500, 'Wystąpił błąd');
+	}
+
+	if (!product) {
+		throw error(404, 'Nie znaleziono produktu');
+	}
+
 	return {
-		// product: db
-		// 	.select({
-		// 		id: products.id,
-		// 		name: products.name,
-		// 		symbol: products.symbol,
-		// 		description: products.description,
-		// 		images: products.images,
-		// 		weight: products.weight,
-		// 		price: products.price,
-		// 		category: products.category,
-		// 		subcategory: products.subcategory,
-		// 		producent: products.producent,
-		// 		encodedURL: products.encodedURL,
-		// 		amountLeft: products.amountLeft
-		// 	})
-		// 	.from(products)
-		// 	.limit(1)
+		product,
+		addProductForm
 	};
 };

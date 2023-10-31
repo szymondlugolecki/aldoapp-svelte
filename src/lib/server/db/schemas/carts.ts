@@ -1,36 +1,17 @@
-// import { cartStatus } from '../../../client/constants/dbTypes';
-
 import { relations, type InferModel } from 'drizzle-orm';
-import {
-	mysqlTable,
-	serial,
-	varchar,
-	timestamp,
-	int,
-	index,
-	text,
-	json
-} from 'drizzle-orm/mysql-core';
+import { mysqlTable, serial, varchar, timestamp, index } from 'drizzle-orm/mysql-core';
 import { users } from './users';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { cartProducts } from './cartProducts';
-import { deliveryMethods, paymentMethods } from '../../../client/constants/dbTypes';
-import type { Address } from './orders';
 
 export const carts = mysqlTable(
 	'carts',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').defaultNow(),
-
-		// Cart data
-		// status: text('delivery_method', { enum: cartStatus }).notNull(),
-		deliveryMethod: text('delivery_method', { enum: deliveryMethods }).notNull(),
-		paymentMethod: text('payment_method', { enum: paymentMethods }).notNull(),
-		customAddress: json('address').$type<Address>(), // optional custom address
+		createdAt: timestamp('created_at').notNull(),
 
 		// relations
-		cartProductsIds: int('cart_products_ids'),
+		// promoCode
 		customerId: varchar('customer_id', { length: 36 }).notNull(), // who receives the product
 		ownerId: varchar('owner_id', { length: 36 }).notNull() // cart owner - adviser or customer
 	},

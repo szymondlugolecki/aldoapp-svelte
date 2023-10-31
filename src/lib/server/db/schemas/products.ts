@@ -1,9 +1,6 @@
 import {
 	mainCategories,
 	producents,
-	type DeliveryStatus,
-	type OrderStatus,
-	type PaymentStatus
 } from '../../../client/constants/dbTypes';
 // '$lib/client/constants/dbTypes';
 import { relations, type InferModel } from 'drizzle-orm';
@@ -21,6 +18,7 @@ import { orderProducts } from './orderProducts';
 import { cartProducts } from './cartProducts';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { images } from './images';
+import { favoriteProducts } from './favoriteProducts';
 
 export type Customer = {
 	email: string;
@@ -28,18 +26,11 @@ export type Customer = {
 	fullName: string;
 };
 
-export type OrderHistoryEvent = {
-	type: 'order' | 'delivery' | 'payment' | 'event';
-	status: OrderStatus | DeliveryStatus | PaymentStatus | 'created';
-	date: Date;
-};
-
 export const products = mysqlTable(
 	'products',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').defaultNow(),
-		updatedAt: timestamp('updated_at').onUpdateNow(),
+		createdAt: timestamp('created_at').notNull(),
 
 		// Product info
 		name: varchar('name', { length: 255 }).notNull(),
@@ -55,7 +46,6 @@ export const products = mysqlTable(
 
 		// relations
 		authorId: varchar('author_id', { length: 36 }).notNull(), // user that added this product
-		imagesId: int('images_id')
 	},
 	(product) => ({
 		// indexes
@@ -68,11 +58,13 @@ export const products = mysqlTable(
 export const productsRelations = relations(products, ({ one, many }) => ({
 	author: one(users, {
 		fields: [products.authorId],
-		references: [users.id]
+		references: [users.id],
+		relationName: 'products'
 	}),
 	orderProducts: many(orderProducts),
 	cartProducts: many(cartProducts),
-	images: many(images)
+	images: many(images),
+	favoriteProducts: many(favoriteProducts, { relationName: 'favoriteProducts' })
 }));
 
 export const createProductSchema = createInsertSchema(products);

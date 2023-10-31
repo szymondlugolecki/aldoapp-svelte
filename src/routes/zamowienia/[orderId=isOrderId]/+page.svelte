@@ -1,186 +1,54 @@
 <script lang="ts">
 	import { confetti } from '@neoconfetti/svelte';
-	import { addressParser, cn, dateParser, flexRender } from '$lib/client/functions/index.js';
-	import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '$shadcn/table';
-	import { createTabs } from '@melt-ui/svelte';
-	import {
-		createSvelteTable,
-		getCoreRowModel,
-		type ColumnDef,
-		type TableOptions,
-	} from '@tanstack/svelte-table';
-	import { writable } from 'svelte/store';
+	import { parseAddress, cn } from '$lib/client/functions/index.js';
+	import { melt, createDialog } from '@melt-ui/svelte';
 	import { page } from '$app/stores';
-	import TableImage from '$components/Table/TableImage.svelte';
-	import TableTextColumn from '$components/Table/TableTextColumn.svelte';
-	import { orderStatusList } from '$lib/client/constants/index.js';
-	import {
-		BatteryFull,
-		BatteryCharging,
-		CalendarClock,
-		CalendarPlus,
-		Car,
-		DollarSign,
-		Home,
-		User,
-		UserCog,
-		XSquare,
-		Landmark,
-		Banknote,
-		BookmarkMinus,
-		CheckCircle2
-	} from 'lucide-svelte';
+	import { paymentMethodsList } from '$lib/client/constants/index.js';
+	import { CheckCircle2, X, ArrowDown, ArrowUp, AlertTriangle } from 'lucide-svelte';
+	import { onMount } from 'svelte';
+	import OrderProduct from '$components/custom/Order/OrderProduct.svelte';
+	import HorizontalOrderSteps from '$components/custom/Steps/HorizontalOrderSteps.svelte';
+	import VerticalOrderSteps from '$components/custom/Steps/VerticalOrderSteps.svelte';
+	import { goto } from '$app/navigation';
+	import { Button } from '$shadcn/button';
+	import createLoadingToast from '$lib/client/functions/createLoadingToast.js';
+	import { handleFormResponse } from '$lib/client/functions/forms.js';
+	import flyAndScale from '$lib/client/transitions/index.js';
+	import ProductsTable from './(components)/products-table.svelte';
+	import * as Form from '$shadcn/form';
+	import { order$ } from '$lib/client/schemas';
+	import MessageAlert from '$components/custom/Form/MessageAlert.svelte';
+	import * as AlertDialog from '$shadcn/alert-dialog';
+	import { CheckCircled } from 'radix-icons-svelte';
+	import { Separator } from '$components/ui/separator';
+	import { superForm } from 'sveltekit-superforms/client';
+	import FormError from '$components/custom/Util/FormError.svelte';
+	import ErrorMessage from '$components/custom/Form/ErrorMessage.svelte';
+	import Message from '$components/custom/Form/Message.svelte';
 
 	export let data;
+	let open = false;
 
 	$: justOrdered = $page.url.searchParams.get('success') === 'true';
 
-	$: console.log('justOrdered', justOrdered);
-
-	const productImgUrl =
-		'https://res.cloudinary.com/dzcuq1b2u/image/upload/v1680687127/products/Lacto%20Start%20IPC%20pasza%20rozdojeniowa%20De%20Heus%2025kg/DB4A2X00G-W00/0.webp';
-
-	type ParsedProduct = (typeof data.order.products)[number];
-
-	const defaultColumns: ColumnDef<ParsedProduct>[] = [
-		{
-			id: 'id',
-			accessorKey: 'id',
-			enableSorting: false
-		},
-		{
-			id: 'encodedURL',
-			header: 'Link',
-			accessorKey: 'encodedURL',
-			cell: (info) =>
-				flexRender(TableImage, {
-					href: `/sklep/${info.getValue()}`,
-					imgSrc: productImgUrl,
-					alt: 'Opakowanie'
-				})
-		},
-		{
-			id: 'product',
-			header: 'Produkt',
-			accessorKey: 'name',
-			cell: (info) => {
-				const product = info.table.options.data.find(
-					(product) => product.id === info.row._getAllCellsByColumnId().id.getValue()
-				);
-
-				const name = product && product.name;
-				const symbol = product && product.symbol;
-
-				if (!name || !symbol) return '?';
-
-				return flexRender(TableTextColumn, {
-					textArray: [name, symbol]
-				});
-			}
-		},
-		{
-			id: 'price',
-			header: 'Cena',
-			accessorKey: 'price',
-			cell: (info) => {
-				const product = info.table.options.data.find(
-					(product) => product.id === info.row._getAllCellsByColumnId().id.getValue()
-				);
-
-				if (!product) return '?';
-
-				if (product.quantity === 1) {
-					return Number(product.price).toFixed(2);
-				}
-
-				return `${(product.quantity * Number(product.price)).toFixed(2)} (${
-					product.quantity
-				} x ${Number(product.price).toFixed(2)})`;
-			}
-		},
-		{
-			id: 'quantity',
-			header: 'Ilość',
-			accessorKey: 'quantity',
-			cell: (info) => {
-				const product = info.table.options.data.find(
-					(product) => product.id === info.row._getAllCellsByColumnId().id.getValue()
-				);
-
-				if (!product) return '?';
-
-				return Number(product.quantity);
-			}
-		}
-		// {
-		// 	id: 'status',
-		// 	header: 'Status',
-		// 	accessorKey: 'status',
-		// 	cell: () => {
-		// 		const { status, paymentStatus, deliveryStatus } = data.order;
-
-		// 		return flexRender(TableTextColumn, {
-		// 			textArray: [
-		// 				orderStatusList[status],
-		// 				`${''}`,
-		// 				`Płatność: ${orderStatusList[paymentStatus]}`,
-		// 				`Dostawa: ${orderStatusList[deliveryStatus]}`
-		// 			]
-		// 		});
-		// 	}
-		// }
-		// {
-		// 	id: 'address',
-		// 	header: 'Adres dostawy',
-		// 	accessorKey: 'address',
-		// 	cell: (info) => {
-		// 		if (data.order.deliveryMethod === 'personal-delivery') {
-		// 			if (data.order.address) {
-		// 				return addressParser(info.getValue() as Address | string | null);
-		// 			}
-		// 			return 'Brak adresu❗';
-		// 		}
-		// 		return '?';
-		// 		// return 'Odbiór osobisty'
-		// 	}
-		// },
-		// {
-		// 	id: 'createdAt',
-		// 	header: 'Dodano',
-		// 	accessorKey: 'createdAt',
-		// 	cell: (info) => info.getValue()
-		// }
-	];
-
-	$: options = writable<TableOptions<ParsedProduct>>({
-		data: data.order.products,
-		columns: defaultColumns,
-		getCoreRowModel: getCoreRowModel(),
-		state: {
-			columnVisibility: {
-				id: false
-			}
+	onMount(() => {
+		if (justOrdered) {
+			const newURL = new URL($page.url);
+			newURL.searchParams.delete('success');
+			goto(newURL.toString()).then(() => (open = true));
 		}
 	});
 
-	$: table = createSvelteTable(options);
-
-	$: console.log('order', data.order);
-
-	$: defaultTab = justOrdered ? 'thankyou' : 'info';
-	const { root, list, content, trigger } = createTabs({ value: defaultTab });
 	let innerWidth: number;
-</script>
+	const productsCount = data.order.products
+		.map(({ quantity }) => quantity)
+		.reduce((prev, quantity) => prev + quantity, 0);
 
-<!-- <div class="flex flex-col">
-	<span>siema</span>
-	<span>Id: {data.order.id}</span>
-	<span>Kwota: {data.order.price} PLN</span>
-	<span>Adres: {data.order.address}</span>
-	<span>Status: {data.order.status}</span>
-	<span>Klient: {data.order.customer.fullName}</span>
-	<span>Zleceniodawca: {data.order.customer.fullName}</span>
-</div> -->
+	const { errors, delayed, timeout, message, enhance } = superForm(data.orderAgainForm, {
+		delayMs: 1000,
+		timeoutMs: 8000
+	});
+</script>
 
 <svelte:head>
 	<title>Zamówienie #{$page.params.orderId} • Twoje ALDO</title>
@@ -202,391 +70,226 @@
 	</div>
 {/if}
 
+<!-- <h2 use:melt={$title} class="flex items-center m-0 text-xl font-medium">
+	Dziękujemy <div class="ml-1.5">
+		<CheckCircle2 strokeWidth={3} class="text-green-500 w-7 h-7" />
+	</div>
+</h2>
+<p use:melt={$description} class="mt-2 mb-2 leading-normal">
+	Sprawdzamy dostępność produktów
+</p> -->
+
 <svelte:window bind:innerWidth />
-<div class="w-full flex justify-center items-start">
-	<div {...$root} class="root">
-		<div {...$list} class="list" aria-label="Zobacz swoje zamówienie">
-			{#if justOrdered}
-				<button {...$trigger('thankyou')} use:trigger class="trigger">Dziękujemy</button>
-			{/if}
-			<button {...$trigger('info')} use:trigger class="trigger">Informacje</button>
-			<button {...$trigger('products')} use:trigger class="trigger">Produkty</button>
-			<button {...$trigger('delivery')} use:trigger class="trigger">Dostawa</button>
-			<button {...$trigger('payment')} use:trigger class="trigger">Płatność</button>
+
+<!-- use:enhance={({ formData }) => {
+	const toastId = createLoadingToast('please-wait');
+
+	formData.append('id', data.order.id.toString());
+	formData.append('event', 'CANCEL');
+
+	return async ({ result, update }) => {
+		open = false;
+
+		handleFormResponse(result, toastId);
+		update();
+	};
+}} -->
+
+<!-- use:enhance={({ formData }) => {
+	const toastId = createLoadingToast('please-wait');
+
+	formData.append('id', data.order.id.toString());
+	formData.append('event', 'KEEP_WAITING');
+
+	return async ({ result, update }) => {
+		open = false;
+
+		handleFormResponse(result, toastId);
+		update();
+	};
+}} -->
+
+<AlertDialog.Root bind:open>
+	<AlertDialog.Content>
+		<AlertDialog.Header>
+			<AlertDialog.Title class="inline-flex items-center gap-x-1"
+				>Dziękujemy Ci <CheckCircled class="text-green-500 square-5" /></AlertDialog.Title
+			>
+			<AlertDialog.Description
+				>Gdy potwierdzimy dostępność produktów, damy Ci znać mailowo oraz przez powiadomienia w
+				telefonie.</AlertDialog.Description
+			>
+		</AlertDialog.Header>
+		<AlertDialog.Footer>
+			<AlertDialog.Action>Ok</AlertDialog.Action>
+		</AlertDialog.Footer>
+	</AlertDialog.Content>
+</AlertDialog.Root>
+
+<div class="flex items-start justify-center w-full">
+	<div class="w-full px-2 py-6 max-w-7xl md:px-8">
+		<!-- Header -->
+		<div class="flex flex-col items-center w-full px-2 sm:flex-row sm:justify-between">
+			<div class="text-3xl font-bold tracking-tight">
+				<h1>Zamówienie #{data.order.id}</h1>
+			</div>
+			<p class="text-sm">
+				Zamówiono <time class="font-semibold" datetime={data.order.createdAt.toString()}>
+					{data.order.createdAt.toLocaleDateString('pl-PL', {
+						day: 'numeric',
+						month: 'long',
+						year: 'numeric'
+					})}
+				</time>
+			</p>
 		</div>
-		<div {...$content('thankyou')} class="content">
-			<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl flex items-center">
-				Dziękujemy Ci
-				<div class="ml-3">
-					<CheckCircle2 strokeWidth={1.75} class="w-16 h-16 text-green-500" />
+
+		<div class="px-2 py-8 md:px-2">
+			<div class="flex items-center justify-between mb-6">
+				<h2 class="text-xl font-medium">Status</h2>
+				<span class={cn('font-medium', data.order.paid ? 'text-green-500' : 'text-red-400')}
+					>{data.order.paid ? 'Opłacono' : 'Nieopłacono'}</span
+				>
+			</div>
+
+			{#if data.order.status === 'awaitingCustomerDecision'}
+				<!-- Alert -->
+				<div class="flex py-4 border rounded-sm shadow-md border-warning">
+					<div class="min-w-[60px] flex justify-center items-start">
+						<AlertTriangle class="w-8 h-8 text-warning" />
+					</div>
+					<div class="flex flex-col gap-y-3">
+						<div class="flex flex-col pr-4 gap-y-2">
+							<p class="text-lg font-medium">Wymagana jest akcja</p>
+							<p class="text-sm">
+								Przynajmniej jeden z produktów, które zamówiłeś jest niedostępny. Możesz poczekać na
+								dostępność lub anulować zamówienie. Jeżeli zdecydujesz się zaczekać, twoje
+								zamówienie zostanie automatycznie wznowione po uzupełnieniu produktów na stanie.
+							</p>
+						</div>
+
+						<div class="flex flex-col sm:flex-row gap-x-6">
+							<form method="post" action="?/changeOrderStatus" class="">
+								<Button variant="default" class="mt-3 max-w-[270px] font-medium"
+									>Poczekaj na dostępność</Button
+								>
+								<input type="hidden" name="id" value={data.order.id} />
+								<input type="hidden" name="event" value="KEEP_WAITING" />
+							</form>
+							<form method="post" action="?/changeOrderStatus" class="">
+								<Button variant="destructive" class="mt-3 max-w-[270px]">Anuluj zamówienie</Button>
+								<input type="hidden" name="id" value={data.order.id} />
+								<input type="hidden" name="event" value="CANCEL" />
+							</form>
+						</div>
+					</div>
 				</div>
-			</h1>
-			<h2
-				class="scroll-m-20 border-b pb-2 text-xl xs:text-2xl md:text-3xl font-semibold tracking-tight transition-colors first:mt-0"
-			>
-				za złożenie zamówienia
-			</h2>
-			<!-- <p class="leading-7 [&:not(:first-child)]:mt-6">
-				Będziemy informować cię o zmianach w statusie zamówienia przez powiadomienia w aplikacji,
-				więc nie zapomnij ich włączyć w <a class="text-blue-700" href="/ustawienia"
-					>ustawieniach aplikacji</a
-				>.
-			</p> -->
-			<blockquote class="mt-2 border-l-2 pl-6 italic">
-				Będziemy Cię informować o zmianach w statusie zamówienia przez powiadomienia w aplikacji.
-				Nie zapomnij ich włączyć w <a class="text-blue-700" href="/ustawienia">ustawieniach</a>.
-				<br /> Zespół ALDO
-			</blockquote>
-			<!-- <p class="leading-7 [&:not(:first-child)]:mt-6">
-				
-			</p> -->
+			{:else}
+				<div class="p-4 border rounded-md shadow-sm border-border">
+					<HorizontalOrderSteps orderStatus={data.order.status} class="flex-col hidden sm:flex" />
+					<VerticalOrderSteps orderStatus={data.order.status} class="inline sm:hidden" />
+				</div>
+			{/if}
 		</div>
-		<div {...$content('info')} class="content">
-			<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-				Zamówienie nr #{data.order.id}
-			</h1>
-			<h2
-				class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
-			>
-				Podstawowe informacje
-			</h2>
-			<div class="mt-3 max-w-[356px] text-sm xs:text-base">
-				<Table>
-					<TableBody>
-						<TableRow>
-							<TableCell>
-								{#if data.order.status === 'pending'}
-									<BatteryCharging class="w-6 h-6 mr-2" />
-								{:else if data.order.status === 'canceled'}
-									<XSquare class="w-6 h-6 mr-2" />
-								{:else if data.order.status === 'completed'}
-									<BatteryFull class="w-6 h-6 mr-2" />
-								{/if}
-							</TableCell>
-							<TableCell>Status</TableCell>
-							<TableCell class="font-medium">{orderStatusList[data.order.status]}</TableCell>
-						</TableRow>
-						<TableRow>
-							<TableCell>
-								<User class="w-6 h-6 mr-2" />
-							</TableCell>
-							<TableCell>Klient</TableCell>
-							<TableCell class="font-medium">{data.order.customer.fullName}</TableCell>
-						</TableRow>
-						<TableRow>
-							<TableCell>
-								<UserCog class="w-6 h-6 mr-2" />
-							</TableCell>
-							<TableCell>Zleceniodawca</TableCell>
-							<TableCell class="font-medium">{data.order.cartOwner.fullName}</TableCell>
-						</TableRow>
-						{#if data.order.createdAt}
-							<TableRow>
-								<TableCell>
-									<CalendarClock class="w-6 h-6 mr-2" />
-								</TableCell>
-								<TableCell>Złożono</TableCell>
-								<TableCell class="font-medium">{dateParser(data.order.createdAt, 'long')}</TableCell
-								>
-							</TableRow>
-						{/if}
-						{#if data.order.updatedAt}
-							<TableRow>
-								<TableCell>
-									<CalendarPlus class="w-6 h-6 mr-2" />
-								</TableCell>
-								<TableCell>Ostatnia aktualizacja</TableCell>
-								<TableCell class="font-medium">{dateParser(data.order.updatedAt, 'long')}</TableCell
-								>
-							</TableRow>
-						{/if}
-						<TableRow>
-							<TableCell>
-								<DollarSign class="w-6 h-6 mr-2" />
-							</TableCell>
-							<TableCell>Kwota</TableCell>
-							<TableCell class="font-medium">{data.order.price} PLN</TableCell>
-						</TableRow>
-					</TableBody>
-				</Table>
+
+		<div class="px-2 py-8 md:px-2">
+			<h3 class="mb-6 text-xl font-medium">Szczegóły zamówienia</h3>
+			<div class="p-4 border rounded-md shadow-sm border-border">
+				<dl class="grid grid-cols-1 text-sm ss:grid-cols-2 gap-y-4">
+					<div
+						class="border-border ss:[&:not(:last-child)]:border-b-0 [&:not(:last-child)]:border-b [&:not(:last-child)]:pb-3"
+					>
+						<dt class="font-medium">Całkowita kwota</dt>
+						<dd class="mt-3">
+							<span class="block"
+								><span class="font-semibold text-blue-600">{data.order.price} PLN</span></span
+							>
+							<!-- <span class="block"
+							>Rabat <span class="font-medium">{data.order.discount} PLN</span></span
+						> -->
+						</dd>
+					</div>
+
+					<div
+						class="border-border ss:[&:not(:last-child)]:border-b-0 [&:not(:last-child)]:border-b [&:not(:last-child)]:pb-3"
+					>
+						<dt class="font-medium">Adres dostawy</dt>
+						<dd class="mt-3 whitespace-pre-line">{parseAddress(data.order.address)}</dd>
+					</div>
+					<div
+						class="border-border ss:[&:not(:last-child)]:border-b-0 [&:not(:last-child)]:border-b [&:not(:last-child)]:pb-3"
+					>
+						<dt class="font-medium">Metoda płatności</dt>
+						<dd class="mt-3">
+							{paymentMethodsList[data.order.paymentMethod]}
+						</dd>
+					</div>
+					<div
+						class="border-border ss:[&:not(:last-child)]:border-b-0 [&:not(:last-child)]:border-b [&:not(:last-child)]:pb-3"
+					>
+						<dt class="font-medium">Zleceniodawca</dt>
+						<dd class="flex mt-3">
+							<a href="/uzytkownik/{data.order.cartOwner.id}" class="underline"
+								>{data.order.cartOwner.fullName}</a
+							>
+						</dd>
+					</div>
+					<div
+						class="border-border ss:[&:not(:last-child)]:border-b-0 [&:not(:last-child)]:border-b [&:not(:last-child)]:pb-3"
+					>
+						<dt class="font-medium">Klient</dt>
+						<dd class="flex mt-3">
+							<a href="/uzytkownik/{data.order.customer.id}" class="underline"
+								>{data.order.customer.fullName}</a
+							>
+						</dd>
+					</div>
+				</dl>
 			</div>
 		</div>
-		<div {...$content('products')} class="content">
-			<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-				Zamówienie nr #{data.order.id}
-			</h1>
-			<h2
-				class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
-			>
-				Zamówione produkty
-			</h2>
-			<Table>
-				<TableHeader>
-					{#each $table.getHeaderGroups() as headerGroup}
-						<TableRow changeBgOnHover={false}>
-							{#each headerGroup.headers as header}
-								{#if !header.isPlaceholder}
-									<TableHead>
-										<svelte:component
-											this={flexRender(header.column.columnDef.header, header.getContext())}
-										/>
-									</TableHead>
-								{/if}
-							{/each}
-						</TableRow>
-					{/each}
-				</TableHeader>
-				<TableBody>
-					{#each $table.getRowModel().rows as row, bodyRowIndex}
-						<TableRow key={bodyRowIndex}>
-							{#each row.getVisibleCells() as cell}
-								<TableCell class="font-medium"
-									><svelte:component
-										this={flexRender(cell.column.columnDef.cell, cell.getContext())}
-									/></TableCell
-								>
-							{/each}
-						</TableRow>
-					{/each}
-				</TableBody>
-			</Table>
-		</div>
-		<div {...$content('delivery')} class="content">
-			<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-				Zamówienie nr #{data.order.id}
-			</h1>
-			<h2
-				class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
-			>
-				Szczegóły dostawy
-			</h2>
-			<div class="mt-3 max-w-[356px] text-sm xs:text-base">
-				<Table>
-					<TableBody>
-						<TableRow>
-							<TableCell>
-								{#if data.order.deliveryStatus === 'pending'}
-									<BatteryCharging class="w-6 h-6" />
-								{:else if data.order.deliveryStatus === 'canceled'}
-									<XSquare class="w-6 h-6" />
-								{:else if data.order.deliveryStatus === 'delivered'}
-									<BatteryFull class="w-6 h-6" />
-								{/if}
-							</TableCell>
-							<TableCell>Status dostawy</TableCell>
-							<TableCell class="font-medium">{orderStatusList[data.order.deliveryStatus]}</TableCell
-							>
-						</TableRow>
-						<TableRow>
-							<TableCell>
-								<Car class="w-6 h-6" />
-							</TableCell>
-							<TableCell>Metoda dostawy</TableCell>
-							<TableCell class="font-medium"
-								>{data.order.deliveryMethod === 'personal-delivery'
-									? 'Kierowca ALDO'
-									: '?'}</TableCell
-							>
-						</TableRow>
-						<TableRow>
-							<TableCell>
-								<Home class="w-6 h-6" />
-							</TableCell>
-							<TableCell>Adres dostawy</TableCell>
-							<TableCell class="font-medium">{addressParser(data.order.address)}</TableCell>
-						</TableRow>
-						<TableRow>
-							<TableCell>
-								<User class="w-6 h-6" />
-							</TableCell>
-							<TableCell>Dostawca</TableCell>
-							<TableCell class="font-medium">{data.order.driver?.fullName || 'Brak'}</TableCell>
-						</TableRow>
-					</TableBody>
-				</Table>
+
+		<div class="px-2 py-8 md:px-2">
+			<h4 class="mb-6 text-xl font-medium">Produkty ({productsCount})</h4>
+
+			<div>
+				<div class="overflow-x-auto border rounded-md shadow-sm border-border">
+					<ProductsTable products={data.order.products} />
+				</div>
 			</div>
 		</div>
-		<div {...$content('payment')} class="content">
-			<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-				Zamówienie nr #{data.order.id}
-			</h1>
-			<h2
-				class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
-			>
-				Szczegóły płatności
-			</h2>
-			<div class="mt-3 max-w-[356px] text-sm xs:text-base">
-				<Table>
-					<TableBody>
-						<TableRow>
-							<TableCell>
-								{#if data.order.paymentStatus === 'pending'}
-									<BatteryCharging class="w-6 h-6" />
-								{:else if data.order.paymentStatus === 'canceled'}
-									<XSquare class="w-6 h-6" />
-								{:else if data.order.paymentStatus === 'completed'}
-									<BatteryFull class="w-6 h-6" />
-								{/if}
-							</TableCell>
-							<TableCell>Status płatności</TableCell>
-							<TableCell class="font-medium">{orderStatusList[data.order.paymentStatus]}</TableCell>
-						</TableRow>
-						<TableRow>
-							<TableCell>
-								{#if data.order.paymentMethod === 'transfer'}
-									<Landmark class="w-6 h-6" />
-								{:else if data.order.paymentMethod === 'cash'}
-									<Banknote class="w-6 h-6" />
-								{/if}
-							</TableCell>
-							<TableCell>Metoda płatności</TableCell>
-							<TableCell class="font-medium"
-								>{data.order.paymentMethod === 'cash'
-									? 'Gotówka/Przedpłata'
-									: data.order.paymentMethod === 'transfer'
-									? 'Przelew bankowy'
-									: '?'}</TableCell
-							>
-						</TableRow>
-						<TableRow>
-							<TableCell>
-								<DollarSign class="w-6 h-6" />
-							</TableCell>
-							<TableCell>Kwota</TableCell>
-							<TableCell class="font-medium"
-								>{data.order.price} PLN {#if data.order.price !== data.order.noDiscountPrice}
-									<span class="line-through">{data.order.noDiscountPrice}</span>
-								{/if}</TableCell
-							>
-						</TableRow>
-						<TableRow>
-							<TableCell>
-								<BookmarkMinus class="w-6 h-6" />
-							</TableCell>
-							<TableCell>Rabat</TableCell>
-							<TableCell class="font-medium">{data.order.discount} PLN</TableCell>
-						</TableRow>
-						{#if data.order.paymentMethod === 'transfer'}
-							<TableRow>
-								<TableCell>
-									<Landmark class="w-6 h-6" />
-								</TableCell>
-								<TableCell>Dane do przelewu</TableCell>
-								<TableCell class="font-medium"
-									><div class="flex flex-col">
-										<span>Numer konta: abcd-efgh-ijkl-mnop</span>
-										<span>Tytuł przelewu: zamowienie{data.order.id}</span>
-									</div></TableCell
-								>
-							</TableRow>
-						{/if}
-					</TableBody>
-				</Table>
+
+		<div class="flex flex-col px-2 py-8 md:px-2 gap-y-4">
+			<div class="">
+				<h5 class="text-xl font-medium tracking-tight">Inne</h5>
+				<p class="text-sm text-muted-foreground">Zarządzaj zamówieniem</p>
+			</div>
+
+			<Separator />
+
+			<div class="grid grid-cols-2 gap-4">
+				<div class="col-span-2 sm:col-span-1">
+					<div class="">
+						<label
+							for="text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+							>Potwórz zamówienie</label
+						>
+					</div>
+					<p class="text-sm text-muted-foreground">
+						Produkty z tego zamówienia zostaną dodane do Twojego koszyka
+					</p>
+					<Message message={$message} />
+					{#if $timeout}
+						<ErrorMessage errors={['Brak odpowiedzi serwera']} />
+					{/if}
+					<ErrorMessage errors={$errors.id} />
+				</div>
+				<div class="sm:justify-self-end sm:place-self-center">
+					<form action="?/orderAgain" method="post" use:enhance>
+						<input type="hidden" name="id" value={data.order.id} />
+						<Button variant="default" class="max-w-[270px]">Potwórz zamówienie</Button>
+					</form>
+				</div>
 			</div>
 		</div>
 	</div>
 </div>
-
-<!-- <Tabs value="account" class="w-[400px]">
-	<TabsList class="grid w-full grid-cols-2">
-		<TabsTrigger value="account">Account</TabsTrigger>
-		<TabsTrigger value="password">Password</TabsTrigger>
-	</TabsList>
-	<TabsContent value="account">
-		<Card>
-			<CardHeader>
-				<CardTitle>Account</CardTitle>
-				<CardDescription>
-					Make changes to your account here. Click save when you're done.
-				</CardDescription>
-			</CardHeader>
-			<CardContent class="space-y-2">
-				<div class="space-y-1">
-					<Label for="name">Name</Label>
-					<Input id="name" value="Pedro Duarte" />
-				</div>
-				<div class="space-y-1">
-					<Label for="username">Username</Label>
-					<Input id="username" value="@peduarte" />
-				</div>
-			</CardContent>
-			<CardFooter>
-				<Button>Save changes</Button>
-			</CardFooter>
-		</Card>
-	</TabsContent>
-	<TabsContent value="password">
-		<Card>
-			<CardHeader>
-				<CardTitle>Password</CardTitle>
-				<CardDescription>
-					Change your password here. After saving, you'll be logged out.
-				</CardDescription>
-			</CardHeader>
-			<CardContent class="space-y-2">
-				<div class="space-y-1">
-					<Label for="current">Current password</Label>
-					<Input id="current" type="password" />
-				</div>
-				<div class="space-y-1">
-					<Label for="new">New password</Label>
-					<Input id="new" type="password" />
-				</div>
-			</CardContent>
-			<CardFooter>
-				<Button>Save password</Button>
-			</CardFooter>
-		</Card>
-	</TabsContent>
-</Tabs> -->
-<style lang="postcss">
-	/* Tab Parts */
-	.root {
-		@apply w-full max-w-screen-lg flex flex-col overflow-hidden rounded-md shadow-lg data-[orientation=vertical]:flex-row;
-	}
-
-	.list {
-		@apply flex shrink-0 border-b data-[orientation=vertical]:flex-col
-			data-[orientation=vertical]:border-r;
-		overflow-x: auto;
-	}
-
-	.trigger {
-		@apply flex h-11 flex-1 cursor-default select-none items-center
-      justify-center rounded-none px-4 leading-none
-			 focus:relative;
-	}
-
-	.trigger[data-orientation='vertical'] {
-		@apply w-full flex-grow-0 rounded-none border-b border-r-2 border-transparent py-4 last:border-b-0;
-	}
-
-	.trigger[data-state='active'] {
-		@apply focus:relative;
-	}
-
-	.trigger[data-state='active'][data-orientation='horizontal'] {
-		@apply shadow-[inset_0_-1px_0_0,0_1px_0_0] shadow-current focus:relative;
-	}
-
-	.trigger[data-state='active'][data-orientation='vertical'] {
-		/* @apply border-r-magnum-500; */
-	}
-
-	.content {
-		@apply grow p-5;
-	}
-
-	/* Content Elements */
-	.description {
-		@apply leading-normal;
-	}
-
-	.actions {
-		@apply mt-5 flex justify-end;
-	}
-
-	button {
-		@apply inline-flex h-8 cursor-default items-center justify-center rounded px-[15px] font-medium leading-none;
-	}
-</style>

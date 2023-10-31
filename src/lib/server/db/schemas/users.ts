@@ -5,77 +5,69 @@ import {
 	uniqueIndex,
 	varchar,
 	char,
-	boolean,
 	timestamp,
 	text,
 	index,
-	json
 } from 'drizzle-orm/mysql-core';
 import { verificationTokens } from './verificationTokens';
-import { orders, type Address } from './orders';
+import { orders } from './orders';
 import { products } from './products';
 import { subscriptions } from './subscriptions';
 import { promoCodes } from './promoCodes';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
 import { carts } from './carts';
+import { favoriteProducts } from './favoriteProducts';
+import { userAddress } from './userAddress';
 
 export const users = mysqlTable(
 	'users',
 	{
 		id: char('id', { length: 255 }).primaryKey(),
-		createdAt: timestamp('created_at').defaultNow(),
-		updatedAt: timestamp('updated_at').onUpdateNow(),
+		createdAt: timestamp('created_at').notNull(),
 
 		// User data
 		email: varchar('email', { length: 320 }).notNull(),
 		fullName: varchar('name', { length: 256 }).notNull(),
 		role: text('role', { enum: userRoles }).notNull(),
-		access: boolean('access').default(true).notNull(),
 		phone: char('phone', { length: 15 }).notNull(),
-		address: json('address').$type<Address>(),
 
 		// relations
 		adviserId: char('adviser_id', { length: 255 }),
-		cartId: char('cart_id', { length: 255 })
-		// advisedId: char('advised_id', { length: 255 })
-		// users_fulltext: text('fulltext').fulltextIndex()
 	},
 	(user) => ({
 		email: uniqueIndex('unique_emailx').on(user.email),
 		adviserId: index('adviser_idx').on(user.adviserId),
-		cartId: index('cart_idx').on(user.cartId)
-		// fullText: index('full_text').on(user.fullName, user.email, user.phone).using('fulltext')
 	})
 );
 
 export const usersRelations = relations(users, ({ one, many }) => ({
 	verificationTokens: many(verificationTokens),
-	orders: many(orders),
-	products: many(products), // authored products
+	customer: many(orders, { relationName: 'order_customer' }),
+	cartOwner: many(orders, { relationName: 'order_cart_owner' }),
+	driver: many(orders, { relationName: 'order_driver' }),
+	products: many(products, { relationName: 'products' }), // authored products
 	subscriptions: many(subscriptions),
 	promoCodes: many(promoCodes),
 	carts: one(carts, {
-		fields: [users.cartId],
-		references: [carts.id]
+		fields: [users.id],
+		references: [carts.ownerId]
 	}),
 	adviser: one(users, {
 		fields: [users.adviserId],
-		references: [users.id]
+		references: [users.id],
+		relationName: 'users'
+	}),
+	favoriteProducts: many(favoriteProducts, { relationName: 'favoriteProductsUser' }),
+	address: one(userAddress, {
+		fields: [users.id],
+		references: [userAddress.userId]
 	})
-	// advised: many(users)
 }));
 
-export const createUserSchema = createInsertSchema(users, {
-	address: () =>
-		z.object({
-			city: z.string(),
-			street: z.string(),
-			zipCode: z.string()
-		})
-});
+export const createUserSchema = createInsertSchema(users)
 export const selectUserSchema = createSelectSchema(users);
 
 export type User = InferModel<typeof users>;
 export type Role = User['role'];
 export type GeneralRole = Extract<Role, 'customer' | 'admin'> | 'moderator';
+

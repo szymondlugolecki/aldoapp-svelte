@@ -1,17 +1,26 @@
 <script lang="ts">
-	import '../app.css';
+	import '../app.postcss';
 
-	import Navbar from '../components/Layout/Navbar.svelte';
-	import Footer from '../components/Layout/Footer.svelte';
-	import { fade } from 'svelte/transition';
+	import Header from './(components)/header.svelte';
+	import Footer from './(components)/footer.svelte';
 	import toast, { Toaster } from 'svelte-french-toast';
 
 	import { onDestroy, onMount } from 'svelte';
 	import { settings } from '$lib/client/stores/settings';
-	import { base64StringToUint8Arr } from '$lib/client/functions/base64StringToUint8Arr';
-	import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public';
 	import type { BeforeInstallPromptEvent } from '../app';
 	import type { Unsubscriber } from 'svelte/store';
+	import { Contact, Home, ShoppingCart } from 'lucide-svelte';
+	import { cn } from '$lib/client/functions';
+	import { page } from '$app/stores';
+	import PhoneMenu from './(components)/phone-menu.svelte';
+	import ScrollToTop from './(components)/scroll-to-top.svelte';
+	import { inview } from 'svelte-inview';
+	import type { ObserverEventDetails } from 'svelte-inview';
+
+	let isInView: boolean;
+	const inViewChange = ({ detail }: CustomEvent<ObserverEventDetails>) => {
+		isInView = detail.inView;
+	};
 
 	let deferredInstallEvent: BeforeInstallPromptEvent | undefined = undefined;
 
@@ -76,20 +85,20 @@
 	export let data;
 </script>
 
-<div class="min-h-screen flex flex-col justify-between max-w-screen bg-background">
-	<Toaster position="bottom-right" />
+<Toaster position="bottom-right" />
 
-	<div class="flex flex-col w-full h-full">
-		<Navbar user={data.user} cart={data.cart} />
-		<main
-			in:fade
-			class="w-full min-h-[calc(100vh-65px)] flex px-1.5 xs:px-2 sm:px-3 pt-1 sm:pt-2 pb-[65px] relative items-stretch"
-		>
-			<slot />
-		</main>
-		{#if deferredInstallEvent}
-			<button class="btn btn-ghost" on:click={handleInstall}>Install</button>
-		{/if}
-	</div>
+<div class="relative">
+	<div
+		class="absolute inset-0 h-screen -z-50"
+		id="top"
+		use:inview={{ rootMargin: '0px', unobserveOnEnter: false }}
+		on:inview_change={inViewChange}
+	/>
+	<Header cart={data.cart} />
+	<slot />
 	<Footer />
+	{#if !isInView}
+		<ScrollToTop />
+	{/if}
+	<PhoneMenu />
 </div>

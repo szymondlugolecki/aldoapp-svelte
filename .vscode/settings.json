@@ -18,7 +18,16 @@
 		"**/.vercel": true,
 		".eslintignore": true,
 		".eslintrc.cjs": true,
-		".npmrc": true
+		".npmrc": true,
+		"**/vite.config.ts.timestamp-1694709001176-0d690244fdef8.mjs": true,
+		"vite.config.ts.timestamp-1694709001176-0d690244fdef8.mjs": true,
+		"vite.config.ts.timestamp-1694708946326-7c2511813266b.mjs": true,
+		"vite.config.ts.timestamp-1694708946307-1ad25a53455f4.mjs": true,
+		"*.mjs": true,
+		"**/*.mjs": true,
+		".vercel": true,
+		"certs": true,
+		".git": true
 	},
 	"explorerExclude.backup": {}
 }

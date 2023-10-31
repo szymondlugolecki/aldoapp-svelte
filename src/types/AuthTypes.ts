@@ -1,3 +1,4 @@
+import type { Address } from '$lib/server/db/schemas/orders';
 import type { Role, User } from '$types';
 import type { JWTPayload, JWTVerifyResult } from 'jose';
 
@@ -7,8 +8,8 @@ interface ATPayloadWithUserEmail extends JWTPayload {
 		email: string;
 		fullName: string;
 		role: Role;
-		access: boolean;
 		phone: string;
+		address: Address | null;
 	};
 	exp: number;
 }
@@ -28,5 +29,5 @@ export interface JWTRefreshTokenResult extends JWTVerifyResult {
 
 export type SessionUser = Pick<
 	User,
-	'id' | 'email' | 'fullName' | 'role' | 'access' | 'phone' | 'address' | 'adviserId'
->;
+	'id' | 'email' | 'fullName' | 'role' | 'phone'
+> & { address: Address | null };

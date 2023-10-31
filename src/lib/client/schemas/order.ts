@@ -1,149 +1,103 @@
 import { z } from 'zod';
-import { deliveryMethods, paymentMethods } from '../constants/dbTypes';
+import { paymentMethods, deliveryMethods, orderEvents } from '../constants/dbTypes';
+import { id as userId, city, zipCode, street } from './user';
+import { id as productId } from './products';
+import { addressForm } from './settings';
 
-export const orderCustomerNameValidation = z
-	.string({
-		required_error: 'Imię i nazwisko jest wymagane',
-		invalid_type_error: 'Nieprawidłowe imię i nazwisko'
-	})
-	.min(3, { message: 'Nieprawidłowe imię i nazwisko' })
-	.max(100, { message: 'Nieprawidłowe imię i nazwisko' });
-
-export const orderStreetValidation = z
-	.string({
-		required_error: 'Ulica i numer jest wymagany',
-		invalid_type_error: 'Nieprawidłowa ulica i numer'
-	})
-	.min(4, { message: 'Nieprawidłowa ulica i numer' })
-	.max(150, { message: 'Nieprawidłowe ulica i numer' });
-
-export const orderZipCodeValidation = z
-	.string({
-		required_error: 'Kod pocztowy jest wymagany',
-		invalid_type_error: 'Nieprawidłowy kod pocztowy'
-	})
-	.min(4, { message: 'Nieprawidłowy kod pocztowy' })
-	.max(30, { message: 'Nieprawidłowe kod pocztowy' });
-
-export const orderCityValidation = z
-	.string({ required_error: 'Miasto jest wymagane', invalid_type_error: 'Nieprawidłowe miasto' })
-	.min(3, { message: 'Nieprawidłowe miasto' })
-	.max(120, { message: 'Nieprawidłowe miasto' });
-
-export const orderPhoneValidation = z
-	.string({
-		required_error: 'Numer telefonu jest wymagany',
-		invalid_type_error: 'Nieprawidłowy numer telefonu'
-	})
-	.min(9, { message: 'Nieprawidłowy numer telefonu' })
-	.max(20, { message: 'Nieprawidłowy numer telefonu' });
-
-export const orderEmailValidation = z
-	.string({
-		required_error: 'Adres email jest wymagany',
-		invalid_type_error: 'Nieprawidłowy adres email'
-	})
-	.email({ message: 'Nieprawidłowy adres email' });
-
-export const orderAddressValidation = z.object({
-	street: orderStreetValidation,
-	zipCode: orderZipCodeValidation,
-	city: orderCityValidation
-});
-
-export const orderCustomerValidation = z.object({
-	phone: orderPhoneValidation,
-	email: orderEmailValidation,
-	fullName: orderCustomerNameValidation
-});
-
-// if delivery method is 'pickup', then delivery address is not required
-
-// const deliveryUnion = z.union([deliveryValidation, z.null()]);
-
-export const orderDeliveryMethodValidation = z.enum(deliveryMethods, {
-	errorMap(issue) {
-		switch (issue.code) {
-			case 'invalid_type':
-				return { message: 'Nieprawidłowa metoda dostawy' };
-				break;
-			case 'invalid_enum_value':
-				return { message: 'Nieprawidłowa metoda dostawy' };
-				break;
-			default:
-				return { message: 'Niespodziewany błąd: metoda dostawy' };
-				break;
-		}
-	}
-});
-
-export const orderPaymentMethodValidation = z.enum(paymentMethods, {
-	errorMap(issue) {
-		switch (issue.code) {
-			case 'invalid_type':
-				return { message: 'Nieprawidłowa metoda płatności' };
-				break;
-			case 'invalid_enum_value':
-				return { message: 'Nieprawidłowa metoda płatności' };
-				break;
-			default:
-				return { message: 'Niespodziewany błąd: metoda płatności' };
-				break;
-		}
-	}
-});
-
-export const orderProductsValidation = z
-	.array(
-		z.object({
-			productId: z
-				.number({
-					invalid_type_error: 'Nieprawidłowe id produktu',
-					required_error: 'Id produktu jest wymagane'
-				})
-				.min(0, { message: 'Id nie może być ujemne' }),
-			quantity: z
-				.number({
-					invalid_type_error: 'Nieprawidłowa ilość produktu',
-					required_error: 'Ilość produktu jest wymagana'
-				})
-				.min(1, { message: 'Nie można zamówić mniej niż jednej sztuki' })
-		}),
-		{
-			invalid_type_error: 'Niespodziewany błąd produktów w koszyku',
-			required_error: 'Należy wybrać produkty'
-		}
-	)
-	.nonempty({ message: 'Nie można zamówić pustego koszyka' });
-
-/*
-
-	The difference between client and server validation is:
-	  	1. Address property is nullable on server side (when the deliveryMethod is personal-pickup)
-		2. Customer property is nullable on server side (when the deliveryMethod is personal-pickup)
-	  	3. promoCode object transforms to only promoCodeId
-
-*/
-
-export const promoCodeIdValidation = z
+export const id = z.coerce
 	.number({
-		invalid_type_error: 'Nieprawidłowe id kodu promocyjnego',
-		required_error: 'Id kodu promocyjnego jest wymagane'
+		invalid_type_error: 'Nieprawidłowe id zamówienia',
+		required_error: 'Id zamówienia jest wymagane'
 	})
-	.min(0, { message: 'Nieprawidłowe id kodu promocyjnego' });
+	.min(0, { message: 'Nieprawidłowe id zamówienia' });
 
-export const clientOrderValidation = z.object({
-	productsQuantity: orderProductsValidation,
-	deliveryMethod: orderDeliveryMethodValidation,
-	paymentMethod: orderPaymentMethodValidation,
-	address: orderAddressValidation,
-	promoCodeId: promoCodeIdValidation.optional()
+export const deliveryMethod = z.enum(deliveryMethods, {
+	errorMap(issue) {
+		switch (issue.code) {
+			case 'invalid_type':
+				return { message: 'Wybierz metodę dostawy' };
+			case 'invalid_enum_value':
+				return { message: 'Wybierz metodę dostawy' };
+			default:
+				return { message: 'Błąd: metoda dostawy' };
+		}
+	}
 });
 
-export const serverOrderValidation = z.object({
-	productsQuantity: orderProductsValidation,
-	deliveryMethod: orderDeliveryMethodValidation,
-	paymentMethod: orderPaymentMethodValidation,
-	address: orderAddressValidation.nullable(),
-	promoCodeId: promoCodeIdValidation.optional()
+export const paymentMethod = z.enum(paymentMethods, {
+	errorMap(issue) {
+		switch (issue.code) {
+			case 'invalid_type':
+				return { message: 'Wybierz metodę płatności' };
+			case 'invalid_enum_value':
+				return { message: 'Wybierz metodę płatności' };
+			default:
+				return { message: 'Błąd: metoda płatności' };
+		}
+	}
 });
+
+export const eventForm = z.object({
+	id,
+	event: z.enum(orderEvents, {
+		errorMap(issue) {
+			switch (issue.code) {
+				case 'invalid_type':
+					return { message: 'Nieprawidłowy status' };
+				case 'invalid_enum_value':
+					return { message: 'Nieprawidłowy status' };
+				default:
+					return { message: 'Niespodziewany błąd: status' };
+			}
+		}
+	})
+});
+
+export const status = z.object({});
+
+export const paymentForm = z.object({
+	id,
+	paid: z
+		.union([z.boolean(), z.literal('true'), z.literal('false')])
+		.transform((value) => value === true || value === 'true')
+});
+
+export const orderAddressForm = addressForm.merge(
+	z.object({
+		id
+	})
+);
+
+const saveAddress = z.boolean({
+	invalid_type_error: 'Nieprawidłowa wartość dla: zapamiętaj adres',
+	required_error: 'Wymagana wartość dla: zapamiętaj adres'
+});
+
+export const productQuantity = z.object({
+	productId,
+	quantity: z
+		.number({
+			invalid_type_error: 'Nieprawidłowa ilość produktu',
+			required_error: 'Ilość produktu jest wymagana'
+		})
+		.min(0, { message: 'Nieprawidłowa ilość produktu' })
+		.max(9, { message: 'Nieprawidłowa ilość produktu' })
+});
+
+export const create = z.object({
+	deliveryMethod,
+	paymentMethod,
+	customerId: userId.optional(), // if not passed then defaults to session user
+	street: street,
+	zipCode: zipCode,
+	city: city,
+	saveAddress: saveAddress.optional()
+});
+
+export const orderAgainForm = z.object({
+	id
+});
+
+export type OrderForm = typeof create;
+export type OrderAgainForm = typeof orderAgainForm;
+export type ProductQuantity = typeof productQuantity;

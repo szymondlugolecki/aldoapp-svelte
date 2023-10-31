@@ -1,13 +1,15 @@
 // import { p } from '$lib/server/clients/pClient';
 
 import add from '$lib/server/actions/product/add';
-import edit from '$lib/server/actions/product/edit';
-import remove from '$lib/server/actions/product/remove';
+// import edit from '$lib/server/actions/product/edit';
+// import remove from '$lib/server/actions/product/remove';
 import { db } from '$lib/server/db';
 import { products } from '$lib/server/db/schemas/products';
 import { sql } from 'drizzle-orm';
-import { isJSON } from '$lib/client/functions';
 import type { ProductSortableColumn } from '$types';
+import { extractParams } from '$lib/server/functions/utils';
+import { superValidate } from 'sveltekit-superforms/server';
+import { products$ } from '$lib/client/schemas/index.js';
 
 const pageLimit = 10;
 const sortableColumns: ProductSortableColumn[] = [
@@ -21,20 +23,26 @@ const sortableColumns: ProductSortableColumn[] = [
 ];
 
 export const load = async ({ url }) => {
-	const page = !isNaN(Number(url.searchParams.get('strona')))
-		? Math.max(Number(url.searchParams.get('strona')), 1)
-		: 1;
+	const { page, sort } = extractParams<ProductSortableColumn>(url, sortableColumns);
 
-	const sort = url.searchParams.get('sort');
-	const desc = url.searchParams.get('desc');
-
-	const descBool = desc && ['true', 'false'].includes(desc) ? isJSON<boolean>(desc) : null;
-	const properSort = (sort: string | null): sort is ProductSortableColumn => {
-		return !!sort && sortableColumns.includes(sort as ProductSortableColumn);
-	};
+	const addForm = await superValidate(products$.addForm);
+	const editForm = await superValidate(products$.editForm);
 
 	return {
 		products: db.query.products.findMany({
+			columns: {
+				id: true,
+				name: true,
+				price: true,
+				weight: true,
+				producent: true,
+				category: true,
+				subcategory: true,
+				createdAt: true,
+				symbol: true,
+				encodedURL: true,
+				description: true
+			},
 			with: {
 				author: {
 					columns: {
@@ -43,15 +51,18 @@ export const load = async ({ url }) => {
 						email: true
 					}
 				},
-				images: true
+				images: {
+					columns: {
+						id: true,
+						url: true
+					}
+				}
 			},
 			offset: (page - 1) * pageLimit,
-			...(descBool !== null && properSort(sort)
-				? {
-						orderBy: (products, { asc, desc }) =>
-							descBool ? desc(products[sort]) : asc(products[sort])
-				  }
-				: {}),
+			orderBy: sort
+				? (products, { asc, desc }) =>
+						sort.descending ? desc(products[sort.by]) : asc(products[sort.by])
+				: (products, { desc }) => desc(products.createdAt),
 			limit: pageLimit
 		}),
 		pageLimit,
@@ -59,12 +70,14 @@ export const load = async ({ url }) => {
 			.select({
 				count: sql<number>`count(*)`.mapWith(Number)
 			})
-			.from(products)
+			.from(products),
+		addForm,
+		editForm
 	};
 };
 
 export const actions = {
-	add,
-	edit,
-	remove
+	add
+	// edit,
+	// remove
 };

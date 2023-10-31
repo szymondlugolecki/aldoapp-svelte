@@ -2,7 +2,7 @@ import { relations, type InferModel } from 'drizzle-orm';
 import {
 	mysqlTable,
 	serial,
-	uniqueIndex,
+	// uniqueIndex,
 	varchar,
 	char,
 	timestamp,
@@ -15,13 +15,12 @@ export const verificationTokens = mysqlTable(
 	'verification_tokens',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').defaultNow(),
-		updatedAt: timestamp('updated_at').onUpdateNow(),
+		createdAt: timestamp('created_at').notNull(),
 
 		// Token data
-		token: varchar('token', { length: 72 }).notNull(),
+		// token: varchar('token', { length: 72 }).notNull(),
 		code: char('code', { length: 4 }).notNull(),
-		userAgent: varchar('user_agent', { length: 400 }).notNull(),
+		userAgent: varchar('user_agent', { length: 512 }).notNull(),
 		// ipAddress: varchar('ip_address', { length: 46 }).notNull(),
 		expiresAt: timestamp('expires_at').notNull(),
 
@@ -30,7 +29,7 @@ export const verificationTokens = mysqlTable(
 	},
 	(verificationToken) => ({
 		// indexes
-		token: uniqueIndex('unique_tokenx').on(verificationToken.token),
+		// token: uniqueIndex('unique_tokenx').on(verificationToken.token),
 		code: index('codex').on(verificationToken.code),
 		userAgent: index('user_agentx').on(verificationToken.userAgent)
 	})

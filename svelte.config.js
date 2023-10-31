@@ -1,25 +1,29 @@
 import adapter from '@sveltejs/adapter-vercel';
 import { vitePreprocess } from '@sveltejs/kit/vite';
+import { preprocessMeltUI } from '@melt-ui/pp'
+import sequence from 'svelte-sequential-preprocessor'
 
 /** @type {import('@sveltejs/kit').Config}*/
 const config = {
 	// Consult https://kit.svelte.dev/docs/integrations#preprocessors
 	// for more information about preprocessors
-
-	preprocess: vitePreprocess(),
+	
+	preprocess: sequence([
+		// ... other preprocessors
+		vitePreprocess(),
+		preprocessMeltUI() // add to the end!
+	  ]),
 	kit: {
 		adapter: adapter({
 			runtime: 'edge'
 		}),
 		alias: {
-			'$components/*': 'src/components',
-			$types: './src/types',
-			'$shadcn/*': 'src/lib/components/ui/*',
-			'$meltui/*': 'src/lib/components/meltui/*'
-		}
+			'$components/*': 'src/components/*',
+			'$shadcn/*': 'src/components/ui/*',
+			'$meltui/*': 'src/components/meltui/*',
+			'$types': './src/types',
+			'$routes': './src/routes',
+		},
 	},
-	shadcn: {
-		componentPath: './src/lib/components/ui'
-	}
 };
 export default config;

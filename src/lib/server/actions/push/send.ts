@@ -1,108 +1,71 @@
 import { trytm } from '@bdsqqq/try';
 import { db } from '$lib/server/db';
-import { error, type Action, fail } from '@sveltejs/kit';
-import { subscriptions } from '$lib/server/db/schemas/subscriptions';
-import { inArray } from 'drizzle-orm';
+import { error, fail, type Action } from '@sveltejs/kit';
+import { eq, inArray } from 'drizzle-orm';
 import { isAtLeastModerator } from '$lib/client/functions';
-import { betterZodParse } from '$lib/client/functions/betterZodParse';
-import { pushNotificationRequest } from '$lib/client/schemas/pushSubscription';
-import { sendNotifications } from '$lib/server/functions/push';
+import { sendNotifications, type PushMessageWithContent } from '$lib/server/functions/push';
+import { setMessage, superValidate } from 'sveltekit-superforms/server';
+import getCustomError from '$lib/client/constants/customErrors';
+import { pushSubscription$ } from '$lib/client/schemas';
 
-const sendPush: Action = async ({ locals, request }) => {
-	const sessionUser = locals.session?.user;
-
-	console.log('send push');
-
+const send: Action = async (event) => {
+	const sessionUser = event.locals.session?.user;
 	if (!sessionUser) {
-		throw error(401, 'Nie jesteś zalogowany');
+		throw error(...getCustomError('not-logged-in'));
 	}
-
 	if (!isAtLeastModerator(sessionUser.role)) {
-		throw error(403, 'Nie masz wystarczających uprawnień');
+		throw error(...getCustomError('insufficient-permissions'));
 	}
 
-	// Validate the user input
-	const [formData, formDataError] = await trytm(request.formData());
-	console.log('push send', 'formData', formData);
-	if (formDataError) {
-		return fail(400, {
-			errors: ['Nieprawidłowe dane do wysłania powiadomień']
-		});
-	}
+	console.log('event');
+	const form = await superValidate(event, pushSubscription$.notification);
+	console.log('form', form.errors, form.data);
 
-	const entries = Object.fromEntries(formData);
-
-	console.log('push send', 'entries', entries);
-
-	if (!entries.targets) {
-		return fail(400, {
-			errors: ['Musisz wybrać przynajmniej jednego odbiorcę powiadomienia']
-		});
-	}
-
-	// Validate the request body
-	const [data, parseError] = betterZodParse(pushNotificationRequest, entries);
-	if (parseError) {
-		console.error('Failed to validate the push send request body', parseError);
-		return fail(400, {
-			errors: parseError
-		});
+	if (!form.valid) {
+		return fail(400, { form });
 	}
 
 	const messageObj = {
-		title: data.title,
+		data: { title: form.data.title, message: form.data.body },
 		options: {
-			body: data.body
+			ttl: 172800
 		}
-	};
+	} satisfies PushMessageWithContent;
 
-	// Query all subscriptions
-	if (data.targets === 'all') {
-		const [subs, fetchSubscriptionsError] = await trytm(
-			db.query.subscriptions.findMany({
-				columns: {
-					subscription: true
-				}
-			})
-		);
+	const { targets } = form.data;
 
-		if (fetchSubscriptionsError) {
-			return fail(500, {
-				errors: ['Wystąpił błąd podczas pobierania użytkowników do wysłania powiadomień']
-			});
-		}
+	const [subscriptionList, fetchSubscriptionsError] = await trytm(
+		Array.isArray(targets)
+			? db.query.subscriptions.findMany({
+					columns: {
+						endpoint: true,
+						keys: true,
+						expirationTime: true
+					},
+					where: (subscription) => inArray(subscription.userId, targets)
+			  })
+			: db.query.subscriptions.findMany({
+					columns: {
+						endpoint: true,
+						keys: true,
+						expirationTime: true
+					},
+					where: (subscription) => eq(subscription.userId, targets)
+			  })
+	);
 
-		sendNotifications(
-			subs.map(({ subscription }) => subscription),
-			messageObj
-		);
-	}
-	// Query specified users' subscriptions
-	else {
-		const [subs, fetchSubscriptionsError] = await trytm(
-			db.select().from(subscriptions).where(inArray(subscriptions.userId, data.targets))
-		);
-
-		// db.query.subscriptions.findMany({
-		// 	columns: {
-		// 		subscription: true,
-		// 	},
-		// 	where: (subscription) => inArray(subscription.userId, data.targets)
-		// })
-
-		if (fetchSubscriptionsError) {
-			return fail(500, {
-				errors: ['Wystąpił błąd podczas pobierania użytkowników do wysłania powiadomień']
-			});
-		}
-
-		sendNotifications(
-			subs.map(({ subscription }) => subscription),
-			messageObj
-		);
+	if (fetchSubscriptionsError) {
+		// Unexpected-error
+		console.error('fetchSubscriptionsError', fetchSubscriptionsError);
+		throw error(500, 'Błąd podczas pobierania użytkowników do wysłania powiadomień');
 	}
 
-	return { success: true };
+	const { message, success } = await sendNotifications(subscriptionList, messageObj);
+	if (!success) {
+		return setMessage(form, message);
+	}
+
+	return setMessage(form, message);
 };
 
-export default sendPush;
+export default send;

@@ -1,38 +1,24 @@
 // import { p } from '$lib/server/clients/pClient';
-import { fail, redirect, type Action } from '@sveltejs/kit';
+import { fail, redirect, error, type Action } from '@sveltejs/kit';
 import { trytm } from '@bdsqqq/try';
-import { betterZodParse } from '$lib/client/functions/betterZodParse';
-import { verificationCodeSchema } from '$lib/client/schemas/auth';
 import { accessTokenExpiryDate, jwtName, refreshTokenExpiryDate } from '$lib/server/constants/auth';
 import { createAccessToken, createRefreshToken } from '$lib/server/functions/auth';
 import { db } from '$lib/server/db';
 import { verificationTokens as verificationTokensTable } from '$lib/server/db/schemas/verificationTokens';
 import { eq } from 'drizzle-orm';
+import { setError, superValidate } from 'sveltekit-superforms/server';
+import { auth$ } from '$lib/client/schemas';
 
-const handleVerification: Action = async ({ request, cookies, locals }) => {
-	// Validate the user input
-	const [formData, formDataError] = await trytm(request.formData());
-	if (formDataError) {
-		console.error('formDataError', formDataError);
-		// Unexpected-error
-		return fail(400, {
-			errors: ['Podano nieprawidłowe dane']
-		});
+const verify = (async ({ request, cookies, locals }) => {
+	const form = await superValidate(request, auth$.verification);
+	if (!form.valid) {
+		return fail(400, { form });
 	}
-	const data = Object.fromEntries(formData);
-	const [codeParsed, codeParsingError] = betterZodParse(verificationCodeSchema, data);
-	if (codeParsingError) {
-		return fail(400, {
-			errors: codeParsingError
-		});
-	}
-
-	const { code } = codeParsed;
 
 	// Check if the token exists & is not expired
 	const [token, fetchTokenError] = await trytm(
 		db.query.verificationTokens.findFirst({
-			where: (verificationTokens, { eq }) => eq(verificationTokens.code, code),
+			where: (verificationTokens, { eq }) => eq(verificationTokens.code, form.data.code),
 			columns: {
 				id: true,
 				expiresAt: true
@@ -44,28 +30,30 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 						email: true,
 						role: true,
 						fullName: true,
-						access: true,
 						phone: true,
-						address: true,
 						adviserId: true
+					},
+					with: {
+						address: {
+							columns: {
+								city: true,
+								zipCode: true,
+								street: true
+							}
+						}
 					}
 				}
 			}
 		})
 	);
-
 	if (fetchTokenError) {
 		// Unexpected-error
 		console.log('fetchTokenError', fetchTokenError);
-		return fail(500, {
-			errors: ['Niespodziewany błąd przy weryfikacji kodu']
-		});
+		return setError(form, 'code', 'Błąd podczas sprawdzania kodu weryfikacyjnego', { status: 500 });
 	}
-
+	// Non-existent/expired
 	if (!token || new Date() > token.expiresAt) {
-		return fail(400, {
-			errors: ['Podany kod nie istnieje lub jest przedawniony']
-		});
+		return setError(form, 'code', 'Kod nie istnieje lub jest przedawniony');
 	}
 
 	const [createTokens, createTokensError] = await trytm(
@@ -75,9 +63,7 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 	if (createTokensError) {
 		// Unexpected-error
 		console.error('createTokensError', createTokensError);
-		return fail(500, {
-			errors: ['Niespodziewany błąd przy tworzeniu tokenów autoryzacyjnych']
-		});
+		throw error(500, 'Błąd podczas logowania');
 	}
 
 	const [accessToken, refreshToken] = createTokens;
@@ -111,6 +97,6 @@ const handleVerification: Action = async ({ request, cookies, locals }) => {
 	}
 
 	throw redirect(303, '/');
-};
+}) satisfies Action;
 
-export default handleVerification;
+export default verify;

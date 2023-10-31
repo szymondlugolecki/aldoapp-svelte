@@ -1,10 +1,9 @@
 <script lang="ts">
-	import type { OrderFilter, OrderWithCustomer } from '$types';
+	import type { BasicUser, PaginationSettings } from '$types';
 	import toast from 'svelte-french-toast';
 	import type { OrderStatus } from '$lib/client/constants/dbTypes';
-	import { orderStatusList } from '$lib/client/constants/index.js';
 	import { cn, dateParser, flexRender } from '$lib/client/functions';
-	import TableHyperlink from '$components/Table/TableHyperlink.svelte';
+	import TableHyperlink from '$components/custom/Table/TableHyperlink.svelte';
 
 	import {
 		createSvelteTable,
@@ -14,40 +13,30 @@
 		type TableOptions,
 		type CellContext,
 		type SortingState,
-		type SortingColumn,
 		type Updater,
 		type PaginationState
 	} from '@tanstack/svelte-table';
 	import { writable } from 'svelte/store';
-	import Pagination from '$components/Table/Pagination.svelte';
-	import AdminEditDialog from '$components/Dialogs/Admin/Edit/Order.svelte';
+	import Pagination from '$components/custom/Table/Pagination.svelte';
+	import AdminEditDialog from '$routes/admin/zamowienia/(components)/EditOrder.svelte';
 
-	import {
-		Table,
-		TableBody,
-		TableCaption,
-		TableCell,
-		TableHead,
-		TableHeader,
-		TableRow
-	} from '$shadcn/table';
+	import * as Table from '$shadcn/table';
 	import { Input } from '$shadcn/input';
 	import type { Address } from '$lib/server/db/schemas/orders.js';
-	import Button from '$shadcn/button/Button.svelte';
+	import { Button } from '$shadcn/button';
 	import { betterZodParse } from '$lib/client/functions/betterZodParse.js';
-	import TableSortableHead from '$shadcn/table/TableSortableHead.svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import Pagination2 from '$components/custom/Table/Pagination2.svelte';
 
 	export let data;
 
 	type ParsedOrder = (typeof data.orders)[number];
-	$: console.log('orders', data.orders);
-	$: count = data.count[0].count;
+	let count = data.count[0].count;
 
 	const createOrderProps = (info: CellContext<ParsedOrder, unknown>) => {
 		const value = info.getValue();
-		const keyPublicName = info.column.columnDef.header;
+		// const label = info.column.columnDef.header;
 		const key = info.column.id;
 
 		const order = info.table.options.data.find(
@@ -56,7 +45,7 @@
 
 		return {
 			value,
-			keyPublicName,
+			// label,
 			key,
 			order
 		};
@@ -82,16 +71,9 @@
 			enableSorting: true
 		},
 		{
-			id: 'deliveryStatus',
-			header: 'Dostawa',
-			accessorKey: 'deliveryStatus',
-			cell: (info) => flexRender(AdminEditDialog, createOrderProps(info)),
-			enableSorting: true
-		},
-		{
-			id: 'paymentStatus',
-			header: 'Płatność',
-			accessorKey: 'paymentStatus',
+			id: 'paid',
+			header: 'Opłacono',
+			accessorKey: 'paid',
 			cell: (info) => flexRender(AdminEditDialog, createOrderProps(info)),
 			enableSorting: true
 		},
@@ -102,29 +84,35 @@
 			cell: (info) => info.getValue(),
 			enableSorting: true
 		},
+		// {
+		// 	id: 'discount',
+		// 	header: 'Rabat',
+		// 	accessorKey: 'discount',
+		// 	cell: (info) => info.getValue(),
+		// 	enableSorting: true
+		// },
 		{
-			id: 'discount',
-			header: 'Rabat',
-			accessorKey: 'discount',
-			cell: (info) => info.getValue(),
+			id: 'cartOwner',
+			header: 'Zleceniodawca',
+			accessorKey: 'cartOwner',
+			cell: (info) => (info.getValue() as BasicUser).fullName,
 			enableSorting: true
 		},
 		{
-			id: 'orderProducts',
+			id: 'customer',
+			header: 'Klient',
+			accessorKey: 'customer',
+			cell: (info) => (info.getValue() as BasicUser).fullName,
+			enableSorting: true
+		},
+		{
+			id: 'products',
 			header: 'Produkty',
-			accessorKey: 'orderProducts',
+			accessorKey: 'products',
 			cell: (info) => {
-				console.log('info', info.getValue(), typeof info.getValue());
-				const products = info.getValue() as (typeof data.orders)[number]['orderProducts'];
+				const products = info.getValue() as (typeof data.orders)[number]['products'];
 				if (!Array.isArray(products)) return '?';
-
-				// 2x'name',
-
-				const parsedProducts = products
-					.map((p) => (p.quantity === 1 ? p.product.name : `${p.quantity}x ${p.product.name}`))
-					.join(', ');
-
-				return parsedProducts.length > 47 ? parsedProducts.slice(0, 47) + '...' : parsedProducts;
+				return '';
 			},
 			enableSorting: false
 		},
@@ -225,6 +213,13 @@
 
 	$: pageParam = $page.url.searchParams.get('strona');
 	$: currentPage = !isNaN(Number(pageParam)) ? Math.max(Number(pageParam), 1) : 1;
+
+	const paginationSettings: PaginationSettings = {
+		count,
+		perPage: data.pageLimit,
+		defaultPage: 1,
+		siblingCount: 1
+	};
 </script>
 
 <svelte:head>
@@ -239,46 +234,44 @@
 		<Input class="max-w-xl" type="text" placeholder="Wyszukaj..." />
 	</div>
 
-	<Table>
-		<TableCaption>Lista zamówień</TableCaption>
-		<TableHeader>
+	<Table.Root>
+		<Table.Caption>Lista zamówień</Table.Caption>
+		<Table.Header>
 			{#each $table.getHeaderGroups() as headerGroup}
-				<TableRow changeBgOnHover={false}>
+				<Table.Row>
 					{#each headerGroup.headers as header}
 						{#if !header.isPlaceholder}
-							<TableHead
-								onClick={header.column.getToggleSortingHandler()}
+							<Table.Head
 								class={cn(
 									`w-[100px]`,
 									header.column.getCanSort() &&
 										'cursor-pointer transition-colors hover:bg-muted/10 hover:rounded-md'
 								)}
 							>
-								<TableSortableHead sortable={header.column.getCanSort()}>
-									<svelte:component
-										this={flexRender(header.column.columnDef.header, header.getContext())}
-									/>
-								</TableSortableHead>
-							</TableHead>
+								<svelte:component
+									this={flexRender(header.column.columnDef.header, header.getContext())}
+								/>
+							</Table.Head>
 						{/if}
 					{/each}
-				</TableRow>
+				</Table.Row>
 			{/each}
-		</TableHeader>
-		<TableBody>
+		</Table.Header>
+		<Table.Body>
 			{#each $table.getRowModel().rows as row, bodyRowIndex}
-				<TableRow key={bodyRowIndex}>
+				<Table.Row>
 					{#each row.getVisibleCells() as cell}
-						<TableCell class="font-medium whitespace-pre-line"
+						<Table.Cell class="font-medium whitespace-pre-line"
 							><svelte:component
 								this={flexRender(cell.column.columnDef.cell, cell.getContext())}
-							/></TableCell
+							/></Table.Cell
 						>
 					{/each}
-				</TableRow>
+				</Table.Row>
 			{/each}
-		</TableBody>
-	</Table>
+		</Table.Body>
+	</Table.Root>
 
-	<Pagination {currentPage} {setPage} rowsPerPage={data.pageLimit} totalRows={count} />
+	<Pagination2 {paginationSettings} />
+	<!-- <Pagination {currentPage} {setPage} rowsPerPage={data.pageLimit} totalRows={count} /> -->
 </section>

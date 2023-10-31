@@ -1,6 +1,6 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
-import { imagetools } from '@zerodevx/svelte-img/vite';
+import { imagetools } from 'vite-imagetools';
 // import fs from 'fs';
 
 export default defineConfig({

@@ -1,78 +1,37 @@
+import getCustomError from '$lib/client/constants/customErrors';
 import { getRoleRank, isAtLeastModerator } from '$lib/client/functions';
-import { betterZodParse } from '$lib/client/functions/betterZodParse';
-import {
-	editUserSchema,
-	userPropertySchemas,
-	type EditUserSchema
-} from '$lib/client/schemas/users';
+import { user$ } from '$lib/client/schemas';
 import { db } from '$lib/server/db';
+import type { Address } from '$lib/server/db/schemas/orders';
+import { userAddress } from '$lib/server/db/schemas/userAddress';
 import { users, type User } from '$lib/server/db/schemas/users';
-// import { p } from '$lib/server/clients/pClient';
 import { trytm } from '@bdsqqq/try';
-import { isCuid } from '@paralleldrive/cuid2';
-import { error, fail, type Action } from '@sveltejs/kit';
+import { error, type Action, fail } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
+import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
 
-const edit: Action = async ({ request, locals }) => {
+const edit = (async ({ request, locals }) => {
+	const sessionUser = locals.session?.user;
+
 	// Only moderators and admins are allowed to edit a user
-	if (!locals.session) {
-		throw error(401, 'Nie jesteś zalogowany');
+	if (!sessionUser) {
+		throw error(...getCustomError('not-logged-in'));
 	}
-	if (!isAtLeastModerator(locals.session?.user.role)) {
-		throw error(403, 'Nie masz wystarczających uprawień');
-	}
-
-	// Validate the user input
-	const [formData, formDataError] = await trytm(request.formData());
-	if (formDataError) {
-		return fail(400, {
-			errors: ['Niepoprawne dane']
-		});
+	if (!isAtLeastModerator(sessionUser.role)) {
+		throw error(...getCustomError('insufficient-permissions'));
 	}
 
-	const data: Partial<EditUserSchema> = Object.fromEntries(formData);
-
-	// data.access is a string in reality - ts wont let me change the type tho
-	if (data.access !== undefined) {
-		data.access = JSON.parse(data.access.toString());
+	const form = await superValidate(request, user$.editForm);
+	if (!form.valid) {
+		return fail(400, { form });
 	}
-	if (data.claimAdviser !== undefined) {
-		data.claimAdviser = JSON.parse(data.claimAdviser.toString());
-	}
-
-	console.log('formData', formData, data);
-
-	// Only id is required, the rest is optional
-	if (!data.id) {
-		return fail(400, {
-			errors: ['Brak id edytowanego użytkownika']
-		});
-	}
-	if (!isCuid(data.id)) {
-		return fail(400, {
-			errors: ['Niepoprawne id edytowanego użytkownika']
-		});
-	}
-
-	console.log('data', data);
 
 	// Make sure something else other than id was provided
-	if (Object.keys(data).length <= 1) {
-		return fail(400, {
-			errors: ['Brak danych do edycji']
-		});
+	if (Object.keys(form.data).length <= 1) {
+		return setError(form, 'Nie podano żadnych danych do edycji', { status: 400 });
 	}
 
-	// Zod parse the data
-	const [editUserObj, editUserObjParseError] = betterZodParse(editUserSchema, data);
-	if (editUserObjParseError) {
-		return fail(400, {
-			errors: [editUserObjParseError[0]]
-		});
-	}
-
-	const { id, email, fullName, role, access, phone, city, zipCode, street, claimAdviser } =
-		editUserObj;
+	const { id, email, fullName, role, phone, city, zipCode, street, claimAdviser } = form.data;
 
 	// Fetch the user from the database (before the edit)
 	const [userBeforeEdit, userBeforeEditError] = await trytm(
@@ -82,9 +41,7 @@ const edit: Action = async ({ request, locals }) => {
 				email: true,
 				fullName: true,
 				role: true,
-				access: true,
-				phone: true,
-				address: true
+				phone: true
 			},
 			with: {
 				adviser: {
@@ -92,6 +49,13 @@ const edit: Action = async ({ request, locals }) => {
 						id: true,
 						fullName: true,
 						email: true
+					}
+				},
+				address: {
+					columns: {
+						city: true,
+						zipCode: true,
+						street: true
 					}
 				}
 			},
@@ -101,96 +65,92 @@ const edit: Action = async ({ request, locals }) => {
 
 	// Check if the user exists
 	if (userBeforeEditError) {
-		return fail(500, {
-			errors: ['Błąd serwera. Nie udało się znaleźć tego użytkownika']
-		});
+		return setError(form, 'Błąd serwera. Nie udało się znaleźć użytkownika', { status: 500 });
 	}
 	if (!userBeforeEdit) {
-		return fail(400, {
-			errors: ['Nie udało się znaleźć użytkownika, którego próbujesz edytować']
-		});
+		return setError(form, 'Nie znaleziono użytkownika', { status: 400 });
 	}
 
 	// If the user is trying to edit themself
-	if (userBeforeEdit.id === locals.session.user.id) {
+	if (userBeforeEdit.id === sessionUser.id) {
 		// It's ok as long as they are not trying to block themself
-		if (access === false) {
-			return fail(400, {
-				errors: ['Nie możesz zablokować sam siebie']
-			});
+		if (role === 'banned') {
+			return setError(form, 'Nie możesz zablokować sam siebie', { status: 400 });
 		}
 	}
 	// If the user is trying to edit another user
 	else {
 		// User is trying to edit a user with higher or equal role
-		if (getRoleRank(locals.session.user.role) <= getRoleRank(userBeforeEdit.role)) {
-			return fail(403, {
-				errors: ['Nie masz wystarczających uprawień']
+		if (getRoleRank(sessionUser.role) <= getRoleRank(userBeforeEdit.role)) {
+			return setError(form, 'Nie możesz edytować użytkowników z wyższą lub równą rolą', {
+				status: 403
 			});
 		}
 	}
 
-	const newUser: Partial<
-		Pick<User, 'email' | 'fullName' | 'access' | 'phone' | 'role' | 'adviserId' | 'address'>
-	> = {};
+	const newUser: Partial<Pick<User, 'email' | 'fullName' | 'phone' | 'role' | 'adviserId'>> = {};
+	const newAddress: Partial<Address> = {};
 
 	if (email) {
-		newUser.email = email.toLowerCase();
+		newUser.email = email;
 	}
-
 	if (fullName) {
 		newUser.fullName = fullName;
 	}
-
 	if (role) {
 		newUser.role = role;
 	}
-
-	if (access !== undefined) {
-		newUser.access = access;
-	}
-
 	if (phone) {
-		newUser.phone = phone.toString().replaceAll(' ', '');
+		newUser.phone = phone;
 	}
-
-	// if (adviserId) {
-	// 	newUser.adviserId = adviserId;
-	// }
-
+	if (city) {
+		newAddress.city = city;
+	}
+	if (zipCode) {
+		newAddress.zipCode = zipCode;
+	}
+	if (street) {
+		newAddress.street = street;
+	}
 	if (claimAdviser !== undefined) {
 		if (claimAdviser) {
-			newUser.adviserId = locals.session.user.id;
+			newUser.adviserId = sessionUser.id;
 		} else {
 			newUser.adviserId = null;
 		}
 	}
 
-	if (city && street && zipCode) {
-		const [address, addressParseError] = betterZodParse(userPropertySchemas.address, {
-			city,
-			street,
-			zipCode
-		});
-		if (addressParseError) {
-			return fail(400, {
-				errors: [addressParseError[0]]
-			});
+	if (Object.keys(newUser).length) {
+		const [, editUserError] = await trytm(
+			db
+				.update(users)
+				.set({
+					...newUser
+				})
+				.where(eq(users.id, id))
+		);
+		if (editUserError) {
+			return setError(form, 'Nie udało się edytować użytkownika', { status: 500 });
 		}
-		newUser.address = address;
 	}
 
-	console.log('newUser', newUser);
+	console.log('userAddress', newAddress, Object.keys(newAddress).length);
 
-	const [, editUserError] = await trytm(db.update(users).set(newUser).where(eq(users.id, id)));
-
-	if (editUserError) {
-		return fail(500, {
-			errors: ['Nie udało się edytować użytkownika']
-		});
+	if (Object.keys(newAddress).length) {
+		const [, editUserAddressError] = await trytm(
+			db
+				.update(userAddress)
+				.set({
+					...newAddress
+				})
+				.where(eq(userAddress.userId, id))
+		);
+		if (editUserAddressError) {
+			return setError(form, 'Nie udało się edytować adresu użytkownika', { status: 500 });
+		}
 	}
 
-	return { success: true, message: 'Pomyślnie edytowano użytkownika' };
-};
+	return setMessage(form, 'Edytowano użytkownika');
+}) satisfies Action;
 
 export default edit;

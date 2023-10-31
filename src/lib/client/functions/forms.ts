@@ -1,5 +1,4 @@
 import type { ActionResult } from '@sveltejs/kit';
-// import { isValidObject } from '.';
 import toast from 'svelte-french-toast';
 
 export const handleFormResponse = (
@@ -9,17 +8,6 @@ export const handleFormResponse = (
 	customMessage?: string,
 	justLoading = false
 ) => {
-	// console.log('result', result.type);
-
-	// if (isValidObject(result.data?.errors)) {
-	// 	errorList = Object.values(result.data?.errors).flatMap((x) => x);
-	// } else if (Array.isArray(result.data?.errors)) {
-	// 	errorList = result.data?.errors;
-	// }
-
-	// const formatErrors = '• ' + errorList.join('\n• ');
-	// toast.error('Wystąpił błąd:\n' + formatErrors, { duration: 3500, id });
-
 	const showErrorToast = (message: string) => {
 		toast.error(message, { duration: 3500, id });
 	};

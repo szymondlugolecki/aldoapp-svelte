@@ -1,4 +1,4 @@
-import { errorResponses } from '$lib/client/constants/errorResponses';
+import getCustomError from '$lib/client/constants/customErrors';
 import { db } from '$lib/server/db/index.js';
 import { trytm } from '@bdsqqq/try';
 import { error, json } from '@sveltejs/kit';
@@ -7,7 +7,7 @@ export async function GET({ locals }) {
 	const sessionUser = locals.session?.user;
 
 	if (!sessionUser) {
-		throw error(...errorResponses[401]);
+		throw error(...getCustomError('not-logged-in'));
 	}
 
 	// Fetch all users with role 'customer' and adviserId equal to sessionUser.id

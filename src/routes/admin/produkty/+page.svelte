@@ -1,14 +1,5 @@
 <script lang="ts">
 	import { cn, dateParser, flexRender } from '$lib/client/functions';
-	import type { ProductFilter, Subcategory } from '$types';
-	import { imagesSorting } from '$lib/client/functions/sorting';
-	import type { MainCategory, Producent } from '$lib/client/constants/dbTypes.js';
-	import {
-		fodderCategories,
-		fodderCategories2,
-		fodderNames,
-		producentsList
-	} from '$lib/client/constants/index.js';
 
 	import {
 		createSvelteTable,
@@ -18,16 +9,15 @@
 		type TableOptions,
 		type CellContext,
 		type SortingState,
-		type SortingColumn,
 		type Updater,
 		type PaginationState
 	} from '@tanstack/svelte-table';
 	import { writable } from 'svelte/store';
-	import Pagination from '$components/Table/Pagination.svelte';
-	import TableHyperlink from '$components/Table/TableHyperlink.svelte';
+	import Pagination from '$components/custom/Table/Pagination.svelte';
+	import TableHyperlink from '$components/custom/Table/TableHyperlink.svelte';
 
-	import AdminProductEditDialog from '$components/Dialogs/Admin/Edit/Product.svelte';
-	import AdminAddDialog from '$components/Dialogs/Admin/Add/Product.svelte';
+	import AdminEditDialog from '$routes/admin/produkty/(components)/edit-product.svelte';
+	import AdminAddDialog from '$routes/admin/produkty/(components)/add-product.svelte';
 
 	import {
 		Table,
@@ -39,59 +29,43 @@
 		TableRow
 	} from '$shadcn/table';
 	import { Input } from '$shadcn/input';
-	import type { Address } from '$lib/server/db/schemas/orders.js';
-	import Button from '$shadcn/button/Button.svelte';
-	import TableSortableHead from '$shadcn/table/TableSortableHead.svelte';
+	import { Button } from '$shadcn/button';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import type { Image } from '$lib/server/db/schemas/images.js';
+	import Pagination2 from '$components/custom/Table/Pagination2.svelte';
+	import type { PaginationSettings } from '$types';
+	import { superForm } from 'sveltekit-superforms/client';
+	import { createProps, setSorting } from '$lib/client/functions/table.js';
+
+	import * as LR from '@uploadcare/blocks';
+	import { PACKAGE_VERSION } from '@uploadcare/blocks';
+	import type { EditProductForm } from '$lib/client/schemas/products.js';
+
+	LR.registerBlocks(LR);
+
+	let files = [];
+	function handleUploaderEvent(e) {
+		const { data } = e.detail;
+		files = data;
+	}
 
 	export let data;
 
-	$: console.log('products', data.products);
-	$: count = data.count[0].count;
+	const { count } = data.count[0];
+	// const { form, errors, enhance, message } = superForm(data.addForm, {
+	// 	resetForm: true
+	// });
 
-	// const dataProductsSorted = data.products
-	// 	.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
-	// 	.map((product) => {
-	// 		return {
-	// 			...product,
-	// 			images: product.images.sort(imagesSorting)
-	// 		};
-	// 	});
+	// const {
+	// 	form: registerForm,
+	// 	errors: registerErrors,
+	// 	enhance: registerEnhance,
+	// 	message: registerMessage
+	// } = superForm(data.editForm, {
+	// 	resetForm: true
+	// });
 
-	// Final list of products filtered by the input from the searchbar, etc.
-	// $: products = applyProductFilters(dataProductsSorted, filter, searchInput);
-
-	// let product: ProductWithAuthorAndImage | undefined;
-
-	const createProductProps = (
-		info: CellContext<ParsedProduct, unknown>,
-		cellTextOverride?: string
-	) => {
-		const cellValue = info.getValue();
-		const keyPublicName = info.column.columnDef.header;
-		const key = info.column.id;
-		const elementId = info.row._getAllCellsByColumnId().id.getValue();
-
-		return {
-			cellValue,
-			keyPublicName,
-			key,
-			cellTextOverride,
-			elementId
-		};
-	};
-
-	// id, link, produkt, zdjecia, cena, dodatkowe informacje, kategorie, opis, dodany
-
-	const subCategoriesList = Object.values(fodderCategories2).reduce<Record<Subcategory, string>>(
-		(acc, curr) => {
-			acc = { ...acc, ...curr };
-			return acc;
-		},
-		{} as Record<Subcategory, string>
-	);
+	type ParsedProduct = (typeof data.products)[number];
 
 	const defaultColumns: ColumnDef<ParsedProduct>[] = [
 		{
@@ -101,74 +75,59 @@
 		},
 		{
 			id: 'encodedURL',
-			header: 'Podgląd',
+			header: 'Sklep',
 			accessorKey: 'encodedURL',
 			cell: (info) =>
-				flexRender(TableHyperlink, { href: `/sklep/${info.getValue()}`, text: 'Sprawdź' }),
+				flexRender(TableHyperlink, { href: `/sklep/${info.getValue()}`, text: 'Sklep' }),
 			enableSorting: false
 		},
 		{
 			id: 'name',
 			header: 'Nazwa',
 			accessorKey: 'name',
-			cell: (info) => flexRender(AdminProductEditDialog, createProductProps(info)),
+			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedProduct>(info, data.editForm)),
 			enableSorting: true
 		},
 		{
 			id: 'symbol',
 			header: 'Kod produktu',
 			accessorKey: 'symbol',
-			cell: (info) => flexRender(AdminProductEditDialog, createProductProps(info)),
+			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedProduct>(info, data.editForm)),
 			enableSorting: false
 		},
 		{
-			id: 'imagesId',
+			id: 'images',
 			header: 'Zdjęcia',
-			accessorKey: 'imagesId',
-			cell: (info) =>
-				flexRender(
-					AdminProductEditDialog,
-					createProductProps(
-						info,
-						info.getValue() ? `${(info.getValue() as Image[]).length} zdjęć` : 'Brak'
-					)
-				),
+			accessorKey: 'images',
+			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedProduct>(info, data.editForm)),
 			enableSorting: false
 		},
 		{
 			id: 'category',
 			header: 'Kategoria',
 			accessorKey: 'category',
-			cell: (info) =>
-				flexRender(
-					AdminProductEditDialog,
-					createProductProps(info, fodderNames[info.getValue() as MainCategory])
-				),
+			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedProduct>(info, data.editForm)),
 			enableSorting: true
 		},
 		{
 			id: 'subcategory',
 			header: 'Podkategoria',
 			accessorKey: 'subcategory',
-			cell: (info) =>
-				flexRender(
-					AdminProductEditDialog,
-					createProductProps(info, subCategoriesList[info.getValue() as Subcategory] || '-')
-				),
+			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedProduct>(info, data.editForm)),
 			enableSorting: true
 		},
 		{
 			id: 'price',
 			header: 'Cena',
 			accessorKey: 'price',
-			cell: (info) => flexRender(AdminProductEditDialog, createProductProps(info)),
+			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedProduct>(info, data.editForm)),
 			enableSorting: true
 		},
 		{
 			id: 'weight',
 			header: 'Waga',
 			accessorKey: 'weight',
-			cell: (info) => flexRender(AdminProductEditDialog, createProductProps(info)),
+			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedProduct>(info, data.editForm)),
 			enableSorting: true
 		},
 		{
@@ -177,8 +136,8 @@
 			accessorKey: 'producent',
 			cell: (info) =>
 				flexRender(
-					AdminProductEditDialog,
-					createProductProps(info, producentsList[info.getValue() as Producent])
+					AdminEditDialog,
+					createProps<ParsedProduct, EditProductForm>(info, data.editForm)
 				),
 			enableSorting: true
 		},
@@ -186,7 +145,11 @@
 			id: 'description',
 			header: 'Opis',
 			accessorKey: 'description',
-			cell: (info) => flexRender(AdminProductEditDialog, createProductProps(info, '...')),
+			cell: (info) =>
+				flexRender(
+					AdminEditDialog,
+					createProps<ParsedProduct, EditProductForm>(info, data.editForm)
+				),
 			enableSorting: false
 		},
 		{
@@ -196,8 +159,6 @@
 			cell: (info) => dateParser(info.getValue() as Date, 'short')
 		}
 	];
-
-	type ParsedProduct = (typeof data.products)[number];
 
 	let sorting: SortingState = [];
 	let pagination: PaginationState = {
@@ -215,34 +176,6 @@
 	const setPage = (pageIndex: number) => {
 		currentPage = pageIndex + 1;
 		$table.setPageIndex(pageIndex);
-	};
-
-	const setSorting = (updater: any) => {
-		if (updater instanceof Function) {
-			sorting = updater(sorting);
-		} else {
-			sorting = updater;
-		}
-
-		const url = new URLSearchParams($page.url.searchParams);
-		if (sorting && sorting[0]) {
-			url.set('sort', sorting[0].id);
-			url.set('desc', sorting[0].desc.toString());
-			if (url.get('strona')) {
-				url.set('strona', currentPage.toString());
-			}
-		}
-
-		goto(`?${url.toString()}`).then(() => {
-			options.update((options) => ({
-				...options,
-				state: {
-					...options.state,
-					data: data.products,
-					sorting
-				}
-			}));
-		});
 	};
 
 	const setPagination = (updater: Updater<PaginationState>) => {
@@ -272,7 +205,23 @@
 			sorting
 		},
 		enableSorting: true,
-		onSortingChange: setSorting,
+		onSortingChange: (updater: any) => {
+			const url = setSorting(updater, sorting, {
+				currentPage,
+				searchParams: $page.url.searchParams
+			});
+			console.log('url', url);
+			goto(`?${url.toString()}`).then(() => {
+				options.update((options) => ({
+					...options,
+					state: {
+						...options.state,
+						data: data.products,
+						sorting
+					}
+				}));
+			});
+		},
 		onPaginationChange: setPagination,
 		manualSorting: true,
 		manualPagination: true
@@ -281,6 +230,13 @@
 	$: table = createSvelteTable(options);
 	$: pageParam = $page.url.searchParams.get('strona');
 	$: currentPage = !isNaN(Number(pageParam)) ? Math.max(Number(pageParam), 1) : 1;
+
+	const paginationSettings: PaginationSettings = {
+		count,
+		perPage: data.pageLimit,
+		defaultPage: 1,
+		siblingCount: 1
+	};
 </script>
 
 <svelte:head>
@@ -292,51 +248,39 @@
 </svelte:head>
 
 <section class="w-full h-full p-2 space-y-3">
-	<!-- <div class="collapse border border-base-300 rounded-box">
-		<input type="checkbox" />
-		<div class="collapse-title text-xl font-medium">Filtrowanie</div>
-		<div class="collapse-content">
-			<div class="space-y-0.5">
-				<span class="block label">Data utworzenia</span>
-
-				<div class="grid grid-cols-1 xs:grid-cols-3 gap-2">
-					<div class="w-full">
-						<label for="joined-date-from" class="block text-sm text-base-content">Od</label>
-						<input
-							class="w-full sm:w-auto p-2 rounded-md"
-							type="date"
-							name="joined-date-from"
-							bind:value={filter.createdSince}
-						/>
-					</div>
-					<div class="w-full">
-						<label for="joined-date-to" class="block text-sm text-base-content">Do</label>
-						<input
-							type="date"
-							name="joined-date-to"
-							class="w-full sm:w-auto p-2 rounded-md"
-							bind:value={filter.createdUntil}
-						/>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div> -->
-
 	<div class="flex justify-between space-x-3 lg:space-x-0">
 		<Input class="max-w-xl" type="text" placeholder="Wyszukaj..." />
-		<Button variant="secondary"><AdminAddDialog /></Button>
+		<AdminAddDialog form={data.addForm} />
 	</div>
+	<lr-config
+		ctx-name="my-uploader"
+		pubkey="demopublickey"
+		multiple="true"
+		multipleMax="10"
+		confirmUpload="true"
+		sourceList="local, url, camera, dropbox, gdrive"
+	/>
+	<lr-file-uploader-regular
+		ctx-name="my-uploader"
+		css-src="https://unpkg.com/@uploadcare/blocks@{PACKAGE_VERSION}/web/lr-file-uploader-regular.min.css"
+	/>
+	<lr-data-output
+		ctx-name="my-uploader"
+		use-event
+		hidden
+		class="uploader-cfg"
+		on:lr-data-output={handleUploaderEvent}
+	/>
 
+	<!-- onClick={header.column.getToggleSortingHandler()} -->
 	<Table>
 		<TableCaption>Lista produktów</TableCaption>
 		<TableHeader>
 			{#each $table.getHeaderGroups() as headerGroup}
-				<TableRow changeBgOnHover={false}>
+				<TableRow>
 					{#each headerGroup.headers as header}
 						{#if !header.isPlaceholder}
 							<TableHead
-								onClick={header.column.getToggleSortingHandler()}
 								class={cn(
 									`w-[100px]`,
 									header.column.getCanSort() &&
@@ -344,11 +288,11 @@
 									header.column.columnDef.id === 'name' && 'w-[150px]'
 								)}
 							>
-								<TableSortableHead sortable={header.column.getCanSort()}>
-									<svelte:component
-										this={flexRender(header.column.columnDef.header, header.getContext())}
-									/>
-								</TableSortableHead>
+								<!-- <TableSortableHead sortable={header.column.getCanSort()}> -->
+								<svelte:component
+									this={flexRender(header.column.columnDef.header, header.getContext())}
+								/>
+								<!-- </TableSortableHead> -->
 							</TableHead>
 						{/if}
 					{/each}
@@ -356,8 +300,8 @@
 			{/each}
 		</TableHeader>
 		<TableBody>
-			{#each $table.getRowModel().rows as row, bodyRowIndex}
-				<TableRow key={bodyRowIndex}>
+			{#each $table.getRowModel().rows as row}
+				<TableRow>
 					{#each row.getVisibleCells() as cell}
 						<TableCell class="font-medium"
 							><svelte:component
@@ -370,5 +314,6 @@
 		</TableBody>
 	</Table>
 
+	<Pagination2 {paginationSettings} />
 	<Pagination {currentPage} {setPage} rowsPerPage={data.pageLimit} totalRows={count} />
 </section>

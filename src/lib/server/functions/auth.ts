@@ -2,14 +2,12 @@ import { errors, jwtVerify, SignJWT } from 'jose';
 import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 import { jwtConfig } from '../constants/auth';
 import type { JWTAccessTokenResult, JWTRefreshTokenResult, SessionUser } from '$types';
-import { createId } from '@paralleldrive/cuid2';
 import { UAParser } from 'ua-parser-js';
 import { textCrusher as tC } from '$lib/client/functions';
 
 const { alg, secret, accessTokenConfig, refreshTokenConfig, audience, issuer } = jwtConfig;
 
 export const createVerificationKeys = () => ({
-	token: createId(),
 	code: new Array(4)
 		.fill(null)
 		.map(() => Math.floor(Math.random() * 10))
@@ -54,7 +52,7 @@ export const verifyRefreshToken = async (token: string) => {
 	}) as Promise<JWTRefreshTokenResult>;
 };
 
-export const uaParser = (header: string | null) => {
+export const getUserAgentString = (header: string | null) => {
 	const UAObj = UAParser(header || undefined);
 
 	const { name: browserName, version: browserVersion } = UAObj.browser;
@@ -66,5 +64,8 @@ export const uaParser = (header: string | null) => {
 	const userAgent = [browserName, browserVersion, osName, osVersion, deviceType, deviceVendor]
 		.map((str) => strFb(str))
 		.join('+');
+
+	console.log('userAgent', tC(userAgent));
+
 	return tC(userAgent);
 };

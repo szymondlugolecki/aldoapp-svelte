@@ -1,13 +1,7 @@
 // import wretch from 'wretch';
 import type { Role } from '$lib/server/db/schemas/users';
-import type { ShortService, Outlets } from '$types';
-import type {
-	DeliveryStatus,
-	MainCategory,
-	OrderStatus,
-	PaymentMethod,
-	PaymentStatus
-} from './dbTypes';
+import type { ShortService, Outlets, OrderEvent } from '$types';
+import type { DeliveryMethod, PaymentMethod, orderStatus } from './dbTypes';
 // import toast from 'svelte-french-toast';
 
 type SalesmenMenuType = {
@@ -27,55 +21,62 @@ export const paymentMethodsList: Record<PaymentMethod, string> = {
 	transfer: 'Przelew bankowy'
 } as const;
 
-export const statusIcon: Record<OrderStatus | PaymentStatus | DeliveryStatus, string> = {
-	canceled: '🔴',
-	pending: '🟠',
-	delivered: '🟢',
-	shipped: '🔵',
-	completed: '🟢'
-};
-
-export const orderStatusList: Record<OrderStatus | PaymentStatus | DeliveryStatus, string> = {
-	canceled: 'Anulowano',
-	pending: 'Oczekiwanie',
-	delivered: 'Dostarczono',
-	shipped: 'Wysłano',
-	completed: 'Zakończono'
+export const deliveryMethodsList: Record<DeliveryMethod, string> = {
+	'personal-delivery': 'Kierowca ALDO'
 } as const;
 
-export const fodderNames: Record<MainCategory, string> = {
-	cattle: 'Bydło',
-	poultry: 'Drób',
-	pigs: 'Trzoda',
-	backyard: 'Hodowla przydomowa'
+export const orderStatusList: Record<(typeof orderStatus)[number], string> = {
+	delivered: 'Dostarczono',
+	awaitingDelivery: 'Wysłano',
+	awaitingOffice: 'Sprawdzanie dostępności',
+	awaitingCustomerDecision: 'Oczekuje na decyzję klienta',
+	awaitingShipment: 'Oczekuje na wysyłkę',
+	cancelled: 'Anulowano'
+} as const;
+
+export const orderEventsList: Record<OrderEvent, string> = {
+	IS_AVAILABLE: 'Produkty są dostępne',
+	IS_UNAVAILABLE: 'Produkty są niedostępne',
+	CANCEL: 'Anuluj zamówienie',
+	KEEP_WAITING: 'Poczekaj na dostępność',
+	SHIPPED: 'Wysłano',
+	DELIVERED: 'Dostarczono'
+	// PAYMENT_RECEIVED: 'Otrzymano płatność'
+};
+
+export const fodderNames = {
+	bydlo: 'Bydło',
+	drob: 'Drób',
+	trzoda: 'Trzoda',
+	'hodowla-przydomowa': 'Hodowla przydomowa'
 } as const;
 
 export const fodderCategories2 = {
-	cattle: {
-		'milk-cows-fodder': 'Pasze dla krów mlecznych',
-		'cow-fodder-mixes': 'Mieszanki paszowe dla bydła',
-		'cow-premixes': 'Premiksy dla bydła',
-		'cow-concentrates': 'Koncentraty dla krów mlecznych i opasów',
-		'calfs-fodder': 'Pasze dla cieląt',
-		'calfs-milk-replacements': 'Preparaty mlekozastępcze dla cieląt / mleko dla cieląt'
+	bydlo: {
+		'pasze-krowy-mleczne': 'Pasze dla krów mlecznych',
+		'mieszanki-paszowe-bydlo': 'Mieszanki paszowe dla bydła',
+		'premiksy-bydlo': 'Premiksy dla bydła',
+		'koncentraty-krowy-mleczne-opasy': 'Koncentraty dla krów mlecznych i opasów',
+		'pasze-cieleta': 'Pasze dla cieląt',
+		'mleko-preparaty-mlekozastepcze': 'Preparaty mlekozastępcze dla cieląt / mleko dla cieląt'
 	},
-	poultry: {
-		'layer-chickens-fodder': 'Pasze dla niosek',
-		'geese-and-ducks-fodder': 'Pasze dla gęsi i kaczek',
-		'broilers-fodder': 'Pasze dla brojlerów',
-		'turkeys-fodder': 'Pasze dla indyków'
+	drob: {
+		'pasze-nioski': 'Pasze dla niosek',
+		'pasze-gesi-kaczki': 'Pasze dla gęsi i kaczek',
+		'pasze-brojler': 'Pasze dla brojlerów',
+		'pasze-indyk': 'Pasze dla indyków'
 	},
-	pigs: {
-		'porkers-fodder': 'Pasze dla tuczników',
-		'liquid-pig-feed': 'Płynne żywienie świń',
-		'piglets-fodder': 'Pasze dla prosiąt',
-		'sows-fodder': 'Pasze dla loch'
+	trzoda: {
+		'pasze-tucznik': 'Pasze dla tuczników',
+		'plynne-zywienie-swinie': 'Płynne żywienie świń',
+		'pasze-prosieta': 'Pasze dla prosiąt',
+		'pasze-lochy': 'Pasze dla loch'
 	},
-	backyard: {}
+	'hodowla-przydomowa': {}
 } as const;
 
 export const fodderCategories = {
-	cattle: [
+	bydlo: [
 		{
 			name: 'Pasze dla krów mlecznych',
 			id: 'milk-cows-fodder'
@@ -101,7 +102,7 @@ export const fodderCategories = {
 			id: 'calfs-milk-replacements'
 		}
 	],
-	poultry: [
+	drob: [
 		{
 			name: 'Pasze dla niosek',
 			id: 'layer-chickens-fodder'
@@ -119,7 +120,7 @@ export const fodderCategories = {
 			id: 'turkeys-fodder'
 		}
 	],
-	pigs: [
+	trzoda: [
 		{
 			name: 'Pasze dla tuczników',
 			id: 'porkers-fodder'
@@ -137,74 +138,108 @@ export const fodderCategories = {
 			id: 'sows-fodder'
 		}
 	],
-	backyard: []
+	'hodowla-przydomowa': []
 } as const;
 
 export const salesmenMenu: SalesmenMenuType[] = [
 	{
 		name: 'Dział pasz',
-		description: 'Pasze dla bydła, drobiu i trzody chlewnej. Bez GMO',
+		description: 'Pasze i koncentraty dla bydła, drobiu, trzody chlewnej. Surowce.',
 		locations: ['surowe'],
 		href: 'pasze'
 	},
 	{
 		name: 'Market',
-		description: 'Hurtownia rolnicza. Części rolnicze. Zamienniki',
+		description: 'Części do ciągników i maszyn, artykuły do produkcji rolnej.',
 		locations: ['myszyniec', 'surowe', 'ełk'],
 		href: 'market'
 	},
 	{
 		name: 'Serwis',
 		description:
-			'Wsparcie serwisowe. Części zamienne. Przegląd w autoryzowanym punkcie Kubota i Kverneland',
+			'Autoryzowany serwis ciągników i maszyn rolniczych Kubota oraz innych marek z oferty ALDO.',
 		locations: ['myszyniec', 'surowe', 'ełk'],
 		href: 'serwis'
 	},
 
 	{
 		name: 'Dział maszyn',
-		description: 'Wysokiej jakości maszyny rolnicze i komunalne renomowanych marek',
+		description: 'Wysokiej jakości maszyny rolnicze i komunalne renomowanych marek.',
 		locations: ['myszyniec', 'wójtowo', 'ełk'],
 		href: 'maszyny'
 	},
 	{
 		name: 'Komis maszyn',
-		description: 'Używany sprzęt wysokiej klasy w świetnym stanie technicznym',
+		description: 'Szeroki wybór maszyn używanych różnych producentów.',
 		locations: ['myszyniec'],
 		href: 'komis'
 	},
 	{
 		name: 'Stacja paliw',
-		description: 'Zatankuj na naszej stacji paliw',
+		description: 'Paliwa z gwarancją jakości Orlen.',
 		locations: ['surowe'],
 		href: 'paliwa'
+	},
+	{
+		name: 'Wulkanizacja',
+		description: 'Chemiczny proces sieciowania cząsteczek polimeru prowadzący do otrzymania gumy.',
+		locations: ['surowe'],
+		href: 'wulkanizacja'
+	}
+];
+
+/*
+
+[
+	['surowe', [['29 77 27 666'], ['what']]],
+	['surowe', [['29 77 27 666'], ['what']]]
+]
+
+*/
+
+export const nutritionalAdvisors = [
+	{
+		name: 'Mariusz Deptuła',
+		phone: ['662 393 252']
+	},
+	{
+		name: 'Rafał Kuskowski',
+		phone: ['668 521 107']
+	},
+	{
+		name: 'Karol Denkiewicz',
+		phone: ['797 503 691']
 	}
 ];
 
 export const contactInfo = {
 	'dział pasz': {
-		surowe: ['29 77 27 666']
+		surowe: [['29 77 27 666'], ['pasze@aldo.agro.pl']]
 	},
 	market: {
-		surowe: ['29 77 27 652'],
-		myszyniec: ['29 77 21 986'],
-		ełk: ['519 619 796', '87 73 32 401', '502 934 174']
+		surowe: [['29 77 27 652'], ['waldemar.skorupski@aldo.agro.pl']],
+		myszyniec: [['29 77 21 986'], ['ewa.dabrowska@aldo.agro.pl']],
+		ełk: [['519 619 796', '87 73 32 401', '502 934 174'], ['arkadiusz.kukier@aldo.agro.pl']]
 	},
 	serwis: {
-		surowe: ['29 77 27 662', '692 448 240'],
-		myszyniec: ['696 655 330', '29 77 21 983'],
-		ełk: ['511 199 208', '87 52 00 038']
+		surowe: [['29 77 27 662', '692 448 240'], ['pawel.duszak@aldo.agro.pl']],
+		myszyniec: [['696 655 330', '29 77 21 983'], ['serwis@aldo.agro.pl']],
+		ełk: [['511 199 208', '87 52 00 038'], ['piotr.makowski@aldo.agro.pl']]
 	},
 	'dział maszyn': {
-		myszyniec: ['29 77 21 980'],
-		ełk: ['87 520 00 38'],
-		wójtowo: ['89 741 00 98']
+		myszyniec: [['29 77 21 980'], ['myszyniec@aldo.agro.pl']],
+		ełk: [['87 520 00 38'], ['elk@aldo.agro.pl']],
+		wójtowo: [['89 741 00 98'], ['wojtowo@aldo.agro.pl']],
+		ciechanów: [['23 673 00 00', '519 494 664'], ['ciechanow@aldo.agro.pl']]
 	},
 	'komis maszyn': {
-		myszyniec: ['881 959 860']
+		myszyniec: [['881 959 860', '29 77 21 991'], ['komis@aldo.agro.pl']]
 	},
 	'stacja paliw': {
-		surowe: ['29 77 27 652']
+		surowe: [['29 77 27 652'], ['waldemar.skorupski@aldo.agro.pl']]
+	},
+	wulkanizacja: {
+		surowe: [['29 77 27 662', '692 448 240'], ['pawel.duszak@aldo.agro.pl']]
 	}
 } as const;
 type Service = keyof typeof contactInfo;
@@ -215,17 +250,35 @@ export const serviceNames: Record<ShortService, Service> = {
 	maszyny: 'dział maszyn',
 	paliwa: 'stacja paliw',
 	pasze: 'dział pasz',
-	serwis: 'serwis'
+	serwis: 'serwis',
+	wulkanizacja: 'wulkanizacja'
 };
 
 export const roleNames: Record<Role, string> = {
+	banned: 'Zablokowany',
 	customer: 'Klient',
 	driver: 'Kierowca',
 	adviser: 'Doradca',
 	admin: 'Admin'
 };
 
-export const services: ShortService[] = ['pasze', 'komis', 'market', 'paliwa', 'maszyny', 'serwis'];
+export const roleColors: Record<Role, string> = {
+	banned: 'bg-gray-500',
+	customer: 'bg-sky-500',
+	driver: 'bg-green-400',
+	adviser: 'bg-orange-400',
+	admin: 'bg-red-700'
+};
+
+export const services: ShortService[] = [
+	'pasze',
+	'komis',
+	'market',
+	'paliwa',
+	'maszyny',
+	'serwis',
+	'wulkanizacja'
+];
 
 // export const wretchClient = wretch('/api')
 // 	.resolve((_) => _.forbidden(() => toast.error('Nie masz uprawnień')))

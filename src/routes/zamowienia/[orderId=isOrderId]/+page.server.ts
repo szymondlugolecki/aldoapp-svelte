@@ -1,41 +1,32 @@
+import getCustomError from '$lib/client/constants/customErrors.js';
 import { isAtLeastModerator } from '$lib/client/functions';
+import { order$ } from '$lib/client/schemas/index.js';
+import changeOrderStatus from '$lib/server/actions/orders/changeOrderStatus';
+import orderAgain from '$lib/server/actions/orders/orderAgain';
 import { db } from '$lib/server/db/index.js';
-import type { OrderSummary } from '$types';
 import { trytm } from '@bdsqqq/try';
 import { error } from '@sveltejs/kit';
+import { superValidate } from 'sveltekit-superforms/server';
 
 export const load = async ({ params, locals }) => {
 	const sessionUser = locals.session?.user;
-	// In order to see order details, user must be:
-	// 1. logged in
-	// 2a. must be the owner of the order
-	// 2b. must be a mod
-
 	if (!sessionUser) {
-		throw error(401, 'Nie jesteś zalogowany');
+		throw error(...getCustomError('not-logged-in'));
 	}
 
 	const isMod = isAtLeastModerator(sessionUser.role);
 
-	const [preParseOrder, fetchOrderError] = await trytm(
+	const [rawOrder, fetchOrderError] = await trytm(
 		db.query.orders.findFirst({
 			columns: {
 				id: true,
 				createdAt: true,
-				updatedAt: true,
-
 				status: true,
-				paymentStatus: true,
-				deliveryStatus: true,
-
-				deliveryMethod: true,
-				paymentMethod: true,
-
-				address: true,
-
+				paid: true,
 				price: true,
 				discount: true,
-				noDiscountPrice: true
+				deliveryMethod: true,
+				paymentMethod: true
 			},
 			with: {
 				cartOwner: {
@@ -52,19 +43,31 @@ export const load = async ({ params, locals }) => {
 						id: true,
 						fullName: true,
 						email: true,
-						phone: true,
-						address: true
+						phone: true
+					},
+					with: {
+						address: {
+							columns: {
+								street: true,
+								city: true,
+								zipCode: true
+							}
+						}
 					}
 				},
-				orderProducts: {
+				products: {
+					columns: {
+						price: true,
+						quantity: true
+					},
 					with: {
 						product: {
 							columns: {
 								id: true,
 								name: true,
 								symbol: true,
-								price: true,
-								encodedURL: true
+								encodedURL: true,
+								description: true
 							}
 						}
 					}
@@ -76,6 +79,13 @@ export const load = async ({ params, locals }) => {
 						email: true,
 						phone: true
 					}
+				},
+				address: {
+					columns: {
+						street: true,
+						city: true,
+						zipCode: true
+					}
 				}
 			},
 			where: (orders, { eq }) => eq(orders.id, Number(params.orderId))
@@ -85,64 +95,39 @@ export const load = async ({ params, locals }) => {
 	if (fetchOrderError) {
 		// Unexpected-error
 		console.log('fetchOrderError', fetchOrderError);
-		throw error(500, 'Wystąpił niespodziewany błąd podczas szukania zamówienia');
+		throw error(500, 'Niespodziewany błąd podczas szukania zamówienia');
 	}
 
-	if (!preParseOrder) {
+	if (!rawOrder) {
 		throw error(404, 'Nie znaleziono zamówienia');
 	}
 
 	// Check permissions
-	const isOwner = preParseOrder.cartOwner.id === sessionUser.id;
-	if (!isOwner) {
-		if (!isMod) {
-			throw error(403, 'Nie masz wystarczających uprawień, żeby zobaczyć te zamówienie');
-		}
+	const isOwner = rawOrder.cartOwner.id === sessionUser.id;
+	if (!isOwner && !isMod) {
+		throw error(...getCustomError('insufficient-permissions'));
 	}
 
-	const {
-		id,
-		address,
-		paymentMethod,
-		paymentStatus,
-		deliveryMethod,
-		deliveryStatus,
-		status,
-		createdAt,
-		updatedAt,
-		price,
-		discount,
-		noDiscountPrice,
-		customer,
-		cartOwner,
-		driver
-	} = preParseOrder;
+	console.log('rawOrder', rawOrder.products.length, rawOrder.products[0]);
 
-	console.log('preParseOrder', preParseOrder.orderProducts.length, preParseOrder.orderProducts[0]);
-
-	const order: OrderSummary = {
-		products: preParseOrder.orderProducts.map(({ product, quantity }) => ({
+	const order = {
+		...rawOrder,
+		products: rawOrder.products.map(({ product, quantity, price }) => ({
 			...product,
+			price,
 			quantity
-		})),
-		id,
-		address,
-		paymentMethod,
-		paymentStatus,
-		deliveryMethod,
-		deliveryStatus,
-		status,
-		createdAt,
-		updatedAt,
-		price,
-		discount,
-		noDiscountPrice,
-		customer,
-		cartOwner,
-		driver
+		}))
 	};
+
+	console.log('cooked ordered', order);
 
 	return {
-		order
+		order,
+		orderAgainForm: superValidate(order$.orderAgainForm)
 	};
+};
+
+export const actions = {
+	changeOrderStatus,
+	orderAgain
 };

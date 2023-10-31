@@ -1,9 +1,10 @@
 import { trytm } from '@bdsqqq/try';
 import { db } from '$lib/server/db';
 import { error, type Action, fail } from '@sveltejs/kit';
-import { changePaymentMethod } from '$lib/server/functions/db';
-import { changePaymentMethodRequestSchema } from '$lib/client/schemas/cart';
+import { changeCartCustomer } from '$lib/server/functions/db';
 import { betterZodParse } from '$lib/client/functions/betterZodParse';
+import { isAtLeastModerator } from '$lib/client/functions';
+import { cart$ } from '$lib/client/schemas';
 
 const setCustomer: Action = async ({ locals, request }) => {
 	const sessionUser = locals.session?.user;
@@ -12,23 +13,27 @@ const setCustomer: Action = async ({ locals, request }) => {
 		throw error(401, 'Nie jesteś zalogowany');
 	}
 
+	if (!isAtLeastModerator(sessionUser.role)) {
+		throw error(403, 'Niewystarczające uprawnienia');
+	}
+
 	// Validate the user input
 	const [formData, formDataError] = await trytm(request.formData());
-	console.log('changePaymentMethod', 'formData', formData);
+	console.log('setCartCustomer', 'formData', formData);
 	if (formDataError) {
 		return fail(400, {
-			errors: ['Nieprawidłowa metoda płatności']
+			errors: ['Nieprawidłowy klient']
 		});
 	}
 
 	const entries = Object.fromEntries(formData);
 
-	console.log('changePaymentMethod', 'entries', entries);
+	console.log('setCartCustomer', 'entries', entries);
 
 	// Validate the request body
-	const [data, parseError] = betterZodParse(changePaymentMethodRequestSchema, entries);
+	const [data, parseError] = betterZodParse(cart$.changeCartCustomer, entries);
 	if (parseError) {
-		console.error('Failed to validate the change payment method request body', parseError);
+		console.error('Failed to validate the change of cart customer', parseError);
 		return fail(400, {
 			errors: parseError
 		});
@@ -50,14 +55,12 @@ const setCustomer: Action = async ({ locals, request }) => {
 	// No cart
 	if (!cart) {
 		return fail(400, {
-			errors: ['Nie można zmienić metody płatności, ponieważ koszyk nie istnieje']
+			errors: ['Nie można zmienić klienta, ponieważ koszyk nie istnieje']
 		});
 	}
 
 	// Remove all products in the cart
-	const [, changePaymentMethodError] = await trytm(
-		changePaymentMethod(cart.id, data.paymentMethod)
-	);
+	const [, changePaymentMethodError] = await trytm(changeCartCustomer(cart.id, data.customerId));
 
 	if (changePaymentMethodError) {
 		// Unexpected-error

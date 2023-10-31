@@ -1,0 +1,47 @@
+<script lang="ts">
+	import MessageAlert from '$components/custom/Form/MessageAlert.svelte';
+	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import * as Form from '$components/ui/form';
+	import { settings$ } from '$lib/client/schemas';
+	import type { EmailForm, PhoneForm } from '$lib/client/schemas/settings';
+	import type { SuperValidated } from 'sveltekit-superforms';
+
+	export let form: SuperValidated<EmailForm>;
+</script>
+
+<Form.Root
+	method="POST"
+	{form}
+	let:submitting
+	schema={settings$.emailForm}
+	let:config
+	action="?/email"
+	class="flex flex-col items-end w-full gap-y-4"
+>
+	<div class="flex flex-col w-full gap-y-2">
+		<h2 class="text-lg font-medium">Adres email</h2>
+
+		<MessageAlert />
+
+		<div class="grid grid-cols-4 gap-x-4 gap-y-2">
+			<Form.Field {config} name="email">
+				<Form.Item class="col-span-4 sm:col-span-2">
+					<Form.Label>Adres email</Form.Label>
+					<Form.Input
+						spellcheck="false"
+						required
+						type="email"
+						minlength={3}
+						disabled={submitting}
+					/>
+					<Form.Validation />
+				</Form.Item>
+			</Form.Field>
+		</div>
+	</div>
+	{#if submitting}
+		<Spinner />
+	{:else}
+		<Form.Button disabled={submitting}>Zapisz</Form.Button>
+	{/if}
+</Form.Root>

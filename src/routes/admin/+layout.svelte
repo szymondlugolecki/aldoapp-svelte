@@ -1,22 +1,20 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
-	import { Button } from '$shadcn/button';
-	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$shadcn/card';
-	import TabsList from '$components/Layout/AdminTabs/TabsList.svelte';
-	import Tab from '$components/Layout/AdminTabs/Tab.svelte';
-	import TabsContent from '$components/Layout/AdminTabs/TabsContent.svelte';
+	import TabsList from '$components/custom/Layout/AdminTabs/TabsList.svelte';
+	import Tab from '$components/custom/Layout/AdminTabs/Tab.svelte';
+	import TabsContent from '$components/custom/Layout/AdminTabs/TabsContent.svelte';
 
 	$: pathname = $page.url.pathname;
 </script>
 
 <div class="flex flex-col w-full">
-	<div class="flex-1 space-y-4 p-8 pt-6 w-full">
+	<div class="flex-1 w-full p-8 pt-6 space-y-4">
 		<div class="flex items-center justify-start space-y-2">
 			<h2 class="text-3xl font-bold tracking-tight">Panel administracyjny</h2>
 			<!-- <div class="flex items-center space-x-2">
 				<Button size="sm">
-					<Download class="mr-2 h-4 w-4" />
+					<Download class="w-4 h-4 mr-2" />
 					Download
 				</Button>
 			</div> -->
@@ -25,11 +23,12 @@
 		<TabsList>
 			<Tab {pathname} href="/admin">Start</Tab>
 			<Tab {pathname} href="/admin/zamowienia">Zamówienia</Tab>
+			<!-- <Tab {pathname} href="/admin/zamowienia2">Zamówienia 2</Tab> -->
 			<Tab {pathname} href="/admin/uzytkownicy">Użytkownicy</Tab>
 			<Tab {pathname} href="/admin/produkty">Produkty</Tab>
 			<Tab {pathname} href="/admin/analityka">Analityka</Tab>
 		</TabsList>
-		<TabsContent class="space-y-4 justi">
+		<TabsContent class="space-y-4">
 			<slot />
 		</TabsContent>
 	</div>
@@ -37,9 +36,9 @@
 
 <!-- <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 				<Card>
-					<CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+					<CardHeader class="flex flex-row items-center justify-between pb-2 space-y-0">
 						<CardTitle class="text-sm font-medium">Total Revenue</CardTitle>
-						<DollarSign class="h-4 w-4 text-muted-foreground" />
+						<DollarSign class="w-4 h-4 text-muted-foreground" />
 					</CardHeader>
 					<CardContent>
 						<div class="text-2xl font-bold">$45,231.89</div>
@@ -47,9 +46,9 @@
 					</CardContent>
 				</Card>
 				<Card>
-					<CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+					<CardHeader class="flex flex-row items-center justify-between pb-2 space-y-0">
 						<CardTitle class="text-sm font-medium">Subscriptions</CardTitle>
-						<Users class="h-4 w-4 text-muted-foreground" />
+						<Users class="w-4 h-4 text-muted-foreground" />
 					</CardHeader>
 					<CardContent>
 						<div class="text-2xl font-bold">+2350</div>
@@ -57,9 +56,9 @@
 					</CardContent>
 				</Card>
 				<Card>
-					<CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+					<CardHeader class="flex flex-row items-center justify-between pb-2 space-y-0">
 						<CardTitle class="text-sm font-medium">Sales</CardTitle>
-						<CreditCard class="h-4 w-4 text-muted-foreground" />
+						<CreditCard class="w-4 h-4 text-muted-foreground" />
 					</CardHeader>
 					<CardContent>
 						<div class="text-2xl font-bold">+12,234</div>
@@ -67,9 +66,9 @@
 					</CardContent>
 				</Card>
 				<Card>
-					<CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+					<CardHeader class="flex flex-row items-center justify-between pb-2 space-y-0">
 						<CardTitle class="text-sm font-medium">Active Now</CardTitle>
-						<Activity class="h-4 w-4 text-muted-foreground" />
+						<Activity class="w-4 h-4 text-muted-foreground" />
 					</CardHeader>
 					<CardContent>
 						<div class="text-2xl font-bold">+573</div>

@@ -1,24 +1,28 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { fodderCategories2, fodderNames, producentsList } from '$lib/client/constants';
-	import Alert from '$shadcn/alert/Alert.svelte';
-	import AlertTitle from '$shadcn/alert/AlertTitle.svelte';
-	import AlertDescription from '$shadcn/alert/AlertDescription.svelte';
-	import Button from '$shadcn/button/Button.svelte';
-	import Separator from '$shadcn/separator/Separator.svelte';
-	import { Package, PlusCircle, ShoppingCart } from 'lucide-svelte';
+	import * as Alert from '$shadcn/alert';
+	// import AlertTitle from '$shadcn/alert/AlertTitle.svelte';
+	// import AlertDescription from '$shadcn/alert/AlertDescription.svelte';
+	import { Button } from '$shadcn/button';
+	import { Separator } from '$shadcn/separator';
+	import { Heart, Package, PlusCircle, ShoppingCart } from 'lucide-svelte';
 	import toast from 'svelte-french-toast';
+	import type { Subcategory } from '$types';
+	import { newCategoryUrl, newSubcategoryUrl } from '$lib/client/functions/index.js';
+	import { handleFormResponse } from '$lib/client/functions/forms.js';
+	import createLoadingToast from '$lib/client/functions/createLoadingToast.js';
+	import { slide } from 'svelte/transition';
+	import { superForm } from 'sveltekit-superforms/client';
+	import { Reload } from 'radix-icons-svelte';
+	import MessageAlert from '$components/custom/Form/MessageAlert.svelte';
+	import ErrorMessage from '$components/custom/Form/ErrorMessage.svelte';
+	import Message from '$components/custom/Form/Message.svelte';
 
 	export let data;
-
-	// $: console.log('data.url', data.url.slice(data.url.lastIndexOf('/') + 1));
-
-	const product = data.products.find((product) => {
-		const index = data.url.lastIndexOf('/');
-		if (index === -1) {
-			return false;
-		}
-		return product.encodedURL === data.url.slice(index + 1);
+	const { enhance, message, errors, delayed, timeout } = superForm(data.addProductForm, {
+		delayMs: 1000,
+		timeoutMs: 10000
 	});
 
 	let selectedImagePreview = 0;
@@ -26,146 +30,174 @@
 		'https://res.cloudinary.com/dzcuq1b2u/image/upload/v1680687127/products/Lacto%20Start%20IPC%20pasza%20rozdojeniowa%20De%20Heus%2025kg/DB4A2X00G-W00/0.webp';
 </script>
 
-{#if product}
-	<section class="w-full flex flex-col items-center justify-start">
-		<div class="mx-auto px-4 w-full">
-			<!-- Breadcrumbs -->
-			<div class="text-sm breadcrumbs max-w-[260px] xxs:max-w-none">
-				<ul>
-					<li><a href="/sklep">{fodderNames[product.category]}</a></li>
-					{#if product.subcategory}
-						<li><a href="/sklep">{fodderCategories2[product.category][product.subcategory]}</a></li>
-					{/if}
-					<li>{product.name}</li>
-				</ul>
+<section class="max-w-2xl px-4 pt-4 mx-auto lg:max-w-6xl sm:px-0 pb-14">
+	<div class="grid lg:grid-cols-2 lg:gap-x-8 gap-y-4 lg:items-start">
+		<!-- Images -->
+		<div class="max-w-md overflow-hidden rounded-md aspect-3/4">
+			<a href="/sklep/{data.product.encodedURL}">
+				<div class="">
+					<img
+						src={productImgUrl}
+						alt={data.product.name}
+						class="scale-[1.19] object-cover object-center hover:scale-[1.21] duration-150 mt-1.5"
+					/>
+				</div>
+			</a>
+		</div>
+
+		<div class="grid gap-y-3">
+			<div class="">
+				<div class="">
+					<h1 class="text-3xl font-bold tracking-tight scroll-m-20">
+						{data.product.name}
+					</h1>
+				</div>
+
+				<h2 class="text-3xl tracking-tight">{data.product.price} PLN</h2>
 			</div>
 
-			<div
-				class="mt-4 flex flex-col lg:flex-row items-center lg:items-start justify-start lg:justify-center"
-			>
-				<div class="lg:col-span-3 lg:row-end-1">
-					<!-- All images -->
-					<div class="lg:flex lg:items-start">
-						<!-- Main Image -->
+			<div>
+				<span
+					class="inline-flex items-center px-2 py-1 my-3 text-xs font-medium text-blue-700 rounded-md bg-blue-50 ring-1 ring-inset ring-blue-600/20"
+					>{fodderNames[data.product.category]}</span
+				>
+			</div>
 
-						<div class="overflow-hidden rounded-md max-w-xl">
-							<a href={`/sklep/${product.encodedURL}`}>
-								<img
-									src={productImgUrl}
-									alt=""
-									class="scale-[1.1] object-cover hover:scale-[1.15] duration-150"
-								/>
-							</a>
-						</div>
+			<p class="">
+				{data.product.description || 'Brak opisu...'}
+			</p>
 
-						<!-- Left Side Images -->
-						<div class="mt-2 lg:order-1 lg:flex-shrink-0">
-							<div
-								class="flex flex-row items-start lg:flex-col w-full mb-3 space-x-4 lg:space-x-0 lg:space-y-4"
+			<div class="w-full border-t border-border" />
+
+			<dl class="grid gap-y-2">
+				<div class="flex items-center justify-between">
+					<dt class="text-base">Waga</dt>
+					<dd class="text-base">{data.product.weight} kg</dd>
+				</div>
+				<div class="flex items-center justify-between">
+					<dt class="text-base">Producent</dt>
+					<dd class="text-base">{producentsList[data.product.producent]}</dd>
+				</div>
+				<div class="flex items-center justify-between">
+					<dt class="text-base">Kod produktu</dt>
+					<dd class="text-base">{data.product.symbol}</dd>
+				</div>
+			</dl>
+
+			<div>
+				<div class="flex flex-col w-full mt-6 gap-y-2">
+					{#if $page.data.user}
+						<div class="flex items-center gap-x-6">
+							<form
+								class="flex items-center w-full max-w-xs gap-x-6"
+								method="post"
+								action="?/changeProductQuantity"
+								use:enhance
 							>
-								{#each product.images.slice(0, 4) as image}
-									<!-- transition:fade={{ duration: 400 }} -->
+								<input type="hidden" name="quantity" value={1} />
+								<input type="hidden" name="productId" value={data.product.id} />
+
+								<!-- Already in cart -->
+								{#if data.cart?.products.some((p) => p.id === data.product.id)}
+									<Button disabled class="w-full">W koszyku</Button>
+								{:else}
+									{#if $delayed}
+										<Button disabled class="w-full">
+											<Reload class="w-4 h-4 mr-2 animate-spin" />
+											Proszę czekać
+										</Button>
+									{/if}
+									<button
+										class="w-full p-2 font-semibold transition-colors bg-blue-700 rounded-sm hover:bg-blue-700/80"
+										type="submit">Dodaj do koszyka</button
+									>
+								{/if}
+							</form>
+
+							<form method="post" action="?/favorite" use:enhance>
+								<input type="hidden" name="productId" value={data.product.id} />
+								<button type="submit" class="transition-colors text-muted hover:text-red-600"
+									><Heart size={28} strokeWidth={2} /></button
+								>
+							</form>
+						</div>
+					{:else}
+						<Alert.Root variant="default">
+							<Alert.Title>Zaloguj się</Alert.Title>
+							<Alert.Description>
+								Musisz być zalogowany, żeby dodać produkt do koszyka.
+							</Alert.Description>
+						</Alert.Root>
+					{/if}
+				</div>
+
+				{#if $message}
+					<Message message={$message} />
+				{/if}
+				{#if $timeout}
+					<ErrorMessage errors={['Brak odpowiedzi serwera']} />
+				{/if}
+				{#if $errors.quantity || $errors.productId}
+					<ErrorMessage errors={$errors.quantity} />
+					<ErrorMessage errors={$errors.productId} />
+				{/if}
+
+				<div class="divider" />
+
+				<ul>
+					<li class="flex items-center text-sm font-medium text-left text-gray-600">
+						<Package class="mr-2" />
+						Darmowa dostawa
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<!-- <div class="lg:col-span-3">
+					<h3 class="text-lg">Opis produktu</h3>
+					<p>{data.product.description || 'Brak opisu...'}</p>
+				</div> -->
+	</div>
+</section>
+
+<!-- Breadcrumbs -->
+<!-- <div class="text-sm breadcrumbs max-w-[260px] xxs:max-w-none">
+				<ul>
+					<li>
+						<a href={newCategoryUrl($page.url.searchParams, data.product.category)}
+							>{fodderNames[data.product.category]}</a
+						>
+					</li>
+					{#if data.product.subcategory}
+						<li>
+							<a href={newSubcategoryUrl($page.url.searchParams, data.product.subcategory)}>
+								{fodderCategories2[data.product.category][data.product.subcategory]}</a
+							>
+						</li>
+					{/if}
+					<li>{data.product.name}</li>
+				</ul>
+			</div> -->
+
+<!-- Left Side Images -->
+<!-- <div class="mt-2 lg:order-1 lg:flex-shrink-0">
+							<div
+								class="flex flex-row items-start w-full mb-3 space-x-4 lg:flex-col lg:space-x-0 lg:space-y-4"
+							>
+								{#each data.product.images.slice(0, 4) as image}
 									<button
 										type="button"
-										class:outline={selectedImagePreview === product.images.indexOf(image)}
-										class:outline-2={selectedImagePreview === product.images.indexOf(image)}
-										class="flex-0 aspect-square h-20 overflow-hidden rounded-lg outline outline-offset-2 outline-base-content text-center"
-										on:click={() => (selectedImagePreview = product.images.indexOf(image))}
+										class:outline={selectedImagePreview === data.product.images.indexOf(image)}
+										class:outline-2={selectedImagePreview === data.product.images.indexOf(image)}
+										class="h-20 overflow-hidden text-center rounded-lg flex-0 aspect-square outline outline-offset-2 outline-base-content"
+										on:click={() => (selectedImagePreview = data.product.images.indexOf(image))}
 									>
 										<img
-											class="h-full w-full object-cover"
+											class="object-cover w-full h-full"
 											src={image && image.url}
-											alt={product.name}
+											alt={data.product.name}
 										/>
 									</button>
 								{/each}
 							</div>
-						</div>
-					</div>
-				</div>
-
-				<div class="divider divider-horizontal xl:mx-16" />
-
-				<div class="max-w-3xl lg:max-w-[340px] lg:w-[300px] xl:w-auto">
-					<!-- <h1 class="text-2xl font-bold sm:text-3xl"></h1> -->
-					<h1 class="scroll-m-20 text-2xl font-extrabold tracking-tight lg:text-3xl">
-						{product.name}
-					</h1>
-					<!-- <h3 class="scroll-m-20 text-xl font-semibold tracking-tight">
-						
-					</h3> -->
-
-					<h3 class="text-base font-semibold mt-1">{product.price} PLN</h3>
-
-					<div class="flex flex-col space-y-1 lg:text-base md:text-sm mt-5">
-						<!-- <div class="flex justify-between items-center">
-							<span class="text-base">Cena</span>
-							<bold class="text-base">{product.price} PLN</bold>
 						</div> -->
-						<div class="flex justify-between items-center">
-							<span class="text-base">Waga</span>
-							<bold class="text-base">{product.weight} kg</bold>
-						</div>
-						<div class="flex justify-between items-center">
-							<span class="text-base">Producent</span>
-							<bold class="text-base">{producentsList[product.producent]}</bold>
-						</div>
-						<div class="flex justify-between items-center">
-							<span class="text-base">Kod produktu</span>
-							<bold class="text-base">{product.symbol}</bold>
-						</div>
-					</div>
-
-					<div>
-						<div class="mt-6 w-full flex space-y-2 flex-col">
-							{#if $page.data.user}
-								<Button>
-									<PlusCircle class="mr-2 h-4 w-4" />
-									Dodaj do koszyka
-								</Button>
-								<Button href="/zamowienie/koszyk" variant="secondary">
-									<ShoppingCart class="mr-2 h-4 w-4" />
-									Otwórz koszyk
-								</Button>
-							{:else}
-								<Alert variant="default">
-									<AlertTitle>Zaloguj się</AlertTitle>
-									<AlertDescription>
-										Musisz być zalogowany, żeby dodać produkt do koszyka.
-										<br /><Button variant="link" href="/zaloguj" class="p-0"
-											>Kliknij tutaj, aby się zalogować</Button
-										>
-									</AlertDescription>
-								</Alert>
-							{/if}
-						</div>
-
-						<div class="divider" />
-
-						<ul>
-							<li class="flex items-center text-left text-sm font-medium text-gray-600">
-								<Package class="mr-2" />
-								Darmowa dostawa
-							</li>
-						</ul>
-					</div>
-				</div>
-
-				<!-- <div class="lg:col-span-3">
-					<h3 class="text-lg">Opis produktu</h3>
-					<p>{product.description || 'Brak opisu...'}</p>
-				</div> -->
-			</div>
-
-			<Separator class="my-4 xl:my-16" orientation="horizontal" />
-
-			<div>
-				<h3 class="text-lg">Opis produktu</h3>
-				<p class="text-sm mt-1">{product.description || ''}</p>
-			</div>
-		</div>
-		<!-- <div class="divider hidden md:flex md:divider-horizontal" /> -->
-	</section>
-{:else}
-	<h1 class="text-xl">Nie znaleziono produktu ☹️</h1>
-{/if}

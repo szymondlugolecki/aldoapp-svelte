@@ -1,7 +1,12 @@
-import addToCart from '$lib/server/actions/cart/add.js';
-import removeFromCart from '$lib/server/actions/cart/remove';
+import { superValidate } from 'sveltekit-superforms/server';
+import changeProductQuantity from '$lib/server/actions/cart/changeProductQuantity';
+import { cart$ } from '$lib/client/schemas/index.js';
 
 export const actions = {
-	addToCart: addToCart,
-	removeFromCart: removeFromCart
+	changeProductQuantity
+};
+
+export const load = async () => {
+	const form = await superValidate(cart$.changeProductQuantity);
+	return { form };
 };

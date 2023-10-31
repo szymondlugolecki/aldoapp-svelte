@@ -1,10 +1,11 @@
-import sendPush from '$lib/server/actions/push/send';
-import type { Config } from '@sveltejs/adapter-vercel';
-
-export const config: Config = {
-	runtime: 'nodejs18.x'
-};
+import { pushSubscription$ } from '$lib/client/schemas/index.js';
+import sendAll from '$lib/server/actions/push/sendAll';
+import { superValidate } from 'sveltekit-superforms/server';
 
 export const actions = {
-	push: sendPush
+	sendAll
+};
+
+export const load = async (event) => {
+	return { form: superValidate(event, pushSubscription$.notificationAll, { id: 'sendAll' }) };
 };

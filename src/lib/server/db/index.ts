@@ -6,12 +6,15 @@ import { connect } from '@planetscale/database';
 // import { users } from './schemas';
 import { DATABASE_HOST, DATABASE_USERNAME, DATABASE_PASSWORD } from '$env/static/private';
 import * as users from './schemas/users';
+import * as userAddress from './schemas/userAddress';
 import * as orders from './schemas/orders';
 import * as products from './schemas/products';
+import * as favoriteProducts from './schemas/favoriteProducts';
 import * as orderProducts from './schemas/orderProducts';
+import * as orderAddress from './schemas/orderAddress';
 import * as carts from './schemas/carts';
 import * as cartProducts from './schemas/cartProducts';
-import * as promoCodes from './schemas/promoCodes';
+// import * as promoCodes from './schemas/promoCodes';
 import * as subscriptions from './schemas/subscriptions';
 import * as verificationTokens from './schemas/verificationTokens';
 import * as images from './schemas/images';
@@ -24,15 +27,18 @@ const connection = connect({
 });
 
 export const db = drizzle(connection, {
-	logger: true,
+	// logger: true,
 	schema: {
 		...users,
+		...userAddress,
 		...orders,
 		...products,
+		...favoriteProducts,
 		...orderProducts,
+		...orderAddress,
 		...carts,
 		...cartProducts,
-		...promoCodes,
+		// ...promoCodes,
 		...subscriptions,
 		...verificationTokens,
 		...images

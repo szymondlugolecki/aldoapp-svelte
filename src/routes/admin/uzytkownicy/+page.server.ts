@@ -1,29 +1,19 @@
-import { isJSON } from '$lib/client/functions/index.js';
+import { user$ } from '$lib/client/schemas/index.js';
 import add from '$lib/server/actions/users/add';
 import edit from '$lib/server/actions/users/edit';
 import { db } from '$lib/server/db';
 import { users } from '$lib/server/db/schemas/users';
+import { extractParams } from '$lib/server/functions/utils';
 import type { UserSortableColumn } from '$types';
 import { sql } from 'drizzle-orm';
+import { superValidate } from 'sveltekit-superforms/server';
 
-const sortableColumns: UserSortableColumn[] = ['fullName', 'email', 'role', 'access', 'createdAt'];
+const sortableColumns: UserSortableColumn[] = ['fullName', 'email', 'role', 'createdAt'];
 
 const pageLimit = 10;
 
 export const load = async ({ url }) => {
-	const page = !isNaN(Number(url.searchParams.get('strona')))
-		? Math.max(Number(url.searchParams.get('strona')), 1)
-		: 1;
-
-	const sort = url.searchParams.get('sort');
-	const desc = url.searchParams.get('desc');
-
-	const descBool = desc && ['true', 'false'].includes(desc) ? isJSON<boolean>(desc) : null;
-	const properSort = (sort: string | null): sort is UserSortableColumn => {
-		return !!sort && sortableColumns.includes(sort as UserSortableColumn);
-	};
-
-	console.log('page', page, sort, 'desc', descBool);
+	const { page, sort } = extractParams<UserSortableColumn>(url, sortableColumns);
 
 	return {
 		users: db.query.users.findMany({
@@ -34,37 +24,37 @@ export const load = async ({ url }) => {
 						email: true,
 						fullName: true
 					}
+				},
+				address: {
+					columns: {
+						street: true,
+						zipCode: true,
+						city: true
+					}
 				}
 			},
 			columns: {
 				id: true,
 				email: true,
 				fullName: true,
-				access: true,
 				role: true,
 				phone: true,
-				createdAt: true,
-				address: true
+				createdAt: true
 			},
 			offset: (page - 1) * pageLimit,
-			...(descBool !== null && properSort(sort)
-				? {
-						orderBy: (users, { asc, desc }) => (descBool ? desc(users[sort]) : asc(users[sort]))
-				  }
-				: {}),
-			limit: pageLimit
-			// ...(search
-			// 	? {
-			// 			where: (users, { sql }) => sql`MATCH(${users.email}) AGAINST(${search} IN BOOLEAN MODE)`
-			// 	  }
-			// 	: {}),
+			limit: pageLimit,
+			orderBy: sort
+				? (users, { asc, desc }) => (sort.descending ? desc(users[sort.by]) : asc(users[sort.by]))
+				: (users, { desc }) => desc(users.createdAt)
 		}),
 		count: db
 			.select({
 				count: sql<number>`count(*)`.mapWith(Number)
 			})
 			.from(users),
-		pageLimit
+		pageLimit,
+		addForm: superValidate(user$.addForm),
+		editForm: superValidate(user$.editForm)
 	};
 };
 

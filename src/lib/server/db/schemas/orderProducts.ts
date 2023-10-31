@@ -18,7 +18,8 @@ export const orderProducts = mysqlTable('order_products', {
 export const orderProductsRelations = relations(orderProducts, ({ one }) => ({
 	order: one(orders, {
 		fields: [orderProducts.orderId],
-		references: [orders.id]
+		references: [orders.id],
+		relationName: 'order_products' 
 	}),
 	product: one(products, {
 		fields: [orderProducts.productId],

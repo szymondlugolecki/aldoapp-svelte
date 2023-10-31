@@ -27,12 +27,21 @@ export const load = async ({ locals, depends, url }) => {
 							id: true,
 							fullName: true,
 							email: true,
-							phone: true,
-							address: true
+							phone: true
+						},
+						with: {
+							address: {
+								columns: {
+									zipCode: true,
+									city: true,
+									street: true
+								}
+							}
 						}
 					},
 					products: {
 						columns: {
+							id: true,
 							quantity: true
 						},
 						with: {
@@ -57,12 +66,14 @@ export const load = async ({ locals, depends, url }) => {
 		const [fetchedCart] = await trytm(cartFetchPromise);
 
 		if (fetchedCart) {
+			const groupedProducts = fetchedCart.products.map(({ product, quantity }) => ({
+				...product,
+				quantity
+			}));
+
 			const fixedCart = {
 				...fetchedCart,
-				products: fetchedCart.products.map(({ product, quantity }) => ({
-					...product,
-					quantity
-				}))
+				products: groupedProducts
 			};
 
 			cart = fixedCart;
@@ -83,8 +94,17 @@ export const load = async ({ locals, depends, url }) => {
 							fullName: true,
 							email: true,
 							phone: true
+						},
+						with: {
+							address: {
+								columns: {
+									zipCode: true,
+									city: true,
+									street: true
+								}
+							}
 						}
 				  })
-				: undefined
+				: []
 	};
 };

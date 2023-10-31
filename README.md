@@ -1,18 +1,66 @@
-# create-svelte
+# twoje aldo
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+Fully featured e-commerce platform built with SvelteKit & TailwindCSS.
 
-## Creating a project
+## Features
+🤖 Automated notification system (email, push)
+🔐 Self-built passwordless authentication system
+📱 PWA
+💬 Push Messages
+👨‍💼 Feature rich Admin Panel
+🛒 Server-based cart
+👨 User profiles
+⚡ Built for the edge
+🥅 Caching & Rate Limiting
 
-If you're seeing this, you've probably already done this step. Congrats!
+
+## Tech stack
 
 ```bash
-# create a new project in the current directory
-npm create svelte@latest
+# core
+sveltekit
+typescript
+drizzle-orm + planetscale serverless driver
+meltui
 
-# create a new project in my-app
-npm create svelte@latest my-app
+# styling
+tailwindcss
+shadcn-svelte
+lucide-svelte
+
+# other
+sveltekit-superforms
+zod
+@upstash/redis
+xstate
+
 ```
+
+# TODO
+Server-side tables:
+-    [  ] Sorting
+-    [  ] Filtering
+-    [  ] Full text search
+-    [  ] Pagination
+
+[  ] Product images
+
+[  ] Hover cards for users
+
+[  ] ToS & Privacy pages
+
+[  ] Date for each change in order status
+
+[  ] Switch auth system to boron-auth
+
+[  ] Page transitions with new Chrome API
+
+[  ] Analytics
+
+[  ] Automatic background removing in product images
+
+<!-- [ ] Add a secure and httpOnly (with restriced path: '/zaloguj/weryfikacja')
+cookie that would prevent logging in with someone else's verification code. > User wants to login > Enters their email > It's written into the cookie & verification email is sent > Under the verification API route it is checked whether the account email is the same as in the cookie -->
 
 ## Developing
 
@@ -36,66 +84,3 @@ npm run build
 You can preview the production build with `npm run preview`.
 
 > To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
-
-# TODO
-
-[✅] Add toasts (also fix toasts stopped showing when logging in)
-
-[✅] Add animations for smoother and nicer user experience (SvelteKit has many built-in)
-
-[✅] Make the filters work on Użytkownicy, Produkty & Zamówienia pages
-
-[✅] Make the user panel more readable (wider)
-
-[] Add backend check to make sure product quantity is not above 127
-
-[ ] Add a secure and httpOnly (with restriced path: '/zaloguj/weryfikacja')
-cookie that would prevent logging in with someone else's verification code. > User wants to login > Enters their email > It's written into the cookie & verification email is sent > Under the verification API route it is checked whether the account email is the same as in the cookie
-
-[✅] Add store page with all the products
-
-[✅] Implement cart & checkout with svelte store
-
-[✅] Add products page in admin panel
-
-[✅] Implement auth system
-
-[✅] Add promo codes
-
-[ ] Implement user profile
-
-[ ] Implement user orders history
-
-[ ] Make a cool home page (with carousels mb)
-
-[ ] Add PWA
-
-[✅] Add push notifications
-
-[✅] Add light/dark mode switch
-
-[ ] Write & run tests
-
-- - - [ ] Test the permissions on forms
-
-[ ] Handle permissions (admin panel access, etc)
-
-[ ] Add support for offline mode
-
-[ ] Add custom error pages
-
-[ ] A11y, SEO
-
-[ ] Add possibility to send a request to a service
-
-[ ] Page transition with new Chrome API (for the shop page)
-
-[ ] Deploy on Vercel
-
-Under consideration:
-
-[ ] Add chatbot for easy user interactions (bot asks what the user wants => user can choose: buy sth, get a phone number for a service of choice, live chat with the staff)
-
-[✅] Add user settings (possibility to add permanent address for future deliveries?, ?, ?)
-
-[ ] Train chatgpt for indefinite interactions with users

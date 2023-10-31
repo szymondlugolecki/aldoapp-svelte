@@ -22,8 +22,7 @@ export const promoCodes = mysqlTable(
 	'promo_codes',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').defaultNow(),
-		updatedAt: timestamp('updated_at').onUpdateNow(),
+		createdAt: timestamp('created_at').notNull(),
 
 		// Promo Code info
 		code: varchar('code', { length: 32 }).notNull(),
@@ -61,8 +60,7 @@ export const promoCodeUses = mysqlTable(
 	'promo_code_uses',
 	{
 		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').defaultNow(),
-		updatedAt: timestamp('updated_at').defaultNow().onUpdateNow(),
+		createdAt: timestamp('created_at').notNull(),
 
 		promoCodeId: varchar('promocode_used_id', { length: 36 }).notNull(),
 		orderId: varchar('order_id', { length: 36 }).notNull(),

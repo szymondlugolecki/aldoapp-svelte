@@ -1,80 +1,47 @@
-import { betterZodParse } from '$lib/client/functions/betterZodParse';
-import { isJSON } from '$lib/client/functions/index.js';
-import { editUserSchema } from '$lib/client/schemas/users';
+import getCustomError from '$lib/client/constants/customErrors.js';
+import { settings$ } from '$lib/client/schemas/index.js';
+import address from '$lib/server/actions/settings/address.js';
+import email from '$lib/server/actions/settings/email.js';
+import phone from '$lib/server/actions/settings/phone.js';
 import { db } from '$lib/server/db';
-import { users } from '$lib/server/db/schemas/users';
 import { trytm } from '@bdsqqq/try';
-import { error, fail } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
+import { error } from '@sveltejs/kit';
+import { superValidate } from 'sveltekit-superforms/server';
+
+export const actions = {
+	address,
+	email,
+	phone
+};
 
 export const load = async ({ locals }) => {
 	// Must be logged in
 	const { session } = locals;
 	if (!session) {
-		throw error(401, 'Nie jesteś zalogowany');
+		throw error(...getCustomError('not-logged-in'));
 	}
 
 	const [user, fetchUserError] = await trytm(
-		db.query.users.findFirst({ where: (users, { eq }) => eq(users.id, session.user.id) })
+		db.query.users.findFirst({
+			where: (users, { eq }) => eq(users.id, session.user.id),
+			columns: {
+				email: true,
+				phone: true
+			},
+			with: { address: { columns: { city: true, zipCode: true, street: true } } }
+		})
 	);
-
 	if (fetchUserError) {
 		throw error(500, 'Nie udało się pobrać danych użytkownika');
 	}
 
 	if (!user) {
-		throw error(401, 'Użytkownik nie istnieje');
+		throw error(404, 'Nie znaleziono użytkownika');
 	}
 
 	return {
-		address: user.address
+		addressForm: superValidate(user.address, settings$.addressForm),
+		emailForm: superValidate({ email: user.email }, settings$.emailForm),
+		phoneForm: superValidate({ phone: user.phone }, settings$.phoneForm)
 	};
-};
-
-export const actions = {
-	address: async ({ request, locals }) => {
-		// Must be logged in
-		if (!locals.session) {
-			throw error(401, 'Nie jesteś zalogowany');
-		}
-
-		// Validate the user input
-		const [formData, formDataError] = await trytm(request.formData());
-		if (formDataError) {
-			return fail(400, {
-				errors: ['Niepoprawne dane']
-			});
-		}
-
-		const entries = Object.fromEntries(formData);
-
-		const data =
-			isJSON(entries.address) && !(entries.address instanceof File)
-				? JSON.parse(entries.address)
-				: {};
-
-		console.log('formData', formData, 'data', data);
-
-		// Zod parse the address
-		const [address, editAddressObjParseError] = betterZodParse(editUserSchema.shape.address, data);
-		if (editAddressObjParseError) {
-			return fail(400, {
-				errors: [editAddressObjParseError[0]]
-			});
-		}
-
-		console.log('final address', address);
-
-		const [, editUserError] = await trytm(
-			db.update(users).set({ address }).where(eq(users.id, locals.session.user.id))
-		);
-
-		if (editUserError) {
-			return fail(500, {
-				errors: ['Nie udało się zmienić adresu']
-			});
-		}
-
-		return { success: true, message: 'Pomyślnie edytowano adres' };
-	}
 };

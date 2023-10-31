@@ -1,19 +1,25 @@
 import { z } from 'zod';
-import { userPropertySchemas } from './users';
+import { email } from './user';
 
-export const authSchemas = {
-	code: z
-		.string({
-			required_error: 'Kod weryfikacyjny jest wymagany',
-			invalid_type_error: 'Nieprawidłowy kod'
-		})
-		.length(4, { message: 'Nieprawidłowy kod' })
-};
+const code = z
+	.string({
+		required_error: 'Kod weryfikacyjny jest wymagany',
+		invalid_type_error: 'Nieprawidłowy kod'
+	})
+	.transform((value) => value.replaceAll(',', ''))
+	.pipe(
+		z
+			.string({
+				required_error: 'Kod weryfikacyjny jest wymagany',
+				invalid_type_error: 'Nieprawidłowy kod'
+			})
+			.length(4, { message: 'Nieprawidłowy kod' })
+	);
 
-export const loginSchema = z.object({
-	email: userPropertySchemas.email
+export const verification = z.object({
+	code
 });
 
-export const verificationCodeSchema = z.object({
-	code: authSchemas.code
+export const login = z.object({
+	email
 });

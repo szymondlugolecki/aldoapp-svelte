@@ -7,13 +7,6 @@ import { build, files, version } from '$service-worker';
 
 const sw = self as unknown as ServiceWorkerGlobalScope;
 
-type NotificationContent = {
-	title: string;
-	options: {
-		body: string;
-	};
-};
-
 // Create a unique cache name for this deployment
 const CACHE = `cache-${version}`;
 
@@ -84,12 +77,8 @@ sw.addEventListener('fetch', (event) => {
 });
 
 sw.addEventListener('push', (event) => {
-	const data: NotificationContent = event.data?.json();
-	console.log('event', event, 'data', data);
-
-	const options = {
-		body: data.options.body
-	};
-
-	sw.registration.showNotification(data.title, options);
+	const data: { title: string; message: string } = event.data?.json();
+	sw.registration.showNotification(data.title, {
+		body: data.message
+	});
 });

@@ -15,8 +15,6 @@ import {
 import { error, type Handle } from '@sveltejs/kit';
 import { trytm } from '@bdsqqq/try';
 import { db } from '../db';
-import { eq } from 'drizzle-orm';
-import { users } from '../db/schemas/users';
 
 // Hooks are used to modify a single request, and are not persisted between requests.
 // Setting locals does not persist between requests
@@ -26,14 +24,14 @@ import { users } from '../db/schemas/users';
 // 2. After refreshing both tokens
 
 export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
+	const sessionUser = event.locals.session?.user;
+
 	// Verify user's access token on every request
 	const accessToken = event.cookies.get(jwtName.access);
 	const refreshToken = event.cookies.get(jwtName.refresh);
 
-	const { session } = event.locals;
-
 	// If the user is banned, throw an error
-	if (session && !session.user.access) {
+	if (sessionUser && sessionUser.role === 'banned') {
 		throw error(403, 'Brak dostępu');
 	}
 
@@ -65,13 +63,8 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 
 	// AT is invalid and RT is valid, so we probably need to refresh
 
-	let userId = event.locals.session?.user.id;
-
 	// If session in locals does not exist, we get the userId from the RT payload
-	if (!userId) {
-		const { payload } = rtPayload;
-		userId = payload.userId;
-	}
+	const userId = sessionUser?.id || rtPayload.payload.userId;
 
 	const joseErrName = joseErrorParser(atPayloadError);
 	console.log('Jose Error Name', joseErrName, userId);
@@ -96,39 +89,45 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 
 	// wtf
 
-	const [dbUsers, getUserError] = await trytm(
-		db
-			.select({
-				id: users.id,
-				email: users.email,
-				fullName: users.fullName,
-				role: users.role,
-				access: users.access,
-				phone: users.phone,
-				address: users.address
-			})
-			.from(users)
-			.where(eq(users.id, userId))
+	const [user, getUserError] = await trytm(
+		db.query.users.findFirst({
+			where: (users, { eq }) => eq(users.id, userId),
+			with: {
+				address: {
+					columns: {
+						zipCode: true,
+						city: true,
+						street: true,
+					}
+				},
+			},
+			columns: {
+				id: true,
+				email: true,
+				fullName: true,
+				role: true,
+				phone: true,
+			},
+
+		})
 	);
 
-	console.log('dbUsers', dbUsers);
+	console.log('user', user);
 
 	if (getUserError) {
 		// Unexpected-error
 		console.error('Błąd przy pobieraniu użytkownika do sesji z bazy danych', getUserError);
 		return resolve(event);
 	}
-	if (!dbUsers.length) {
+	if (!user) {
 		// Unexpected-error
-		console.error('Zalogowano jako nieistniejący użytkownik. Mógł zostać usunięty', dbUsers.length);
+		console.error('Zalogowano jako nieistniejący użytkownik. Mógł zostać usunięty');
 		throw error(500, 'Niespodziewany błąd sesji. Spróbuj zalogować się ponownie');
 	}
 
-	const freshUser = dbUsers[0];
-
 	// Create new tokens
 	const [result, promiseError] = await trytm(
-		Promise.all([createAccessToken(freshUser), createRefreshToken({ userId: freshUser.id })])
+		Promise.all([createAccessToken(user), createRefreshToken({ userId: user.id })])
 	);
 
 	if (promiseError) {
@@ -154,7 +153,7 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 	});
 
 	event.locals.session = {
-		user: freshUser,
+		user,
 		expires: accessTokenExpirationDate
 	};
 

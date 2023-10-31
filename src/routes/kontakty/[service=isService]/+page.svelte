@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { serviceNames, contactInfo } from '$lib/client/constants';
+	import { serviceNames, contactInfo, nutritionalAdvisors } from '$lib/client/constants';
 	import { capitalize } from '$lib/client/functions';
 
 	import {
@@ -16,6 +16,7 @@
 	import type { ShortService } from '$types';
 	$: service = serviceNames[$page.params.service as ShortService];
 	$: contact = contactInfo[service];
+	$: contactEntries = Object.entries(contact) as [string, [string[], string[] | undefined]][];
 </script>
 
 <svelte:head>
@@ -26,15 +27,10 @@
 	/>
 </svelte:head>
 
-<section class="h-full space-y-10 w-full flex justify-center">
-	<!-- <header class="w-full text-center mt-4">
-		<h1 class="text-4xl font-semibold">{capitalize(service)}</h1>
-		<h2 class="text-2xl">Numery telefonów</h2>
-	</header> -->
-
+<section class="gap-y-20 w-full flex flex-col items-center pt-10 pb-48">
 	<div class="flex max-w-3xl w-full">
-		<Table>
-			<TableCaption>Market - Numery telefonów</TableCaption>
+		<Table class="caption-top">
+			<TableCaption>Kontakt - {capitalize(service)}</TableCaption>
 			<TableHeader>
 				<TableRow>
 					<TableHead>Punkt sprzedaży</TableHead>
@@ -43,60 +39,56 @@
 				</TableRow>
 			</TableHeader>
 			<TableBody>
-				{#each Object.entries(contact) as data}
+				{#each contactEntries as data}
+					{@const emails = data[1][1]}
 					<TableRow>
 						<TableCell class="font-medium">{capitalize(data[0])}</TableCell>
-						<TableCell class="flex flex-col space-y-4">
-							{#each data[1] as number}
-								<a href={`tel:+48${number}`} class="block hover:text-primary duration-150"
-									>{number}</a
+						<TableCell class="flex flex-col space-y-4 min-w-[120px]">
+							{#each data[1][0] as phoneNumber}
+								<a
+									href={`tel:+48${phoneNumber.split(' ').join('')}`}
+									class="block hover:text-primary duration-150">{phoneNumber}</a
 								>
 							{/each}
 						</TableCell>
-						<TableCell>✉️</TableCell>
+						<TableCell>
+							{#if emails && emails.length}
+								{#each emails as email}
+									<a href="mailto:{email}" class="block hover:text-primary duration-150">{email}</a>
+								{/each}
+							{:else}
+								Brak
+							{/if}
+						</TableCell>
 					</TableRow>
-
-					<!-- <tr class="last:border-0 border-b border-border">
-				<th scope="row" class="px-3 sm:px-6 py-4 font-medium whitespace-nowrap">
-					{capitalize(data[0])}
-				</th>
-				<td class="px-3 sm:px-6 py-4 space-y-4 whitespace-nowrap">
-					{#each data[1] as number}
-						<a href={`tel:+48${number}`} class="block hover:text-primary duration-150"
-							>{number}</a
-						>
-					{/each}
-				</td>
-			</tr> -->
 				{/each}
 			</TableBody>
 		</Table>
 	</div>
-	<!-- 
-	<div class="relative overflow-x-auto flex justify-center">
-		<table class="w-full lg:w-3/4 text-sm text-left">
-			<thead class="text-xs uppercase">
-				<tr>
-					<th scope="col" class="px-3 sm:px-6 py-3"> Punkt sprzedaży </th>
-					<th scope="col" class="px-3 sm:px-6 py-3"> Numery telefonu </th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each Object.entries(contact) as data}
-					<tr class="last:border-0 border-b border-border">
-						<th scope="row" class="px-3 sm:px-6 py-4 font-medium whitespace-nowrap">
-							{capitalize(data[0])}
-						</th>
-						<td class="px-3 sm:px-6 py-4 space-y-4 whitespace-nowrap">
-							{#each data[1] as number}
-								<a href={`tel:+48${number}`} class="block hover:text-primary duration-150"
-									>{number}</a
-								>
-							{/each}
-						</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
-	</div> -->
+
+	{#if service === 'dział pasz'}
+		<div class="flex max-w-3xl w-full">
+			<Table class="caption-top">
+				<TableCaption>Doradcy żywieniowi</TableCaption>
+				<TableHeader>
+					<TableRow>
+						<TableHead>Doradca</TableHead>
+						<TableHead>Numer telefonu</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					{#each nutritionalAdvisors as advisor}
+						<TableRow>
+							<TableCell class="font-medium">{advisor.name}</TableCell>
+							<TableCell class="flex flex-col space-y-4">
+								{#each advisor.phone as phone}
+									<a href={`tel:+48${phone.split(' ').join('')}`} class="block">{phone}</a>
+								{/each}
+							</TableCell>
+						</TableRow>
+					{/each}
+				</TableBody>
+			</Table>
+		</div>
+	{/if}
 </section>
