@@ -8,11 +8,11 @@ export async function POST(event) {
 		throw error(403, 'Nie masz uprawnień do wykonania tej akcji');
 	}
 
-	const [, deleteAllProductsError] = await trytm(db.delete(subscriptions));
+	const [, deleteAllSubscriptionsError] = await trytm(db.delete(subscriptions));
 
-	if (deleteAllProductsError) {
-		console.error('deleteAllProductsError blad', deleteAllProductsError);
-		throw error(500, 'Niespodziewany błąd podczas usuwania wszystkich zamowien');
+	if (deleteAllSubscriptionsError) {
+		console.error('deleteAllSubscriptionsError blad', deleteAllSubscriptionsError);
+		throw error(500, 'Niespodziewany błąd podczas usuwania wszystkich subskrypcji');
 	}
 
 	return json({ success: true, message: 'Usunieto wszystkie subskrypcje' });

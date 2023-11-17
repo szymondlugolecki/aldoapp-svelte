@@ -1,25 +1,37 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	// import * as Tabs from "$shadcn/tabs";
 
 	import TabsList from '$components/custom/Layout/AdminTabs/TabsList.svelte';
 	import Tab from '$components/custom/Layout/AdminTabs/Tab.svelte';
 	import TabsContent from '$components/custom/Layout/AdminTabs/TabsContent.svelte';
 
 	$: pathname = $page.url.pathname;
+
+	const subpageLabels = {
+		'/admin': 'Start',
+		'/admin/zamowienia': 'Zamówienia',
+		'/admin/uzytkownicy': 'Użytkownicy',
+		'/admin/produkty': 'Produkty',
+		'/admin/analityka': 'Analityka'
+	};
+
+	const getSubpageLabel = (pathname: string) => {
+		if (!(pathname in subpageLabels)) {
+			return '?';
+		}
+
+		// @ts-ignore
+		return subpageLabels[pathname];
+	};
 </script>
 
 <div class="flex flex-col w-full">
 	<div class="flex-1 w-full p-8 pt-6 space-y-4">
-		<div class="flex items-center justify-start space-y-2">
-			<h2 class="text-3xl font-bold tracking-tight">Panel administracyjny</h2>
-			<!-- <div class="flex items-center space-x-2">
-				<Button size="sm">
-					<Download class="w-4 h-4 mr-2" />
-					Download
-				</Button>
-			</div> -->
+		<div class="">
+			<h2 class="py-1 text-3xl font-bold tracking-tight">Panel administracyjny</h2>
+			<h3 class="text-2xl font-semibold tracking-tight scroll-m-20">{getSubpageLabel(pathname)}</h3>
 		</div>
-		<!-- <Tabs value="overview" class="space-y-4"> -->
 		<TabsList>
 			<Tab {pathname} href="/admin">Start</Tab>
 			<Tab {pathname} href="/admin/zamowienia">Zamówienia</Tab>

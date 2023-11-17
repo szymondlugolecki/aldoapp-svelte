@@ -4,7 +4,7 @@ import { error, fail, type Action } from '@sveltejs/kit';
 import { eq, inArray } from 'drizzle-orm';
 import { isAtLeastModerator } from '$lib/client/functions';
 import { sendNotifications, type PushMessageWithContent } from '$lib/server/functions/push';
-import { setMessage, superValidate } from 'sveltekit-superforms/server';
+import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
 import getCustomError from '$lib/client/constants/customErrors';
 import { pushSubscription$ } from '$lib/client/schemas';
 
@@ -62,7 +62,7 @@ const send: Action = async (event) => {
 
 	const { message, success } = await sendNotifications(subscriptionList, messageObj);
 	if (!success) {
-		return setMessage(form, message);
+		return setError(form, 'body', message, { status: 400 });
 	}
 
 	return setMessage(form, message);

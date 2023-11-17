@@ -101,3 +101,7 @@ export const orderAgainForm = z.object({
 export type OrderForm = typeof create;
 export type OrderAgainForm = typeof orderAgainForm;
 export type ProductQuantity = typeof productQuantity;
+
+export type OrderAddressForm = typeof orderAddressForm;
+export type PaymentForm = typeof paymentForm;
+export type EventForm = typeof eventForm;

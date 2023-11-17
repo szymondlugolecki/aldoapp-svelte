@@ -4,7 +4,7 @@ import { error, fail, type Action } from '@sveltejs/kit';
 import getCustomError from '$lib/client/constants/customErrors';
 import { subscriptions } from '$lib/server/db/schemas/subscriptions';
 import { and, eq } from 'drizzle-orm';
-import { uaParser } from '$lib/server/functions/auth';
+import { getUserAgentString } from '$lib/server/functions/auth';
 import { setMessage, superValidate } from 'sveltekit-superforms/server';
 import { pushSubscription$ } from '$lib/client/schemas';
 
@@ -20,7 +20,7 @@ const unsubscribe: Action = async ({ locals, request }) => {
 		return fail(400, { form });
 	}
 
-	const userAgent = uaParser(request.headers.get('User-Agent'));
+	const userAgent = getUserAgentString(request.headers.get('User-Agent'));
 
 	// Check if subscription exists
 	const [currentSubscription, fetchSubscriptionError] = await trytm(

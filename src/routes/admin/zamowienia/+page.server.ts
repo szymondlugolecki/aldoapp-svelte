@@ -4,10 +4,10 @@ import { sql } from 'drizzle-orm';
 import { orders } from '$lib/server/db/schemas/orders.js';
 import { extractParams } from '$lib/server/functions/utils';
 import changeOrderStatus from '$lib/server/actions/orders/changeOrderStatus';
-import changePaidStatus from '$lib/server/actions/orders/changePaidStatus.js';
+import changePaymentStatus from '$lib/server/actions/orders/changeOrderPaymentStatus.js';
 import changeOrderAddress from '$lib/server/actions/orders/changeOrderAddress.js';
-// import { superValidate } from 'sveltekit-superforms/server';
-// import { order$ } from '$lib/client/schemas';
+import { superValidate } from 'sveltekit-superforms/server';
+import { order$ } from '$lib/client/schemas';
 
 const sortableColumns: OrderSortableColumn[] = [
 	'status',
@@ -89,15 +89,15 @@ export const load = ({ url }) => {
 				count: sql<number>`count(*)`.mapWith(Number)
 			})
 			.from(orders),
-		pageLimit
-		// eventForm: superValidate(order$.eventForm),
-		// paymentForm: superValidate(order$.paymentForm),
-		// addressForm: superValidate(order$.orderAddressForm)
+		pageLimit,
+		eventForm: superValidate(order$.eventForm),
+		paymentForm: superValidate(order$.paymentForm),
+		addressForm: superValidate(order$.orderAddressForm)
 	};
 };
 
 export const actions = {
 	changeOrderStatus,
-	changePaidStatus,
+	changePaymentStatus,
 	changeOrderAddress
 };

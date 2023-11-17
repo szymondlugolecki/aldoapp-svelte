@@ -44,6 +44,8 @@ export const sendNotifications = async (
 		const init = await buildPushPayloadTyped(message, subscription, vapidDetails);
 		const res = await fetch(subscription.endpoint, init);
 
+		console.log('subscription', subscription);
+
 		if (res.ok) {
 			results.push(true);
 		} else {
@@ -56,6 +58,14 @@ export const sendNotifications = async (
 	}
 
 	const successCount = results.filter((result) => result === true).length;
+
+	// No subscriptions
+	if (subscriptions.length === 0) {
+		return {
+			success: false,
+			message: 'Żaden z użytkowników nie ma włączonych powiadomień'
+		};
+	}
 
 	// All sent
 	if (successCount === subscriptions.length) {
@@ -77,6 +87,13 @@ export const sendNotifications = async (
 		return {
 			success: false,
 			message: 'Nie udało się wysłać wiadomości'
+		};
+	}
+
+	if (successCount === 0) {
+		return {
+			success: false,
+			message: 'Nie udało się wysłać żadnej wiadomości'
 		};
 	}
 

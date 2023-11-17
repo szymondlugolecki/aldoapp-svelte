@@ -3,7 +3,9 @@
 	// import ___ASSET___0 from '$lib/assets/bg1.png';
 	// import { Image } from '@unpic/svelte';
 	import Image from '$components/custom/Util/Image.svelte';
-	import BackgroundImage from '$lib/assets/bg3.png?w=1500&format=avif;webp;jpg&as=picture';
+	// import BackgroundImage from '$lib/assets/bg3.png?w=1500&format=avif;webp;jpg&as=picture';
+	import KubotaTractor from '$lib/assets/background/KubotaLX1.jpg?w=1000&format=avif;webp;jpg&as=picture';
+	import logo from '$lib/assets/logo.png?w=220&format=avif;webp;jpg&as=picture';
 
 	import Pig from '$lib/assets/category/pig.png?w=250&format=avif;webp;jpg&as=picture';
 	import Cow from '$lib/assets/category/cow.png?w=250&format=avif;webp;jpg&as=picture';
@@ -87,6 +89,17 @@
 		console.log('Response', json);
 	}
 
+	async function removeAllTokens() {
+		const response = await fetch('/api/reset/tokens', {
+			method: 'POST',
+			headers: {
+				'content-type': 'application/json'
+			}
+		});
+		const json = await response.json();
+		console.log('Response', json);
+	}
+
 	export let data;
 
 	const productImgUrl =
@@ -143,35 +156,36 @@
 		</div>
 	</div> -->
 
-<section class="relative">
-	<div class="absolute top-0 bottom-0 left-0 right-0 w-full h-full">
-		<Image
-			class="w-full h-full brightness-[.4] object-cover object-center -z-50"
-			loading="eager"
-			meta={BackgroundImage}
-			alt="tło strony, warsztat samochodowy"
-		/>
-	</div>
-	<!-- class="px-4 sm:max-w-2xl lg:max-w-3xl sm:px-0 sm:gap-y-6" -->
-	<div
-		class="relative flex flex-col items-center justify-center h-screen max-w-2xl px-0 mx-auto -mt-24 text-center gap-y-3"
-	>
-		<h1 class="text-5xl font-bold tracking-tight text-white sm:text-6xl">Twoje ALDO</h1>
-		<p class="text-sm font-semibold text-white sm:text-xl">Zamawiaj gdzie chcesz i kiedy chcesz.</p>
-		<div class="text-center">
-			<Button
-				href="/sklep"
-				variant="default"
-				class="w-full max-w-xs px-3 font-semibold text-black bg-white rounded-md sm:max-w-sm h-9 sm:h-10 sm:py-2 sm:px-4"
-				>Przejdź do sklepu</Button
-			>
+<section class="flex justify-center h-screen -mt-24">
+	<div class="flex justify-center w-full h-full pb-24 max-w-7xl">
+		<div class="flex flex-col items-center justify-center flex-1 w-full max-w-md gap-y-3">
+			<div class="flex flex-col gap-y-1">
+				<h1 class="flex items-center text-5xl font-bold tracking-tight sm:text-6xl gap-x-4">
+					Twoje <Image meta={logo} alt="ALDO" sizes="140px" />
+				</h1>
+
+				<p class="text-sm font-semibold sm:text-xl">w telefonie i w komputerze</p>
+				<div class="flex py-6 gap-x-5">
+					<Button href="/sklep" variant="default">Przejdź do sklepu</Button>
+					<Button href="/kontakty" variant="secondary">Lista kontaktów</Button>
+				</div>
+			</div>
+		</div>
+		<div class="flex items-center">
+			<div class="w-[700px] overflow-hidden">
+				<Image
+					class="object-cover object-center w-full h-full scale-[1.356] -translate-y-4 translate-x-8 aspect-video"
+					loading="eager"
+					meta={KubotaTractor}
+					alt="traktor kubota"
+				/>
+			</div>
 		</div>
 	</div>
 </section>
 
-<!-- <div class="absolute w-full h-4 -bottom-1 bg-background" /> -->
 <main>
-	<div class="flex flex-col items-center pt-24 text-center sm:pt-32">
+	<div class="flex flex-col items-center pt-6 text-center">
 		<div class="max-w-3xl px-5">
 			<h2 class="text-4xl font-semibold tracking-tight">Zamawiaj swobodnie z domu</h2>
 			<p class="px-10 py-2 text-base font-medium">Dostarczymy do Ciebie za darmo w ciągu 3 dni</p>
@@ -256,6 +270,11 @@
 <!-- <button on:click={removeAllSubscriptions} class="px-3 py-2 text-lg text-white bg-gray-800"
 	>Usun subskrypcje</button
 > -->
+
+<!-- <button on:click={removeAllTokens} class="px-3 py-2 text-lg text-white bg-gray-800"
+	>Usun tokeny</button
+> -->
+
 <!-- <button on:click={removeAllUsers} class="px-3 py-2 text-lg text-white bg-gray-800"
 	>Usun użytkowników</button
 > -->

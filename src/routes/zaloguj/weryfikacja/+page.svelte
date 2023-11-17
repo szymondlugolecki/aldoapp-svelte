@@ -67,7 +67,7 @@
 				</div>
 				<div class="">
 					<p class="text-sm text-muted-foreground">
-						Jeżeli nie otrzymałeś kodu, spróbuj zalogować się ponownie
+						Jeżeli nie widzisz maila z kodem, sprawdź folder spam lub spróbuj zalogować się ponownie
 					</p>
 				</div>
 

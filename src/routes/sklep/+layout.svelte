@@ -69,9 +69,9 @@
 						</Sheet.Root>
 					</div>
 				</div>
-				<div class="px-1 py-1">
+				<div class="">
 					{#if mainStorePage}
-						<div class="flex flex-col items-start justify-center gap-y-2">
+						<div class="flex flex-col items-start justify-center px-1 py-2 gap-y-2">
 							<h1 class="text-2xl font-medium tracking-tight scroll-m-20 lg:text-3xl">
 								{#if selectedCategory && selectedSubcategory && selectedSubcategory !== 'all'}
 									{getSubcategoryName(selectedCategory, selectedSubcategory)}
@@ -81,17 +81,15 @@
 									Wszystkie produkty
 								{/if}
 							</h1>
-							<p class="text-sm text-muted-foreground">Znaleziono {data.products.length} wyników</p>
-						</div>
-					{:else}
-						<div class="flex items-center justify-between">
-							<a href="/sklep" class="flex items-center text-sm text-blue-600 gap-x-1"
-								>Powrót do sklepu <CornerDownLeft class="square-5" /></a
-							>
 						</div>
 					{/if}
 				</div>
 			</div>
+			{#if mainStorePage}
+				<div class="px-1 pb-0.5">
+					<p class="text-sm text-muted-foreground">Znaleziono {data.products.length} wyników</p>
+				</div>
+			{/if}
 			<div class="px-1 py-2 mb-3">
 				<slot />
 			</div>

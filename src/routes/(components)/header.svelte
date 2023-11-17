@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { Popover, PopoverTrigger, PopoverContent } from '$shadcn/popover';
+
 	import { salesmenMenu } from '$lib/client/constants';
 	import {
 		LogOut,
@@ -43,26 +45,54 @@
 					</a>
 				</div>
 				<!-- High Viewport Navigation Menu -->
-				<div class="items-center justify-center hidden space-x-6 md:flex">
-					<a class={cn('transition-colors', activeUrl === '/' && 'text-blue-600')} href="/"
-						>Strona główna</a
+				<div class="items-center justify-center hidden gap-x-6 md:flex">
+					<a
+						class={cn(
+							'transition-colors hover:text-blue-600/90',
+							activeUrl === '/' && 'text-blue-600'
+						)}
+						href="/">Strona główna</a
 					>
 					<a
-						class={cn('transition-colors', activeUrl.startsWith('/sklep') && 'text-blue-600')}
+						class={cn(
+							'transition-colors hover:text-blue-600/90',
+							activeUrl.startsWith('/sklep') && 'text-blue-600'
+						)}
 						href="/sklep">Sklep</a
 					>
-					<div class="static dropdown">
-						<label
-							for="megamenu"
-							tabindex="-1"
-							class={cn(
-								'transition-colors flex items-center cursor-pointer',
-								activeUrl.startsWith('/kontakty') && 'text-blue-600'
-							)}>Kontakty <ChevronDown size={20} class="ml-1" /></label
-						>
+					<Popover>
+						<PopoverTrigger asChild let:builder>
+							<Button
+								builders={[builder]}
+								variant="link"
+								class={cn(
+									'transition-colors text-base font-normal leading-6 px-0 hover:no-underline hover:text-blue-600/90',
+									activeUrl.startsWith('/kontakty') && 'text-blue-600'
+								)}>Kontakty <ChevronDown size={20} class="ml-1" /></Button
+							>
+						</PopoverTrigger>
+						<PopoverContent class="w-[600px]">
+							<div class="grid gap-4">
+								<!-- <div class="space-y-2">
+									<h4 class="font-medium leading-none">Dimensions</h4>
+									<p class="text-sm text-muted-foreground">Set the dimensions for the layer.</p>
+								</div> -->
+								<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+									{#each salesmenMenu as element}
+										<a
+											href="/kontakty/{element.href}"
+											class="px-2 py-1 pb-4 duration-150 border-b rounded"
+										>
+											<p class="text-lg font-medium leading-6">{element.name}</p>
+											<p>{element.description}</p>
+										</a>
+									{/each}
+								</div>
+							</div>
+						</PopoverContent>
+					</Popover>
 
-						<!-- <MegaMenu /> -->
-					</div>
+					<!-- <MegaMenu /> -->
 				</div>
 
 				<div class="flex-none flex items-center gap-1.5">

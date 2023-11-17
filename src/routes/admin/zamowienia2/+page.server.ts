@@ -2,7 +2,7 @@ import { db } from '$lib/server/db';
 import { orders as ordersTable } from '$lib/server/db/schemas/orders.js';
 import { extractParams } from '$lib/server/functions/utils';
 import changeOrderStatus from '$lib/server/actions/orders/changeOrderStatus';
-import changePaidStatus from '$lib/server/actions/orders/changePaidStatus.js';
+import changePaidStatus from '$lib/server/actions/orders/changeOrderPaymentStatus.js';
 import { isAtLeastModerator } from '$lib/client/functions';
 import { trytm } from '@bdsqqq/try';
 import { error } from '@sveltejs/kit';

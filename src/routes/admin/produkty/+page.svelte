@@ -44,7 +44,7 @@
 	LR.registerBlocks(LR);
 
 	let files = [];
-	function handleUploaderEvent(e) {
+	function handleUploaderEvent(e: any) {
 		const { data } = e.detail;
 		files = data;
 	}
@@ -75,7 +75,7 @@
 		},
 		{
 			id: 'encodedURL',
-			header: 'Sklep',
+			header: '',
 			accessorKey: 'encodedURL',
 			cell: (info) =>
 				flexRender(TableHyperlink, { href: `/sklep/${info.getValue()}`, text: 'Sklep' }),
@@ -96,42 +96,66 @@
 			id: 'symbol',
 			header: 'Kod produktu',
 			accessorKey: 'symbol',
-			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedProduct>(info, data.editForm)),
+			cell: (info) =>
+				flexRender(
+					AdminEditDialog,
+					createProps<ParsedProduct, EditProductForm>(info, data.editForm)
+				),
 			enableSorting: false
 		},
 		{
 			id: 'images',
 			header: 'Zdjęcia',
 			accessorKey: 'images',
-			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedProduct>(info, data.editForm)),
+			cell: (info) =>
+				flexRender(
+					AdminEditDialog,
+					createProps<ParsedProduct, EditProductForm>(info, data.editForm)
+				),
 			enableSorting: false
 		},
 		{
 			id: 'category',
 			header: 'Kategoria',
 			accessorKey: 'category',
-			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedProduct>(info, data.editForm)),
+			cell: (info) =>
+				flexRender(
+					AdminEditDialog,
+					createProps<ParsedProduct, EditProductForm>(info, data.editForm)
+				),
 			enableSorting: true
 		},
 		{
 			id: 'subcategory',
 			header: 'Podkategoria',
 			accessorKey: 'subcategory',
-			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedProduct>(info, data.editForm)),
+			cell: (info) =>
+				flexRender(
+					AdminEditDialog,
+					createProps<ParsedProduct, EditProductForm>(info, data.editForm)
+				),
 			enableSorting: true
 		},
 		{
 			id: 'price',
 			header: 'Cena',
 			accessorKey: 'price',
-			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedProduct>(info, data.editForm)),
+			cell: (info) =>
+				flexRender(
+					AdminEditDialog,
+					createProps<ParsedProduct, EditProductForm>(info, data.editForm)
+				),
 			enableSorting: true
 		},
 		{
 			id: 'weight',
 			header: 'Waga',
 			accessorKey: 'weight',
-			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedProduct>(info, data.editForm)),
+			cell: (info) =>
+				flexRender(
+					AdminEditDialog,
+					createProps<ParsedProduct, EditProductForm>(info, data.editForm)
+				),
 			enableSorting: true
 		},
 		{

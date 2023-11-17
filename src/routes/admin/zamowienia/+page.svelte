@@ -18,7 +18,7 @@
 	} from '@tanstack/svelte-table';
 	import { writable } from 'svelte/store';
 	import Pagination from '$components/custom/Table/Pagination.svelte';
-	import AdminEditDialog from '$routes/admin/zamowienia/(components)/EditOrder.svelte';
+	import AdminEditDialog from '$routes/admin/zamowienia/(components)/edit-order.svelte';
 
 	import * as Table from '$shadcn/table';
 	import { Input } from '$shadcn/input';
@@ -37,17 +37,23 @@
 	const createOrderProps = (info: CellContext<ParsedOrder, unknown>) => {
 		const value = info.getValue();
 		// const label = info.column.columnDef.header;
-		const key = info.column.id;
+		const key = info.column.id as keyof ParsedOrder;
 
 		const order = info.table.options.data.find(
 			(order) => order.id === info.row._getAllCellsByColumnId().id.getValue()
 		);
 
+		const forms = {
+			statusForm: key === 'status' ? data.eventForm : null,
+			addressForm: key === 'address' ? data.addressForm : null,
+			paymentForm: key === 'paid' ? data.paymentForm : null
+		};
+
 		return {
 			value,
-			// label,
 			key,
-			order
+			order,
+			...forms
 		};
 	};
 

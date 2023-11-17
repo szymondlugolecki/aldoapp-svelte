@@ -2,19 +2,22 @@
 	import { salesmenMenu } from '$lib/client/constants';
 </script>
 
-<section class="w-full flex flex-col items-center pb-44">
-	<h1 class="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl my-8">Kontakty</h1>
+<section class="flex flex-col items-center w-full px-8 pb-44">
+	<div class="my-8 text-center">
+		<h1 class="my-4 text-4xl font-extrabold tracking-tight scroll-m-20 lg:text-5xl">Kontakty</h1>
+		<p>Wybierz interesujący Cię dział, aby zobaczyć listę kontaktów.</p>
+	</div>
 	<div
 		style="grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));"
-		class="max-w-4xl grid gap-4 w-full px-8"
+		class="grid w-full max-w-4xl gap-4"
 	>
 		{#each salesmenMenu as element}
 			<a
 				href="/kontakty/{element.href}"
-				class="rounded-lg border-border border p-4 flex flex-col gap-y-3"
+				class="flex flex-col p-4 transition-colors border rounded-lg border-border gap-y-3 hover:bg-foreground/5"
 			>
 				<span class="text-2xl font-semibold tracking-tight">{element.name}</span>
-				<p class="leading-7 text-sm">
+				<p class="text-sm leading-7">
 					{element.description}
 				</p>
 			</a>

@@ -9,7 +9,7 @@ import { eq } from 'drizzle-orm';
 import { order$ } from '$lib/client/schemas';
 import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
 
-const changeOrderPaidStatus = (async ({ request, locals }) => {
+const changeOrderPaymentStatus = (async ({ request, locals }) => {
 	const sessionUser = locals.session?.user;
 
 	// Only moderators and admins are allowed to edit a user
@@ -48,4 +48,4 @@ const changeOrderPaidStatus = (async ({ request, locals }) => {
 	return setMessage(form, 'Pomyślnie zmieniono status płatności');
 }) satisfies Action;
 
-export default changeOrderPaidStatus;
+export default changeOrderPaymentStatus;

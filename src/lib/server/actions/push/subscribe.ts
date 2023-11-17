@@ -6,7 +6,7 @@ import getCustomError from '$lib/client/constants/customErrors';
 import { pushSubscription$ } from '$lib/client/schemas';
 import { subscriptions, type Subscription } from '$lib/server/db/schemas/subscriptions';
 import { getPushMessage } from '$lib/server/constants/messages';
-import { uaParser } from '$lib/server/functions/auth';
+import { getUserAgentString } from '$lib/server/functions/auth';
 import { and, eq } from 'drizzle-orm';
 // import { betterZodParse } from '$lib/client/functions/betterZodParse';
 // import { safeParseJSON } from '$lib/client/functions';
@@ -43,7 +43,7 @@ const subscribe: Action = async ({ locals, request }) => {
 	}
 
 	const { endpoint, expirationTime, auth, p256dh } = form.data;
-	const userAgent = uaParser(request.headers.get('User-Agent'));
+	const userAgent = getUserAgentString(request.headers.get('User-Agent'));
 
 	// Check if subscription exists
 	const [currentSubscription, fetchSubscriptionError] = await trytm(
@@ -73,7 +73,7 @@ const subscribe: Action = async ({ locals, request }) => {
 		keys,
 		userId: sessionUser.id,
 		createdAt: new Date(),
-		userAgent: uaParser(request.headers.get('User-Agent'))
+		userAgent: userAgent
 	} satisfies Omit<Subscription, 'id'>;
 
 	const [, addSubscriptionError] = await trytm(db.insert(subscriptions).values(newSubscription));

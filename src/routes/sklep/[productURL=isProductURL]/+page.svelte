@@ -6,7 +6,7 @@
 	// import AlertDescription from '$shadcn/alert/AlertDescription.svelte';
 	import { Button } from '$shadcn/button';
 	import { Separator } from '$shadcn/separator';
-	import { Heart, Package, PlusCircle, ShoppingCart } from 'lucide-svelte';
+	import { CornerDownLeft, Heart, Package, PlusCircle, ShoppingCart } from 'lucide-svelte';
 	import toast from 'svelte-french-toast';
 	import type { Subcategory } from '$types';
 	import { newCategoryUrl, newSubcategoryUrl } from '$lib/client/functions/index.js';
@@ -31,6 +31,11 @@
 </script>
 
 <section class="max-w-2xl px-4 pt-4 mx-auto lg:max-w-6xl sm:px-0 pb-14">
+	<div class="flex items-center justify-end px-1">
+		<a href="/sklep" class="flex items-center text-sm text-blue-600 gap-x-1"
+			>Powrót do sklepu <CornerDownLeft class="square-5" /></a
+		>
+	</div>
 	<div class="grid lg:grid-cols-2 lg:gap-x-8 gap-y-4 lg:items-start">
 		<!-- Images -->
 		<div class="max-w-md overflow-hidden rounded-md aspect-3/4">
@@ -64,7 +69,7 @@
 			</div>
 
 			<p class="">
-				{data.product.description || 'Brak opisu...'}
+				{data.product.description || 'Brak opisu'}
 			</p>
 
 			<div class="w-full border-t border-border" />
@@ -152,32 +157,8 @@
 				</ul>
 			</div>
 		</div>
-
-		<!-- <div class="lg:col-span-3">
-					<h3 class="text-lg">Opis produktu</h3>
-					<p>{data.product.description || 'Brak opisu...'}</p>
-				</div> -->
 	</div>
 </section>
-
-<!-- Breadcrumbs -->
-<!-- <div class="text-sm breadcrumbs max-w-[260px] xxs:max-w-none">
-				<ul>
-					<li>
-						<a href={newCategoryUrl($page.url.searchParams, data.product.category)}
-							>{fodderNames[data.product.category]}</a
-						>
-					</li>
-					{#if data.product.subcategory}
-						<li>
-							<a href={newSubcategoryUrl($page.url.searchParams, data.product.subcategory)}>
-								{fodderCategories2[data.product.category][data.product.subcategory]}</a
-							>
-						</li>
-					{/if}
-					<li>{data.product.name}</li>
-				</ul>
-			</div> -->
 
 <!-- Left Side Images -->
 <!-- <div class="mt-2 lg:order-1 lg:flex-shrink-0">

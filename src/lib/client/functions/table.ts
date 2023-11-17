@@ -4,10 +4,10 @@ import type { AnyZodObject } from 'zod';
 
 export const createProps = <
 	T extends Record<string, unknown> & { id: string | number },
-	Y extends SuperValidated<AnyZodObject>
+	Y extends AnyZodObject
 >(
 	info: CellContext<T, unknown>,
-	form: Y
+	form: SuperValidated<Y>
 ) => {
 	const value = info.getValue();
 	const label = info.column.columnDef.header;
