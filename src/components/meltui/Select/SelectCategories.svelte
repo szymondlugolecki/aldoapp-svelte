@@ -53,7 +53,7 @@
 		</label>
 		<div class="relative col-span-4">
 			{#if $selected}
-				<input type="hidden" name="kategoria" value={$selected.value} />
+				<input type="hidden" name="category" value={$selected.value} />
 			{/if}
 			<input
 				class="flex w-full h-10 px-3 py-2 text-sm bg-transparent border rounded-md border-input ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"

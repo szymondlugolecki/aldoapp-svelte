@@ -94,12 +94,23 @@
 	});
 
 	let open = false;
+	let files: File | undefined = undefined;
+
+	console.log('product', product);
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Trigger class={cn(buttonVariants({ variant: 'link' }), 'whitespace-pre')}
-		>{cellOverride || value}</Dialog.Trigger
-	>
+	{#if key !== 'images' || (key === 'images' && !product.image)}
+		<Dialog.Trigger class={cn(buttonVariants({ variant: 'link' }), 'whitespace-pre')}>
+			{cellOverride || value}
+		</Dialog.Trigger>
+	{:else if product.image}
+		<Dialog.Trigger class="flex items-center justify-center p-0">
+			<div class="h-20 overflow-hidden rounded-lg aspect-3/4">
+				<img src={product.image} alt="" class="object-cover object-center w-full h-full" />
+			</div>
+		</Dialog.Trigger>
+	{/if}
 	<Dialog.Content class="sm:max-w-[425px]">
 		<Dialog.Header>
 			<Dialog.Title>Edytuj użytkownika</Dialog.Title>
@@ -115,6 +126,7 @@
 			let:submitting
 			schema={products$.editForm}
 			let:config
+			let:errors
 			class="flex flex-col gap-y-2"
 			options={{
 				onResult: ({ result }) => {
@@ -125,8 +137,10 @@
 				},
 				id: product.id.toString(),
 				delayMs: 1000,
-				timeoutMs: 8000
+				timeoutMs: 8000,
+				dataType: 'json'
 			}}
+			enctype="multipart/form-data"
 		>
 			{#if key === 'name'}
 				<Form.Field {config} name={key}>
@@ -179,6 +193,15 @@
 				</Form.Field>
 			{:else if key === 'producent'}
 				<SelectProducent bind:combobox={producentCombobox} />
+			{:else if key === 'images'}
+				<Form.Field {config} name="images">
+					<Form.Item>
+						<Form.Label>Zdjęcie</Form.Label>
+						<Form.Input type="file" accept="image/*" bind:value={files} />
+						<Form.Description>Wybierz zdjęcie produktu.</Form.Description>
+						<Form.Validation />
+					</Form.Item>
+				</Form.Field>
 			{/if}
 
 			<Form.Field {config} name="id">

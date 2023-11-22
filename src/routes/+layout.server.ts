@@ -51,7 +51,8 @@ export const load = async ({ locals, depends, url }) => {
 									name: true,
 									price: true,
 									symbol: true,
-									encodedURL: true
+									encodedURL: true,
+									image: true
 								}
 							}
 						}

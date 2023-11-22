@@ -53,7 +53,8 @@ export const load = ({ url }) => {
 				subcategory: true,
 				producent: true,
 				encodedURL: true,
-				amountLeft: true
+				amountLeft: true,
+				image: true
 			},
 			where: extendedWhereClause,
 			with: {

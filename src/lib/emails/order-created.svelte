@@ -1,5 +1,20 @@
 <script lang="ts">
-	import { Container, Head, Hr, Html, Img, Link, Preview, Section, Text } from 'svelte-email';
+	import type { OrderProduct } from '$types';
+	import {
+		Container,
+		Head,
+		Hr,
+		Html,
+		Img,
+		Link,
+		Preview,
+		Section,
+		Text,
+		Column,
+		styleToString
+	} from 'svelte-email';
+
+	export let products: (OrderProduct & { quantity: number; image: string | null })[];
 
 	export let firstName: string;
 	export let orderId: number | string;
@@ -59,6 +74,37 @@
 		color: '#8898aa',
 		fontSize: '12px'
 	};
+
+	const productPriceWrapper = {
+		display: 'table-cell',
+		padding: '0px 20px 0px 0px',
+		width: '100px',
+		verticalAlign: 'top'
+	};
+
+	const productDescriptionWrapper = {
+		lineHeight: 'auto',
+		margin: '0 20px',
+		width: '100%'
+	};
+
+	const productDescription = {
+		fontFamily,
+		fontSize: '12px',
+		color: 'rgb(102,102,102)'
+	};
+
+	const productTitle = { fontFamily, fontSize: '12px', fontWeight: '600' };
+
+	const productPrice = {
+		fontFamily,
+		fontSize: '12px',
+		fontWeight: '600',
+		margin: '0'
+	};
+
+	const fakeProductUrl =
+		'https://res.cloudinary.com/dzcuq1b2u/image/upload/v1680687127/products/Lacto%20Start%20IPC%20pasza%20rozdojeniowa%20De%20Heus%2025kg/DB4A2X00G-W00/0.webp';
 </script>
 
 <Html lang="pl-PL">
@@ -102,6 +148,39 @@
 				<Text style={smallParagraph}>{cartOwner.phone}</Text>
 				<Hr style={hr} />
 			{/if}
+
+			<Section>
+				<Column>
+					<Text>Produkty</Text>
+				</Column>
+			</Section>
+			{#each products as product}
+				<Section>
+					<Column>
+						<Img src={product.image || fakeProductUrl} width="64" height="96" alt={product.name} />
+					</Column>
+					<Column>
+						<Text style={productDescriptionWrapper}>
+							<span dir="auto" style={styleToString(productTitle)}>
+								{product.name}
+							</span>
+							<br />
+							<span style={styleToString(productDescription)}>{product.symbol}</span>
+						</Text>
+					</Column>
+
+					<Column style={productPriceWrapper}>
+						<span style={styleToString(productPrice)}>{product.quantity} szt.</span>
+					</Column>
+
+					<Column style={productPriceWrapper}>
+						<span style={styleToString(productPrice)}
+							>{Number(product.price) * product.quantity} zł</span
+						>
+					</Column>
+				</Section>
+			{/each}
+
 			<Text style={footer}>Twoje ALDO</Text>
 		</Container>
 	</Section>

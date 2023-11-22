@@ -1,9 +1,11 @@
 <script lang="ts">
+	import Spinner from '$components/custom/Util/Spinner.svelte';
 	import { FormButton } from '$shadcn/form';
 	import { Skeleton } from '$shadcn/skeleton';
 
 	export let subtotal: string;
-	export let processing = false;
+	export let processing: boolean;
+	export let submittingOrder: boolean;
 </script>
 
 <div class="flex flex-col border-y border-border">
@@ -50,7 +52,13 @@
 
 	<div class="flex items-center justify-end w-full p-6">
 		<div class="">
-			<FormButton disabled={processing}>Zamawiam</FormButton>
+			<FormButton disabled={processing || submittingOrder}>
+				{#if submittingOrder}
+					<Spinner />
+				{:else}
+					Zamawiam
+				{/if}
+			</FormButton>
 		</div>
 	</div>
 </div>

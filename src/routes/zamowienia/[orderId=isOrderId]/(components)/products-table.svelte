@@ -21,7 +21,7 @@
 			accessor: 'encodedURL',
 			header: '',
 			cell: ({ value }) => {
-				return createRender(TableImage, { href: value, alt: 'produkt' });
+				return createRender(TableImage, { href: `/sklep/${value}`, alt: 'produkt' });
 			},
 			plugins: {
 				resize: {

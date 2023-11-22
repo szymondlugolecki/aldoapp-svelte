@@ -3,6 +3,7 @@ import OrderStatusEmail from '$lib/emails/order-status.svelte';
 import OrderCreatedEmail from '$lib/emails/order-created.svelte';
 import { RESEND_API_KEY } from '$env/static/private';
 import { render } from 'svelte-email';
+import type { OrderProduct } from '$types';
 
 const from = 'onboarding@resend.dev';
 
@@ -24,6 +25,7 @@ interface OrderCreatedEmailData extends EmailData {
 			email: string;
 			phone: string;
 		} | null;
+		products: (OrderProduct & { quantity: number; image: string | null })[];
 	};
 }
 

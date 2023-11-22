@@ -97,14 +97,14 @@
 
 	<div class="pl-[10px]">
 		<span use:melt={$root} class="relative flex h-[20px] w-[200px] items-center">
-			<span class="block h-[3px] w-full bg-black/40">
-				<span use:melt={$range} class="h-[3px] bg-white" />
+			<span class="block h-[3px] w-full bg-background/40">
+				<span use:melt={$range} class="h-[3px] bg-foreground" />
 			</span>
 
 			{#each $value as _}
 				<span
 					use:melt={$thumb()}
-					class="block w-5 h-5 bg-white rounded-full focus:ring-4 focus:ring-black/40"
+					class="block w-5 h-5 rounded-full bg-foreground focus:ring-4 focus:ring-foreground/40"
 				/>
 			{/each}
 		</span>

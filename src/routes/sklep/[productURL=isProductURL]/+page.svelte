@@ -42,9 +42,9 @@
 			<a href="/sklep/{data.product.encodedURL}">
 				<div class="">
 					<img
-						src={productImgUrl}
+						src={data.product.image || productImgUrl}
 						alt={data.product.name}
-						class="scale-[1.19] object-cover object-center hover:scale-[1.21] duration-150 mt-1.5"
+						class="scale-[1.1] object-cover object-center duration-150 mt-1.5"
 					/>
 				</div>
 			</a>
@@ -113,7 +113,7 @@
 										</Button>
 									{/if}
 									<button
-										class="w-full p-2 font-semibold transition-colors bg-blue-700 rounded-sm hover:bg-blue-700/80"
+										class="w-full p-2 font-semibold text-white transition-colors bg-blue-700 rounded-sm hover:bg-blue-700/80"
 										type="submit">Dodaj do koszyka</button
 									>
 								{/if}

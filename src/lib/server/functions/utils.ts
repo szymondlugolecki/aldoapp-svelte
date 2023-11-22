@@ -35,8 +35,8 @@ export const extractParams = <T extends string>(url: URL, sortableColumns?: T[])
 	const priceMax = Number(url.searchParams.get('cena_max') || undefined);
 	const customerId = url.searchParams.get('klient_id') || undefined;
 	const cartOwnerId = url.searchParams.get('zleceniodawca_id') || undefined;
-	const category = url.searchParams.get('kategoria');
-	const subcategory = url.searchParams.get('podkategoria');
+	const category = url.searchParams.get('category');
+	const subcategory = url.searchParams.get('subcategory');
 	const producent = url.searchParams.get('producent');
 
 	// Sorting

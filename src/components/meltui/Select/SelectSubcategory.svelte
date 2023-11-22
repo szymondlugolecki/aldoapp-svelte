@@ -51,7 +51,7 @@
 
 	<div class="relative col-span-4">
 		{#if $selected}
-			<input type="hidden" name="podkategoria" value={$selected.value} />
+			<input type="hidden" name="subcategory" value={$selected.value} />
 		{/if}
 
 		<input

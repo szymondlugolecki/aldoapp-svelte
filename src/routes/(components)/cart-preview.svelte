@@ -69,7 +69,12 @@
 					<div class="flex flex-grow">
 						<div class="flex items-start flex-1 space-x-2">
 							<a href="/sklep/{product.encodedURL}" class="flex items-center h-full">
-								<img src={productImgUrl} width="32px" height="32px" alt={product.name} />
+								<img
+									src={product.image || productImgUrl}
+									width="32px"
+									height="32px"
+									alt={product.name}
+								/>
 							</a>
 							<div class="flex flex-col items-start">
 								<span class="text-xs truncate max-w-[144px]">{product.name}</span>

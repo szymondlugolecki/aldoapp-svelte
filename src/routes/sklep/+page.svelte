@@ -8,16 +8,16 @@
 
 	export let data;
 
-	$: fakeProducts = [].concat(...Array(4).fill(data.products)) as typeof data.products;
+	// $: fakeProducts = [].concat(...Array(4).fill(data.products)) as typeof data.products;
 
 	const productImgUrl =
 		'https://res.cloudinary.com/dzcuq1b2u/image/upload/v1680687127/products/Lacto%20Start%20IPC%20pasza%20rozdojeniowa%20De%20Heus%2025kg/DB4A2X00G-W00/0.webp';
 </script>
 
 <div class="grid gap-3 sm:gap-10 grid-cols-[repeat(auto-fit,minmax(170px,1fr))] sm:grid-cols-3">
-	{#each fakeProducts as product}
+	{#each data.products as product}
 		{@const isInCart = data.cart?.products.find((p) => p.id === product.id)}
-		<Card.Root>
+		<Card.Root class="flex flex-col">
 			<Card.Header class="h-[110px]">
 				<Card.Title>
 					<a href={`/sklep/${product.encodedURL}`}>
@@ -31,14 +31,14 @@
 				<div class="overflow-hidden rounded-md">
 					<a href={`/sklep/${product.encodedURL}`}>
 						<img
-							src={productImgUrl}
+							src={product.image || productImgUrl}
 							alt="Zdjęcie produktu"
-							class="scale-[1.1] object-cover hover:scale-[1.15] duration-150"
+							class="scale-[1.1] object-cover hover:scale-[1.15] duration-150 max-h-[552px]"
 						/>
 					</a>
 				</div>
 			</Card.Content>
-			<Card.Footer class="justify-end">
+			<Card.Footer class="self-end justify-end mt-auto">
 				{#if $page.data.user}
 					<form
 						method="post"

@@ -95,7 +95,7 @@
 		on:inview_change={inViewChange}
 	/>
 	<Header cart={data.cart} />
-	<slot />
+	<div class="min-h-screen pt-24 -mt-24"><slot /></div>
 	<Footer />
 	{#if !isInView}
 		<ScrollToTop />

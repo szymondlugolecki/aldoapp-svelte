@@ -113,7 +113,7 @@
 	<AlertDialog.Content>
 		<AlertDialog.Header>
 			<AlertDialog.Title class="inline-flex items-center gap-x-1"
-				>Dziękujemy Ci <CheckCircled class="text-green-500 square-5" /></AlertDialog.Title
+				>Dziękujemy <CheckCircled class="text-green-500 square-5" /></AlertDialog.Title
 			>
 			<AlertDialog.Description
 				>Gdy potwierdzimy dostępność produktów, damy Ci znać mailowo oraz przez powiadomienia w

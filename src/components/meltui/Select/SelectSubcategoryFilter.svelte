@@ -66,7 +66,7 @@
 
 	<div class="relative col-span-4">
 		{#if $selected}
-			<input type="hidden" name="podkategoria" value={$selected.value} />
+			<input type="hidden" name="subcategory" value={$selected.value} />
 		{/if}
 
 		<input
@@ -95,10 +95,10 @@
 			{#each filteredSubcategoryList as subcategory, index (index)}
 				<li
 					use:melt={$option(toOption(subcategory))}
-					class="relative cursor-pointer scroll-my-2 rounded-md py-2 pl-4 pr-4 hover:bg-pink-100 data-[highlighted]:bg-pink-200 data-[highlighted]:text-pink-900 data-[disabled]:opacity-50"
+					class="relative cursor-pointer scroll-my-2 rounded-md py-2 pl-4 pr-4 hover:bg-blue-100 data-[highlighted]:bg-blue-200 data-[highlighted]:text-blue-900 data-[disabled]:opacity-50"
 				>
 					{#if $isSelected(subcategory)}
-						<div class="absolute z-10 text-pink-900 check left-2 top-1/2">
+						<div class="absolute z-10 text-blue-900 check left-2 top-1/2">
 							<Check class="square-4" />
 						</div>
 					{/if}

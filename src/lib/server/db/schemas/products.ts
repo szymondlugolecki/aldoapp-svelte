@@ -1,7 +1,4 @@
-import {
-	mainCategories,
-	producents,
-} from '../../../client/constants/dbTypes';
+import { mainCategories, producents } from '../../../client/constants/dbTypes';
 // '$lib/client/constants/dbTypes';
 import { relations, type InferModel } from 'drizzle-orm';
 import {
@@ -43,9 +40,10 @@ export const products = mysqlTable(
 		amountLeft: int('amount_left').notNull(),
 		producent: varchar('producent', { length: 255, enum: producents }).notNull(),
 		encodedURL: varchar('encoded_url', { length: 512 }).notNull(),
+		image: varchar('image', { length: 2048 }),
 
 		// relations
-		authorId: varchar('author_id', { length: 36 }).notNull(), // user that added this product
+		authorId: varchar('author_id', { length: 36 }).notNull() // user that added this product
 	},
 	(product) => ({
 		// indexes

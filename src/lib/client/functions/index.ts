@@ -34,15 +34,15 @@ export const getSubcategoryName = (
 
 export const newCategoryUrl = (searchParams: URLSearchParams, category: string) => {
 	const url = new URLSearchParams(searchParams);
-	url.set('kategoria', category);
-	url.delete('podkategoria');
+	url.set('category', category);
+	url.delete('subcategory');
 	return `/sklep?${url.toString()}`;
 };
 
 export const newSubcategoryUrl = (searchParams: URLSearchParams, subcategory: string) => {
 	const url = new URLSearchParams(searchParams);
-	url.set('podkategoria', subcategory);
-	url.delete('kategoria');
+	url.set('subcategory', subcategory);
+	url.delete('category');
 	return `/sklep?${url.toString()}`;
 };
 

@@ -67,9 +67,9 @@
 				<a href="/sklep/{product.encodedURL}">
 					<div class="w-16 overflow-hidden aspect-3/4">
 						<img
-							src={productImgUrl}
+							src={product.image || productImgUrl}
 							alt={product.name}
-							class="w-full h-full object-cover object-center scale-[1.17] hover:scale-[1.19] transition-transform"
+							class="object-cover object-center w-full h-full transition-transform"
 						/>
 					</div>
 				</a>

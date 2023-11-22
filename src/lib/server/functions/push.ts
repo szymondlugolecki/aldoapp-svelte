@@ -44,8 +44,6 @@ export const sendNotifications = async (
 		const init = await buildPushPayloadTyped(message, subscription, vapidDetails);
 		const res = await fetch(subscription.endpoint, init);
 
-		console.log('subscription', subscription);
-
 		if (res.ok) {
 			results.push(true);
 		} else {

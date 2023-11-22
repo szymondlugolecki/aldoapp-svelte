@@ -1,7 +1,7 @@
 // import { p } from '$lib/server/clients/pClient';
 
 import add from '$lib/server/actions/product/add';
-// import edit from '$lib/server/actions/product/edit';
+import edit from '$lib/server/actions/product/edit';
 // import remove from '$lib/server/actions/product/remove';
 import { db } from '$lib/server/db';
 import { products } from '$lib/server/db/schemas/products';
@@ -41,7 +41,8 @@ export const load = async ({ url }) => {
 				createdAt: true,
 				symbol: true,
 				encodedURL: true,
-				description: true
+				description: true,
+				image: true
 			},
 			with: {
 				author: {
@@ -77,7 +78,7 @@ export const load = async ({ url }) => {
 };
 
 export const actions = {
-	add
-	// edit,
+	add,
+	edit
 	// remove
 };

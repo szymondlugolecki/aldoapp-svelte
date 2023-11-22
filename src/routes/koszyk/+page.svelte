@@ -38,7 +38,11 @@
 		}
 	};
 
-	const { formId, submitting, ...rest } = superForm(data.productQuantityForm, {
+	const {
+		formId,
+		submitting: productQuantitySubmitting,
+		...rest
+	} = superForm(data.productQuantityForm, {
 		delayMs: 1000,
 		onSubmit: ({ formData }) => {
 			const id = formData.get('productId');
@@ -62,6 +66,10 @@
 			schema={order$.create}
 			let:config
 			let:formValues
+			let:message
+			let:delayed
+			let:timeout
+			let:submitting
 			action="?/createOrder"
 			class="flex flex-col items-start w-full max-w-6xl gap-8 px-4 pb-8 lg:flex-row sm:px-10"
 		>
@@ -202,12 +210,16 @@
 					<ProductsTable
 						productQuantityForm={{
 							...rest,
-							submitting,
+							submitting: productQuantitySubmitting,
 							formId
 						}}
 						products={data.cart.products}
 					/>
-					<Summary {subtotal} processing={$submitting} />
+					<Summary
+						{subtotal}
+						processing={$productQuantitySubmitting}
+						submittingOrder={submitting}
+					/>
 				</div>
 			</div>
 		</Form.Root>

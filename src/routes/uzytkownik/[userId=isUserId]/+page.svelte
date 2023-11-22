@@ -13,7 +13,7 @@
 	};
 </script>
 
-<div class="flex flex-col xl:flex-row">
+<div class="flex flex-col">
 	<section class="flex flex-col px-2 ss:px-4 gap-y-3">
 		<h2 class="text-2xl font-semibold tracking-tight scroll-m-20">Podstawowe informacje</h2>
 		<div class="flex flex-col w-full overflow-x-auto gap-y-2">

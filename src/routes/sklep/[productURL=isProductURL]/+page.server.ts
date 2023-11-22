@@ -27,7 +27,8 @@ export const load = async ({ params }) => {
 				subcategory: true,
 				producent: true,
 				encodedURL: true,
-				amountLeft: true
+				amountLeft: true,
+				image: true
 			},
 			where: (product, { eq }) => eq(product.encodedURL, encodedURL)
 		})

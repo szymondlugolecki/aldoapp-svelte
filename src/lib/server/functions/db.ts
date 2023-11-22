@@ -16,6 +16,7 @@ import { sendNotifications } from './push';
 import { getPushMessage } from '../constants/messages';
 import { orderAddress } from '../db/schemas/orderAddress';
 import { sendOrderCreatedEmail } from '../clients/resend';
+import type { OrderProduct } from '$types';
 
 type CreateOrderProduct = { orderId: number; quantity: number; productId: number; price: string };
 
@@ -34,6 +35,7 @@ interface CreateOrderParams {
 	saveAddress?: boolean;
 	cartOwner: Pick<User, 'id' | 'email' | 'fullName' | 'phone'>;
 	customer: Pick<User, 'id' | 'email' | 'fullName' | 'phone'>;
+	productsForEmailSummary: (OrderProduct & { quantity: number; image: string | null })[];
 }
 
 export const createNewOrder = ({
@@ -43,7 +45,8 @@ export const createNewOrder = ({
 	productsWithoutOrderId,
 	saveAddress,
 	cartOwner,
-	customer
+	customer,
+	productsForEmailSummary
 }: CreateOrderParams) => {
 	return db.transaction(async (tx) => {
 		// Create the order & add products && add order address
@@ -105,7 +108,8 @@ export const createNewOrder = ({
 					time: orderDate,
 					price: order.price,
 					firstName: customer.fullName.split(' ')[0],
-					cartOwner
+					cartOwner,
+					products: productsForEmailSummary
 				}
 			});
 		});

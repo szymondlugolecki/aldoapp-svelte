@@ -107,7 +107,7 @@
 
 	const categoryToUrl = (category: string) => {
 		const newUrl = new URL('/sklep', $page.url.href);
-		newUrl.searchParams.set('kategoria', category);
+		newUrl.searchParams.set('category', category);
 		return newUrl.href;
 	};
 

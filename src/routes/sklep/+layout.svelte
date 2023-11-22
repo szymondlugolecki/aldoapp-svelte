@@ -13,8 +13,8 @@
 
 	export let data;
 
-	$: selectedCategory = ($page.url.searchParams.get('kategoria') || 'all') as ExtendedCategory;
-	$: selectedSubcategory = ($page.url.searchParams.get('podkategoria') ||
+	$: selectedCategory = ($page.url.searchParams.get('category') || 'all') as ExtendedCategory;
+	$: selectedSubcategory = ($page.url.searchParams.get('subcategory') ||
 		'all') as ExtendedSubcategory;
 	$: selectedProducent = ($page.url.searchParams.get('producent') || 'all') as ExtendedProducent;
 

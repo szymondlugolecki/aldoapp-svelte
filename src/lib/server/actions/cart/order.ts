@@ -37,7 +37,8 @@ const createOrder: Action = async (event) => {
 								name: true,
 								price: true,
 								symbol: true,
-								encodedURL: true
+								encodedURL: true,
+								image: true
 							}
 						}
 					}
@@ -104,6 +105,18 @@ const createOrder: Action = async (event) => {
 		price
 	}));
 
+	const productsForEmailSummary = productsWithQuantity.map(
+		({ id, quantity, price, name, symbol, encodedURL, image }) => ({
+			id,
+			quantity,
+			price,
+			name,
+			symbol,
+			encodedURL,
+			image
+		})
+	);
+
 	// Create the order
 	const [newOrderId, createOrderError] = await trytm(
 		createNewOrder({
@@ -117,7 +130,8 @@ const createOrder: Action = async (event) => {
 			},
 			saveAddress: form.data.saveAddress,
 			cartOwner: cart.owner,
-			customer: cart.customer
+			customer: cart.customer,
+			productsForEmailSummary
 		})
 	);
 

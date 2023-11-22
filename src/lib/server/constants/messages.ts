@@ -4,7 +4,7 @@ import type { PushMessageWithContent } from '../functions/push';
 
 export const pushMessages = {
 	'order-created': {
-		title: 'Złożono zamówienie',
+		title: 'Nowe zamówienie',
 		message: 'Będziemy informować Cię o zmianach statusie zamówienia'
 	},
 	subscribed: {

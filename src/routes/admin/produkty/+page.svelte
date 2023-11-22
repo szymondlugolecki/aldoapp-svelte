@@ -37,19 +37,16 @@
 	import { superForm } from 'sveltekit-superforms/client';
 	import { createProps, setSorting } from '$lib/client/functions/table.js';
 
-	import * as LR from '@uploadcare/blocks';
-	import { PACKAGE_VERSION } from '@uploadcare/blocks';
+	// import * as LR from '@uploadcare/blocks';
+	// import { PACKAGE_VERSION } from '@uploadcare/blocks';
 	import type { EditProductForm } from '$lib/client/schemas/products.js';
+	// import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
 
-	LR.registerBlocks(LR);
-
-	let files = [];
-	function handleUploaderEvent(e: any) {
-		const { data } = e.detail;
-		files = data;
-	}
+	// LR.registerBlocks(LR);
 
 	export let data;
+
+	// const {  } = superForm(data.editForm)
 
 	const { count } = data.count[0];
 	// const { form, errors, enhance, message } = superForm(data.addForm, {
@@ -280,27 +277,6 @@
 		<Input class="max-w-xl" type="text" placeholder="Wyszukaj..." />
 		<AdminAddDialog form={data.addForm} />
 	</div>
-	<lr-config
-		ctx-name="my-uploader"
-		pubkey="demopublickey"
-		multiple="true"
-		multipleMax="10"
-		confirmUpload="true"
-		sourceList="local, url, camera, dropbox, gdrive"
-	/>
-	<lr-file-uploader-regular
-		ctx-name="my-uploader"
-		css-src="https://unpkg.com/@uploadcare/blocks@{PACKAGE_VERSION}/web/lr-file-uploader-regular.min.css"
-	/>
-	<lr-data-output
-		ctx-name="my-uploader"
-		use-event
-		hidden
-		class="uploader-cfg"
-		on:lr-data-output={handleUploaderEvent}
-	/>
-
-	<!-- onClick={header.column.getToggleSortingHandler()} -->
 	<Table>
 		<TableCaption>Lista produktów</TableCaption>
 		<TableHeader>
