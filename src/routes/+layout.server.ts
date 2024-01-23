@@ -6,7 +6,6 @@
 
 import { isAtLeastModerator } from '$lib/client/functions/index.js';
 import { db } from '$lib/server/db';
-import type { Cart } from '$types';
 import { trytm } from '@bdsqqq/try';
 // import type { Config } from '@sveltejs/adapter-vercel';
 
@@ -18,94 +17,99 @@ export const load = async ({ locals, depends, url }) => {
 	depends('session');
 	const sessionUser = locals.session?.user;
 
-	const cartFetchPromise = sessionUser
-		? db.query.carts.findFirst({
-				where: (carts, { eq }) => eq(carts.ownerId, sessionUser.id),
-				with: {
-					customer: {
-						columns: {
-							id: true,
-							fullName: true,
-							email: true,
-							phone: true
-						},
-						with: {
-							address: {
-								columns: {
-									zipCode: true,
-									city: true,
-									street: true
-								}
+	const base = {
+		user: locals.session?.user,
+		url: url.href
+	};
+
+	if (!sessionUser) {
+		return base;
+	}
+
+	const [fetchedCart] = await trytm(
+		db.query.carts.findFirst({
+			where: (carts, { eq }) => eq(carts.ownerId, sessionUser.id),
+			with: {
+				customer: {
+					columns: {
+						id: true,
+						fullName: true,
+						email: true,
+						phone: true
+					},
+					with: {
+						address: {
+							columns: {
+								zipCode: true,
+								city: true,
+								street: true
 							}
 						}
+					}
+				},
+				products: {
+					columns: {
+						id: true,
+						quantity: true
 					},
-					products: {
-						columns: {
-							id: true,
-							quantity: true
-						},
-						with: {
-							product: {
-								columns: {
-									id: true,
-									name: true,
-									price: true,
-									symbol: true,
-									encodedURL: true,
-									image: true
-								}
+					with: {
+						product: {
+							columns: {
+								id: true,
+								name: true,
+								price: true,
+								symbol: true,
+								encodedURL: true,
+								image: true
 							}
 						}
 					}
 				}
-		  })
-		: undefined;
+			}
+		})
+	);
 
-	let cart: Cart | undefined;
-
-	if (sessionUser && cartFetchPromise) {
-		const [fetchedCart] = await trytm(cartFetchPromise);
-
-		if (fetchedCart) {
-			const groupedProducts = fetchedCart.products.map(({ product, quantity }) => ({
-				...product,
-				quantity
-			}));
-
-			const fixedCart = {
-				...fetchedCart,
-				products: groupedProducts
-			};
-
-			cart = fixedCart;
-		}
+	if (!fetchedCart) {
+		return base;
 	}
 
+	const groupedProducts = fetchedCart.products.map(({ product, quantity }) => ({
+		...product,
+		quantity
+	}));
+
+	const fixedCart = {
+		...fetchedCart,
+		products: groupedProducts
+	};
+
 	return {
-		user: locals.session?.user,
-		cart,
-		url: url.href,
-		customers:
-			sessionUser && isAtLeastModerator(sessionUser.role)
-				? db.query.users.findMany({
-						where: (users, { eq, and }) =>
-							and(eq(users.role, 'customer'), eq(users.adviserId, sessionUser.id)),
-						columns: {
-							id: true,
-							fullName: true,
-							email: true,
-							phone: true
-						},
-						with: {
-							address: {
-								columns: {
-									zipCode: true,
-									city: true,
-									street: true
+		...base,
+		cart: fixedCart,
+		lazy: {
+			...(isAtLeastModerator(sessionUser.role)
+				? {
+						customers: db.query.users.findMany({
+							where: (users, { eq, and }) =>
+								and(eq(users.role, 'customer'), eq(users.adviserId, sessionUser.id)),
+							columns: {
+								id: true,
+								fullName: true,
+								email: true,
+								phone: true
+							},
+							with: {
+								address: {
+									columns: {
+										zipCode: true,
+										city: true,
+										street: true
+									}
 								}
 							}
-						}
-				  })
-				: []
+						})
+				  }
+				: { customers: [] })
+		}
 	};
 };

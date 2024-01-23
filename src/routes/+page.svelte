@@ -156,29 +156,45 @@
 		</div>
 	</div> -->
 
-<section class="flex justify-center h-screen -mt-24">
-	<div class="flex justify-center w-full h-full pb-24 max-w-7xl">
-		<div class="flex flex-col items-center justify-center flex-1 w-full max-w-md gap-y-3">
+<section class="flex justify-center h-screen pt-24 -mt-24">
+	<div
+		class="flex flex-col items-center justify-center w-full h-full lg:pb-24 lg:flex-row max-w-7xl gap-y-6"
+	>
+		<div class="flex flex-col items-center justify-center w-full max-w-md px-4 lg:flex-1 gap-y-3">
 			<div class="flex flex-col gap-y-1">
-				<h1 class="flex items-center text-5xl font-bold tracking-tight sm:text-6xl gap-x-4">
+				<h1
+					class="flex items-center justify-center text-4xl font-bold tracking-tight sm:text-6xl gap-x-4"
+				>
 					Twoje <Image meta={logo} alt="ALDO" sizes="140px" />
 				</h1>
 
-				<p class="text-sm font-semibold sm:text-xl">w telefonie i w komputerze</p>
+				<p class="text-base font-semibold text-center sm:text-xl">w telefonie i komputerze</p>
 				<div class="flex py-6 gap-x-5">
-					<Button href="/sklep" variant="default">Przejdź do sklepu</Button>
+					<Button href="/sklep" class="flex-1" variant="default">Przejdź do sklepu</Button>
 					<Button href="/kontakty" variant="secondary">Lista kontaktów</Button>
 				</div>
 			</div>
 		</div>
-		<div class="flex items-center">
-			<div class="w-[700px] overflow-hidden">
-				<Image
+		<div class="flex items-center px-4">
+			<div class="overflow-auto">
+				<div class="collage">
+					{#each entries as [category, label]}
+						<div class="relative w-32 overflow-hidden rounded-lg sm:w-44 aspect-2/3">
+							<Image
+								class="w-full h-full brightness-[.75] object-cover object-center"
+								loading="lazy"
+								meta={categoryPictures[category]}
+								alt={label}
+							/>
+						</div>
+					{/each}
+				</div>
+				<!-- <Image
 					class="object-cover object-center w-full h-full scale-[1.356] -translate-y-4 translate-x-8 aspect-video"
 					loading="eager"
 					meta={KubotaTractor}
 					alt="traktor kubota"
-				/>
+				/> -->
 			</div>
 		</div>
 	</div>
@@ -208,7 +224,7 @@
 					{#each entries as [category, label]}
 						<div class="p-2.5">
 							<a href={categoryToUrl(category)}>
-								<div class="relative overflow-hidden rounded-lg w-42 aspect-2/3">
+								<div class="relative overflow-hidden rounded-lg aspect-2/3">
 									<div class="absolute flex items-center justify-center w-full h-full text-center">
 										<p
 											class="z-10 text-lg font-semibold tracking-tight text-white capitalize lg:tracking-normal sm:text-2xl whitespace-break-spaces"
@@ -217,7 +233,7 @@
 										</p>
 									</div>
 									<Image
-										class="w-full h-full max-h-screen brightness-[.45] object-cover object-center hover:scale-110 transition-transform"
+										class="w-full h-full max-h-screen brightness-[.75] object-cover object-center hover:scale-110 transition-transform"
 										loading="lazy"
 										meta={categoryPictures[category]}
 										alt={label}
@@ -234,6 +250,32 @@
 	<div class="flex justify-center px-4 pt-24 sm:pt-32 sm:px-8">
 		<div class="w-full max-w-7xl">
 			<span class="text-xl font-medium">Najczęściej kupowane</span>
+			<div class="flex justify-start px-[10px] pt-6 pb-12">
+				<div class="flex items-center w-auto pb-2 overflow-x-auto gap-x-16 justify-items-center">
+					{#each data.mostBought as product, i}
+						<a href="/sklep/{product.encodedURL}">
+							<div class="flex flex-col w-60 gap-y-1">
+								<div class="overflow-hidden rounded-lg aspect-3/4">
+									<img
+										src={productImgUrl}
+										alt={product.name}
+										class="w-full h-full object-cover object-center scale-[1.15] hover:scale-[1.165] transition-transform"
+									/>
+								</div>
+								<div class="font-medium tracking-tight text-left break-words">
+									{product.name}
+								</div>
+							</div>
+						</a>
+					{/each}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="flex justify-center px-4 pt-24 sm:pt-32 sm:px-8">
+		<div class="w-full max-w-7xl">
+			<span class="text-xl font-medium">Twoje ulubione</span>
 			<div class="flex justify-start px-[10px] pt-6 pb-12">
 				<div class="flex items-center w-auto pb-2 overflow-x-auto gap-x-16 justify-items-center">
 					{#each data.mostBought as product, i}
@@ -332,3 +374,11 @@
 		<li>Możliwość płatności online (Dotpay/Przelewy24/Stripe/Paypal????)</li>
 		<li>Page Transition z nowym API Chrome</li>
 	</ul> -->
+
+<style lang="postcss">
+	.collage {
+		@apply grid gap-6 grid-cols-2 overflow-auto [&>*:nth-child(2)]:row-start-2 [&>*:nth-child(3)]:row-start-2;
+		@apply sm:grid-cols-4 sm:[&>*:nth-child(2)]:row-start-1 sm:[&>*:nth-child(3)]:row-start-1;
+		@apply lg:grid-cols-2 lg:[&>*:nth-child(2)]:row-start-2 lg:[&>*:nth-child(3)]:row-start-2;
+	}
+</style>

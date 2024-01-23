@@ -1,23 +1,25 @@
-import getCustomError from '$lib/client/constants/customErrors';
+import { getCustomRedirect } from '$lib/client/constants/customErrors';
 import { isAtLeastModerator } from '$lib/client/functions/index.js';
-import { order$ } from '$lib/client/schemas';
+import { cart$, order$ } from '$lib/client/schemas';
 import changeProductQuantity from '$lib/server/actions/cart/changeProductQuantity';
+import setCustomer from '$lib/server/actions/cart/setCustomer';
+
 import createOrder from '$lib/server/actions/cart/order.js';
 import { db } from '$lib/server/db';
 import { trytm } from '@bdsqqq/try';
-import { error } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
 
 export const actions = {
 	changeProductQuantity,
-	createOrder
+	createOrder,
+	setCustomer
 };
 
 export const load = async ({ locals }) => {
 	const sessionUser = locals.session?.user;
-
 	if (!sessionUser) {
-		throw error(...getCustomError('not-logged-in'));
+		throw redirect(...getCustomRedirect('login-required', '/koszyk'));
 	}
 
 	const [cart] = await trytm(
@@ -77,7 +79,8 @@ export const load = async ({ locals }) => {
 	// Populate the form with default values
 	return {
 		customers,
-		orderForm: superValidate(defaultAddress, order$.create),
-		productQuantityForm: superValidate(order$.productQuantity)
+		orderForm: superValidate(order$.create),
+		productQuantityForm: superValidate(order$.productQuantity),
+		setCustomerForm: superValidate(cart$.changeCartCustomer)
 	};
 };

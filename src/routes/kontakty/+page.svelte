@@ -5,7 +5,7 @@
 <section class="flex flex-col items-center w-full px-8 pb-44">
 	<div class="my-8 text-center">
 		<h1 class="my-4 text-4xl font-extrabold tracking-tight scroll-m-20 lg:text-5xl">Kontakty</h1>
-		<p>Wybierz interesujący Cię dział, aby zobaczyć listę kontaktów.</p>
+		<p>Wybierz interesujący Cię dział.</p>
 	</div>
 	<div
 		style="grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));"

@@ -133,7 +133,7 @@
 			id: 'createdAt',
 			header: 'Złożono',
 			accessorKey: 'createdAt',
-			cell: (info) => dateParser(info.getValue() as Date, 'short')
+			cell: (info) => dateParser(info.getValue() as Date, 'medium')
 		}
 	];
 

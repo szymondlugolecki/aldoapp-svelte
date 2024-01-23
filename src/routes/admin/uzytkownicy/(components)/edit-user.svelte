@@ -148,6 +148,22 @@
 						<Form.Validation />
 					</Form.Item>
 				</Form.Field>
+			{:else if key === 'adviser'}
+				<Form.Field {config} name="claimAdviser">
+					<p class="leading-7 [&:not(:first-child)]:mt-6">
+						Obecny doradca: {user.adviser?.fullName || 'Brak'}
+					</p>
+
+					<Form.Item class="flex flex-row items-center justify-between p-4 border rounded-lg">
+						<div class="space-y-0.5">
+							<Form.Label>Zostań doradcą</Form.Label>
+							<Form.Description
+								>Dostaniesz możliwość zamawiania w imieniu tego klienta</Form.Description
+							>
+						</div>
+						<Form.Switch />
+					</Form.Item>
+				</Form.Field>
 			{/if}
 
 			<Form.Field {config} name="id">

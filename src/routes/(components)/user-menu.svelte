@@ -56,7 +56,7 @@
 			</button>
 			<button use:melt={$close} class="">
 				<a
-					href="/ustawienia"
+					href="/ustawienia/preferencje"
 					class="flex gap-2 items-center hover:bg-muted px-2 py-2.5 rounded-lg text-sm"
 					><Settings class="square-5" />Ustawienia</a
 				>

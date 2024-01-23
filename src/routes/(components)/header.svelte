@@ -15,7 +15,6 @@
 		Contact,
 		Settings
 	} from 'lucide-svelte';
-	import type { Cart } from '$types';
 	// import Img from '@zerodevx/svelte-img';
 	// import logo from '$lib/assets/logo.png?run&width=110&height=80&format=webp';
 	import { slide } from 'svelte/transition';
@@ -29,7 +28,9 @@
 
 	$: activeUrl = $page.url.pathname.toLowerCase();
 
-	export let cart: Cart | undefined;
+	type PageServerParentData = import('../$types').PageServerParentData;
+
+	export let cart: PageServerParentData['cart'];
 </script>
 
 <header class="sticky top-0 z-40 w-full bg-background">

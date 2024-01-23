@@ -3,10 +3,10 @@ import { userRoles } from '../constants/dbTypes';
 
 export const id = z
 	.string({
-		required_error: 'Id użytkownika jest wymagane',
-		invalid_type_error: 'Nieprawidłowe id użytkownika'
+		required_error: 'Identyfikator użytkownika jest wymagany',
+		invalid_type_error: 'Nieprawidłowy użytkownik'
 	})
-	.cuid2({ message: 'Nieprawidłowe id użytkownika' });
+	.cuid2({ message: 'Nieprawidłowy użytkownik' });
 
 export const email = z
 	.string({

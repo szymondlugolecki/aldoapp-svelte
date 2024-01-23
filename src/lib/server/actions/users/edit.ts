@@ -139,11 +139,18 @@ const edit = (async ({ request, locals }) => {
 	if (Object.keys(newAddress).length) {
 		const [, editUserAddressError] = await trytm(
 			db
-				.update(userAddress)
-				.set({
-					...newAddress
+				.insert(userAddress)
+				.values({
+					userId: id,
+					street: newAddress.street || '',
+					zipCode: newAddress.zipCode || '',
+					city: newAddress.city || ''
 				})
-				.where(eq(userAddress.userId, id))
+				.onDuplicateKeyUpdate({
+					set: {
+						...newAddress
+					}
+				})
 		);
 		if (editUserAddressError) {
 			return setError(form, 'Nie udało się edytować adresu użytkownika', { status: 500 });

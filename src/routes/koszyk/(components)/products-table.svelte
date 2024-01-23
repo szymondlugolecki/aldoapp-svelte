@@ -1,7 +1,6 @@
 <script lang="ts">
 	import createLoadingToast from '$lib/client/functions/createLoadingToast.js';
 	import { Minus, Plus, Trash, X } from 'lucide-svelte';
-	import type { Cart } from '$types';
 	import { createSelect, melt } from '@melt-ui/svelte';
 	import { Skeleton } from '$shadcn/skeleton';
 	import type { ProductQuantity } from '$lib/client/schemas/order';
@@ -22,8 +21,10 @@
 		}
 	});
 
+	type PageServerParentData = import('../$types').PageServerParentData;
+
 	// export let form: SuperValidated<ProductQuantity>;
-	export let products: Cart['products'];
+	export let products: NonNullable<PageServerParentData['cart']>['products'];
 
 	export let productQuantityForm: SuperForm<ProductQuantity>;
 	const { enhance, delayed, formId, submitting } = productQuantityForm;

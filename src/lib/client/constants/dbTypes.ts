@@ -7,7 +7,7 @@ export type Producent = 'deheus' | 'unknown';
 export type MainCategory = 'bydlo' | 'drob' | 'trzoda' | 'hodowla-przydomowa';
 
 export type PaymentMethod = 'cash' | 'transfer';
-export type DeliveryMethod = 'personal-delivery'; // 'personal-pickup' |
+export type DeliveryMethod = 'personal-delivery' | 'personal-pickup';
 
 export type OrderStatus =
 	| 'awaitingCustomerDecision'

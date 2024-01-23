@@ -8,7 +8,6 @@
 		getPaginationRowModel,
 		type ColumnDef,
 		type TableOptions,
-		type CellContext,
 		type SortingState,
 		type Updater,
 		type PaginationState
@@ -28,18 +27,21 @@
 		TableRow
 	} from '$shadcn/table';
 	import { Input } from '$shadcn/input';
-	import { Button } from '$shadcn/button';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import Pagination2 from '$components/custom/Table/Pagination2.svelte';
 	import { createProps } from '$lib/client/functions/table';
 	// import { superForm } from 'sveltekit-superforms/client';
 
+	import type { EditUserForm } from '$lib/client/schemas/user.js';
+
 	export let data;
 
 	type ParsedUser = (typeof data.users)[number];
 
 	let count = data.count[0].count;
+
+	console.log(data.users);
 
 	const defaultColumns: ColumnDef<ParsedUser>[] = [
 		{
@@ -59,41 +61,47 @@
 			id: 'fullName',
 			header: 'Imię i nazwisko',
 			accessorKey: 'fullName',
-			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedUser['id'], ParsedUser>(info)),
+			cell: (info) =>
+				flexRender(AdminEditDialog, createProps<ParsedUser, EditUserForm>(info, data.editForm)),
 			enableSorting: true
 		},
 		{
 			id: 'email',
 			header: 'Email',
 			accessorKey: 'email',
-			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedUser['id'], ParsedUser>(info)),
+			cell: (info) =>
+				flexRender(AdminEditDialog, createProps<ParsedUser, EditUserForm>(info, data.editForm)),
 			enableSorting: true
 		},
 		{
 			id: 'role',
 			header: 'Rola',
 			accessorKey: 'role',
-			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedUser['id'], ParsedUser>(info))
+			cell: (info) =>
+				flexRender(AdminEditDialog, createProps<ParsedUser, EditUserForm>(info, data.editForm))
 		},
 		{
 			id: 'phone',
 			header: 'Telefon',
 			accessorKey: 'phone',
-			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedUser['id'], ParsedUser>(info)),
+			cell: (info) =>
+				flexRender(AdminEditDialog, createProps<ParsedUser, EditUserForm>(info, data.editForm)),
 			enableSorting: false
 		},
 		{
 			id: 'address',
 			header: 'Adres',
 			accessorKey: 'address',
-			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedUser['id'], ParsedUser>(info)),
+			cell: (info) =>
+				flexRender(AdminEditDialog, createProps<ParsedUser, EditUserForm>(info, data.editForm)),
 			enableSorting: false
 		},
 		{
 			id: 'adviser',
 			header: 'Doradca',
 			accessorKey: 'adviser',
-			cell: (info) => flexRender(AdminEditDialog, createProps<ParsedUser['id'], ParsedUser>(info))
+			cell: (info) =>
+				flexRender(AdminEditDialog, createProps<ParsedUser, EditUserForm>(info, data.editForm))
 		},
 		{
 			id: 'createdAt',

@@ -33,7 +33,7 @@
 						<img
 							src={product.image || productImgUrl}
 							alt="Zdjęcie produktu"
-							class="scale-[1.1] object-cover hover:scale-[1.15] duration-150 max-h-[552px]"
+							class="scale-[1] object-cover hover:scale-[1.05] duration-150 max-h-[552px]"
 						/>
 					</a>
 				</div>

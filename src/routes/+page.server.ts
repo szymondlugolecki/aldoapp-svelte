@@ -194,15 +194,15 @@ export const load = async () => {
 
 	// console.log('subscriptions', subs);
 
-	const verificationTokens = await db.query.verificationTokens.findMany({
-		columns: {
-			userId: true,
-			code: true,
-			userAgent: true
-		}
-	});
+	// const verificationTokens = await db.query.verificationTokens.findMany({
+	// 	columns: {
+	// 		userId: true,
+	// 		code: true,
+	// 		userAgent: true
+	// 	}
+	// });
 
-	console.log('verificationTokens', verificationTokens.length, verificationTokens);
+	// console.log('verificationTokens', verificationTokens.length, verificationTokens);
 
 	return {
 		recentlyOrdered,

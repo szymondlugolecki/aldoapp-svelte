@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { paymentMethods, deliveryMethods, orderEvents } from '../constants/dbTypes';
-import { id as userId, city, zipCode, street } from './user';
+// import { id as userId, city, zipCode, street } from './user';
 import { id as productId } from './products';
 import { addressForm } from './settings';
 
@@ -68,10 +68,10 @@ export const orderAddressForm = addressForm.merge(
 	})
 );
 
-const saveAddress = z.boolean({
-	invalid_type_error: 'Nieprawidłowa wartość dla: zapamiętaj adres',
-	required_error: 'Wymagana wartość dla: zapamiętaj adres'
-});
+// const saveAddress = z.boolean({
+// 	invalid_type_error: 'Nieprawidłowa wartość dla: zapamiętaj adres',
+// 	required_error: 'Wymagana wartość dla: zapamiętaj adres'
+// });
 
 export const productQuantity = z.object({
 	productId,
@@ -86,12 +86,12 @@ export const productQuantity = z.object({
 
 export const create = z.object({
 	deliveryMethod,
-	paymentMethod,
-	customerId: userId.optional(), // if not passed then defaults to session user
-	street: street,
-	zipCode: zipCode,
-	city: city,
-	saveAddress: saveAddress.optional()
+	paymentMethod
+	// customerId: userId.optional() // if not passed then defaults to session user
+	// street: street,
+	// zipCode: zipCode,
+	// city: city,
+	// saveAddress: saveAddress.optional()
 });
 
 export const orderAgainForm = z.object({

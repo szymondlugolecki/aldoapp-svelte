@@ -151,7 +151,7 @@
 
 			<Section>
 				<Column>
-					<Text>Produkty</Text>
+					<Text style={{ ...paragraph, fontWeight: 600 }}>Produkty</Text>
 				</Column>
 			</Section>
 			{#each products as product}

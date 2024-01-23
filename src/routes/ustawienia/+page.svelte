@@ -8,7 +8,7 @@
 	import PhoneForm from './(components)/phone-form.svelte';
 	import EmailForm from './(components)/email-form.svelte';
 
-	export let data;
+	// export let data;
 </script>
 
 <svelte:head>
@@ -17,16 +17,16 @@
 </svelte:head>
 
 <div class="flex flex-col gap-y-6">
-	<div>
+	<!-- <div>
 		<h1 class="text-xl font-medium tracking-tight">Profil</h1>
 		<p class="text-sm text-muted-foreground">
 			Zmodyfikuj swój adres email, domyślny adres dostawy i numer telefonu
 		</p>
-	</div>
-	<Separator />
+	</div> -->
+	<!-- <Separator />
 	<AddressForm form={data.addressForm} />
 	<Separator />
 	<EmailForm form={data.emailForm} />
 	<Separator />
-	<PhoneForm form={data.phoneForm} />
+	<PhoneForm form={data.phoneForm} /> -->
 </div>

@@ -3,10 +3,10 @@
 	import SidebarNav from './(components)/sidebar-nav.svelte';
 
 	const sidebarNavItems = [
-		{
-			title: 'Profil',
-			href: '/ustawienia'
-		},
+		// {
+		// 	title: 'Profil',
+		// 	href: '/ustawienia'
+		// },
 		{
 			title: 'Preferencje',
 			href: '/ustawienia/preferencje'

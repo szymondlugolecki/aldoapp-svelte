@@ -67,6 +67,13 @@ export const createNewOrder = ({
 		// Clear the cart
 		await tx.transaction(async (tx) => {
 			await tx.delete(cartProductsTable).where(eq(cartProductsTable.cartId, cartId));
+			console.log('removing the customer', cartId);
+			await tx
+				.update(carts)
+				.set({
+					customerId: cartOwner.id
+				})
+				.where(eq(carts.id, cartId));
 		});
 
 		// Send PUSH notifications

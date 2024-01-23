@@ -22,20 +22,21 @@ export const paymentMethodsList: Record<PaymentMethod, string> = {
 } as const;
 
 export const deliveryMethodsList: Record<DeliveryMethod, string> = {
-	'personal-delivery': 'Kierowca ALDO'
+	'personal-delivery': 'Kierowca ALDO',
+	'personal-pickup': 'Odbiór osobisty'
 } as const;
 
 export const orderStatusList: Record<(typeof orderStatus)[number], string> = {
 	delivered: 'Dostarczono',
 	awaitingDelivery: 'Wysłano',
-	awaitingOffice: 'Sprawdzanie dostępności',
+	awaitingOffice: 'Weryfikowanie dostępności',
 	awaitingCustomerDecision: 'Oczekuje na decyzję klienta',
 	awaitingShipment: 'Oczekuje na wysyłkę',
 	cancelled: 'Anulowano'
 } as const;
 
 export const orderEventsList: Record<OrderEvent, string> = {
-	IS_AVAILABLE: 'Produkty są dostępne',
+	IS_AVAILABLE: 'Zweryfikowano zamówienie',
 	IS_UNAVAILABLE: 'Produkty są niedostępne',
 	CANCEL: 'Anuluj zamówienie',
 	KEEP_WAITING: 'Poczekaj na dostępność',
@@ -46,8 +47,8 @@ export const orderEventsList: Record<OrderEvent, string> = {
 
 export const fodderNames = {
 	bydlo: 'Bydło',
-	drob: 'Drób',
 	trzoda: 'Trzoda',
+	drob: 'Drób',
 	'hodowla-przydomowa': 'Hodowla przydomowa'
 } as const;
 
@@ -182,7 +183,7 @@ export const salesmenMenu: SalesmenMenuType[] = [
 	},
 	{
 		name: 'Wulkanizacja',
-		description: 'Chemiczny proces sieciowania cząsteczek polimeru prowadzący do otrzymania gumy.',
+		description: 'Profesjonalny serwis i montaż opon.',
 		locations: ['surowe'],
 		href: 'wulkanizacja'
 	}
@@ -209,6 +210,10 @@ export const nutritionalAdvisors = [
 	{
 		name: 'Karol Denkiewicz',
 		phone: ['797 503 691']
+	},
+	{
+		name: 'Paweł Drejer',
+		phone: ['519 494 655']
 	}
 ];
 

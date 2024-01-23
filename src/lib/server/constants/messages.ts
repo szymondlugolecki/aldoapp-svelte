@@ -47,9 +47,9 @@ export const getOrderStatusPushMessage = (event: OrderEvent): PushMessageWithCon
 export const orderStatusEmailDescription = (event: OrderEvent) => {
 	switch (event) {
 		case 'CANCEL':
-			return 'Zamówienie zostało anulowane.';
+			return 'Zamówienie zostało anulowane';
 		case 'IS_AVAILABLE':
-			return 'Potwierdziliśmy, że zamówione produkty są dostępne w naszym magazynie. Przechodzimy do realizacji Twojego zamówienia.';
+			return 'Zweryfikowaliśmy Twoje zamówienie. Teraz przystąpimy do realizacji';
 		case 'IS_UNAVAILABLE':
 			return 'Niestety przynajmniej jeden z zamówionych produktów nie jest dostępny w naszym magazynie. Podejmij decyzję o kontynuowaniu lub anulowaniu zamówienia na stronie zamówienia lub kontaktując się z nami.';
 		case 'DELIVERED':
@@ -57,7 +57,7 @@ export const orderStatusEmailDescription = (event: OrderEvent) => {
 		case 'KEEP_WAITING':
 			return 'Damy Ci znać, gdy produkty będą dostępne';
 		case 'SHIPPED':
-			return 'Twoja przesyłka jest w drodze. Dostarczymy ją w przeciągu 3 godzin.';
+			return 'Twoja przesyłka jest w drodze';
 		default:
 			return '';
 	}
@@ -68,7 +68,7 @@ export const orderStatusEmailPreview = (event: OrderEvent) => {
 		case 'CANCEL':
 			return 'Anulowano zamówienie';
 		case 'IS_AVAILABLE':
-			return 'Produkty są dostępne';
+			return 'Zamówienie zweryfikowane';
 		case 'IS_UNAVAILABLE':
 			return 'Produkty są niedostępne';
 		case 'DELIVERED':

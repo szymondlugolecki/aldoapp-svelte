@@ -5,7 +5,7 @@ import { createNewOrder } from '$lib/server/functions/db';
 import getCustomError from '$lib/client/constants/customErrors';
 import type { createOrderSchema } from '$lib/server/db/schemas/orders';
 import type { z } from 'zod';
-import { superValidate } from 'sveltekit-superforms/server';
+import { setError, superValidate } from 'sveltekit-superforms/server';
 import { order$ } from '$lib/client/schemas';
 
 const createOrder: Action = async (event) => {
@@ -76,7 +76,7 @@ const createOrder: Action = async (event) => {
 	if (!cart) {
 		// Unexpected-error
 		console.error('No cart found for unknown reason', sessionUser);
-		throw error(500, 'Nie znaleziono ksozyka');
+		throw error(500, 'Nie znaleziono koszyka');
 	}
 
 	const productsWithQuantity = cart.products.map(({ product, quantity }) => ({
@@ -123,12 +123,13 @@ const createOrder: Action = async (event) => {
 			order,
 			productsWithoutOrderId: orderProducts,
 			cartId: cart.id,
-			address: {
-				city: form.data.city,
-				street: form.data.street,
-				zipCode: form.data.zipCode
-			},
-			saveAddress: form.data.saveAddress,
+			address: cart.customer.address,
+			// {
+			// 	city: form.data.city,
+			// 	street: form.data.street,
+			// 	zipCode: form.data.zipCode
+			// },
+			// saveAddress: form.data.saveAddress,
 			cartOwner: cart.owner,
 			customer: cart.customer,
 			productsForEmailSummary
@@ -138,7 +139,7 @@ const createOrder: Action = async (event) => {
 	if (createOrderError) {
 		// Unexpected-error
 		console.log('createOrderError', createOrderError);
-		throw error(500, 'Błąd podczas składania zamówienia');
+		return setError(form, 'Błąd podczas składania zamówienia', { status: 500 });
 	}
 
 	throw redirect(303, `/zamowienia/${newOrderId}?success=true`);
