@@ -54,7 +54,15 @@ export const load = async ({ url }) => {
 			.from(users),
 		pageLimit,
 		addForm: superValidate(user$.addForm),
-		editForm: superValidate(user$.editForm)
+		editForm: superValidate(user$.editForm),
+		advisers: db.query.users.findMany({
+			where: (users, { eq }) => eq(users.role, 'adviser'),
+			columns: {
+				id: true,
+				fullName: true,
+				email: true
+			}
+		})
 	};
 };
 

@@ -63,7 +63,7 @@
 		}
 	};
 
-	let changingCustomer = false;
+	$: console.log('orderFormId', orderFormId);
 </script>
 
 <svelte:head>
@@ -87,7 +87,6 @@
 							id: data.user.id,
 							fullName: data.user.fullName
 						}}
-						selectedCustomer={data.cart.customer}
 						setCustomerForm={data.setCustomerForm}
 					/>
 				{/if}

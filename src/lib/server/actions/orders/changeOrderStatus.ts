@@ -30,6 +30,7 @@ import { sendOrderStatusEmail } from '$lib/server/clients/resend';
 const changeOrderStatus = (async ({ request, locals }) => {
 	const sessionUser = locals.session?.user;
 
+	// ! THIS IS REMOVED FOR NOW:
 	// Only moderators and admins are allowed to change order status
 	// ! BUT
 	// if state=awaitingCustomerDecision then the user
@@ -37,6 +38,9 @@ const changeOrderStatus = (async ({ request, locals }) => {
 
 	if (!sessionUser) {
 		throw error(...getCustomError('not-logged-in'));
+	}
+	if (!isAtLeastModerator(sessionUser.role)) {
+		throw error(...getCustomError('insufficient-permissions'));
 	}
 	const form = await superValidate(request, order$.eventForm);
 	if (!form.valid) {
@@ -107,20 +111,20 @@ const changeOrderStatus = (async ({ request, locals }) => {
 
 	// Check if the user is allowed to change the status
 	// Only mods are allowed to change the status in general
-	// But if the status is awaitingCustomerDecision then the user can either
+	// But if the status is awaitingCustomerDecision then the user can either:
 	// 1. Cancel the order
 	// 2. Keep waiting for the products to be available
 
-	if (!isAtLeastModerator(sessionUser.role)) {
-		// Not a moderator
-		// Can only change the status if the order status is awaitingCustomerDecision
-		// And they are editing their own order
-		const awaitingCustomerDecision = previousOrder.status === 'awaitingCustomerDecision';
-		const editingItsOwnOrder = previousOrder.customerId === sessionUser.id;
-		if (!awaitingCustomerDecision || !editingItsOwnOrder) {
-			throw error(...getCustomError('insufficient-permissions'));
-		}
-	}
+	// if (!isAtLeastModerator(sessionUser.role)) {
+	// 	// Not a moderator
+	// 	// Can only change the status if the order status is awaitingCustomerDecision
+	// 	// And they are editing their own order
+	// 	const awaitingCustomerDecision = previousOrder.status === 'awaitingCustomerDecision';
+	// 	const editingItsOwnOrder = previousOrder.customerId === sessionUser.id;
+	// 	if (!awaitingCustomerDecision || !editingItsOwnOrder) {
+	// 		throw error(...getCustomError('insufficient-permissions'));
+	// 	}
+	// }
 
 	// Restore the machine
 	const service = interpret(orderMachine).onTransition(async (state) => {

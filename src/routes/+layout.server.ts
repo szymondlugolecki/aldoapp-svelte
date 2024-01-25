@@ -4,7 +4,7 @@
 // import { eq } from 'drizzle-orm';
 // import { orders } from '$lib/server/db/schemas/products.js';
 
-import { isAtLeastModerator } from '$lib/client/functions/index.js';
+// import { isAtLeastModerator } from '$lib/client/functions/index.js';
 import { db } from '$lib/server/db';
 import { trytm } from '@bdsqqq/try';
 // import type { Config } from '@sveltejs/adapter-vercel';
@@ -85,31 +85,31 @@ export const load = async ({ locals, depends, url }) => {
 
 	return {
 		...base,
-		cart: fixedCart,
-		lazy: {
-			...(isAtLeastModerator(sessionUser.role)
-				? {
-						customers: db.query.users.findMany({
-							where: (users, { eq, and }) =>
-								and(eq(users.role, 'customer'), eq(users.adviserId, sessionUser.id)),
-							columns: {
-								id: true,
-								fullName: true,
-								email: true,
-								phone: true
-							},
-							with: {
-								address: {
-									columns: {
-										zipCode: true,
-										city: true,
-										street: true
-									}
-								}
-							}
-						})
-				  }
-				: { customers: [] })
-		}
+		cart: fixedCart
+		// lazy: {
+		// 	...(isAtLeastModerator(sessionUser.role)
+		// 		? {
+		// 				customers: db.query.users.findMany({
+		// 					where: (users, { eq, and }) =>
+		// 						and(eq(users.role, 'customer'), eq(users.adviserId, sessionUser.id)),
+		// 					columns: {
+		// 						id: true,
+		// 						fullName: true,
+		// 						email: true,
+		// 						phone: true
+		// 					},
+		// 					with: {
+		// 						address: {
+		// 							columns: {
+		// 								zipCode: true,
+		// 								city: true,
+		// 								street: true
+		// 							}
+		// 						}
+		// 					}
+		// 				})
+		// 		  }
+		// 		: { customers: [] })
+		// }
 	};
 };

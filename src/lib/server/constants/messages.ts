@@ -13,13 +13,16 @@ export const pushMessages = {
 	}
 } as const;
 
-export const orderPushMessages = {
-	IS_AVAILABLE: orderEventsList['IS_AVAILABLE'],
+export const orderPushMessages: Record<OrderEvent, string> = {
+	IS_AVAILABLE_FOR_PICKUP: orderEventsList['IS_AVAILABLE_FOR_PICKUP'],
+	IS_AVAILABLE_FOR_SHIPMENT: orderEventsList['IS_AVAILABLE_FOR_SHIPMENT'],
 	IS_UNAVAILABLE: orderEventsList['IS_UNAVAILABLE'],
+	READY_FOR_PICKUP: orderEventsList['READY_FOR_PICKUP'],
 	CANCEL: 'Anulowano zamówienie',
-	KEEP_WAITING: 'Damy Ci znać, gdy produkty będą dostępne',
 	SHIPPED: 'Zamówienie jest w drodze',
-	DELIVERED: 'Zamówienie zostało dostarczone'
+	DELIVERED: 'Zamówienie zostało dostarczone',
+	PICKED_UP: 'Zamówienie zostało odebrane'
+	// KEEP_WAITING: 'Damy Ci znać, gdy produkty będą dostępne',
 } as const;
 
 export const getPushMessage = (key: keyof typeof pushMessages): PushMessageWithContent => {
@@ -48,14 +51,20 @@ export const orderStatusEmailDescription = (event: OrderEvent) => {
 	switch (event) {
 		case 'CANCEL':
 			return 'Zamówienie zostało anulowane';
-		case 'IS_AVAILABLE':
+		case 'IS_AVAILABLE_FOR_PICKUP':
+			return 'Zweryfikowaliśmy Twoje zamówienie. Teraz przystąpimy do realizacji';
+		case 'IS_AVAILABLE_FOR_SHIPMENT':
 			return 'Zweryfikowaliśmy Twoje zamówienie. Teraz przystąpimy do realizacji';
 		case 'IS_UNAVAILABLE':
 			return 'Niestety przynajmniej jeden z zamówionych produktów nie jest dostępny w naszym magazynie. Podejmij decyzję o kontynuowaniu lub anulowaniu zamówienia na stronie zamówienia lub kontaktując się z nami.';
 		case 'DELIVERED':
 			return 'Zamówienie zostało zrealizowane. Dziękujemy za zakupy.';
-		case 'KEEP_WAITING':
-			return 'Damy Ci znać, gdy produkty będą dostępne';
+		// case 'KEEP_WAITING':
+		// 	return 'Damy Ci znać, gdy produkty będą dostępne';
+		case 'READY_FOR_PICKUP':
+			return 'Zamówienie jest gotowe do odbioru';
+		case 'PICKED_UP':
+			return 'Zamówienie zostało zrealizowane. Dziękujemy za zakupy.';
 		case 'SHIPPED':
 			return 'Twoja przesyłka jest w drodze';
 		default:
@@ -67,17 +76,23 @@ export const orderStatusEmailPreview = (event: OrderEvent) => {
 	switch (event) {
 		case 'CANCEL':
 			return 'Anulowano zamówienie';
-		case 'IS_AVAILABLE':
+		case 'IS_AVAILABLE_FOR_PICKUP':
+			return 'Zamówienie zweryfikowane';
+		case 'IS_AVAILABLE_FOR_SHIPMENT':
 			return 'Zamówienie zweryfikowane';
 		case 'IS_UNAVAILABLE':
 			return 'Produkty są niedostępne';
 		case 'DELIVERED':
 			return 'Dostarczono zamówienie';
-		case 'KEEP_WAITING':
-			return 'Oczekiwanie na dostępność produktów';
 		case 'SHIPPED':
 			return 'Przesyłka jest w drodze';
+		case 'READY_FOR_PICKUP':
+			return 'Zamówienie gotowe do odbioru';
+		case 'PICKED_UP':
+			return 'Odebrano zamówienie';
 		default:
 			return '';
+		// case 'KEEP_WAITING':
+		// 	return 'Oczekiwanie na dostępność produktów';
 	}
 };

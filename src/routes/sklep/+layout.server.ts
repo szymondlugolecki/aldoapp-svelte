@@ -17,7 +17,8 @@ const sortableColumns: ProductSortableColumn[] = [
 
 export const load = ({ url }) => {
 	const { page, sort, product } = extractParams<ProductSortableColumn>(url, sortableColumns);
-	const defaultWhereClause = or();
+	const defaultWhereClause = eq(products.hidden, false);
+	// or();
 	// eq(products.customerId, userId),
 	// eq(products.cartOwnerId, userId)
 

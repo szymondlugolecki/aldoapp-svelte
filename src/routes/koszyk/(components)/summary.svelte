@@ -7,6 +7,8 @@
 	export let isRecalculating: boolean;
 	export let disableOrderButton: boolean;
 	export let orderFormId: string;
+
+	$: console.log('summary', orderFormId);
 </script>
 
 <div class="flex flex-col border-y border-border">

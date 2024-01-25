@@ -304,8 +304,8 @@
 <!-- <button on:click={removeAllOrders} class="px-3 py-2 text-lg text-white bg-gray-800"
 	>Usun zamowienia</button
 > -->
-<!-- 
-<button on:click={removeAllProducts} class="px-3 py-2 text-lg text-white bg-gray-800"
+
+<!-- <button on:click={removeAllProducts} class="px-3 py-2 text-lg text-white bg-gray-800"
 	>Usun produkty</button
 > -->
 

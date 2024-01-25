@@ -5,19 +5,22 @@ import getCustomError from '$lib/client/constants/customErrors';
 import { isAtLeastModerator } from '$lib/client/functions';
 import { products$ } from '$lib/client/schemas';
 import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
-import { betterZodParse } from '$lib/client/functions/betterZodParse';
-// import { uploadFile } from '$lib/server/clients/backblaze';
-import * as Bytescale from '@bytescale/sdk';
-import nodeFetch from 'node-fetch';
-import fileToArrayBuffer from 'file2arraybuffer';
 import { products, type Product } from '$lib/server/db/schemas/products';
 import { eq } from 'drizzle-orm';
 import { db } from '$lib/server/db';
+import { utapi } from '$lib/server/clients/uploadthing';
 
-const uploadManager = new Bytescale.UploadManager({
-	fetchApi: nodeFetch as any, // import nodeFetch from "node-fetch"; // Only required for Node.js. TypeScript: 'nodeFetch as any' may be necessary.
-	apiKey: 'public_W142iLN7owvrifLvXWpbYdspQnhJ' // This is your API key.
-});
+const getImageUrl = async (uploadedImage: FormDataEntryValue | null) => {
+	if (!(uploadedImage instanceof File)) {
+		return null;
+	}
+	const { data, error } = await utapi.uploadFiles(uploadedImage);
+	if (error) {
+		throw error;
+	}
+	console.log('data', data);
+	return data.url;
+};
 
 const edit: Action = async ({ request, locals }) => {
 	// Must be a moderator or higher
@@ -39,54 +42,17 @@ const edit: Action = async ({ request, locals }) => {
 		return setError(form, 'Nie podano żadnych danych do edycji', { status: 400 });
 	}
 
-	const { id, name, symbol, category, subcategory, price, producent, weight, description } =
+	const { id, name, symbol, category, subcategory, price, producent, weight, description, hidden } =
 		form.data;
 
-	let imageUrl: string | undefined = undefined;
-
 	const uploadedImage = formData.get('images');
-	if (uploadedImage instanceof File) {
-		console.log('uploadedImage', uploadedImage);
-		// const [, imageError] = betterZodParse(products$.image, uploadedImage);
-
-		// if (imageError) {
-		// return setError(form, 'images', imageError[0]);
-		// }
-
-		const file = await fileToArrayBuffer(uploadedImage);
-
-		const [uploadData, uploadError] = await trytm(
-			uploadManager.upload({
-				// Supported types:
-				// - String
-				// - Blob
-				// - ArrayBuffer
-				// - Buffer
-				// - ReadableStream (Node.js), e.g. fs.createReadStream("file.txt")
-				data: Buffer.from(file),
-
-				// Required if 'data' is a stream, buffer, or string.
-				mime: 'text/plain',
-
-				// Required if 'data' is a stream, buffer, or string.
-				originalFileName: uploadedImage.name
-
-				// Required if 'data' is a stream.
-				// size: 5098, // e.g. fs.statSync("file.txt").size
-			})
-		);
-
-		if (uploadError) {
-			// Unexpected-error
-			console.error('uploadError', uploadError);
-			return setError(form, 'Nie udało się zmienić zdjęcia', { status: 500 });
-		}
-
-		const { fileUrl, filePath } = uploadData;
-
-		console.log(`File uploaded to: ${fileUrl}`, filePath);
-		imageUrl = fileUrl;
+	const [imageUrl, imageUploadError] = await trytm(getImageUrl(uploadedImage));
+	if (imageUploadError) {
+		console.error('imageUploadError', imageUploadError);
+		return setError(form, 'Nie udało się przesłać obrazka', { status: 500 });
 	}
+
+	console.log('imageUrl', imageUrl);
 
 	const newProduct: Partial<
 		Pick<
@@ -100,6 +66,7 @@ const edit: Action = async ({ request, locals }) => {
 			| 'weight'
 			| 'description'
 			| 'image'
+			| 'hidden'
 		>
 	> = {};
 
@@ -137,6 +104,10 @@ const edit: Action = async ({ request, locals }) => {
 
 	if (imageUrl) {
 		newProduct.image = imageUrl;
+	}
+
+	if (hidden) {
+		newProduct.hidden = hidden;
 	}
 
 	console.log('newProduct', newProduct);

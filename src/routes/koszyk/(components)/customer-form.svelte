@@ -11,24 +11,9 @@
 
 	export let customers: Customers;
 	export let setCustomerForm: PageServerData['setCustomerForm'];
-	export let selectedCustomer: NonNullable<PageServerData['customers']>[number];
 	export let user: {
 		id: string;
 		fullName: string;
-	};
-
-	$: isChangingCustomer = false;
-	console.log('isChangingCustomer', isChangingCustomer);
-	const onSelectChange: OnChangeFn<SelectOption<unknown> | undefined> = (e) => {
-		console.log(
-			'selected locally:',
-			(e as SelectOption<typeof user> | undefined)?.value.id,
-			'selected on the server:',
-			selectedCustomer.id
-		);
-		if (e) {
-			isChangingCustomer = (e as SelectOption<typeof user>).value.id !== selectedCustomer.id;
-		}
 	};
 </script>
 
@@ -50,7 +35,7 @@
 			<Form.Label>Klient</Form.Label>
 			{#if customers.length}
 				<div class="flex gap-x-3">
-					<Form.Select onSelectedChange={onSelectChange}>
+					<Form.Select>
 						<Form.SelectTrigger placeholder="Zmień odbiorcę zamówienia" />
 						<Form.SelectContent>
 							{#each [{ id: user.id, fullName: `${user.fullName} (Ty)` }, ...customers] as customer}
@@ -58,7 +43,7 @@
 							{/each}
 						</Form.SelectContent>
 					</Form.Select>
-					<Form.Button disabled={submitting || !isChangingCustomer}>
+					<Form.Button disabled={submitting}>
 						{#if submitting}
 							<Spinner />
 						{:else}

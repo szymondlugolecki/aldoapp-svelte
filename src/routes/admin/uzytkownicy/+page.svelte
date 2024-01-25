@@ -101,7 +101,12 @@
 			header: 'Doradca',
 			accessorKey: 'adviser',
 			cell: (info) =>
-				flexRender(AdminEditDialog, createProps<ParsedUser, EditUserForm>(info, data.editForm))
+				flexRender(
+					AdminEditDialog,
+					createProps<ParsedUser, EditUserForm>(info, data.editForm, {
+						advisers: data.advisers
+					})
+				)
 		},
 		{
 			id: 'createdAt',

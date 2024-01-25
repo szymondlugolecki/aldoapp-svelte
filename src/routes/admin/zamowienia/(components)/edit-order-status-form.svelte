@@ -25,6 +25,19 @@
 
 	const availableEvents = getNextEvents(order.status);
 
+	// It should only show the event relevant to the delivery method
+	if (
+		availableEvents.includes('IS_AVAILABLE_FOR_PICKUP') &&
+		availableEvents.includes('IS_AVAILABLE_FOR_SHIPMENT')
+	) {
+		// If it's personal delivery, remove the 'is available for shipment' option and vice versa
+		if (order.deliveryMethod === 'personal-delivery') {
+			availableEvents.splice(availableEvents.indexOf('IS_AVAILABLE_FOR_PICKUP'), 1);
+		} else if (order.deliveryMethod === 'personal-pickup') {
+			availableEvents.splice(availableEvents.indexOf('IS_AVAILABLE_FOR_SHIPMENT'), 1);
+		}
+	}
+
 	console.log('availableEvents', availableEvents);
 </script>
 

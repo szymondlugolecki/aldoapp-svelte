@@ -42,7 +42,8 @@ export const load = async ({ url }) => {
 				symbol: true,
 				encodedURL: true,
 				description: true,
-				image: true
+				image: true,
+				hidden: true
 			},
 			with: {
 				author: {

@@ -31,7 +31,7 @@ const edit = (async ({ request, locals }) => {
 		return setError(form, 'Nie podano żadnych danych do edycji', { status: 400 });
 	}
 
-	const { id, email, fullName, role, phone, city, zipCode, street, claimAdviser } = form.data;
+	const { id, email, fullName, role, phone, city, zipCode, street, adviserId } = form.data;
 
 	// Fetch the user from the database (before the edit)
 	const [userBeforeEdit, userBeforeEditError] = await trytm(
@@ -103,6 +103,12 @@ const edit = (async ({ request, locals }) => {
 	if (phone) {
 		newUser.phone = phone;
 	}
+	if (adviserId) {
+		if (sessionUser.role !== 'admin') {
+			return setError(form, 'Tylko administrator może przypisać doradcę', { status: 403 });
+		}
+		newUser.adviserId = adviserId;
+	}
 	if (city) {
 		newAddress.city = city;
 	}
@@ -112,13 +118,14 @@ const edit = (async ({ request, locals }) => {
 	if (street) {
 		newAddress.street = street;
 	}
-	if (claimAdviser !== undefined) {
-		if (claimAdviser) {
-			newUser.adviserId = sessionUser.id;
-		} else {
-			newUser.adviserId = null;
-		}
-	}
+
+	// if (claimAdviser !== undefined) {
+	// 	if (claimAdviser) {
+	// 		newUser.adviserId = sessionUser.id;
+	// 	} else {
+	// 		newUser.adviserId = null;
+	// 	}
+	// }
 
 	if (Object.keys(newUser).length) {
 		const [, editUserError] = await trytm(

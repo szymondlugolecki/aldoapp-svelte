@@ -17,7 +17,7 @@ export const producentsList = {
 } as const;
 
 export const paymentMethodsList: Record<PaymentMethod, string> = {
-	cash: 'Gotówka/Przedpłata',
+	cash: 'Gotówka',
 	transfer: 'Przelew bankowy'
 } as const;
 
@@ -27,21 +27,27 @@ export const deliveryMethodsList: Record<DeliveryMethod, string> = {
 } as const;
 
 export const orderStatusList: Record<(typeof orderStatus)[number], string> = {
-	delivered: 'Dostarczono',
+	awaitingOffice: 'Weryfikowanie zamówienia',
+	preparingForPickup: 'Przygotowywanie zamówienia do odbioru',
+	awaitingPickup: 'Oczekuje na odbiór',
 	awaitingDelivery: 'Wysłano',
-	awaitingOffice: 'Weryfikowanie dostępności',
-	awaitingCustomerDecision: 'Oczekuje na decyzję klienta',
 	awaitingShipment: 'Oczekuje na wysyłkę',
-	cancelled: 'Anulowano'
+	cancelled: 'Anulowano',
+	delivered: 'Dostarczono',
+	pickedUp: 'Odebrano'
+	// awaitingCustomerDecision: 'Oczekuje na decyzję klienta',
 } as const;
 
 export const orderEventsList: Record<OrderEvent, string> = {
-	IS_AVAILABLE: 'Zweryfikowano zamówienie',
+	IS_AVAILABLE_FOR_SHIPMENT: 'Zweryfikowano zamówienie',
+	IS_AVAILABLE_FOR_PICKUP: 'Zweryfikowano zamówienie',
 	IS_UNAVAILABLE: 'Produkty są niedostępne',
+	READY_FOR_PICKUP: 'Zamówienie gotowe do odbioru',
 	CANCEL: 'Anuluj zamówienie',
-	KEEP_WAITING: 'Poczekaj na dostępność',
 	SHIPPED: 'Wysłano',
-	DELIVERED: 'Dostarczono'
+	DELIVERED: 'Dostarczono',
+	PICKED_UP: 'Odebrano zamówienie'
+	// KEEP_WAITING: 'Poczekaj na dostępność',
 	// PAYMENT_RECEIVED: 'Otrzymano płatność'
 };
 

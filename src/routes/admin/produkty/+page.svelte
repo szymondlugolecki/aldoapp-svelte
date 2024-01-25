@@ -37,16 +37,10 @@
 	import { superForm } from 'sveltekit-superforms/client';
 	import { createProps, setSorting } from '$lib/client/functions/table.js';
 
-	// import * as LR from '@uploadcare/blocks';
-	// import { PACKAGE_VERSION } from '@uploadcare/blocks';
 	import type { EditProductForm } from '$lib/client/schemas/products.js';
 	// import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
 
-	// LR.registerBlocks(LR);
-
 	export let data;
-
-	// const {  } = superForm(data.editForm)
 
 	const { count } = data.count[0];
 	// const { form, errors, enhance, message } = superForm(data.addForm, {
@@ -170,6 +164,17 @@
 			id: 'description',
 			header: 'Opis',
 			accessorKey: 'description',
+			cell: (info) =>
+				flexRender(
+					AdminEditDialog,
+					createProps<ParsedProduct, EditProductForm>(info, data.editForm)
+				),
+			enableSorting: false
+		},
+		{
+			id: 'hidden',
+			header: 'Ukryty',
+			accessorKey: 'hidden',
 			cell: (info) =>
 				flexRender(
 					AdminEditDialog,

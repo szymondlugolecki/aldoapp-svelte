@@ -3,7 +3,7 @@ import { createMachine, interpret } from 'xstate';
 import type { OrderStatus } from '../constants/dbTypes';
 
 export const orderMachine = createMachine({
-	/** @xstate-layout N4IgpgJg5mDOIC5QHsBOEyoMoBcCGOArrAHR4DueAljlQHZQDyAZs1QMZgDEAklgPoBBAGqCeAGUEAhcQFEA2gAYAuolAAHZLBpVkdNSAAeiAEwBGAOwlzJgGy2AzAFYAHAE4TiixZcAaEACeiJZuJLYuJhbmtmaKdrYALAC+Sf5oGNj4RKQU1LQMLGycvAIAqgByImKSMgoqBpratHoGxgjmVjb2zu6e3n6BwQ6KJAkOJiZuivYxFmYmyakg6Zi4BMRklDoMAMLEOMgAtpgAImDsVNp6XDuC5Tuy4kqqSCCNOi2vbbZOJiQuCRcTjizkUigSTjc-iCCHc1kcijcbgcthMTgSEKcKTS6FWWQ2uW2UD2sAOx1QZwuVzoXAA0rJZAAFfgAdTEABUeOUAOLPBpaD76L6mYajBxuWwWRQOcZmQEeaGIFxmEhmZVAtxRPq2abY5a4zLrHJbfJQLAACyo6mOdBwXCwAAkeIzGbITnzXu9mkLQN9fv9AcCTKDwZDFQgQmEIlEzDE4vZFjiMmtsps8vQoGcADZUABumACXBOjx4wlkACU3R6NALva1EG50SQHC5pi2YiZW0jw5HwpForF4oslnRkBh4K8VobsvymrofUZEABaWzhlckMFgzuWPvAzV6qcpgkmjOFDhgWeC+sIBImcNwsa-MxOCwy2+IkwHg1H43p3b7I5TnOS550vOthRvOISAsQFbDcOVwgcCw4Ice9QjlCFG3ghw1RmL9k3xUh2DwOhOCzLNIDA0CIP6EgpliDDATsIF7ysdxJQSREUWVex8LxI00yJC0rRtHAqM+X1EDGP5wkQhIfk1FwUR7CxQicRIFjiJEAQWFw+OnY8-0zMAc3zVAYRrOcJMXBBaPoxRGIicInBUtSNM4yY3B0wF9J-EgMFMzBKM9WtqMkiNERcMUMSldivMRFSopwxJEQSCxgRRKIUhSIA */
+	/** @xstate-layout N4IgpgJg5mDOIC5QHsBOEyoMoBcCGOArrAHR4DueAljlQHZQDyAZs1QMZgDEAklgPoBBAGqCeAGUEAhcQFF+AMUYAlflgASPAAoBZWQDkAKgG0ADAF1EoAA7JYNKsjpWQAD0QAmLyQCsAZh8ADg8AdkCAFn8-MJ8AGhAAT0QARg8AThJkvwA2D3Ds1OTs7J9UgF8y+LQMbHwiUgpqWgYWNk5eARExSRl5JVUtHgBhAGkAVS0zSyQQW3taJxd3BC8PXwDgsMi-aMC4xJS000zktOjIsOTN5Iqq9ExcAmIySgcW1g5uPn4x-S6JaRyKYuOYORYzZbhDzxJIIQLJTLwwIhPzJfw+fI+Dy3EDVB51Z7WVBgax4VD0KAKNBaDgAa0I1i4ylkggAIgBNRQqfiDUYTYEzUELZwQxAhUw+EiBbISkIhNIo3KBGGHY7JU7nHyXa44vG1J4NV7NKA09j0xm8kayVk-SYWEF2MEi0DLZKmM6+eV7YIY9F+FUIU5qjUhC5I0I3Sq4+76+ovJoUrAACyo1gAtmA6DguBptFprQKbI7hUsxRKpTKtfLFR5lQdA+lMjlUfkIkVSiFdTHHnHGm8oKywAAbKgAN0wCS4rNk4h4wlkzNZhdmxcczrcKXdfk9aW9Hl9AX99dSGSy2Rb2TbJWSnZxdGQGHgMz1PeIDvma9LCAAtCFJaH1T8dJAjSLwfFMbIA2-SU0lghV4XCNJig8AouxqV9DQTd42jAd8nS-LFMgKIIgglQJTEQv8AyySVwiAnI8jSDFilvO50IJUh2DwOhOCHIdIDwktRR-UISAArJgNA-cIP2WFa23NFTmRIJ9yyQI0PxA0SCJEkyQpKlUFNc1BM-YTwNPfIILSSIIwVSDjyOEhTGcvdwndCUNNjZ4+2NIyGRM8EXUQUDjnIiJ-BRDw0VrajHOc0xXPcnxPIw+N+2TVMMyzAL12WUo1j8NJknyXcdi1U5qMbUwby9PxW2RSIUo4tLjUHEdx1QWEiw-QKNwQIrAkyeL0XAkJ1WhY8qpq0r6tDZKoxfZqMHazABMFVdetdDxohIc9ojRHwirGrJKpCMTslgmVwoKbJwkjNjNLjaw6UgMZrByr9Uh2vaxp8Q6b0A6jAkGv8-FMDxTBRJCdmsioKiAA */
 	predictableActionArguments: true,
 	tsTypes: {} as import('./orderStatus.typegen').Typegen0,
 	id: 'orderStatus',
@@ -11,9 +11,6 @@ export const orderMachine = createMachine({
 	schema: {
 		events: {} as OrderEventsSchema
 	},
-	// context: {
-	// 	paid: false
-	// } as OrderContext,
 	// on: {
 	// 	PAYMENT_RECEIVED: {
 	// 		actions: assign({
@@ -24,18 +21,29 @@ export const orderMachine = createMachine({
 	states: {
 		awaitingOffice: {
 			on: {
-				IS_AVAILABLE: 'awaitingShipment',
-				IS_UNAVAILABLE: 'awaitingCustomerDecision'
+				IS_AVAILABLE_FOR_SHIPMENT: 'awaitingShipment',
+				IS_AVAILABLE_FOR_PICKUP: 'preparingForPickup',
+				IS_UNAVAILABLE: 'awaitingOffice'
 			}
 		},
-		awaitingCustomerDecision: {
-			on: {
-				CANCEL: 'cancelled',
-				KEEP_WAITING: 'awaitingOffice'
-			}
-		},
+		// awaitingCustomerDecision: {
+		// 	on: {
+		// 		CANCEL: 'cancelled',
+		// 		KEEP_WAITING: 'awaitingOffice'
+		// 	}
+		// },
 		cancelled: {
 			type: 'final'
+		},
+		preparingForPickup: {
+			on: {
+				READY_FOR_PICKUP: 'awaitingPickup'
+			}
+		},
+		awaitingPickup: {
+			on: {
+				PICKED_UP: 'pickedUp'
+			}
 		},
 		awaitingShipment: {
 			on: {
@@ -48,6 +56,9 @@ export const orderMachine = createMachine({
 			}
 		},
 		delivered: {
+			type: 'final'
+		},
+		pickedUp: {
 			type: 'final'
 		}
 	}

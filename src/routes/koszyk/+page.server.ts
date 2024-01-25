@@ -45,8 +45,6 @@ export const load = async ({ locals }) => {
 
 	const defaultAddress = cart?.customer.address;
 
-	console.log('defaultAddress', defaultAddress);
-
 	const [customers, customersFetchError] = isAtLeastModerator(sessionUser.role)
 		? await trytm(
 				db.query.users.findMany({

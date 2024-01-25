@@ -8,7 +8,8 @@ import {
 	timestamp,
 	int,
 	index,
-	decimal
+	decimal,
+	boolean
 } from 'drizzle-orm/mysql-core';
 import { users } from './users';
 import { orderProducts } from './orderProducts';
@@ -41,6 +42,7 @@ export const products = mysqlTable(
 		producent: varchar('producent', { length: 255, enum: producents }).notNull(),
 		encodedURL: varchar('encoded_url', { length: 512 }).notNull(),
 		image: varchar('image', { length: 2048 }),
+		hidden: boolean('hidden').default(false).notNull(),
 
 		// relations
 		authorId: varchar('author_id', { length: 36 }).notNull() // user that added this product

@@ -10,6 +10,7 @@
 	import type { AddUserForm } from '$lib/client/schemas/user';
 	import { buttonVariants } from '$shadcn/button';
 	import RequiredAsterisk from '$components/custom/Util/RequiredAsterisk.svelte';
+	import { cn } from '$lib/client/functions';
 
 	const noAdminRoles = userRoles.filter((role) => role !== 'admin');
 
@@ -76,11 +77,13 @@
 			<Form.Field {config} name="role">
 				<Form.Item>
 					<Form.Label>Rola<RequiredAsterisk /></Form.Label>
-					<Form.Select required>
+					<Form.Select se required>
 						<Form.SelectTrigger placeholder="Wybierz rolę" />
 						<Form.SelectContent>
-							{#each roles as role}
-								<Form.SelectItem value={role}>{roleNames[role]}</Form.SelectItem>
+							{#each roles.filter((r) => r !== 'banned') as role}
+								<Form.SelectItem value={role} class={cn(role === 'admin' && 'text-red-500')}
+									>{roleNames[role]}</Form.SelectItem
+								>
 							{/each}
 						</Form.SelectContent>
 					</Form.Select>

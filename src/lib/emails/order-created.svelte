@@ -113,7 +113,7 @@
 		<title>Nowe zamówienie</title>
 		<meta name="description" content="Potwierdzenie złożenia zamówienia #{orderId}" />
 	</Head>
-	<Preview preview="Sprawdzanie dostępności produktów" />
+	<Preview preview="Weryfikowanie zamówienia" />
 	<Section style={main}>
 		<Container style={container}>
 			<Img
@@ -125,10 +125,9 @@
 			/>
 			<Text style={{ ...paragraph, fontWeight: 600 }}>Witaj, {firstName}!</Text>
 			<Text style={paragraph}>Nowe zamówienie</Text>
-			<Text style={codeParagraph}>Sprawdzanie dostępności produktów</Text>
+			<Text style={codeParagraph}>Weryfikowanie zamówienia</Text>
 			<Text style={paragraph}
-				>Po upewnieniu się, że produkty są dostępne, przejdziemy do realizacji zamówienia. O
-				wszystkim będziemy Cię informować.</Text
+				>Zamówienie przyjęte do realizacji. Będziemy Cię na bieżąco informować o zmianie statusu.</Text
 			>
 			<Link href="https://aldoapp-svelte.vercel.app/zamowienia/{orderId}"
 				>Kliknij tutaj, aby sprawdzić szczegóły zamówienia</Link

@@ -90,10 +90,11 @@ export const editForm = z.object({
 	street: street.optional(),
 	zipCode: zipCode.optional(),
 	city: city.optional(),
-	claimAdviser: z
-		.union([z.boolean(), z.literal('true'), z.literal('false')])
-		.transform((value) => value === true || value === 'true')
-		.optional()
+	adviserId: id.optional()
+	// claimAdviser: z
+	// 	.union([z.boolean(), z.literal('true'), z.literal('false')])
+	// 	.transform((value) => value === true || value === 'true')
+	// 	.optional()
 });
 
 export type AddUserForm = typeof addForm;

@@ -103,6 +103,11 @@ export const image = z
 		'.jpg, .jpeg, .png and .webp files are accepted.'
 	);
 
+export const hidden = z.boolean({
+	invalid_type_error: 'Nieprawidłowa wartość dla: ukryty',
+	required_error: 'Wymagana wartość dla: ukryty'
+});
+
 export const addForm = z.object({
 	name,
 	symbol,
@@ -123,7 +128,8 @@ export const editForm = z.object({
 	price: price.optional(),
 	weight: weight.optional(),
 	producent: producent.optional(),
-	image: image.optional().nullish()
+	image: image.optional().nullish(),
+	hidden: hidden.optional()
 });
 
 export type AddProductForm = typeof addForm;

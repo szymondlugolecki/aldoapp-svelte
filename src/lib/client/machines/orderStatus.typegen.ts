@@ -17,11 +17,13 @@ export interface Typegen0 {
 	eventsCausingGuards: {};
 	eventsCausingServices: {};
 	matchesStates:
-		| 'awaitingCustomerDecision'
 		| 'awaitingDelivery'
 		| 'awaitingOffice'
+		| 'awaitingPickup'
 		| 'awaitingShipment'
 		| 'cancelled'
-		| 'delivered';
+		| 'delivered'
+		| 'pickedUp'
+		| 'preparingForPickup';
 	tags: never;
 }

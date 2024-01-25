@@ -76,13 +76,13 @@
 			cell: (info) => flexRender(AdminEditDialog, createOrderProps(info)),
 			enableSorting: true
 		},
-		{
-			id: 'paid',
-			header: 'Opłacono',
-			accessorKey: 'paid',
-			cell: (info) => flexRender(AdminEditDialog, createOrderProps(info)),
-			enableSorting: true
-		},
+		// {
+		// 	id: 'paid',
+		// 	header: 'Opłacono',
+		// 	accessorKey: 'paid',
+		// 	cell: (info) => flexRender(AdminEditDialog, createOrderProps(info)),
+		// 	enableSorting: true
+		// },
 		{
 			id: 'price',
 			header: 'Kwota (z rabatem)',

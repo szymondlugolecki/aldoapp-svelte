@@ -7,7 +7,8 @@ export const createProps = <
 	Y extends AnyZodObject
 >(
 	info: CellContext<T, unknown>,
-	form: SuperValidated<Y>
+	form: SuperValidated<Y>,
+	extraArgs: Record<string, unknown> = {}
 ) => {
 	const value = info.getValue();
 	const label = info.column.columnDef.header;
@@ -22,7 +23,8 @@ export const createProps = <
 		label,
 		key,
 		item,
-		form
+		form,
+		...extraArgs
 	};
 };
 

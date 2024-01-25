@@ -41,6 +41,7 @@
 	export let form: SuperValidated<EditProductForm>;
 
 	let cellOverride: string | undefined;
+
 	if (key === 'category') {
 		cellOverride = fodderNames[product.category];
 	} else if (key === 'subcategory') {
@@ -55,6 +56,8 @@
 		cellOverride = 'Brak zdjęć';
 	} else if (key === 'description') {
 		cellOverride = product.description ? '...' : 'Brak';
+	} else if (key === 'hidden') {
+		cellOverride = product.hidden ? 'Tak' : 'Nie';
 	}
 
 	const subcategory = product.subcategory as Subcategory | undefined;
@@ -96,7 +99,7 @@
 	let open = false;
 	let files: File | undefined = undefined;
 
-	console.log('product', product);
+	// console.log('product', product);
 </script>
 
 <Dialog.Root bind:open>
@@ -199,6 +202,26 @@
 						<Form.Label>Zdjęcie</Form.Label>
 						<Form.Input type="file" accept="image/*" bind:value={files} />
 						<Form.Description>Wybierz zdjęcie produktu.</Form.Description>
+						<Form.Validation />
+					</Form.Item>
+				</Form.Field>
+			{:else if key === 'hidden'}
+				<Form.Field {config} name="hidden">
+					<Form.Item>
+						<Form.Label>Ukryty</Form.Label>
+						<Form.Select
+							required
+							selected={{
+								value: product.hidden,
+								label: product.hidden ? 'Tak' : 'Nie'
+							}}
+						>
+							<Form.SelectTrigger placeholder="Czy produkt ma być ukryty?" />
+							<Form.SelectContent>
+								<Form.SelectItem value={false}>Nie</Form.SelectItem>
+								<Form.SelectItem value={true}>Tak</Form.SelectItem>
+							</Form.SelectContent>
+						</Form.Select>
 						<Form.Validation />
 					</Form.Item>
 				</Form.Field>

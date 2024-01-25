@@ -31,13 +31,13 @@
 
 	$: justOrdered = $page.url.searchParams.get('success') === 'true';
 
-	onMount(() => {
-		if (justOrdered) {
-			const newURL = new URL($page.url);
-			newURL.searchParams.delete('success');
-			goto(newURL.toString()).then(() => (open = true));
-		}
-	});
+	// onMount(() => {
+	// 	if (justOrdered) {
+	// 		const newURL = new URL($page.url);
+	// 		newURL.searchParams.delete('success');
+	// 		goto(newURL.toString()).then(() => (open = true));
+	// 	}
+	// });
 
 	let innerWidth: number;
 	const productsCount = data.order.products
@@ -116,8 +116,7 @@
 				>Dziękujemy <CheckCircled class="text-green-500 square-5" /></AlertDialog.Title
 			>
 			<AlertDialog.Description
-				>Gdy potwierdzimy dostępność produktów, damy Ci znać mailowo oraz przez powiadomienia w
-				telefonie.</AlertDialog.Description
+				>Gdy zweryfikujemy zamówienie, damy Ci znać mailowo oraz przez powiadomienia w telefonie.</AlertDialog.Description
 			>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
@@ -147,13 +146,12 @@
 		<div class="px-2 py-8 md:px-2">
 			<div class="flex items-center justify-between mb-6">
 				<h2 class="text-xl font-medium">Status</h2>
-				<span class={cn('font-medium', data.order.paid ? 'text-green-500' : 'text-red-400')}
+				<!-- <span class={cn('font-medium', data.order.paid ? 'text-green-500' : 'text-red-400')}
 					>{data.order.paid ? 'Opłacono' : 'Nieopłacono'}</span
-				>
+				> -->
 			</div>
 
-			{#if data.order.status === 'awaitingCustomerDecision'}
-				<!-- Alert -->
+			<!-- {#if data.order.status === 'awaitingCustomerDecision'}
 				<div class="flex py-4 border rounded-sm shadow-md border-warning">
 					<div class="min-w-[60px] flex justify-center items-start">
 						<AlertTriangle class="w-8 h-8 text-warning" />
@@ -184,12 +182,20 @@
 						</div>
 					</div>
 				</div>
-			{:else}
-				<div class="p-4 border rounded-md shadow-sm border-border">
-					<HorizontalOrderSteps orderStatus={data.order.status} class="flex-col hidden sm:flex" />
-					<VerticalOrderSteps orderStatus={data.order.status} class="inline sm:hidden" />
-				</div>
-			{/if}
+			{:else} -->
+			<div class="p-4 border rounded-md shadow-sm border-border">
+				<HorizontalOrderSteps
+					orderStatus={data.order.status}
+					deliveryMethod={data.order.deliveryMethod}
+					class="flex-col hidden sm:flex"
+				/>
+				<VerticalOrderSteps
+					orderStatus={data.order.status}
+					deliveryMethod={data.order.deliveryMethod}
+					class="inline sm:hidden"
+				/>
+			</div>
+			<!-- {/if} -->
 		</div>
 
 		<div class="px-2 py-8 md:px-2">

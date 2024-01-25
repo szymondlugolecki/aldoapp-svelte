@@ -3,6 +3,7 @@
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import * as Form from '$shadcn/form';
 	import * as Dialog from '$shadcn/dialog';
+	import * as Select from '$shadcn/select';
 
 	import { userRoles, type UserRole } from '$lib/client/constants/dbTypes';
 	import { roleNames } from '$lib/client/constants';
@@ -16,13 +17,16 @@
 	import UserId from './user-id.svelte';
 	import Feedback from '$components/custom/Form/Feedback.svelte';
 	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import Label from '$components/ui/label/label.svelte';
 
-	type ExtendedUser = import('../$types').PageServerData['users'];
+	type ExtendedUser = import('../$types').PageServerData['users'][number];
+	type Advisers = import('../$types').PageServerData['advisers'];
 
 	export let label: string;
-	export let key: keyof ExtendedUser[number];
-	export let value: ExtendedUser[number][keyof ExtendedUser[number]];
-	let user: ExtendedUser[number];
+	export let key: keyof ExtendedUser;
+	export let value: ExtendedUser[keyof ExtendedUser];
+	export let advisers: Advisers | undefined = undefined;
+	let user: ExtendedUser;
 
 	export { user as item };
 
@@ -149,21 +153,33 @@
 					</Form.Item>
 				</Form.Field>
 			{:else if key === 'adviser'}
-				<Form.Field {config} name="claimAdviser">
-					<p class="leading-7 [&:not(:first-child)]:mt-6">
-						Obecny doradca: {user.adviser?.fullName || 'Brak'}
-					</p>
-
-					<Form.Item class="flex flex-row items-center justify-between p-4 border rounded-lg">
-						<div class="space-y-0.5">
-							<Form.Label>Zostań doradcą</Form.Label>
-							<Form.Description
-								>Dostaniesz możliwość zamawiania w imieniu tego klienta</Form.Description
-							>
-						</div>
-						<Form.Switch />
-					</Form.Item>
-				</Form.Field>
+				{#if $page.data.user?.role === 'admin'}
+					{#if advisers}
+						<Form.Field {config} name="adviserId">
+							<Form.Item>
+								<Form.Label>Wybierz doradcę</Form.Label>
+								<Form.Select>
+									<Form.SelectTrigger placeholder="Wybierz spośród użytkowników z rolą doradcy" />
+									<Form.SelectContent>
+										{#each advisers as adviser}
+											<Form.SelectItem value={adviser.id}>{adviser.fullName}</Form.SelectItem>
+										{:else}
+											Brak doradców
+										{/each}
+									</Form.SelectContent>
+								</Form.Select>
+								<Form.Description>
+									Wybrany doradca będzie mógł zamawiać w imieniu tego użytkownika.
+								</Form.Description>
+								<Form.Validation />
+							</Form.Item>
+						</Form.Field>
+					{:else}
+						<span>Brak doradców</span>
+					{/if}
+				{:else}
+					<span>{user.adviser?.fullName || 'Brak'}</span>
+				{/if}
 			{/if}
 
 			<Form.Field {config} name="id">

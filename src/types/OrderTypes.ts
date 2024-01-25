@@ -11,10 +11,13 @@ export type OrderSortableColumn = keyof Pick<
 
 export type OrderEventsSchema =
 	// | { type: 'PAYMENT_RECEIVED' }
-	| { type: 'IS_AVAILABLE' }
+	// | { type: 'KEEP_WAITING' }
+	| { type: 'IS_AVAILABLE_FOR_SHIPMENT' }
+	| { type: 'IS_AVAILABLE_FOR_PICKUP' }
 	| { type: 'IS_UNAVAILABLE' }
 	| { type: 'CANCEL' }
-	| { type: 'KEEP_WAITING' }
+	| { type: 'READY_FOR_PICKUP' }
+	| { type: 'PICKED_UP' }
 	| { type: 'SHIPPED' }
 	| { type: 'DELIVERED' };
 

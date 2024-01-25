@@ -1,21 +1,41 @@
 <script lang="ts">
-	import type { OrderStatus } from '$lib/client/constants/dbTypes';
+	import type { DeliveryMethod, OrderStatus } from '$lib/client/constants/dbTypes';
 	import { cn } from '$lib/client/functions';
 
 	export let orderStatus: OrderStatus;
-	const steps = ['Sprawdzanie dostępności', 'Oczekiwanie na wysyłkę', 'Wysłano', 'Dostarczono'];
+	export let deliveryMethod: DeliveryMethod;
+	const steps = {
+		'personal-delivery': [
+			'Weryfikowanie zamówienia',
+			'Oczekiwanie na wysyłkę',
+			'Wysłano',
+			'Dostarczono'
+		],
+		'personal-pickup': [
+			'Weryfikowanie zamówienia',
+			'Przygotowywanie przesyłki',
+			'Oczekiwanie na odbiór',
+			'Odebrano'
+		]
+	};
 	let className: string | null | undefined;
 	export { className as class };
 
-	const getCurrentStep = (status: OrderStatus): number => {
+	const getCurrentStep = (status: OrderStatus) => {
 		switch (status) {
 			case 'awaitingOffice':
 				return 0;
 			case 'awaitingShipment':
 				return 1;
+			case 'preparingForPickup':
+				return 1;
 			case 'awaitingDelivery':
 				return 2;
+			case 'awaitingPickup':
+				return 2;
 			case 'delivered':
+				return 3;
+			case 'pickedUp':
 				return 3;
 			default:
 				return -1;
@@ -27,13 +47,15 @@
 
 <div class={cn(className)}>
 	<ol>
-		{#each steps as step, i}
+		{#each steps[deliveryMethod] as step, i}
 			<li class="[&:not(:last-child)]:pb-10 flex justify-start relative">
-				{#if currentStep > i && i < 3}
+				{#if currentStep > i && i < steps[deliveryMethod].length - 1}
+					<!-- The line that connects the steps -->
 					<div class="w-[.125rem] h-full top-4 left-4 bg-blue-600 absolute mt-1" />
 				{/if}
-				<span class="flex items-center w-full h-9">
-					{#if currentStep >= i + 1}
+				<span class="flex items-center w-full h-9 gap-x-4">
+					{#if currentStep >= i + 1 || currentStep === steps[deliveryMethod].length - 1}
+						<!-- Checkmark in completed steps -->
 						<span
 							class="relative z-10 flex items-center justify-center bg-blue-600 rounded-full square-8"
 						>
@@ -51,17 +73,19 @@
 							>
 						</span>
 					{:else if currentStep === i}
+						<!-- Empty circle in the current step -->
 						<span
 							class="bg-background relative flex justify-center items-center rounded-full square-8 z-10 border-[2px] border-blue-600"
 						>
 							<span class="bg-blue-600 rounded-full square-2" />
 						</span>
 					{:else}
+						<!-- Emptyness in the future steps -->
 						<span
 							class="relative flex justify-center items-center rounded-full square-8 z-10 border-border border-[2px]"
 						/>
 					{/if}
-					<div class="flex flex-col ml-4">
+					<div class="flex flex-col">
 						<span class="text-sm font-medium">{step}</span>
 					</div>
 				</span>
@@ -78,7 +102,7 @@
 		</div>
 		<div class="grid grid-rows-4 text-sm font-medium">
 			<div class={cn('self-center text-right', currentStep >= 0 && 'text-blue-600')}>
-				Sprawdzanie dostępności
+				Weryfikowanie zamówienia
 			</div>
 			<div class={cn('self-center text-right', currentStep >= 1 && 'text-blue-600')}>
 				Oczekiwanie na wysyłkę

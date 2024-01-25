@@ -10,12 +10,14 @@ export type PaymentMethod = 'cash' | 'transfer';
 export type DeliveryMethod = 'personal-delivery' | 'personal-pickup';
 
 export type OrderStatus =
-	| 'awaitingCustomerDecision'
-	| 'awaitingDelivery'
 	| 'awaitingOffice'
+	| 'preparingForPickup'
+	| 'awaitingPickup'
 	| 'awaitingShipment'
+	| 'awaitingDelivery'
 	| 'cancelled'
-	| 'delivered';
+	| 'delivered'
+	| 'pickedUp';
 export type CartStatus = 'active' | 'inactive';
 
 export type DiscountType = 'percentage' | 'fixed';
@@ -30,7 +32,10 @@ export const userRoles: [UserRole, ...UserRole[]] = [
 ];
 
 export const paymentMethods: [PaymentMethod, ...PaymentMethod[]] = ['cash', 'transfer'];
-export const deliveryMethods: [DeliveryMethod, ...DeliveryMethod[]] = ['personal-delivery'];
+export const deliveryMethods: [DeliveryMethod, ...DeliveryMethod[]] = [
+	'personal-delivery',
+	'personal-pickup'
+];
 
 export const producents: [Producent, ...Producent[]] = ['deheus', 'unknown'];
 export const mainCategories: [MainCategory, ...MainCategory[]] = [
@@ -41,21 +46,26 @@ export const mainCategories: [MainCategory, ...MainCategory[]] = [
 ];
 
 export const orderStatus: [OrderStatus, ...OrderStatus[]] = [
-	'awaitingCustomerDecision',
-	'awaitingDelivery',
 	'awaitingOffice',
+	'preparingForPickup',
+	'awaitingPickup',
 	'awaitingShipment',
+	'awaitingDelivery',
 	'cancelled',
-	'delivered'
+	'delivered',
+	'pickedUp'
 ];
 
 export const orderEvents: [OrderEvent, ...OrderEvent[]] = [
 	'DELIVERED',
 	'SHIPPED',
 	'CANCEL',
-	'IS_AVAILABLE',
 	'IS_UNAVAILABLE',
-	'KEEP_WAITING' // till products are available
+	'READY_FOR_PICKUP',
+	'PICKED_UP',
+	'IS_AVAILABLE_FOR_SHIPMENT',
+	'IS_AVAILABLE_FOR_PICKUP'
+	// 'KEEP_WAITING' // till products are available
 	// 'PAYMENT_RECEIVED',
 ];
 
