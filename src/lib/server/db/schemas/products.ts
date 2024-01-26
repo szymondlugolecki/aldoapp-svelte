@@ -64,7 +64,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
 	orderProducts: many(orderProducts),
 	cartProducts: many(cartProducts),
 	images: many(images),
-	favoriteProducts: many(favoriteProducts, { relationName: 'favoriteProducts' })
+	favoriteProducts: many(favoriteProducts, { relationName: 'favorite_products' })
 }));
 
 export const createProductSchema = createInsertSchema(products);

@@ -2,6 +2,7 @@ import getCustomError from '$lib/client/constants/customErrors.js';
 import { isAtLeastModerator } from '$lib/client/functions';
 import { order$ } from '$lib/client/schemas/index.js';
 import changeOrderStatus from '$lib/server/actions/orders/changeOrderStatus';
+import fetchStatusHistory from '$lib/server/actions/orders/fetchStatusHistory';
 import orderAgain from '$lib/server/actions/orders/orderAgain';
 import { db } from '$lib/server/db/index.js';
 import { trytm } from '@bdsqqq/try';
@@ -123,11 +124,13 @@ export const load = async ({ params, locals }) => {
 
 	return {
 		order,
-		orderAgainForm: superValidate(order$.orderAgainForm)
+		orderAgainForm: superValidate(order$.orderAgainForm),
+		orderStatusHistoryForm: superValidate(order$.orderStatusHistoryForm)
 	};
 };
 
 export const actions = {
 	changeOrderStatus,
-	orderAgain
+	orderAgain,
+	fetchStatusHistory
 };

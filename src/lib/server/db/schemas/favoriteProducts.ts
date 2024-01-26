@@ -14,11 +14,11 @@ export const favoriteProductsRelations = relations(favoriteProducts, ({ one }) =
 	user: one(users, {
 		fields: [favoriteProducts.userId],
 		references: [users.id],
-		relationName: 'favoriteProductsUser'
+		relationName: 'favorite_products_user'
 	}),
 	product: one(products, {
 		fields: [favoriteProducts.productId],
 		references: [products.id],
-		relationName: 'favoriteProducts'
+		relationName: 'favorite_products'
 	})
 }));

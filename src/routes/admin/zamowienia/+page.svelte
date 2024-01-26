@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { BasicUser, PaginationSettings } from '$types';
 	import toast from 'svelte-french-toast';
-	import type { OrderStatus } from '$lib/client/constants/dbTypes';
+	import type { DeliveryMethod, OrderStatus, PaymentMethod } from '$lib/client/constants/dbTypes';
 	import { cn, dateParser, flexRender } from '$lib/client/functions';
 	import TableHyperlink from '$components/custom/Table/TableHyperlink.svelte';
 
@@ -28,6 +28,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import Pagination2 from '$components/custom/Table/Pagination2.svelte';
+	import { deliveryMethodsList, paymentMethodsList } from '$lib/client/constants/index.js';
 
 	export let data;
 
@@ -98,12 +99,26 @@
 		// 	enableSorting: true
 		// },
 		{
-			id: 'cartOwner',
-			header: 'Zleceniodawca',
-			accessorKey: 'cartOwner',
-			cell: (info) => (info.getValue() as BasicUser).fullName,
+			id: 'deliveryMethod',
+			header: 'Metoda dostawy',
+			accessorKey: 'deliveryMethod',
+			cell: (info) => deliveryMethodsList[info.getValue() as DeliveryMethod] || '?',
 			enableSorting: true
 		},
+		{
+			id: 'paymentMethod',
+			header: 'Metoda płatności',
+			accessorKey: 'paymentMethod',
+			cell: (info) => paymentMethodsList[info.getValue() as PaymentMethod] || '?',
+			enableSorting: true
+		},
+		// {
+		// 	id: 'cartOwner',
+		// 	header: 'Zleceniodawca',
+		// 	accessorKey: 'cartOwner',
+		// 	cell: (info) => (info.getValue() as BasicUser).fullName,
+		// 	enableSorting: true
+		// },
 		{
 			id: 'customer',
 			header: 'Klient',
@@ -111,17 +126,17 @@
 			cell: (info) => (info.getValue() as BasicUser).fullName,
 			enableSorting: true
 		},
-		{
-			id: 'products',
-			header: 'Produkty',
-			accessorKey: 'products',
-			cell: (info) => {
-				const products = info.getValue() as (typeof data.orders)[number]['products'];
-				if (!Array.isArray(products)) return '?';
-				return '';
-			},
-			enableSorting: false
-		},
+		// {
+		// 	id: 'products',
+		// 	header: 'Produkty',
+		// 	accessorKey: 'products',
+		// 	cell: (info) => {
+		// 		const products = info.getValue() as (typeof data.orders)[number]['products'];
+		// 		if (!Array.isArray(products)) return '?';
+		// 		return '';
+		// 	},
+		// 	enableSorting: false
+		// },
 		{
 			id: 'address',
 			header: 'Adres',

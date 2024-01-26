@@ -222,6 +222,7 @@
 								<Form.SelectItem value={true}>Tak</Form.SelectItem>
 							</Form.SelectContent>
 						</Form.Select>
+						<Form.Description>Ukryte produkty nie będą wyświetlane w sklepie.</Form.Description>
 						<Form.Validation />
 					</Form.Item>
 				</Form.Field>

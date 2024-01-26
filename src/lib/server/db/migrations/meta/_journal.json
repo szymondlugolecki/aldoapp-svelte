@@ -246,6 +246,13 @@
       "when": 1706196329873,
       "tag": "0034_premium_glorian",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "5",
+      "when": 1706209173684,
+      "tag": "0035_panoramic_joshua_kane",
+      "breakpoints": true
     }
   ]
 }

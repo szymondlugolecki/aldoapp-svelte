@@ -7,7 +7,7 @@ import {
 	char,
 	timestamp,
 	text,
-	index,
+	index
 } from 'drizzle-orm/mysql-core';
 import { verificationTokens } from './verificationTokens';
 import { orders } from './orders';
@@ -18,6 +18,7 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { carts } from './carts';
 import { favoriteProducts } from './favoriteProducts';
 import { userAddress } from './userAddress';
+import { orderStatusLogs } from './orderStatusLogs';
 
 export const users = mysqlTable(
 	'users',
@@ -32,11 +33,11 @@ export const users = mysqlTable(
 		phone: char('phone', { length: 15 }).notNull(),
 
 		// relations
-		adviserId: char('adviser_id', { length: 255 }),
+		adviserId: char('adviser_id', { length: 255 })
 	},
 	(user) => ({
 		email: uniqueIndex('unique_emailx').on(user.email),
-		adviserId: index('adviser_idx').on(user.adviserId),
+		adviserId: index('adviser_idx').on(user.adviserId)
 	})
 );
 
@@ -57,17 +58,17 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 		references: [users.id],
 		relationName: 'users'
 	}),
-	favoriteProducts: many(favoriteProducts, { relationName: 'favoriteProductsUser' }),
+	favoriteProducts: many(favoriteProducts, { relationName: 'favorite_products_user' }),
+	statusLogs: many(orderStatusLogs),
 	address: one(userAddress, {
 		fields: [users.id],
 		references: [userAddress.userId]
 	})
 }));
 
-export const createUserSchema = createInsertSchema(users)
+export const createUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
 
 export type User = InferModel<typeof users>;
 export type Role = User['role'];
 export type GeneralRole = Extract<Role, 'customer' | 'admin'> | 'moderator';
-

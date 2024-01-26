@@ -12,6 +12,7 @@ import * as products from './schemas/products';
 import * as favoriteProducts from './schemas/favoriteProducts';
 import * as orderProducts from './schemas/orderProducts';
 import * as orderAddress from './schemas/orderAddress';
+import * as orderStatusLogs from './schemas/orderStatusLogs';
 import * as carts from './schemas/carts';
 import * as cartProducts from './schemas/cartProducts';
 // import * as promoCodes from './schemas/promoCodes';
@@ -36,6 +37,7 @@ export const db = drizzle(connection, {
 		...favoriteProducts,
 		...orderProducts,
 		...orderAddress,
+		...orderStatusLogs,
 		...carts,
 		...cartProducts,
 		// ...promoCodes,

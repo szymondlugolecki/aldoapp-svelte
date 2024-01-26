@@ -15,6 +15,7 @@ import { users } from './users';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { orderProducts } from './orderProducts';
 import { orderAddress } from './orderAddress';
+import { orderStatusLogs } from './orderStatusLogs';
 
 export type Address = {
 	street: string;
@@ -78,6 +79,7 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
 	// 	references: [promoCodes.id]
 	// }),
 	products: many(orderProducts, { relationName: 'order_products' }),
+	statusLogs: many(orderStatusLogs, { relationName: 'order_status_logs' }),
 	address: one(orderAddress, {
 		fields: [orders.id],
 		references: [orderAddress.orderId]

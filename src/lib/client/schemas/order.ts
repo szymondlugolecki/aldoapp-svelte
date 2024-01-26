@@ -98,6 +98,10 @@ export const orderAgainForm = z.object({
 	id
 });
 
+export const orderStatusHistoryForm = z.object({
+	id
+});
+
 export type OrderForm = typeof create;
 export type OrderAgainForm = typeof orderAgainForm;
 export type ProductQuantity = typeof productQuantity;
