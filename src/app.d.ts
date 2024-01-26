@@ -17,6 +17,9 @@ declare global {
 	// 	lazyloadInstance?: ILazyLoadInstance;
 	// }
 	namespace App {
+		interface PageState {
+			historyModalOpen?: boolean;
+		}
 		// interface Error {}
 		interface Locals {
 			session?: {

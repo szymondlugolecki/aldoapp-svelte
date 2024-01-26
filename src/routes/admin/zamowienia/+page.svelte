@@ -54,7 +54,8 @@
 			value,
 			key,
 			order,
-			...forms
+			...forms,
+			userRole: data.user?.role
 		};
 	};
 

@@ -11,11 +11,11 @@ import { setMessage, superValidate } from 'sveltekit-superforms/server';
 const add: Action = async ({ request, locals }) => {
 	// Must be a moderator or higher
 	if (!locals.session) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 
 	if (!isAtLeastModerator(locals.session?.user.role)) {
-		throw error(...getCustomError('insufficient-permissions'));
+		error(...getCustomError('insufficient-permissions'));
 	}
 
 	const form = await superValidate(request, products$.addForm);
@@ -48,7 +48,7 @@ const add: Action = async ({ request, locals }) => {
 	if (addProductError) {
 		// Unexpected-error
 		console.log('addProductError', addProductError);
-		throw error(500, 'Wystąpił błąd podczas dodawania produktu');
+		error(500, 'Wystąpił błąd podczas dodawania produktu');
 	}
 
 	return setMessage(form, 'Dodano produkt');

@@ -6,6 +6,6 @@ export const actions = {
 	default: handleLogin
 };
 
-export const load = () => {
-	return { form: superValidate(auth$.login) };
+export const load = async () => {
+	return { form: await superValidate(auth$.login) };
 };

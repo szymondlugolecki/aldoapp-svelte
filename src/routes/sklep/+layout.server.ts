@@ -2,7 +2,7 @@ import { db } from '$lib/server/db';
 import { products } from '$lib/server/db/schemas/products';
 import { clauseConcat, extractParams } from '$lib/server/functions/utils';
 import type { ProductSortableColumn } from '$types';
-import { eq, gte, lte, or, sql } from 'drizzle-orm';
+import { eq, gte, lte, sql } from 'drizzle-orm';
 
 const pageLimit = 10;
 const sortableColumns: ProductSortableColumn[] = [
@@ -15,7 +15,7 @@ const sortableColumns: ProductSortableColumn[] = [
 	'subcategory'
 ];
 
-export const load = ({ url }) => {
+export const load = async ({ url }) => {
 	const { page, sort, product } = extractParams<ProductSortableColumn>(url, sortableColumns);
 	const defaultWhereClause = eq(products.hidden, false);
 	// or();
@@ -42,7 +42,7 @@ export const load = ({ url }) => {
 	const extendedWhereClause = clauseConcat(...clausesArr);
 
 	return {
-		products: db.query.products.findMany({
+		products: await db.query.products.findMany({
 			columns: {
 				id: true,
 				name: true,
@@ -78,7 +78,7 @@ export const load = ({ url }) => {
 			limit: pageLimit
 		}),
 		pageLimit,
-		count: db
+		count: await db
 			.select({
 				count: sql<number>`count(*)`.mapWith(Number)
 			})

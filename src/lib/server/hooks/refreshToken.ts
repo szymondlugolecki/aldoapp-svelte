@@ -32,7 +32,7 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 
 	// If the user is banned, throw an error
 	if (sessionUser && sessionUser.role === 'banned') {
-		throw error(403, 'Brak dostępu');
+		error(403, 'Brak dostępu');
 	}
 
 	// Only makes sense to refresh the tokens if the user has a Refresh Token cookie
@@ -76,7 +76,7 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 			joseErrName,
 			userId
 		);
-		throw error(500, 'Niespodziewany błąd sesji. Spróbuj zalogować się ponownie');
+		error(500, 'Niespodziewany błąd sesji. Spróbuj zalogować się ponownie');
 	}
 
 	/*
@@ -122,7 +122,7 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 	if (!user) {
 		// Unexpected-error
 		console.error('Zalogowano jako nieistniejący użytkownik. Mógł zostać usunięty');
-		throw error(500, 'Niespodziewany błąd sesji. Spróbuj zalogować się ponownie');
+		error(500, 'Niespodziewany błąd sesji. Spróbuj zalogować się ponownie');
 	}
 
 	// Create new tokens
@@ -133,7 +133,7 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 	if (promiseError) {
 		// Unexpected-error
 		console.error('Nie udało się utworzyć nowych tokenów do autoryzacji', promiseError);
-		throw error(500, 'Nie udało się odświeżyć sesji. Spróbuj zalogować się ponownie.');
+		error(500, 'Nie udało się odświeżyć sesji. Spróbuj zalogować się ponownie.');
 	}
 
 	const [newAccessToken, newRefreshToken] = result;

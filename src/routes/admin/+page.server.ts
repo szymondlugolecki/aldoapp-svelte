@@ -7,5 +7,5 @@ export const actions = {
 };
 
 export const load = async (event) => {
-	return { form: superValidate(event, pushSubscription$.notificationAll, { id: 'sendAll' }) };
+	return { form: await superValidate(event, pushSubscription$.notificationAll, { id: 'sendAll' }) };
 };

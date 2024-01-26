@@ -14,10 +14,10 @@ const changeOrderAddress = (async ({ request, locals }) => {
 
 	// Only moderators and admins are allowed
 	if (!sessionUser) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 	if (!isAtLeastModerator(sessionUser.role)) {
-		throw error(403, 'Nie masz wystarczających uprawień');
+		error(403, 'Nie masz wystarczających uprawień');
 	}
 
 	const form = await superValidate(request, order$.orderAddressForm);

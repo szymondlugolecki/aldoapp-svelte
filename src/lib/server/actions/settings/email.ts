@@ -10,7 +10,7 @@ import { setMessage, superValidate } from 'sveltekit-superforms/server';
 const email: Action = async (event) => {
 	const sessionUser = event.locals.session?.user;
 	if (!sessionUser) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 
 	const form = await superValidate(event, settings$.emailForm);
@@ -30,7 +30,7 @@ const email: Action = async (event) => {
 	if (editEmailError) {
 		// Unexpected-error
 		console.error('editEmailError', editEmailError);
-		throw error(500, 'Błąd podczas zmieniania adresu email');
+		error(500, 'Błąd podczas zmieniania adresu email');
 	}
 
 	return setMessage(form, 'Pomyślnie edytowano adres email');

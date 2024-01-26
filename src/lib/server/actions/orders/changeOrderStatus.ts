@@ -18,6 +18,7 @@ import {
 } from '$lib/server/constants/messages';
 import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
 import { sendOrderStatusEmail } from '$lib/server/clients/resend';
+import { orderStatusLogs } from '$lib/server/db/schemas/orderStatusLogs';
 
 /*
 
@@ -37,10 +38,10 @@ const changeOrderStatus = (async ({ request, locals }) => {
 	// can cancel the order (items are unavailable)
 
 	if (!sessionUser) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 	if (!isAtLeastModerator(sessionUser.role)) {
-		throw error(...getCustomError('insufficient-permissions'));
+		error(...getCustomError('insufficient-permissions'));
 	}
 	const form = await superValidate(request, order$.eventForm);
 	if (!form.valid) {
@@ -146,12 +147,21 @@ const changeOrderStatus = (async ({ request, locals }) => {
 
 	// Update the order
 	const [, editOrderError] = await trytm(
-		db
-			.update(orders)
-			.set({
-				status: currentState
-			})
-			.where(eq(orders.id, id))
+		db.transaction(async (tx) => {
+			await tx
+				.update(orders)
+				.set({
+					status: currentState
+				})
+				.where(eq(orders.id, id));
+
+			await tx.insert(orderStatusLogs).values({
+				orderId: id,
+				event,
+				userId: sessionUser.id,
+				timestamp: new Date()
+			});
+		})
 	);
 
 	if (editOrderError) {

@@ -16,7 +16,7 @@ const subscribe: Action = async ({ locals, request }) => {
 	console.log('subscribing XD');
 	const sessionUser = locals.session?.user;
 	if (!sessionUser) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 
 	// const entries = Object.fromEntries(await request.formData());
@@ -55,7 +55,7 @@ const subscribe: Action = async ({ locals, request }) => {
 	if (fetchSubscriptionError) {
 		// Unexpected-error
 		console.error('fetchSubscriptionError', fetchSubscriptionError);
-		throw error(500, 'Błąd podczas szukania subskrypcji');
+		error(500, 'Błąd podczas szukania subskrypcji');
 	}
 	if (currentSubscription) {
 		return setError(form, 'endpoint', 'Subskrypcja już istnieje');
@@ -78,7 +78,7 @@ const subscribe: Action = async ({ locals, request }) => {
 
 	const [, addSubscriptionError] = await trytm(db.insert(subscriptions).values(newSubscription));
 	if (addSubscriptionError) {
-		throw error(500, 'Błąd przy dodawaniu subskrypcji powiadomień');
+		error(500, 'Błąd przy dodawaniu subskrypcji powiadomień');
 	}
 
 	sendNotifications([{ endpoint, expirationTime, keys }], getPushMessage('subscribed'));

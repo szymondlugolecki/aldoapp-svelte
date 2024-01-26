@@ -37,11 +37,11 @@ export const load = async ({ params }) => {
 	if (findProductError) {
 		// Unexpected-error
 		console.log('findProductError', findProductError);
-		throw error(500, 'Wystąpił błąd');
+		error(500, 'Wystąpił błąd');
 	}
 
 	if (!product) {
-		throw error(404, 'Nie znaleziono produktu');
+		error(404, 'Nie znaleziono produktu');
 	}
 
 	return {

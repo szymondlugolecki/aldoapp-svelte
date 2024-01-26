@@ -6,7 +6,7 @@
 	import OrderProduct from '$components/custom/Order/OrderProduct.svelte';
 	import HorizontalOrderSteps from '$components/custom/Steps/HorizontalOrderSteps.svelte';
 	import VerticalOrderSteps from '$components/custom/Steps/VerticalOrderSteps.svelte';
-	import { goto } from '$app/navigation';
+	import { goto, preloadData, pushState } from '$app/navigation';
 	import { Button } from '$shadcn/button';
 	import ProductsTable from './(components)/products-table.svelte';
 	import * as Form from '$shadcn/form';
@@ -19,14 +19,14 @@
 	import ErrorMessage from '$components/custom/Form/ErrorMessage.svelte';
 	import Message from '$components/custom/Form/Message.svelte';
 
-	import * as Sheet from '$shadcn/sheet';
-	import { Input } from '$shadcn/input';
-	import { Label } from '$shadcn/label';
+	import History from './historia/+page.svelte';
 
 	export let data;
 	let open = false;
 
 	$: justOrdered = $page.url.searchParams.get('success') === 'true';
+
+	console.log('data.statusHistory', data.statusHistory);
 
 	// onMount(() => {
 	// 	if (justOrdered) {
@@ -37,6 +37,7 @@
 	// });
 
 	let innerWidth: number;
+	let innerHeight: number;
 	const productsCount = data.order.products
 		.map(({ quantity }) => quantity)
 		.reduce((prev, quantity) => prev + quantity, 0);
@@ -59,8 +60,8 @@
 				duration: 2250,
 				force: 0.3,
 				particleCount: 75,
-				stageWidth: 1200,
-				stageHeight: 800,
+				stageWidth: innerWidth,
+				stageHeight: innerHeight,
 				colors: ['#4ade80', '#22d3ee', '#f59e0b', '#ec4899']
 			}}
 		/>
@@ -76,7 +77,7 @@
 	Sprawdzamy dostępność produktów
 </p> -->
 
-<svelte:window bind:innerWidth />
+<svelte:window bind:innerWidth bind:innerHeight />
 
 <!-- use:enhance={({ formData }) => {
 	const toastId = createLoadingToast('please-wait');
@@ -308,7 +309,7 @@
 				</div>
 				<div class="sm:justify-self-end sm:place-self-center">
 					<Button
-						href="historia"
+						href="/zamowienia/{data.order.id}/historia"
 						data-sveltekit-preload-data="hover"
 						on:click={async (e) => {
 							// bail if opening a new tab, or we're on too small a screen
@@ -322,19 +323,14 @@
 
 							// run `load` functions (or rather, get the result of the `load` functions
 							// that are already running because of `data-sveltekit-preload-data`)
-							// const result = await preloadData(href);
+							const result = await preloadData(href);
 
-							// if (result.type === 'loaded' && result.status === 200) {
-							// pushState(href, { selected: result.data });
-							goto(href, {
-								state: {
-									historyModalOpen: true
-								}
-							});
-							// } else {
-							// something bad happened! try navigating
-							goto(href);
-							// }
+							if (result.type === 'loaded' && result.status === 200) {
+								pushState(href, { historyModalOpen: true });
+							} else {
+								// something bad happened! try navigating
+								goto(href);
+							}
 						}}
 						variant="default"
 						class="max-w-[270px]">Historia statusu</Button
@@ -346,44 +342,5 @@
 </div>
 
 {#if $page.state.historyModalOpen}
-	<Sheet.Root
-		onOpenChange={(isOpen) => {
-			if (isOpen === false) {
-				history.back();
-			}
-		}}
-	>
-		<Sheet.Trigger asChild let:builder>
-			<Button builders={[builder]} variant="outline">Open</Button>
-		</Sheet.Trigger>
-		<Sheet.Content side="right">
-			<Sheet.Header>
-				<Sheet.Title>Edit profile</Sheet.Title>
-				<Sheet.Description>
-					Make changes to your profile here. Click save when you're done.
-				</Sheet.Description>
-			</Sheet.Header>
-			<div class="grid gap-4 py-4">
-				<div class="grid items-center grid-cols-4 gap-4">
-					<Label for="name" class="text-right">Name</Label>
-					<Input id="name" value="Pedro Duarte" class="col-span-3" />
-				</div>
-				<div class="grid items-center grid-cols-4 gap-4">
-					<Label for="username" class="text-right">Username</Label>
-					<Input id="username" value="@peduarte" class="col-span-3" />
-				</div>
-			</div>
-			<Sheet.Footer>
-				<Sheet.Close asChild let:builder>
-					<Button builders={[builder]} type="submit">Save changes</Button>
-				</Sheet.Close>
-			</Sheet.Footer>
-		</Sheet.Content>
-	</Sheet.Root>
-
-	<Modal on:close={() => history.back()}>
-		<!-- pass page data to the +page.svelte component,
-			 just like SvelteKit would on navigation -->
-		<PhotoPage data={$page.state.selected} />
-	</Modal>
+	<History data={data.statusHistory} />
 {/if}

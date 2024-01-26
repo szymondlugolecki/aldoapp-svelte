@@ -38,7 +38,7 @@ export const orderStatusList: Record<(typeof orderStatus)[number], string> = {
 	// awaitingCustomerDecision: 'Oczekuje na decyzję klienta',
 } as const;
 
-export const orderEventsList: Record<OrderEvent, string> = {
+export const orderEventsList: Record<OrderEvent, string> & { CREATED: string } = {
 	IS_AVAILABLE_FOR_SHIPMENT: 'Zweryfikowano zamówienie',
 	IS_AVAILABLE_FOR_PICKUP: 'Zweryfikowano zamówienie',
 	IS_UNAVAILABLE: 'Produkty są niedostępne',
@@ -46,7 +46,8 @@ export const orderEventsList: Record<OrderEvent, string> = {
 	CANCEL: 'Anuluj zamówienie',
 	SHIPPED: 'Wysłano',
 	DELIVERED: 'Dostarczono',
-	PICKED_UP: 'Odebrano zamówienie'
+	PICKED_UP: 'Odebrano zamówienie',
+	CREATED: 'Złożono zamówienie'
 	// KEEP_WAITING: 'Poczekaj na dostępność',
 	// PAYMENT_RECEIVED: 'Otrzymano płatność'
 };

@@ -37,8 +37,6 @@
 			availableEvents.splice(availableEvents.indexOf('IS_AVAILABLE_FOR_SHIPMENT'), 1);
 		}
 	}
-
-	console.log('availableEvents', availableEvents);
 </script>
 
 <Form.Root

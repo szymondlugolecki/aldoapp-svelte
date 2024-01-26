@@ -10,10 +10,10 @@ import { pushSubscription$ } from '$lib/client/schemas';
 const sendAll: Action = async ({ locals, request }) => {
 	const sessionUser = locals.session?.user;
 	if (!sessionUser) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 	if (!isAtLeastModerator(sessionUser.role)) {
-		throw error(...getCustomError('insufficient-permissions'));
+		error(...getCustomError('insufficient-permissions'));
 	}
 
 	const form = await superValidate(request, pushSubscription$.notificationAll, { id: 'sendAll' });
@@ -44,7 +44,7 @@ const sendAll: Action = async ({ locals, request }) => {
 	if (fetchSubscriptionsError) {
 		// Unexpected-error
 		console.error('fetchSubscriptionsError', fetchSubscriptionsError);
-		throw error(500, 'Błąd podczas pobierania użytkowników do wysłania powiadomień');
+		error(500, 'Błąd podczas pobierania użytkowników do wysłania powiadomień');
 	}
 
 	sendNotifications(subs, messageObj);

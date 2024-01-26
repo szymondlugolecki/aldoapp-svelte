@@ -17,6 +17,7 @@ import { getPushMessage } from '../constants/messages';
 import { orderAddress } from '../db/schemas/orderAddress';
 import { sendOrderCreatedEmail } from '../clients/resend';
 import type { OrderProduct } from '$types';
+import { orderStatusLogs } from '../db/schemas/orderStatusLogs';
 
 type CreateOrderProduct = { orderId: number; quantity: number; productId: number; price: string };
 
@@ -43,7 +44,6 @@ export const createNewOrder = ({
 	cartId,
 	order,
 	productsWithoutOrderId,
-	saveAddress,
 	cartOwner,
 	customer,
 	productsForEmailSummary
@@ -54,15 +54,23 @@ export const createNewOrder = ({
 		const orderId = Number(orderIdStr);
 		const products = productsWithoutOrderId.map((product) => ({ ...product, orderId }));
 
-		await tx.transaction(async (tx) => {
-			await tx.insert(orderProducts).values(products);
-			await tx.insert(orderAddress).values([{ ...address, orderId }]);
+		await tx.insert(orderProducts).values(products);
+		await tx.insert(orderAddress).values([{ ...address, orderId }]);
 
-			// Save address
-			if (saveAddress) {
-				await tx.insert(userAddress).values([{ ...address, userId: order.customerId }]);
-			}
+		// Creation event
+		await tx.insert(orderStatusLogs).values({
+			orderId,
+			event: 'CREATED',
+			userId: cartOwner.id,
+			timestamp: new Date()
 		});
+
+		// await tx.transaction(async (tx) => {
+		// 	// Save address
+		// 	if (saveAddress) {
+		// 		await tx.insert(userAddress).values([{ ...address, userId: order.customerId }]);
+		// 	}
+		// });
 
 		// Clear the cart
 		await tx.transaction(async (tx) => {

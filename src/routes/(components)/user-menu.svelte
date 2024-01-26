@@ -27,7 +27,7 @@
 	<div
 		use:melt={$content}
 		transition:fade={{ duration: 100 }}
-		class="z-10 w-[232px] rounded-sm p-5 shadow-sm"
+		class="z-50 w-[232px] rounded-sm p-5 shadow-sm"
 	>
 		<div use:melt={$arrow} />
 		<div class="flex flex-col gap-1 p-3 border rounded-lg bg-background border-border">
@@ -72,11 +72,3 @@
 		</button>
 	</div>
 {/if}
-
-<style lang="postcss">
-	.trigger {
-		@apply inline-flex h-10 w-10 items-center justify-center rounded-full p-0 relative;
-		@apply text-sm font-medium text-primary transition-colors hover:bg-primary/10;
-		@apply focus-visible:ring focus-visible:ring-offset-2;
-	}
-</style>

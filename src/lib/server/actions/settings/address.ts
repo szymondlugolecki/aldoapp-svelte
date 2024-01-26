@@ -12,7 +12,7 @@ import { message, superValidate } from 'sveltekit-superforms/server';
 const address: Action = async (event) => {
 	const sessionUser = event.locals.session?.user;
 	if (!sessionUser) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 
 	await sleep(3);
@@ -47,7 +47,7 @@ const address: Action = async (event) => {
 	if (editAddressError) {
 		// Unexpected-error
 		console.error('editAddressError', editAddressError);
-		throw error(500, 'Błąd podczas zmieniania adresu');
+		error(500, 'Błąd podczas zmieniania adresu');
 	}
 
 	console.log('success');

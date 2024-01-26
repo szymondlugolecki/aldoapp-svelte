@@ -7,7 +7,7 @@ export async function GET({ locals }) {
 	const sessionUser = locals.session?.user;
 
 	if (!sessionUser) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 
 	// Fetch all users with role 'customer' and adviserId equal to sessionUser.id
@@ -25,7 +25,7 @@ export async function GET({ locals }) {
 	);
 
 	if (fetchAdvisersError) {
-		throw error(500, 'Nie udało się pobrać listy doradców');
+		error(500, 'Nie udało się pobrać listy doradców');
 	}
 
 	// const response = await fetch(url);

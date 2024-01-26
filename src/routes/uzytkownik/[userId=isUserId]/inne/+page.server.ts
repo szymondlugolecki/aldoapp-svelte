@@ -6,8 +6,8 @@ export const actions = {
 	send
 };
 
-export const load = () => {
+export const load = async () => {
 	return {
-		form: superValidate(pushSubscription$.notification)
+		form: await superValidate(pushSubscription$.notification)
 	};
 };

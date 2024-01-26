@@ -63,7 +63,7 @@ const verify = (async ({ request, cookies, locals }) => {
 	if (createTokensError) {
 		// Unexpected-error
 		console.error('createTokensError', createTokensError);
-		throw error(500, 'Błąd podczas logowania');
+		error(500, 'Błąd podczas logowania');
 	}
 
 	const [accessToken, refreshToken] = createTokens;
@@ -96,7 +96,7 @@ const verify = (async ({ request, cookies, locals }) => {
 		// just continue
 	}
 
-	throw redirect(303, '/');
+	redirect(303, '/');
 }) satisfies Action;
 
 export default verify;

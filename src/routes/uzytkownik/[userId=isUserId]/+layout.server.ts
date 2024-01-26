@@ -35,7 +35,7 @@ export const load = async ({ params, locals, url }) => {
 	// 2b. must be an admin/mod
 
 	if (!sessionUser) {
-		throw error(401, 'Nie jesteś zalogowany');
+		error(401, 'Nie jesteś zalogowany');
 	}
 
 	const isMod = isAtLeastModerator(sessionUser.role);
@@ -70,15 +70,15 @@ export const load = async ({ params, locals, url }) => {
 	if (fetchUserError) {
 		// Unexpected-error
 		console.error('fetchUserError', fetchUserError);
-		throw error(500, 'Wystąpił błąd podczas pobierania danych użytkownika');
+		error(500, 'Wystąpił błąd podczas pobierania danych użytkownika');
 	}
 
 	if (!user) {
-		throw error(404, 'Podany użytkownik nie istnieje');
+		error(404, 'Podany użytkownik nie istnieje');
 	}
 
 	if (sessionUser.id !== user.id && !isMod) {
-		throw error(401, 'Nie masz uprawnień do przeglądania profilu tego użytkownika');
+		error(401, 'Nie masz uprawnień do przeglądania profilu tego użytkownika');
 	}
 
 	const defaultWhereClause = or(
@@ -170,7 +170,7 @@ export const load = async ({ params, locals, url }) => {
 	if (fetchOrdersError) {
 		// Unexpected-error
 		console.error('fetchOrdersError', fetchOrdersError);
-		throw error(500, 'Wystąpił błąd podczas pobierania zamówień użytkownika');
+		error(500, 'Wystąpił błąd podczas pobierania zamówień użytkownika');
 	}
 
 	const [unsortedCustomersAndCartOwners, fetchCustomersAndCartOwnersError] = await trytm(
@@ -205,7 +205,7 @@ export const load = async ({ params, locals, url }) => {
 	if (fetchCustomersAndCartOwnersError) {
 		// Unexpected-error
 		console.error('fetchCustomersAndCartOwnersError', fetchCustomersAndCartOwnersError);
-		throw error(500, 'Błąd podczas pobierania zamówień użytkownika');
+		error(500, 'Błąd podczas pobierania zamówień użytkownika');
 	}
 
 	const customersAndCartOwners = unsortedCustomersAndCartOwners.reduce(

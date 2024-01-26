@@ -1,0 +1,1 @@
+ALTER TABLE `order_status_logs` ADD `timestamp` int NOT NULL;

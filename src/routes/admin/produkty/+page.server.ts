@@ -25,11 +25,8 @@ const sortableColumns: ProductSortableColumn[] = [
 export const load = async ({ url }) => {
 	const { page, sort } = extractParams<ProductSortableColumn>(url, sortableColumns);
 
-	const addForm = await superValidate(products$.addForm);
-	const editForm = await superValidate(products$.editForm);
-
 	return {
-		products: db.query.products.findMany({
+		products: await db.query.products.findMany({
 			columns: {
 				id: true,
 				name: true,
@@ -68,13 +65,13 @@ export const load = async ({ url }) => {
 			limit: pageLimit
 		}),
 		pageLimit,
-		count: db
+		count: await db
 			.select({
 				count: sql<number>`count(*)`.mapWith(Number)
 			})
 			.from(products),
-		addForm,
-		editForm
+		addForm: await superValidate(products$.addForm),
+		editForm: await superValidate(products$.editForm)
 	};
 };
 

@@ -10,7 +10,7 @@ import { setMessage, superValidate } from 'sveltekit-superforms/server';
 const phone: Action = async (event) => {
 	const sessionUser = event.locals.session?.user;
 	if (!sessionUser) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 
 	const form = await superValidate(event, settings$.phoneForm);
@@ -30,7 +30,7 @@ const phone: Action = async (event) => {
 	if (editPhoneError) {
 		// Unexpected-error
 		console.error('editPhoneError', editPhoneError);
-		throw error(500, 'Błąd podczas zmieniania numeru telefonu');
+		error(500, 'Błąd podczas zmieniania numeru telefonu');
 	}
 
 	console.log('success');

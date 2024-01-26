@@ -116,7 +116,7 @@
 	{/if}
 	<Dialog.Content class="sm:max-w-[425px]">
 		<Dialog.Header>
-			<Dialog.Title>Edytuj użytkownika</Dialog.Title>
+			<Dialog.Title>Edytuj produkt</Dialog.Title>
 			<Dialog.Description>Po dokonaniu zmian wciśnij przycisk Zapisz</Dialog.Description>
 		</Dialog.Header>
 		<Form.Root
@@ -140,8 +140,7 @@
 				},
 				id: product.id.toString(),
 				delayMs: 1000,
-				timeoutMs: 8000,
-				dataType: 'json'
+				timeoutMs: 8000
 			}}
 			enctype="multipart/form-data"
 		>
@@ -201,7 +200,7 @@
 					<Form.Item>
 						<Form.Label>Zdjęcie</Form.Label>
 						<Form.Input type="file" accept="image/*" bind:value={files} />
-						<Form.Description>Wybierz zdjęcie produktu.</Form.Description>
+						<Form.Description>Wybierz zdjęcie produktu</Form.Description>
 						<Form.Validation />
 					</Form.Item>
 				</Form.Field>

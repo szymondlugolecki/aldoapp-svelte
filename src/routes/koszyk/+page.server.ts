@@ -19,7 +19,7 @@ export const actions = {
 export const load = async ({ locals }) => {
 	const sessionUser = locals.session?.user;
 	if (!sessionUser) {
-		throw redirect(...getCustomRedirect('login-required', '/koszyk'));
+		redirect(...getCustomRedirect('login-required', '/koszyk'));
 	}
 
 	const [cart] = await trytm(
@@ -77,8 +77,8 @@ export const load = async ({ locals }) => {
 	// Populate the form with default values
 	return {
 		customers,
-		orderForm: superValidate(order$.create),
-		productQuantityForm: superValidate(order$.productQuantity),
-		setCustomerForm: superValidate(cart$.changeCartCustomer)
+		orderForm: await superValidate(order$.create),
+		productQuantityForm: await superValidate(order$.productQuantity),
+		setCustomerForm: await superValidate(cart$.changeCartCustomer)
 	};
 };

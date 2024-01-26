@@ -6,6 +6,6 @@ export const actions = {
 	default: handleVerification
 };
 
-export const load = () => {
-	return { form: superValidate(auth$.verification) };
+export const load = async () => {
+	return { form: await superValidate(auth$.verification) };
 };

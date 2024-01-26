@@ -8,7 +8,7 @@ import { setMessage, superValidate } from 'sveltekit-superforms/server';
 const changeProductQuantity: Action = async ({ request, locals }) => {
 	const sessionUser = locals.session?.user;
 	if (!sessionUser) {
-		throw error(401, 'Nie jesteś zalogowany');
+		error(401, 'Nie jesteś zalogowany');
 	}
 
 	const form = await superValidate(request, cart$.changeProductQuantity);
@@ -25,7 +25,7 @@ const changeProductQuantity: Action = async ({ request, locals }) => {
 	);
 
 	if (fetchCartError) {
-		throw error(500, 'Błąd podczas sprawdzania czy istnieje koszyk');
+		error(500, 'Błąd podczas sprawdzania czy istnieje koszyk');
 	}
 
 	// If no cart, create one
@@ -36,10 +36,10 @@ const changeProductQuantity: Action = async ({ request, locals }) => {
 		const [, createCartError] = await trytm(createCart(sessionUser.id));
 
 		if (createCartError) {
-			throw error(500, 'Błąd podczas tworzenia koszyka');
+			error(500, 'Błąd podczas tworzenia koszyka');
 		}
 
-		throw error(500, 'Spróbuj ponownie');
+		error(500, 'Spróbuj ponownie');
 	}
 
 	// Change product quantity
@@ -49,7 +49,7 @@ const changeProductQuantity: Action = async ({ request, locals }) => {
 	if (changeProductQuantityError) {
 		// Unexpected-error
 		console.error('Failed to change product quantity', changeProductQuantityError);
-		throw error(500, 'Błąd podczas zmieniania ilości produktu');
+		error(500, 'Błąd podczas zmieniania ilości produktu');
 	}
 
 	if (quantity === 0) {

@@ -16,7 +16,7 @@ export const load = async ({ url }) => {
 	const { page, sort } = extractParams<UserSortableColumn>(url, sortableColumns);
 
 	return {
-		users: db.query.users.findMany({
+		users: await db.query.users.findMany({
 			with: {
 				adviser: {
 					columns: {
@@ -47,15 +47,15 @@ export const load = async ({ url }) => {
 				? (users, { asc, desc }) => (sort.descending ? desc(users[sort.by]) : asc(users[sort.by]))
 				: (users, { desc }) => desc(users.createdAt)
 		}),
-		count: db
+		count: await db
 			.select({
 				count: sql<number>`count(*)`.mapWith(Number)
 			})
 			.from(users),
 		pageLimit,
-		addForm: superValidate(user$.addForm),
-		editForm: superValidate(user$.editForm),
-		advisers: db.query.users.findMany({
+		addForm: await superValidate(user$.addForm),
+		editForm: await superValidate(user$.editForm),
+		advisers: await db.query.users.findMany({
 			where: (users, { eq }) => eq(users.role, 'adviser'),
 			columns: {
 				id: true,

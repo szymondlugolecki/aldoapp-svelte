@@ -19,13 +19,13 @@ const sortableColumns: OrderSortableColumn[] = [
 
 const pageLimit = 10;
 
-export const load = ({ url }) => {
+export const load = async ({ url }) => {
 	const { page, sort } = extractParams<OrderSortableColumn>(url, sortableColumns);
 
 	console.log('page', page, sort);
 
 	return {
-		orders: db.query.orders.findMany({
+		orders: await db.query.orders.findMany({
 			limit: pageLimit,
 			offset: (page - 1) * pageLimit,
 			columns: {
@@ -84,15 +84,15 @@ export const load = ({ url }) => {
 						sort.descending ? desc(orders[sort.by]) : asc(orders[sort.by])
 				: (orders, { desc }) => desc(orders.createdAt)
 		}),
-		count: db
+		count: await db
 			.select({
 				count: sql<number>`count(*)`.mapWith(Number)
 			})
 			.from(orders),
 		pageLimit,
-		eventForm: superValidate(order$.eventForm),
-		paymentForm: superValidate(order$.paymentForm),
-		addressForm: superValidate(order$.orderAddressForm)
+		eventForm: await superValidate(order$.eventForm),
+		paymentForm: await superValidate(order$.paymentForm),
+		addressForm: await superValidate(order$.orderAddressForm)
 	};
 };
 

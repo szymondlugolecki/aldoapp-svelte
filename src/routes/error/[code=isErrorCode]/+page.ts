@@ -12,5 +12,5 @@ export const load = ({ params }) => {
 		};
 	}
 
-	throw error(...getCustomError('not-found'));
+	error(...getCustomError('not-found'));
 };

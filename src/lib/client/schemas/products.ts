@@ -96,11 +96,11 @@ const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/web
 
 export const image = z
 	.any()
-	.refine((files) => files?.length == 1, 'Image is required.')
-	.refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, `Max file size is 5MB.`)
+	.refine((files) => files?.length === 1, 'Wymagane jest jedno zdjęcie.')
+	.refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, `Maksymalny rozmiar zdjęcia to 5MB.`)
 	.refine(
 		(files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
-		'.jpg, .jpeg, .png and .webp files are accepted.'
+		'.jpg, .jpeg, .png and .webp są dozwolone.'
 	);
 
 export const hidden = z.boolean({

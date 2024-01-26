@@ -11,10 +11,10 @@ import { pushSubscription$ } from '$lib/client/schemas';
 const send: Action = async (event) => {
 	const sessionUser = event.locals.session?.user;
 	if (!sessionUser) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 	if (!isAtLeastModerator(sessionUser.role)) {
-		throw error(...getCustomError('insufficient-permissions'));
+		error(...getCustomError('insufficient-permissions'));
 	}
 
 	console.log('event');
@@ -57,7 +57,7 @@ const send: Action = async (event) => {
 	if (fetchSubscriptionsError) {
 		// Unexpected-error
 		console.error('fetchSubscriptionsError', fetchSubscriptionsError);
-		throw error(500, 'Błąd podczas pobierania użytkowników do wysłania powiadomień');
+		error(500, 'Błąd podczas pobierania użytkowników do wysłania powiadomień');
 	}
 
 	const { message, success } = await sendNotifications(subscriptionList, messageObj);

@@ -22,7 +22,7 @@ What it should do:
 const orderAgain = (async (event) => {
 	const sessionUser = event.locals.session?.user;
 	if (!sessionUser) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 
 	const form = await superValidate(event, order$.orderAgainForm);
@@ -57,7 +57,7 @@ const orderAgain = (async (event) => {
 	if (getOrderError) {
 		// Unexpected error
 		console.error('getOrderError', getOrderError);
-		throw error(500, 'Błąd podczas szukania zamówienia');
+		error(500, 'Błąd podczas szukania zamówienia');
 	}
 	if (!order) {
 		// Order not found
@@ -75,7 +75,7 @@ const orderAgain = (async (event) => {
 	if (getCartError) {
 		// Unexpected error
 		console.error('getCartError', getCartError);
-		throw error(500, 'Błąd podczas szukania Twojego koszyka');
+		error(500, 'Błąd podczas szukania Twojego koszyka');
 	}
 	if (!cart) {
 		// Cart not found
@@ -89,7 +89,7 @@ const orderAgain = (async (event) => {
 	if (clearCartError) {
 		// Unexpected error
 		console.error('clearCartError', clearCartError);
-		throw error(500, 'Błąd podczas opróżniania koszyka');
+		error(500, 'Błąd podczas opróżniania koszyka');
 	}
 
 	// Add products to the cart
@@ -103,7 +103,7 @@ const orderAgain = (async (event) => {
 		return setError(form, 'id', 'Błąd podczas dodawania produktów do koszyka');
 	}
 
-	throw redirect(301, '/koszyk');
+	redirect(301, '/koszyk');
 }) satisfies Action;
 
 export default orderAgain;

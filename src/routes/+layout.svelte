@@ -27,18 +27,14 @@
 	let unsubscribe: Unsubscriber | undefined;
 
 	onMount(async () => {
-		// setInterval(() => {
-		// 	toast('Jaroslaw wlasnie kupil Pasze ALDO Premium', { icon: '🔔' });
-		// }, 1000 * 30);
+		// window.addEventListener('beforeinstallprompt', (e) => {
+		// 	console.log('before install prompt', e);
+		// 	// e.preventDefault();
+		// 	toast.success('Before install prompt!');
+		// 	deferredInstallEvent = e as BeforeInstallPromptEvent;
+		// });
 
-		window.addEventListener('beforeinstallprompt', (e) => {
-			console.log('before install prompt', e);
-			// e.preventDefault();
-			toast.success('Before install prompt!');
-			deferredInstallEvent = e as BeforeInstallPromptEvent;
-		});
-
-		$settings.theme = 'dark';
+		// $settings.theme = 'dark';
 
 		unsubscribe = settings.subscribe(({ theme }) => {
 			switch (theme) {

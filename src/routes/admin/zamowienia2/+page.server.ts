@@ -24,10 +24,10 @@ export const load = async ({ url, locals }) => {
 	const sessionUser = locals.session?.user;
 
 	if (!sessionUser) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 	if (!isAtLeastModerator(sessionUser.role)) {
-		throw error(...getCustomError('insufficient-permissions'));
+		error(...getCustomError('insufficient-permissions'));
 	}
 
 	const { page, sort, order } = extractParams<OrderSortableColumn>(url, sortableColumns);
@@ -127,7 +127,7 @@ export const load = async ({ url, locals }) => {
 	if (fetchOrdersError) {
 		// Unexpected-error
 		console.error('fetchOrdersError', fetchOrdersError);
-		throw error(500, 'Błąd podczas pobierania zamówień użytkownika');
+		error(500, 'Błąd podczas pobierania zamówień użytkownika');
 	}
 
 	const orders: OrderTable[] = ordersUngrouped.map((o) => {

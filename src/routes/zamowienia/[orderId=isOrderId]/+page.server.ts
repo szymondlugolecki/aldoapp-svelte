@@ -2,7 +2,6 @@ import getCustomError from '$lib/client/constants/customErrors.js';
 import { isAtLeastModerator } from '$lib/client/functions';
 import { order$ } from '$lib/client/schemas/index.js';
 import changeOrderStatus from '$lib/server/actions/orders/changeOrderStatus';
-import fetchStatusHistory from '$lib/server/actions/orders/fetchStatusHistory';
 import orderAgain from '$lib/server/actions/orders/orderAgain';
 import { db } from '$lib/server/db/index.js';
 import { trytm } from '@bdsqqq/try';
@@ -12,7 +11,7 @@ import { superValidate } from 'sveltekit-superforms/server';
 export const load = async ({ params, locals }) => {
 	const sessionUser = locals.session?.user;
 	if (!sessionUser) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 
 	const isMod = isAtLeastModerator(sessionUser.role);
@@ -96,17 +95,17 @@ export const load = async ({ params, locals }) => {
 	if (fetchOrderError) {
 		// Unexpected-error
 		console.log('fetchOrderError', fetchOrderError);
-		throw error(500, 'Niespodziewany błąd podczas szukania zamówienia');
+		error(500, 'Niespodziewany błąd podczas szukania zamówienia');
 	}
 
 	if (!rawOrder) {
-		throw error(404, 'Nie znaleziono zamówienia');
+		error(404, 'Nie znaleziono zamówienia');
 	}
 
 	// Check permissions
 	const isOwner = rawOrder.cartOwner.id === sessionUser.id;
 	if (!isOwner && !isMod) {
-		throw error(...getCustomError('insufficient-permissions'));
+		error(...getCustomError('insufficient-permissions'));
 	}
 
 	console.log('rawOrder', rawOrder.products.length, rawOrder.products[0]);
@@ -122,15 +121,51 @@ export const load = async ({ params, locals }) => {
 
 	console.log('cooked ordered', order);
 
+	// Fetch the status logs history
+	const [statusHistory, getStatusHistoryError] =
+		sessionUser.role === 'admin'
+			? await trytm(
+					db.query.orders.findFirst({
+						where: (orders, { eq }) => eq(orders.id, Number(params.orderId)),
+						columns: {
+							id: true
+						},
+						with: {
+							statusLogs: {
+								orderBy: (logs, { desc }) => desc(logs.timestamp),
+								columns: {
+									event: true,
+									timestamp: true
+								},
+								with: {
+									user: {
+										columns: {
+											id: true,
+											fullName: true
+										}
+									}
+								}
+							}
+						}
+					})
+			  )
+			: [null, null];
+
+	if (getStatusHistoryError) {
+		// Unexpected-error
+		console.error('getStatusHistoryError', getStatusHistoryError);
+		error(500, 'Nie udało się pobrać historii statusu zamówienia');
+	}
+
 	return {
 		order,
-		orderAgainForm: superValidate(order$.orderAgainForm),
-		orderStatusHistoryForm: superValidate(order$.orderStatusHistoryForm)
+		orderAgainForm: await superValidate(order$.orderAgainForm),
+		orderStatusHistoryForm: await superValidate(order$.orderStatusHistoryForm),
+		statusHistory
 	};
 };
 
 export const actions = {
 	changeOrderStatus,
-	orderAgain,
-	fetchStatusHistory
+	orderAgain
 };

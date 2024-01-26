@@ -15,10 +15,10 @@ const edit = (async ({ request, locals }) => {
 
 	// Only moderators and admins are allowed to edit a user
 	if (!sessionUser) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 	if (!isAtLeastModerator(sessionUser.role)) {
-		throw error(...getCustomError('insufficient-permissions'));
+		error(...getCustomError('insufficient-permissions'));
 	}
 
 	const form = await superValidate(request, user$.editForm);

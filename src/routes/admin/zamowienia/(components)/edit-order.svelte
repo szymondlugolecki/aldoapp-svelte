@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Input } from '$shadcn/input';
 	import { Label } from '$shadcn/label';
-	import type { Order } from '$types';
+	import type { Order, Role } from '$types';
 	import { enhance } from '$app/forms';
 	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 	import { handleFormResponse } from '$lib/client/functions/forms';
@@ -29,6 +29,7 @@
 	export let addressForm: SuperValidated<OrderAddressForm>;
 	export let statusForm: SuperValidated<EventForm>;
 	export let paymentForm: SuperValidated<PaymentForm>;
+	export let userRole: Role | undefined;
 
 	let cellOverride = undefined as string | undefined | null;
 
@@ -55,11 +56,17 @@
 
 		{#if key === 'address'}
 			<EditOrderAddressForm bind:open {order} form={addressForm} />
-		{:else if key === 'status'}
+		{:else if key === 'status' && userRole}
 			{#if order.status === 'delivered'}
 				<p class="text-center">Zamówienie zostało dostarczone</p>
-			{:else}
+			{:else if order.status === 'pickedUp'}
+				<p class="text-center">Zamówienie zostało odebrane</p>
+			{:else if order.status === 'cancelled'}
+				<p class="text-center">Zamówienie zostało anulowane</p>
+			{:else if userRole !== 'driver' || (userRole === 'driver' && order.status === 'awaitingDelivery')}
 				<EditOrderStatusForm bind:open {order} form={statusForm} />
+			{:else}
+				<p class="text-center">Nie możesz zmienić statusu tego zamówienia</p>
 			{/if}
 		{:else if key === 'paid'}
 			<EditOrderPaymentForm bind:open {order} form={paymentForm} />

@@ -18,7 +18,7 @@ export const load = async ({ locals }) => {
 	// Must be logged in
 	const { session } = locals;
 	if (!session) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 
 	// const [user, fetchUserError] = await trytm(

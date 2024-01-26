@@ -15,10 +15,10 @@ type CreateUserSchema = z.infer<typeof createUserSchema>;
 const add = (async ({ request, locals }) => {
 	// Only moderators and admins are allowed to add a user
 	if (!locals.session) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 	if (!isAtLeastModerator(locals.session?.user.role)) {
-		throw error(...getCustomError('insufficient-permissions'));
+		error(...getCustomError('insufficient-permissions'));
 	}
 
 	const form = await superValidate(request, user$.addForm);

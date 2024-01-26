@@ -12,7 +12,7 @@ const unsubscribe: Action = async ({ locals, request }) => {
 	console.log('unsubscribing XD');
 	const sessionUser = locals.session?.user;
 	if (!sessionUser) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 
 	const form = await superValidate(request, pushSubscription$.unsubscribe);
@@ -32,7 +32,7 @@ const unsubscribe: Action = async ({ locals, request }) => {
 	if (fetchSubscriptionError) {
 		// Unexpected-error
 		console.error('fetchSubscriptionError', fetchSubscriptionError);
-		throw error(500, 'Błąd podczas szukania subskrypcji');
+		error(500, 'Błąd podczas szukania subskrypcji');
 	}
 
 	if (!currentSubscription) {
@@ -45,7 +45,7 @@ const unsubscribe: Action = async ({ locals, request }) => {
 			.where(and(eq(subscriptions.userId, sessionUser.id), eq(subscriptions.userAgent, userAgent)))
 	);
 	if (deleteSubscriptionError) {
-		throw error(500, 'Błąd przy usuwaniu subskrypcji powiadomień');
+		error(500, 'Błąd przy usuwaniu subskrypcji powiadomień');
 	}
 
 	return setMessage(form, 'Pomyślnie odsubskrybowano');

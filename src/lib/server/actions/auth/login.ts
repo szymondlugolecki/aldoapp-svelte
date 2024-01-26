@@ -92,7 +92,7 @@ const login = (async ({ request, getClientAddress, platform }) => {
 		);
 	}
 
-	throw redirect(303, '/zaloguj/weryfikacja?success=true');
+	redirect(303, '/zaloguj/weryfikacja?success=true');
 }) satisfies Action;
 
 export default login;

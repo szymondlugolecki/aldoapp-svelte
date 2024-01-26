@@ -253,6 +253,34 @@
       "when": 1706209173684,
       "tag": "0035_panoramic_joshua_kane",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "5",
+      "when": 1706274039910,
+      "tag": "0036_jazzy_rogue",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "5",
+      "when": 1706274099126,
+      "tag": "0037_nappy_cerebro",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "5",
+      "when": 1706278916279,
+      "tag": "0038_sad_micromax",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "5",
+      "when": 1706279249017,
+      "tag": "0039_classy_starhawk",
+      "breakpoints": true
     }
   ]
 }

@@ -11,7 +11,7 @@ import { order$ } from '$lib/client/schemas';
 const createOrder: Action = async (event) => {
 	const sessionUser = event.locals.session?.user;
 	if (!sessionUser) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 
 	const form = await superValidate(event, order$.create);
@@ -69,14 +69,14 @@ const createOrder: Action = async (event) => {
 	if (fetchCartError) {
 		// Unexpected-error
 		console.error('fetchCartError', fetchCartError);
-		throw error(500, 'Błąd podczas pobierania produktów z koszyka');
+		error(500, 'Błąd podczas pobierania produktów z koszyka');
 	}
 
 	// No cart
 	if (!cart) {
 		// Unexpected-error
 		console.error('No cart found for unknown reason', sessionUser);
-		throw error(500, 'Nie znaleziono koszyka');
+		error(500, 'Nie znaleziono koszyka');
 	}
 
 	const productsWithQuantity = cart.products.map(({ product, quantity }) => ({
@@ -142,7 +142,7 @@ const createOrder: Action = async (event) => {
 		return setError(form, 'Błąd podczas składania zamówienia', { status: 500 });
 	}
 
-	throw redirect(303, `/zamowienia/${newOrderId}?success=true`);
+	redirect(303, `/zamowienia/${newOrderId}?success=true`);
 };
 
 export default createOrder;

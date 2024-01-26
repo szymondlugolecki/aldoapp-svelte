@@ -6,7 +6,7 @@ import { ne } from 'drizzle-orm';
 
 export async function POST(event) {
 	if (event.locals.session?.user.role !== 'admin') {
-		throw error(403, 'Nie masz uprawnień do wykonania tej akcji');
+		error(403, 'Nie masz uprawnień do wykonania tej akcji');
 	}
 
 	const [, deleteAllUsersError] = await trytm(
@@ -15,7 +15,7 @@ export async function POST(event) {
 
 	if (deleteAllUsersError) {
 		console.error('deleteAllUsersError', deleteAllUsersError);
-		throw error(500, 'Niespodziewany błąd podczas usuwania wszystkich użytkowników');
+		error(500, 'Niespodziewany błąd podczas usuwania wszystkich użytkowników');
 	}
 
 	return json({ success: true, message: 'Usunieto wszystkich użytkowników' });

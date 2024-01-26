@@ -7,11 +7,11 @@ import { error, json } from '@sveltejs/kit';
 export async function POST() {
 	const [user, fetchUserError] = await trytm(db.query.users.findFirst());
 	if (fetchUserError) {
-		throw error(500, 'Niespodziewany błąd podczas próby pobrania użytkownika');
+		error(500, 'Niespodziewany błąd podczas próby pobrania użytkownika');
 	}
 
 	if (user) {
-		throw error(400, 'Nie można utworzyć użytkownika protoplasty, ponieważ już istnieje');
+		error(400, 'Nie można utworzyć użytkownika protoplasty, ponieważ już istnieje');
 	}
 
 	const [, createProgenitorError] = await trytm(
@@ -27,7 +27,7 @@ export async function POST() {
 
 	if (createProgenitorError) {
 		console.error('Protoplasta blad', createProgenitorError);
-		throw error(500, 'Niespodziewany błąd podczas tworzenia użytkownika protoplasty');
+		error(500, 'Niespodziewany błąd podczas tworzenia użytkownika protoplasty');
 	}
 
 	return json({ success: true, message: 'Utworzono użytkownika protoplastę' });

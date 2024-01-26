@@ -10,26 +10,14 @@ import { eq } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { utapi } from '$lib/server/clients/uploadthing';
 
-const getImageUrl = async (uploadedImage: FormDataEntryValue | null) => {
-	if (!(uploadedImage instanceof File)) {
-		return null;
-	}
-	const { data, error } = await utapi.uploadFiles(uploadedImage);
-	if (error) {
-		throw error;
-	}
-	console.log('data', data);
-	return data.url;
-};
-
 const edit: Action = async ({ request, locals }) => {
 	// Must be a moderator or higher
 	if (!locals.session) {
-		throw error(...getCustomError('not-logged-in'));
+		error(...getCustomError('not-logged-in'));
 	}
 
 	if (!isAtLeastModerator(locals.session?.user.role)) {
-		throw error(...getCustomError('insufficient-permissions'));
+		error(...getCustomError('insufficient-permissions'));
 	}
 
 	const formData = await request.formData();
@@ -45,14 +33,30 @@ const edit: Action = async ({ request, locals }) => {
 	const { id, name, symbol, category, subcategory, price, producent, weight, description, hidden } =
 		form.data;
 
-	const uploadedImage = formData.get('images');
-	const [imageUrl, imageUploadError] = await trytm(getImageUrl(uploadedImage));
-	if (imageUploadError) {
-		console.error('imageUploadError', imageUploadError);
-		return setError(form, 'Nie udało się przesłać obrazka', { status: 500 });
-	}
+	let imageUrl: string | null = null;
 
-	console.log('imageUrl', imageUrl);
+	const image = formData.get('images');
+	console.log('formData.image', image);
+
+	if (image instanceof File) {
+		// One image per product is enough for now
+
+		// const imgExtension = image.type.split('/')[1];
+		// const fileEsque = new File([image], `${crypto.randomUUID()}.${imgExtension}`, {
+		// 	type: image.type
+		// });
+		// console.log('fileEsque', fileEsque);
+
+		const { data, error } = await utapi.uploadFiles(image);
+
+		if (error) {
+			console.error('product.edit.images', error);
+			return setError(form, 'Nie udało się przesłać obrazka', { status: 500 });
+		}
+
+		console.log('imageUrl', imageUrl);
+		imageUrl = data.url;
+	}
 
 	const newProduct: Partial<
 		Pick<
