@@ -29,9 +29,6 @@
 	$: productsCount = cart
 		? cart.products.map(({ quantity }) => quantity).reduce((prev, quantity) => prev + quantity, 0)
 		: 0;
-
-	const productImgUrl =
-		'https://res.cloudinary.com/dzcuq1b2u/image/upload/v1680687127/products/Lacto%20Start%20IPC%20pasza%20rozdojeniowa%20De%20Heus%2025kg/DB4A2X00G-W00/0.webp';
 </script>
 
 <button type="button" class="trigger" use:melt={$trigger} aria-label="Podgląd koszyka">
@@ -69,12 +66,7 @@
 					<div class="flex flex-grow">
 						<div class="flex items-start flex-1 space-x-2">
 							<a href="/sklep/{product.encodedURL}" class="flex items-center h-full">
-								<img
-									src={product.image || productImgUrl}
-									width="32px"
-									height="32px"
-									alt={product.name}
-								/>
+								<img src={product.image} width="32px" height="32px" alt={product.name} />
 							</a>
 							<div class="flex flex-col items-start">
 								<span class="text-xs truncate max-w-[144px]">{product.name}</span>

@@ -102,9 +102,6 @@
 
 	export let data;
 
-	const productImgUrl =
-		'https://res.cloudinary.com/dzcuq1b2u/image/upload/v1680687127/products/Lacto%20Start%20IPC%20pasza%20rozdojeniowa%20De%20Heus%2025kg/DB4A2X00G-W00/0.webp';
-
 	const categoryToUrl = (category: string) => {
 		const newUrl = new URL('/sklep', $page.url.href);
 		newUrl.searchParams.set('category', category);
@@ -257,7 +254,7 @@
 							<div class="flex flex-col w-60 gap-y-1">
 								<div class="overflow-hidden rounded-lg aspect-3/4">
 									<img
-										src={productImgUrl}
+										src={product.image}
 										alt={product.name}
 										class="w-full h-full object-cover object-center scale-[1.15] hover:scale-[1.165] transition-transform"
 									/>
@@ -283,7 +280,7 @@
 							<div class="flex flex-col w-60 gap-y-1">
 								<div class="overflow-hidden rounded-lg aspect-3/4">
 									<img
-										src={productImgUrl}
+										src={product.image}
 										alt={product.name}
 										class="w-full h-full object-cover object-center scale-[1.15] hover:scale-[1.165] transition-transform"
 									/>

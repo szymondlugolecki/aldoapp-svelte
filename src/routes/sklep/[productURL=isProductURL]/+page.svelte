@@ -26,26 +26,15 @@
 	});
 
 	let selectedImagePreview = 0;
-	const productImgUrl =
-		'https://res.cloudinary.com/dzcuq1b2u/image/upload/v1680687127/products/Lacto%20Start%20IPC%20pasza%20rozdojeniowa%20De%20Heus%2025kg/DB4A2X00G-W00/0.webp';
 </script>
 
 <section class="max-w-2xl px-4 pt-4 mx-auto lg:max-w-6xl sm:px-0 pb-14">
-	<div class="flex items-center justify-end px-1">
-		<a href="/sklep" class="flex items-center text-sm text-blue-600 gap-x-1"
-			>Powrót do sklepu <CornerDownLeft class="square-5" /></a
-		>
-	</div>
 	<div class="grid lg:grid-cols-2 lg:gap-x-8 gap-y-4 lg:items-start">
 		<!-- Images -->
 		<div class="max-w-md overflow-hidden rounded-md aspect-3/4">
 			<a href="/sklep/{data.product.encodedURL}">
 				<div class="">
-					<img
-						src={data.product.image || productImgUrl}
-						alt={data.product.name}
-						class="scale-[1.1] object-cover object-center duration-150 mt-1.5"
-					/>
+					<img src={data.product.image} alt={data.product.name} />
 				</div>
 			</a>
 		</div>

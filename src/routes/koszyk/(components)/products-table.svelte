@@ -1,12 +1,17 @@
 <script lang="ts">
 	import createLoadingToast from '$lib/client/functions/createLoadingToast.js';
-	import { Minus, Plus, Trash, X } from 'lucide-svelte';
+	import { X } from 'lucide-svelte';
 	import { createSelect, melt } from '@melt-ui/svelte';
 	import { Skeleton } from '$shadcn/skeleton';
 	import type { ProductQuantity } from '$lib/client/schemas/order';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import ProductQuantityForm from './product-quantity-form.svelte';
 	import type { SuperForm } from 'sveltekit-superforms/client';
+	import Button from '$components/ui/button/button.svelte';
+	// import * as Form from "$shadcn/form";
+	import { Input } from '$shadcn/input';
+	import { toast } from 'svelte-sonner';
+	import { onMount } from 'svelte';
 
 	const {
 		elements: { trigger, menu, option, group, groupLabel, label },
@@ -27,10 +32,20 @@
 	export let products: NonNullable<PageServerParentData['cart']>['products'];
 
 	export let productQuantityForm: SuperForm<ProductQuantity>;
-	const { enhance, delayed, formId, submitting } = productQuantityForm;
+	const { enhance, delayed, formId, submitting, errors, form } = productQuantityForm;
 
-	const productImgUrl =
-		'https://res.cloudinary.com/dzcuq1b2u/image/upload/v1680687127/products/Lacto%20Start%20IPC%20pasza%20rozdojeniowa%20De%20Heus%2025kg/DB4A2X00G-W00/0.webp';
+	errors.subscribe((e) => {
+		console.log('e', e._errors, e.quantity);
+		const errorList = Object.values(e)
+			.flatMap((x) => x)
+			.filter((v) => v);
+		const currentError = errorList[0];
+		if (currentError) {
+			toast.error(currentError, {
+				duration: 3500
+			});
+		}
+	});
 </script>
 
 <ul class="w-full divide-y">
@@ -68,7 +83,7 @@
 				<a href="/sklep/{product.encodedURL}">
 					<div class="w-16 overflow-hidden aspect-3/4">
 						<img
-							src={product.image || productImgUrl}
+							src={product.image}
 							alt={product.name}
 							class="object-cover object-center w-full h-full transition-transform"
 						/>
@@ -82,12 +97,18 @@
 								<form action="?/changeProductQuantity" method="post" use:enhance>
 									<input type="hidden" name="quantity" value="0" />
 									<input type="hidden" name="productId" value={product.id} />
-									<button type="submit" aria-label="Usuń produkt" class="group">
-										<Trash
+									<Button
+										type="submit"
+										size="icon"
+										variant="ghost"
+										aria-label="Usuń produkt"
+										class="group square-8"
+									>
+										<X
 											size={16}
 											class="transition-colors text-primary/40 group-hover:text-red-400"
 										/>
-									</button>
+									</Button>
 								</form>
 							</dd>
 						</dl>
@@ -100,9 +121,40 @@
 						{/if}
 						<div class="">
 							<!-- <ProductQuantityForm {form} /> -->
-							<form action="?/changeProductQuantity" method="post" use:enhance>
-								<input type="hidden" name="productId" value={product.id} />
-								<select
+							<form
+								action="?/changeProductQuantity"
+								method="post"
+								use:enhance
+								class="flex flex-col items-end"
+							>
+								<input
+									type="hidden"
+									name="productId"
+									value={product.id}
+									aria-invalid={$errors.productId ? 'true' : undefined}
+								/>
+								{#if $errors.productId}<span class="invalid">{$errors.productId}</span>{/if}
+								<Input
+									type="number"
+									step={1}
+									min={1}
+									max={50}
+									placeholder={product.quantity.toString()}
+									name="quantity"
+									class="max-w-[64px]"
+									value={product.quantity}
+									on:change={(e) => {
+										console.log(e.currentTarget.value);
+										if (!e.currentTarget.value) {
+											return;
+										}
+										e.currentTarget.form?.requestSubmit();
+									}}
+									aria-label="Ilość sztuk"
+									aria-invalid={$errors.quantity ? 'true' : undefined}
+								/>
+								{#if $errors.quantity}<span class="invalid">{$errors.quantity}</span>{/if}
+								<!-- <select
 									aria-label="Ilość sztuk"
 									name="quantity"
 									class="px-1 rounded-sm bg-background"
@@ -115,7 +167,7 @@
 											{i + 1}
 										</option>
 									{/each}
-								</select>
+								</select> -->
 							</form>
 						</div>
 					</div>

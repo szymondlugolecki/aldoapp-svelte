@@ -16,12 +16,22 @@
 	const table = createTable(readable(products), {
 		resize: addResizedColumns({})
 	});
+
+	const getProductImage = (encodedURL: string) => {
+		const product = products.find(({ encodedURL: url }) => url === encodedURL);
+		return product && product.image ? product.image : '';
+	};
+
 	const columns = table.createColumns([
 		table.column({
 			accessor: 'encodedURL',
 			header: '',
-			cell: ({ value }) => {
-				return createRender(TableImage, { href: `/sklep/${value}`, alt: 'produkt' });
+			cell: ({ value, state }) => {
+				return createRender(TableImage, {
+					href: `/sklep/${value}`,
+					alt: 'produkt',
+					image: getProductImage(value)
+				});
 			},
 			plugins: {
 				resize: {

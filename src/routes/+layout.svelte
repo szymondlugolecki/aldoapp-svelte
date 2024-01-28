@@ -3,7 +3,8 @@
 
 	import Header from './(components)/header.svelte';
 	import Footer from './(components)/footer.svelte';
-	import toast, { Toaster } from 'svelte-french-toast';
+	// import toast, { Toaster } from 'svelte-french-toast';
+	import { Toaster } from '$shadcn/sonner';
 
 	import { onDestroy, onMount } from 'svelte';
 	import { settings } from '$lib/client/stores/settings';
@@ -81,7 +82,8 @@
 	export let data;
 </script>
 
-<Toaster position="bottom-right" />
+<!-- <Toaster position="bottom-right" /> -->
+<Toaster theme="system" />
 
 <div class="relative">
 	<div

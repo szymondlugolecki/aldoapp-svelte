@@ -3,7 +3,6 @@
 	import { parseAddress } from '$lib/client/functions/index.js';
 	import { page } from '$app/stores';
 	import { paymentMethodsList } from '$lib/client/constants/index.js';
-	import OrderProduct from '$components/custom/Order/OrderProduct.svelte';
 	import HorizontalOrderSteps from '$components/custom/Steps/HorizontalOrderSteps.svelte';
 	import VerticalOrderSteps from '$components/custom/Steps/VerticalOrderSteps.svelte';
 	import { goto, preloadData, pushState } from '$app/navigation';

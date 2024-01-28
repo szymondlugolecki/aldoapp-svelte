@@ -40,13 +40,6 @@ const edit: Action = async ({ request, locals }) => {
 
 	if (image instanceof File) {
 		// One image per product is enough for now
-
-		// const imgExtension = image.type.split('/')[1];
-		// const fileEsque = new File([image], `${crypto.randomUUID()}.${imgExtension}`, {
-		// 	type: image.type
-		// });
-		// console.log('fileEsque', fileEsque);
-
 		const { data, error } = await utapi.uploadFiles(image);
 
 		if (error) {

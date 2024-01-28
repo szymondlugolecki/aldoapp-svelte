@@ -6,8 +6,8 @@ export const changeProductQuantity = z.object({
 	productId,
 	quantity: z
 		.number({ invalid_type_error: 'Nieprawidłowa ilość', required_error: 'Ilość jest wymagana' })
-		.min(0, { message: 'Minimalna wartość to 0' })
-		.max(9, { message: 'Maksymalna wartość to 9' }),
+		.min(0, { message: 'Minimalna ilość to 0' })
+		.max(50, { message: 'Maksymalna ilość to 50' }),
 	add: z.boolean().optional()
 });
 

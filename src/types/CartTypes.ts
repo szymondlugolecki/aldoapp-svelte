@@ -4,7 +4,7 @@ import type { Product } from '$lib/server/db/schemas/products';
 import type { User } from './UserTypes';
 
 export type Cart = Pick<CartSchema, 'id' | 'createdAt' | 'ownerId'> & {
-	products: (Pick<Product, 'id' | 'name' | 'symbol' | 'price' | 'encodedURL'> & {
+	products: (Pick<Product, 'id' | 'name' | 'symbol' | 'price' | 'encodedURL' | 'image'> & {
 		quantity: number;
 	})[];
 	customer: Pick<User, 'id' | 'fullName' | 'phone' | 'email'> & {

@@ -7,7 +7,7 @@ import { inArray } from 'drizzle-orm';
 const MINUTE_IN_SECONDS = 60;
 const HOUR_IN_SECONDS = 60 * MINUTE_IN_SECONDS;
 
-type ProductShowcaseReady = Pick<Product, 'id' | 'name' | 'price' | 'encodedURL'>;
+type ProductShowcaseReady = Pick<Product, 'id' | 'name' | 'price' | 'encodedURL' | 'image'>;
 
 const cacheNames = {
 	recentlyOrdered: 'recently-ordered',
@@ -60,7 +60,8 @@ const fetchMostBoughtFromDb = async () => {
 				id: true,
 				name: true,
 				price: true,
-				encodedURL: true
+				encodedURL: true,
+				image: true
 			},
 			limit: 10
 		})
@@ -95,7 +96,8 @@ const fetchRecentlyOrderedFromDb = async () => {
 								id: true,
 								name: true,
 								price: true,
-								encodedURL: true
+								encodedURL: true,
+								image: true
 							}
 						}
 					}
@@ -151,7 +153,8 @@ const fetchFavoriteProductsFromDb = async () => {
 				id: true,
 				name: true,
 				price: true,
-				encodedURL: true
+				encodedURL: true,
+				image: true
 			},
 			limit: 10
 		})

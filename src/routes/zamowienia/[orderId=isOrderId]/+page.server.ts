@@ -67,7 +67,8 @@ export const load = async ({ params, locals }) => {
 								name: true,
 								symbol: true,
 								encodedURL: true,
-								description: true
+								description: true,
+								image: true
 							}
 						}
 					}

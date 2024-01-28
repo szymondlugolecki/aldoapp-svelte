@@ -9,7 +9,6 @@
 	import Filters from './(components)/Filters.svelte';
 	import { getSubcategoryName } from '$lib/client/functions';
 	import { builderActions } from 'bits-ui';
-	import { CornerDownLeft } from 'lucide-svelte';
 
 	export let data;
 
@@ -34,40 +33,38 @@
 		<div class="flex flex-col w-full h-full sm:px-4">
 			<div class="sticky top-[96px] flex flex-col w-full bg-background z-10">
 				<div class="flex justify-between w-full py-2 sm:py-4 gap-x-3">
-					<Input type="text" class="max-w-xs" placeholder="Szukaj..." />
-					<div>
-						<Sheet.Root>
-							<Sheet.Trigger asChild let:builder>
-								<Button builders={[builder]} variant="outline">Kategorie</Button>
-							</Sheet.Trigger>
-							<Sheet.Content side="left" class="w-[320px]">
-								<Sheet.Header>
-									<Sheet.Title>Filtry</Sheet.Title>
-									<Sheet.Description>
-										Wybierz interesujące Cię kategorie lub przefiltruj produkty według wybranych
-										kryteriów
-									</Sheet.Description>
-								</Sheet.Header>
-								<Filters bind:selectedCategory bind:selectedSubcategory bind:selectedProducent />
-								<Sheet.Footer>
-									<Sheet.Close asChild let:builder>
-										<Button builders={[builder]} href={$page.url.pathname} variant="link"
-											>Reset</Button
-										>
+					<Input type="text" class="w-full sm:max-w-xs" placeholder="Szukaj..." />
+					<Sheet.Root>
+						<Sheet.Trigger asChild let:builder>
+							<Button builders={[builder]} variant="outline">Kategorie</Button>
+						</Sheet.Trigger>
+						<Sheet.Content side="left" class="w-[320px]">
+							<Sheet.Header>
+								<Sheet.Title>Filtry</Sheet.Title>
+								<Sheet.Description>
+									Wybierz interesujące Cię kategorie lub przefiltruj produkty według wybranych
+									kryteriów
+								</Sheet.Description>
+							</Sheet.Header>
+							<Filters bind:selectedCategory bind:selectedSubcategory bind:selectedProducent />
+							<Sheet.Footer>
+								<Sheet.Close asChild let:builder>
+									<Button builders={[builder]} href={$page.url.pathname} variant="link"
+										>Reset</Button
+									>
 
-										<button
-											type="submit"
-											form="store-filter-form"
-											use:builderActions={{ builders: [builder] }}
-											class={buttonVariants({ variant: 'default' })}
-										>
-											Zastosuj
-										</button>
-									</Sheet.Close>
-								</Sheet.Footer>
-							</Sheet.Content>
-						</Sheet.Root>
-					</div>
+									<button
+										type="submit"
+										form="store-filter-form"
+										use:builderActions={{ builders: [builder] }}
+										class={buttonVariants({ variant: 'default' })}
+									>
+										Zastosuj
+									</button>
+								</Sheet.Close>
+							</Sheet.Footer>
+						</Sheet.Content>
+					</Sheet.Root>
 				</div>
 				<div class="">
 					{#if mainStorePage}
