@@ -4,6 +4,7 @@ import { jwtConfig } from '../constants/auth';
 import type { JWTAccessTokenResult, JWTRefreshTokenResult, SessionUser } from '$types';
 import { UAParser } from 'ua-parser-js';
 import { textCrusher as tC } from '$lib/client/functions';
+import type { SelectUser } from '../db/schemas/users';
 
 const { alg, secret, accessTokenConfig, refreshTokenConfig, audience, issuer } = jwtConfig;
 
@@ -17,12 +18,12 @@ export const createVerificationKeys = () => ({
 export const createVerificationLink = (token: string) =>
 	`${PUBLIC_WEBSITE_URL}/zaloguj/weryfikacja/${token}`;
 
-export const createRefreshToken = (payload: { userId: string }) =>
+export const createRefreshToken = (payload: { userId: SelectUser['id'] }) =>
 	new SignJWT(payload)
 		.setProtectedHeader({ alg: alg })
 		.setIssuedAt()
 		.setIssuer(issuer)
-		.setSubject(payload.userId)
+		.setSubject(payload.userId.toString())
 		.setAudience(audience)
 		.setExpirationTime(refreshTokenConfig.expirationTime)
 		.sign(secret);

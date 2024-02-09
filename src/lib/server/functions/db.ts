@@ -1,15 +1,11 @@
-import type { z } from 'zod';
 import { db } from '../db';
-import { createOrderSchema, orders, type Address } from '../db/schemas/orders';
-import { createProductSchema, products } from '../db/schemas/products';
-import { users, type createUserSchema, type User } from '../db/schemas/users';
-import {
-	verificationTokens,
-	type createVerificationTokenSchema
-} from '../db/schemas/verificationTokens';
+import { orders, type Address, type InsertOrder } from '../db/schemas/orders';
+import { products, type InsertProduct, type SelectProduct } from '../db/schemas/products';
+import { users, type SelectUser, type InsertUser } from '../db/schemas/users';
+import { verificationTokens, type InsertVerificationToken } from '../db/schemas/verificationTokens';
 import { cartProducts as cartProductsTable } from '../db/schemas/cartProducts';
 import { orderProducts } from '../db/schemas/orderProducts';
-import { carts } from '../db/schemas/carts';
+import { carts, type SelectCart } from '../db/schemas/carts';
 import { and, eq } from 'drizzle-orm';
 import { userAddress } from '../db/schemas/userAddress';
 import { sendNotifications } from './push';
@@ -18,6 +14,7 @@ import { orderAddress } from '../db/schemas/orderAddress';
 import { sendOrderCreatedEmail } from '../clients/resend';
 import type { OrderProduct } from '$types';
 import { orderStatusLogs } from '../db/schemas/orderStatusLogs';
+import { trytm } from '@bdsqqq/try';
 
 type CreateOrderProduct = { orderId: number; quantity: number; productId: number; price: string };
 
@@ -29,13 +26,13 @@ type CreateOrderProduct = { orderId: number; quantity: number; productId: number
 // };
 
 interface CreateOrderParams {
-	order: z.infer<typeof createOrderSchema>;
+	order: InsertOrder;
 	productsWithoutOrderId: Omit<CreateOrderProduct, 'orderId'>[];
 	cartId: number;
 	address: Address;
 	saveAddress?: boolean;
-	cartOwner: Pick<User, 'id' | 'email' | 'fullName' | 'phone'>;
-	customer: Pick<User, 'id' | 'email' | 'fullName' | 'phone'>;
+	cartOwner: Pick<SelectUser, 'id' | 'email' | 'fullName' | 'phone'>;
+	customer: Pick<SelectUser, 'id' | 'email' | 'fullName' | 'phone'>;
 	productsForEmailSummary: (OrderProduct & { quantity: number; image: string | null })[];
 }
 
@@ -50,23 +47,52 @@ export const createNewOrder = ({
 }: CreateOrderParams) => {
 	return db.transaction(async (tx) => {
 		// Create the order & add products && add order address
-		const orderIdStr = (await tx.insert(orders).values([order])).insertId;
-		const orderId = Number(orderIdStr);
-		const products = productsWithoutOrderId.map((product) => ({ ...product, orderId }));
+		const [insertOrder, insertOrderError] = await trytm(
+			tx
+				.insert(orders)
+				.values([order] as [InsertOrder])
+				.returning()
+		);
+		const createdOrder = insertOrder ? insertOrder[0] : null;
+		const orderId = createdOrder?.id;
 
-		await tx.insert(orderProducts).values(products);
-		await tx.insert(orderAddress).values([{ ...address, orderId }]);
+		if (insertOrderError || !createdOrder || !orderId) {
+			// Unexpected-error
+			console.error('insertOrderError', insertOrderError || 'Brak zamówienia po utworzeniu?');
+			tx.rollback();
+			return 'Nie udało się utworzyć zamówienia';
+		}
 
-		// Creation event
-		await tx.insert(orderStatusLogs).values({
+		const products = productsWithoutOrderId.map((product) => ({
+			...product,
 			orderId,
-			event: 'CREATED',
-			userId: cartOwner.id,
-			timestamp: new Date()
-		});
+			price: Number(product.price)
+		}));
 
+		const [, error] = await trytm(
+			Promise.all([
+				tx.insert(orderProducts).values(products),
+				tx.insert(orderAddress).values([{ ...address, orderId }]),
+				tx.insert(orderStatusLogs).values([
+					{
+						orderId,
+						event: 'CREATED',
+						userId: cartOwner.id,
+						createdAt: new Date()
+					}
+				])
+			])
+		);
+
+		if (error) {
+			// Unexpected-error
+			console.error('createNewOrder error @ Promise.all', error);
+			tx.rollback();
+			return 'Błąd podczas tworzenia zamówienia';
+		}
+
+		// 	Save address
 		// await tx.transaction(async (tx) => {
-		// 	// Save address
 		// 	if (saveAddress) {
 		// 		await tx.insert(userAddress).values([{ ...address, userId: order.customerId }]);
 		// 	}
@@ -106,7 +132,7 @@ export const createNewOrder = ({
 
 		// Send email
 		await tx.transaction(async () => {
-			const orderDate = order.createdAt.toLocaleString('pl-PL', {
+			const orderDate = createdOrder.createdAt.toLocaleString('pl-PL', {
 				timeZone: 'Europe/Warsaw',
 				month: 'long',
 				day: '2-digit',
@@ -143,20 +169,20 @@ export const resetCart = (cartId: number) => {
 	});
 };
 
-export const addProduct = (product: z.infer<typeof createProductSchema>) => {
+export const addProduct = (product: InsertProduct) => {
 	return db.insert(products).values(product);
 };
 
-export const addUser = (user: z.infer<typeof createUserSchema>) => {
+export const addUser = (user: SelectUser) => {
 	return db.transaction(async (tx) => {
-		const userId = (await tx.insert(users).values(user)).insertId;
+		const userId = (await tx.insert(users).values(user)).lastInsertRowid;
 		const cartId = (
 			await tx.insert(carts).values({
 				ownerId: user.id,
 				customerId: user.id,
 				createdAt: new Date()
 			})
-		).insertId;
+		).lastInsertRowid;
 		const addressId = (
 			await tx.insert(userAddress).values({
 				city: '',
@@ -164,7 +190,7 @@ export const addUser = (user: z.infer<typeof createUserSchema>) => {
 				zipCode: '',
 				userId: user.id
 			})
-		).insertId;
+		).lastInsertRowid;
 
 		return {
 			userId,
@@ -174,11 +200,11 @@ export const addUser = (user: z.infer<typeof createUserSchema>) => {
 	});
 };
 
-export const addVerificationToken = (token: z.infer<typeof createVerificationTokenSchema>) => {
+export const addVerificationToken = (token: InsertVerificationToken) => {
 	return db.insert(verificationTokens).values(token);
 };
 
-export const createCart = (ownerId: string) => {
+export const createCart = (ownerId: SelectUser['id']) => {
 	return db.insert(carts).values({
 		ownerId,
 		customerId: ownerId,
@@ -186,13 +212,13 @@ export const createCart = (ownerId: string) => {
 	});
 };
 
-export const deleteProduct = (cartId: number, productId: number) => {
+export const deleteProduct = (cartId: SelectCart['id'], productId: SelectProduct['id']) => {
 	return db
 		.delete(cartProductsTable)
 		.where(and(eq(cartProductsTable.cartId, cartId), eq(cartProductsTable.productId, productId)));
 };
 
-export const changeCartCustomer = (cartId: number, customerId: string) => {
+export const changeCartCustomer = (cartId: SelectCart['id'], customerId: SelectUser['id']) => {
 	return db
 		.update(carts)
 		.set({
@@ -201,7 +227,10 @@ export const changeCartCustomer = (cartId: number, customerId: string) => {
 		.where(eq(carts.id, cartId));
 };
 
-export const addProductsToCart = (cartId: number, products: { quantity: number; id: number }[]) => {
+export const addProductsToCart = (
+	cartId: SelectCart['id'],
+	products: { quantity: number; id: number }[]
+) => {
 	return db.transaction(async (tx) => {
 		const cartProducts = products.map((product) => ({
 			productId: product.id,
@@ -253,19 +282,31 @@ export const setCartProductQuantity = (cartId: number, productId: number, quanti
 	});
 };
 
-export const createUser = (user: z.infer<typeof createUserSchema>) => {
+export const createUser = (user: InsertUser) => {
 	return db.transaction(async (tx) => {
-		await tx.insert(users).values(user);
-		await tx.insert(carts).values({
-			ownerId: user.id,
-			customerId: user.id,
-			createdAt: new Date()
-		});
-		await tx.insert(userAddress).values({
-			city: '',
-			street: '',
-			zipCode: '',
-			userId: user.id
-		});
+		const [insertUser, insertUserError] = await trytm(tx.insert(users).values(user).returning());
+		const createdUser = insertUser ? insertUser[0] : null;
+		if (insertUserError || !createdUser) {
+			// Unexpected-error
+			console.error('insertUserError', insertUserError || 'Brak użytkownika po utworzeniu?');
+			return {
+				status: 'error',
+				message: 'Błąd podczas tworzenia użytkownika'
+			};
+		}
+		await tx.insert(carts).values([
+			{
+				ownerId: createdUser.id,
+				customerId: createdUser.id
+			}
+		]);
+		await tx.insert(userAddress).values([
+			{
+				city: '',
+				street: '',
+				zipCode: '',
+				userId: createdUser.id
+			}
+		]);
 	});
 };

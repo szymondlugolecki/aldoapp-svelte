@@ -1,17 +1,20 @@
 import { relations } from 'drizzle-orm';
-import { mysqlTable, serial, int, smallint } from 'drizzle-orm/mysql-core';
+import { sqliteTable, integer } from 'drizzle-orm/sqlite-core';
 import { products } from './products';
-// import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { carts } from './carts';
 
-export const cartProducts = mysqlTable('cart_products', {
-	id: serial('id').primaryKey().autoincrement(),
+export const cartProducts = sqliteTable('cart_products', {
+	id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
 
-	quantity: smallint('quantity').notNull(),
+	quantity: integer('quantity', { mode: 'number' }).notNull(),
 
 	// relations
-	productId: int('product_id').notNull(),
-	cartId: int('cart_id').notNull()
+	productId: integer('product_id', { mode: 'number' })
+		.notNull()
+		.references(() => products.id),
+	cartId: integer('cart_id', { mode: 'number' })
+		.notNull()
+		.references(() => carts.id)
 });
 
 export const cartProductsRelations = relations(cartProducts, ({ one }) => ({

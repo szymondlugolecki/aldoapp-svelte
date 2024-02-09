@@ -1,23 +1,30 @@
-import { relations, type InferModel } from 'drizzle-orm';
-import { mysqlTable, serial, varchar, timestamp, index } from 'drizzle-orm/mysql-core';
+import { relations, type InferSelectModel, type InferInsertModel, sql } from 'drizzle-orm';
+import { sqliteTable, integer, text, index } from 'drizzle-orm/sqlite-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { products } from './products';
+import { users } from './users';
 
-export const images = mysqlTable(
+export const images = sqliteTable(
 	'images',
 	{
-		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').notNull(),
+		id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+		createdAt: integer('created_at', { mode: 'timestamp' })
+			.notNull()
+			.default(sql`CURRENT_TIMESTAMP`),
 
-		url: varchar('url', { length: 512 }).notNull(),
+		url: text('url', { length: 512 }).notNull(),
 
 		// relations
-		productId: varchar('product_id', { length: 36 }).notNull(),
-		authorId: varchar('author_id', { length: 36 }).notNull() // user who added the image
+		productId: integer('product_id', { mode: 'number' })
+			.notNull()
+			.references(() => products.id),
+		authorId: integer('author_id', { mode: 'number' })
+			.notNull()
+			.references(() => users.id) // user who added the image
 	},
 	(product) => ({
 		// indexes
-		authorId: index('author_idx').on(product.authorId)
+		authorId: index('images_author_idx').on(product.authorId)
 	})
 );
 
@@ -31,4 +38,5 @@ export const imagesRelations = relations(images, ({ one }) => ({
 export const createImageSchema = createInsertSchema(images);
 export const selectImageSchema = createSelectSchema(images);
 
-export type Image = InferModel<typeof images>;
+export type SelectImage = InferSelectModel<typeof images>;
+export type InsertImage = InferInsertModel<typeof images>;

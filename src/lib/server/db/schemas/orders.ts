@@ -1,16 +1,7 @@
 import { deliveryMethods, orderStatus, paymentMethods } from '../../../client/constants/dbTypes';
 
-import { relations, type InferModel } from 'drizzle-orm';
-import {
-	mysqlTable,
-	serial,
-	varchar,
-	timestamp,
-	text,
-	index,
-	decimal,
-	boolean
-} from 'drizzle-orm/mysql-core';
+import { relations, type InferSelectModel, type InferInsertModel, sql } from 'drizzle-orm';
+import { sqliteTable, text, integer, real, index } from 'drizzle-orm/sqlite-core';
 import { users } from './users';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { orderProducts } from './orderProducts';
@@ -23,38 +14,40 @@ export type Address = {
 	city: string;
 };
 
-export const orders = mysqlTable(
+export const orders = sqliteTable(
 	'orders',
 	{
-		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').notNull(),
+		id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+		createdAt: integer('created_at', { mode: 'timestamp' })
+			.notNull()
+			.default(sql`CURRENT_TIMESTAMP`),
 
 		// Order data
-		price: decimal('price', { precision: 8, scale: 2 }).notNull(), // price with discount included
+		price: real('price').notNull(), // price with discount included
 		// noDiscountPrice: decimal('no_discount_price', { precision: 8, scale: 2 }).notNull(),
-		discount: decimal('discount', { precision: 8, scale: 2 }).notNull(),
+		discount: real('discount').notNull(),
 
 		status: text('status', {
 			enum: orderStatus
 		}).notNull(),
-		paid: boolean('paid').default(false).notNull(),
+		paid: integer('paid', { mode: 'boolean' }).default(false).notNull(),
 
-		estimatedDeliveryDate: timestamp('estimated_delivery_date'),
+		estimatedDeliveryDate: integer('estimated_delivery_date', { mode: 'timestamp' }),
 		deliveryMethod: text('delivery_method', { enum: deliveryMethods }).notNull(),
 		paymentMethod: text('payment_method', { enum: paymentMethods }).notNull(),
 
 		// relations
-		customerId: varchar('customer_id', { length: 36 }).notNull(),
-		cartOwnerId: varchar('cart_owner_id', { length: 36 }).notNull(),
+		customerId: text('customer_id', { length: 36 }).notNull(),
+		cartOwnerId: text('cart_owner_id', { length: 36 }).notNull(),
+		driverId: text('driver_id', { length: 36 })
 		// promoCodeId: int('promo_code_id'),
-		driverId: varchar('driver_id', { length: 36 })
 	},
 	(order) => ({
 		// indexes
-		customerId: index('customer_idx').on(order.customerId),
-		cartOwnerId: index('cart_owner_idx').on(order.cartOwnerId),
-		// promoCodeId: index('promo_code_idx').on(order.promoCodeId),
-		driverId: index('driver_idx').on(order.driverId)
+		customerId: index('order_customer_idx').on(order.customerId),
+		cartOwnerId: index('order_cart_owner_idx').on(order.cartOwnerId),
+		// promoCodeId: index('order_promo_code_idx').on(order.promoCodeId),
+		driverId: index('order_driver_idx').on(order.driverId)
 	})
 );
 
@@ -89,4 +82,5 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
 export const createOrderSchema = createInsertSchema(orders);
 export const selectOrderSchema = createSelectSchema(orders);
 
-export type Order = InferModel<typeof orders>;
+export type SelectOrder = InferSelectModel<typeof orders>;
+export type InsertOrder = InferInsertModel<typeof orders>;

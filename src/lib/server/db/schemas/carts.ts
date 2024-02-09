@@ -1,23 +1,30 @@
-import { relations, type InferModel } from 'drizzle-orm';
-import { mysqlTable, serial, varchar, timestamp, index } from 'drizzle-orm/mysql-core';
+import { relations, type InferSelectModel, type InferInsertModel, sql } from 'drizzle-orm';
+import { sqliteTable, integer, index } from 'drizzle-orm/sqlite-core';
 import { users } from './users';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { cartProducts } from './cartProducts';
 
-export const carts = mysqlTable(
+export const carts = sqliteTable(
 	'carts',
 	{
-		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').notNull(),
+		id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+		createdAt: integer('created_at', { mode: 'timestamp' })
+			.notNull()
+			.default(sql`CURRENT_TIMESTAMP`),
 
 		// relations
+		customerId: integer('customer_id', { mode: 'number' })
+			.notNull()
+			.references(() => users.id), // who receives the product
+		ownerId: integer('owner_id', { mode: 'number' })
+			.notNull()
+			.references(() => users.id) // cart owner - adviser or customer
 		// promoCode
-		customerId: varchar('customer_id', { length: 36 }).notNull(), // who receives the product
-		ownerId: varchar('owner_id', { length: 36 }).notNull() // cart owner - adviser or customer
 	},
 	(order) => ({
 		// indexes
-		customerId: index('customer_idx').on(order.customerId)
+		customerId: index('cart_customer_idx').on(order.customerId),
+		cartOwnerId: index('cart_owner_idx').on(order.ownerId)
 	})
 );
 
@@ -36,4 +43,5 @@ export const cartsRelations = relations(carts, ({ one, many }) => ({
 export const createCartSchema = createInsertSchema(carts);
 export const selectCartSchema = createSelectSchema(carts);
 
-export type Cart = InferModel<typeof carts>;
+export type SelectCart = InferSelectModel<typeof carts>;
+export type InsertCart = InferInsertModel<typeof carts>;

@@ -7,9 +7,12 @@ import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public';
 // import { buildPushPayload } from '@block65/webcrypto-web-push';
 
 import { buildPushPayload } from '@block65/webcrypto-web-push';
-import type { buildPushPayload as BuildPushPayload } from '@block65/webcrypto-web-push/dist/lib/payload';
-import type { PushMessage, PushSubscription } from '@block65/webcrypto-web-push/dist/lib/types';
-import type { VapidKeys } from '@block65/webcrypto-web-push/dist/lib/vapid';
+import type {
+	buildPushPayload as BuildPushPayload,
+	VapidKeys,
+	PushMessage,
+	PushSubscription
+} from '@block65/webcrypto-web-push';
 
 // import {
 // 	type PushSubscription,

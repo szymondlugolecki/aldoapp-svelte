@@ -1,31 +1,27 @@
-import { relations, type InferModel } from 'drizzle-orm';
-import {
-	mysqlTable,
-	serial,
-	// uniqueIndex,
-	varchar,
-	char,
-	timestamp,
-	index
-} from 'drizzle-orm/mysql-core';
+import { relations, sql, type InferSelectModel, type InferInsertModel } from 'drizzle-orm';
+import { sqliteTable, integer, text, index } from 'drizzle-orm/sqlite-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { users } from './users';
 
-export const verificationTokens = mysqlTable(
+export const verificationTokens = sqliteTable(
 	'verification_tokens',
 	{
-		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').notNull(),
+		id: integer('id').primaryKey({ autoIncrement: true }),
+		createdAt: integer('created_at', { mode: 'timestamp' })
+			.notNull()
+			.default(sql`CURRENT_TIMESTAMP`),
 
 		// Token data
 		// token: varchar('token', { length: 72 }).notNull(),
-		code: char('code', { length: 4 }).notNull(),
-		userAgent: varchar('user_agent', { length: 512 }).notNull(),
+		code: text('code', { length: 4 }).notNull(),
+		userAgent: text('user_agent', { length: 512 }).notNull(),
 		// ipAddress: varchar('ip_address', { length: 46 }).notNull(),
-		expiresAt: timestamp('expires_at').notNull(),
+		expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
 
 		// relations
-		userId: char('user_id', { length: 255 }).notNull()
+		userId: integer('user_id', { mode: 'number' })
+			.notNull()
+			.references(() => users.id)
 	},
 	(verificationToken) => ({
 		// indexes
@@ -42,4 +38,5 @@ export const verificationTokensRelations = relations(verificationTokens, ({ one 
 export const createVerificationTokenSchema = createInsertSchema(verificationTokens);
 export const selectVerificationTokenSchema = createSelectSchema(verificationTokens);
 
-export type VerificationToken = InferModel<typeof verificationTokens>;
+export type SelectVerificationToken = InferSelectModel<typeof verificationTokens>;
+export type InsertVerificationToken = InferInsertModel<typeof verificationTokens>;

@@ -1,15 +1,17 @@
+import type { SelectUser } from '$lib/server/db/schemas/users';
 import type { ActionResult } from '@sveltejs/kit';
 import toast from 'svelte-french-toast';
 
 export const handleFormResponse = (
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	result: ActionResult<Record<string, any>, Record<string, any>>,
-	id: string,
+	id: SelectUser['id'],
 	customMessage?: string,
 	justLoading = false
 ) => {
+	const idString = id.toString();
 	const showErrorToast = (message: string) => {
-		toast.error(message, { duration: 3500, id });
+		toast.error(message, { duration: 3500, id: idString });
 	};
 
 	switch (result.type) {
@@ -36,7 +38,7 @@ export const handleFormResponse = (
 			}
 
 			if (justLoading) {
-				toast.dismiss(id);
+				toast.dismiss(idString);
 				return;
 			}
 
@@ -44,19 +46,19 @@ export const handleFormResponse = (
 				message = 'Sukces 🎉';
 			}
 
-			toast.success(message, { id, duration: 2500 });
+			toast.success(message, { id: idString, duration: 2500 });
 			break;
 		}
 		case 'redirect':
 			if (justLoading) {
-				toast.dismiss(id);
+				toast.dismiss(idString);
 				return;
 			}
 
-			toast.success(customMessage || 'Przekierowano 🙂', { id, duration: 2000 });
+			toast.success(customMessage || 'Przekierowano 🙂', { id: idString, duration: 2000 });
 			break;
 		case 'error':
-			toast.error('Wystąpił błąd 😟', { id, duration: 3000 });
+			toast.error('Wystąpił błąd 😟', { id: idString, duration: 3000 });
 			break;
 		default:
 			break;

@@ -1,1 +1,0 @@
-ALTER TABLE `products` ADD `image` varchar(2048);

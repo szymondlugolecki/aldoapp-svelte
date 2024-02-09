@@ -1,1 +1,0 @@
-CREATE INDEX `cart_owner_idx` ON `orders` (`customer_id`);

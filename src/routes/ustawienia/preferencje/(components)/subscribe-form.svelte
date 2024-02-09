@@ -14,7 +14,7 @@
 	import type { SubscribeForm } from '$lib/client/schemas/pushSubscription';
 	import { superForm, type FormOptions } from 'sveltekit-superforms/client';
 	import Spinner from '$components/custom/Util/Spinner.svelte';
-	import type { PushSubscription as PushSubscriptionWithKeys } from '@block65/webcrypto-web-push/dist/lib/types';
+	import type { PushSubscription as PushSubscriptionWithKeys } from '@block65/webcrypto-web-push';
 
 	let subscribeForm: SuperValidated<SubscribeForm>;
 	export { subscribeForm as form };

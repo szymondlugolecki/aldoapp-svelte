@@ -1,10 +1,10 @@
 // db.ts
-import { drizzle } from 'drizzle-orm/planetscale-serverless';
+// import { drizzle } from 'drizzle-orm/planetscale-serverless';
 // import { migrate } from 'drizzle-orm/planetscale-serverless/migrator';
-
-import { connect } from '@planetscale/database';
-// import { users } from './schemas';
-import { DATABASE_HOST, DATABASE_USERNAME, DATABASE_PASSWORD } from '$env/static/private';
+// import { connect } from '@planetscale/database';
+import { createClient } from '@libsql/client';
+import { drizzle } from 'drizzle-orm/libsql';
+import { DATABASE_URL, DATABASE_SECRET } from '$env/static/private';
 import * as users from './schemas/users';
 import * as userAddress from './schemas/userAddress';
 import * as orders from './schemas/orders';
@@ -20,15 +20,18 @@ import * as subscriptions from './schemas/subscriptions';
 import * as verificationTokens from './schemas/verificationTokens';
 import * as images from './schemas/images';
 
-// Create the connection
-const connection = connect({
-	host: DATABASE_HOST,
-	username: DATABASE_USERNAME,
-	password: DATABASE_PASSWORD
-});
+// Create the connection (PlanetScale)
+// const connection = connect({
+// 	host: DATABASE_HOST,
+// 	username: DATABASE_USERNAME,
+// 	password: DATABASE_PASSWORD
+// });
 
-export const db = drizzle(connection, {
+const client = createClient({ url: DATABASE_URL, authToken: DATABASE_SECRET });
+
+export const db = drizzle(client, {
 	// logger: true,
+	logger: true,
 	schema: {
 		...users,
 		...userAddress,

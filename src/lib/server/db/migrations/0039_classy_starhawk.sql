@@ -1,1 +1,0 @@
-ALTER TABLE `order_status_logs` MODIFY COLUMN `timestamp` timestamp NOT NULL;

@@ -1,52 +1,389 @@
 {
   "version": "5",
-  "dialect": "mysql",
-  "id": "af1a57f4-1f59-4ab4-bb51-0b0b8eeb13bd",
+  "dialect": "sqlite",
+  "id": "b365913c-dae9-4704-a3ed-b7661979b6bb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "orders": {
-      "name": "orders",
+    "cart_products": {
+      "name": "cart_products",
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "product_id": {
+          "name": "product_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cart_id": {
+          "name": "cart_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "cart_products_product_id_products_id_fk": {
+          "name": "cart_products_product_id_products_id_fk",
+          "tableFrom": "cart_products",
+          "tableTo": "products",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "cart_products_cart_id_carts_id_fk": {
+          "name": "cart_products_cart_id_carts_id_fk",
+          "tableFrom": "cart_products",
+          "tableTo": "carts",
+          "columnsFrom": [
+            "cart_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "carts": {
+      "name": "carts",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "(now())"
+          "default": "CURRENT_TIMESTAMP"
         },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
+        "customer_id": {
+          "name": "customer_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "cart_customer_idx": {
+          "name": "cart_customer_idx",
+          "columns": [
+            "customer_id"
+          ],
+          "isUnique": false
+        },
+        "cart_owner_idx": {
+          "name": "cart_owner_idx",
+          "columns": [
+            "owner_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "carts_customer_id_users_id_fk": {
+          "name": "carts_customer_id_users_id_fk",
+          "tableFrom": "carts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "customer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "carts_owner_id_users_id_fk": {
+          "name": "carts_owner_id_users_id_fk",
+          "tableFrom": "carts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "favorite_products": {
+      "name": "favorite_products",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "product_id": {
+          "name": "product_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "author_id": {
+          "name": "author_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "favorite_products_product_id_products_id_fk": {
+          "name": "favorite_products_product_id_products_id_fk",
+          "tableFrom": "favorite_products",
+          "tableTo": "products",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "favorite_products_author_id_users_id_fk": {
+          "name": "favorite_products_author_id_users_id_fk",
+          "tableFrom": "favorite_products",
+          "tableTo": "users",
+          "columnsFrom": [
+            "author_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "images": {
+      "name": "images",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "onUpdate": true
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "url": {
+          "name": "url",
+          "type": "text(512)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "product_id": {
+          "name": "product_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "author_id": {
+          "name": "author_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "images_author_idx": {
+          "name": "images_author_idx",
+          "columns": [
+            "author_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "images_product_id_products_id_fk": {
+          "name": "images_product_id_products_id_fk",
+          "tableFrom": "images",
+          "tableTo": "products",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "images_author_id_users_id_fk": {
+          "name": "images_author_id_users_id_fk",
+          "tableFrom": "images",
+          "tableTo": "users",
+          "columnsFrom": [
+            "author_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "order_products": {
+      "name": "order_products",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
         },
         "price": {
           "name": "price",
-          "type": "decimal(8,2)",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "product_id": {
+          "name": "product_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "order_id": {
+          "name": "order_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "order_products_product_id_products_id_fk": {
+          "name": "order_products_product_id_products_id_fk",
+          "tableFrom": "order_products",
+          "tableTo": "products",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "order_products_order_id_orders_id_fk": {
+          "name": "order_products_order_id_orders_id_fk",
+          "tableFrom": "order_products",
+          "tableTo": "orders",
+          "columnsFrom": [
+            "order_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "orders": {
+      "name": "orders",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "price": {
+          "name": "price",
+          "type": "real",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "discount": {
           "name": "discount",
-          "type": "decimal(8,2)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "payment_status": {
-          "name": "payment_status",
-          "type": "text",
+          "type": "real",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -58,23 +395,17 @@
           "notNull": true,
           "autoincrement": false
         },
-        "delivery_status": {
-          "name": "delivery_status",
-          "type": "text",
+        "paid": {
+          "name": "paid",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
-        },
-        "address": {
-          "name": "address",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "autoincrement": false,
+          "default": false
         },
         "estimated_delivery_date": {
           "name": "estimated_delivery_date",
-          "type": "timestamp",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -93,59 +424,45 @@
           "notNull": true,
           "autoincrement": false
         },
-        "products_quantity": {
-          "name": "products_quantity",
-          "type": "json",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "ordered_products_ids": {
-          "name": "ordered_products_ids",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "customer_id": {
           "name": "customer_id",
-          "type": "varchar(36)",
+          "type": "text(36)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "promo_code_id": {
-          "name": "promo_code_id",
-          "type": "int",
+        "cart_owner_id": {
+          "name": "cart_owner_id",
+          "type": "text(36)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "driver_id": {
           "name": "driver_id",
-          "type": "varchar(36)",
+          "type": "text(36)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         }
       },
       "indexes": {
-        "customer_idx": {
-          "name": "customer_idx",
+        "order_customer_idx": {
+          "name": "order_customer_idx",
           "columns": [
             "customer_id"
           ],
           "isUnique": false
         },
-        "promo_code_idx": {
-          "name": "promo_code_idx",
+        "order_cart_owner_idx": {
+          "name": "order_cart_owner_idx",
           "columns": [
-            "promo_code_id"
+            "cart_owner_id"
           ],
           "isUnique": false
         },
-        "driver_idx": {
-          "name": "driver_idx",
+        "order_driver_idx": {
+          "name": "order_driver_idx",
           "columns": [
             "driver_id"
           ],
@@ -153,21 +470,44 @@
         }
       },
       "foreignKeys": {},
-      "compositePrimaryKeys": {}
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
     },
-    "orders_to_products": {
-      "name": "orders_to_products",
+    "order_status_logs": {
+      "name": "order_status_logs",
       "columns": {
-        "order_id": {
-          "name": "order_id",
-          "type": "int",
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "event": {
+          "name": "event",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "group_id": {
-          "name": "group_id",
-          "type": "int",
+        "timestamp": {
+          "name": "timestamp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "order_id": {
+          "name": "order_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -175,9 +515,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "orders_to_products_order_id_orders_id_fk": {
-          "name": "orders_to_products_order_id_orders_id_fk",
-          "tableFrom": "orders_to_products",
+        "order_status_logs_order_id_orders_id_fk": {
+          "name": "order_status_logs_order_id_orders_id_fk",
+          "tableFrom": "order_status_logs",
           "tableTo": "orders",
           "columnsFrom": [
             "order_id"
@@ -188,12 +528,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "orders_to_products_group_id_products_id_fk": {
-          "name": "orders_to_products_group_id_products_id_fk",
-          "tableFrom": "orders_to_products",
-          "tableTo": "products",
+        "order_status_logs_user_id_users_id_fk": {
+          "name": "order_status_logs_user_id_users_id_fk",
+          "tableFrom": "order_status_logs",
+          "tableTo": "users",
           "columnsFrom": [
-            "group_id"
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -202,186 +542,206 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {
-        "orders_to_products_group_id_order_id": {
-          "name": "orders_to_products_group_id_order_id",
-          "columns": [
-            "group_id",
-            "order_id"
-          ]
-        }
-      }
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
     },
     "products": {
       "name": "products",
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "(now())"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "onUpdate": true
+          "default": "CURRENT_TIMESTAMP"
         },
         "name": {
           "name": "name",
-          "type": "varchar(255)",
+          "type": "text(255)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "description": {
           "name": "description",
-          "type": "varchar(2048)",
+          "type": "text(2048)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "symbol": {
           "name": "symbol",
-          "type": "varchar(255)",
+          "type": "text(255)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "subcategory": {
           "name": "subcategory",
-          "type": "varchar(255)",
+          "type": "text(255)",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "category": {
           "name": "category",
-          "type": "varchar(255)",
+          "type": "text(255)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "price": {
           "name": "price",
-          "type": "decimal(8,2)",
+          "type": "real",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "weight": {
           "name": "weight",
-          "type": "decimal(8,2)",
+          "type": "real",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "amount_left": {
           "name": "amount_left",
-          "type": "int",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "producent": {
           "name": "producent",
-          "type": "varchar(255)",
+          "type": "text(255)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "encoded_url": {
           "name": "encoded_url",
-          "type": "varchar(512)",
+          "type": "text(512)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "images": {
-          "name": "images",
-          "type": "json",
+        "image": {
+          "name": "image",
+          "type": "text(2048)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "hidden": {
+          "name": "hidden",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "('[]')"
+          "default": false
         },
         "author_id": {
           "name": "author_id",
-          "type": "varchar(36)",
+          "type": "text(36)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         }
       },
       "indexes": {
-        "author_idx": {
-          "name": "author_idx",
+        "products_author_idx": {
+          "name": "products_author_idx",
           "columns": [
             "author_id"
           ],
           "isUnique": false
+        },
+        "products_name_idx": {
+          "name": "products_name_idx",
+          "columns": [
+            "name"
+          ],
+          "isUnique": false
+        },
+        "products_symbol_idx": {
+          "name": "products_symbol_idx",
+          "columns": [
+            "symbol"
+          ],
+          "isUnique": false
         }
       },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {}
+      "foreignKeys": {
+        "products_author_id_users_id_fk": {
+          "name": "products_author_id_users_id_fk",
+          "tableFrom": "products",
+          "tableTo": "users",
+          "columnsFrom": [
+            "author_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
     },
     "promo_code_uses": {
       "name": "promo_code_uses",
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "(now())"
+          "default": "CURRENT_TIMESTAMP"
         },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
+        "promocode_used_id": {
+          "name": "promocode_used_id",
+          "type": "text(36)",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
-          "onUpdate": true
+          "autoincrement": false
         },
-        "promocode_id": {
-          "name": "promocode_id",
-          "type": "varchar(36)",
+        "order_id": {
+          "name": "order_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "user_id": {
           "name": "user_id",
-          "type": "char(255)",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         }
       },
       "indexes": {
-        "promo_code_id_idx": {
-          "name": "promo_code_id_idx",
+        "promo_code_use_idx": {
+          "name": "promo_code_use_idx",
           "columns": [
-            "promocode_id"
+            "promocode_used_id"
           ],
           "isUnique": false
         },
@@ -393,80 +753,100 @@
           "isUnique": false
         }
       },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {}
+      "foreignKeys": {
+        "promo_code_uses_order_id_orders_id_fk": {
+          "name": "promo_code_uses_order_id_orders_id_fk",
+          "tableFrom": "promo_code_uses",
+          "tableTo": "orders",
+          "columnsFrom": [
+            "order_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "promo_code_uses_user_id_users_id_fk": {
+          "name": "promo_code_uses_user_id_users_id_fk",
+          "tableFrom": "promo_code_uses",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
     },
     "promo_codes": {
       "name": "promo_codes",
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "(now())"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "onUpdate": true
+          "default": "CURRENT_TIMESTAMP"
         },
         "code": {
           "name": "code",
-          "type": "varchar(32)",
+          "type": "text(32)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "discount": {
           "name": "discount",
-          "type": "decimal(8,2)",
+          "type": "real",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "valid_since": {
           "name": "valid_since",
-          "type": "timestamp",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "valid_until": {
           "name": "valid_until",
-          "type": "timestamp",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "use_limit": {
           "name": "use_limit",
-          "type": "int",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "per_user_use_limit": {
           "name": "per_user_use_limit",
-          "type": "int",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "disabled": {
-          "name": "disabled",
-          "type": "boolean",
+        "enabled": {
+          "name": "enabled",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
@@ -481,81 +861,95 @@
         },
         "min_cart_value": {
           "name": "min_cart_value",
-          "type": "decimal(8,2)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "applicable_products": {
-          "name": "applicable_products",
-          "type": "json",
+          "type": "real",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "author_id": {
           "name": "author_id",
-          "type": "varchar(36)",
+          "type": "text(36)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         }
       },
       "indexes": {
-        "author_idx": {
-          "name": "author_idx",
+        "promo_codes_author_idx": {
+          "name": "promo_codes_author_idx",
           "columns": [
             "author_id"
           ],
           "isUnique": false
         }
       },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {}
+      "foreignKeys": {
+        "promo_codes_author_id_users_id_fk": {
+          "name": "promo_codes_author_id_users_id_fk",
+          "tableFrom": "promo_codes",
+          "tableTo": "users",
+          "columnsFrom": [
+            "author_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
     },
     "subscriptions": {
       "name": "subscriptions",
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "(now())"
+          "default": "CURRENT_TIMESTAMP"
         },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
+        "expiration_time": {
+          "name": "expiration_time",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "onUpdate": true
+          "notNull": false,
+          "autoincrement": false
         },
-        "subscription": {
-          "name": "subscription",
-          "type": "json",
+        "keys": {
+          "name": "keys",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "endpoint": {
           "name": "endpoint",
-          "type": "varchar(767)",
+          "type": "text(512)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_agent": {
+          "name": "user_agent",
+          "type": "text(512)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "user_id": {
           "name": "user_id",
-          "type": "char(255)",
+          "type": "text(255)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -570,45 +964,110 @@
           "isUnique": true
         }
       },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {}
+      "foreignKeys": {
+        "subscriptions_user_id_users_id_fk": {
+          "name": "subscriptions_user_id_users_id_fk",
+          "tableFrom": "subscriptions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "user_address": {
+      "name": "user_address",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "zip_code": {
+          "name": "zip_code",
+          "type": "text(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "street": {
+          "name": "street",
+          "type": "text(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "city": {
+          "name": "city",
+          "type": "text(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_address_user_id_users_id_fk": {
+          "name": "user_address_user_id_users_id_fk",
+          "tableFrom": "user_address",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
     },
     "users": {
       "name": "users",
       "columns": {
         "id": {
           "name": "id",
-          "type": "char(255)",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": false
+          "autoincrement": true
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "(now())"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "onUpdate": true
+          "default": "CURRENT_TIMESTAMP"
         },
         "email": {
           "name": "email",
-          "type": "varchar(320)",
+          "type": "text(320)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "name": {
           "name": "name",
-          "type": "varchar(256)",
+          "type": "text(256)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -620,24 +1079,16 @@
           "notNull": true,
           "autoincrement": false
         },
-        "access": {
-          "name": "access",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": true
-        },
         "phone": {
           "name": "phone",
-          "type": "char(15)",
+          "type": "text(15)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "assigned_adviser": {
-          "name": "assigned_adviser",
-          "type": "char(255)",
+        "adviser_id": {
+          "name": "adviser_id",
+          "type": "text(255)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -651,87 +1102,66 @@
           ],
           "isUnique": true
         },
-        "assigned_adviserx": {
-          "name": "assigned_adviserx",
+        "adviser_idx": {
+          "name": "adviser_idx",
           "columns": [
-            "assigned_adviser"
+            "adviser_id"
           ],
           "isUnique": false
         }
       },
       "foreignKeys": {},
-      "compositePrimaryKeys": {}
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
     },
     "verification_tokens": {
       "name": "verification_tokens",
       "columns": {
         "id": {
           "name": "id",
-          "type": "serial",
+          "type": "integer",
           "primaryKey": true,
           "notNull": true,
           "autoincrement": true
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "(now())"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "onUpdate": true
-        },
-        "token": {
-          "name": "token",
-          "type": "varchar(72)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
+          "default": "CURRENT_TIMESTAMP"
         },
         "code": {
           "name": "code",
-          "type": "char(4)",
+          "type": "text(4)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "user_agent": {
           "name": "user_agent",
-          "type": "varchar(400)",
+          "type": "text(512)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "expires_at": {
           "name": "expires_at",
-          "type": "timestamp",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "user_id": {
           "name": "user_id",
-          "type": "char(255)",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         }
       },
       "indexes": {
-        "unique_tokenx": {
-          "name": "unique_tokenx",
-          "columns": [
-            "token"
-          ],
-          "isUnique": true
-        },
         "codex": {
           "name": "codex",
           "columns": [
@@ -747,11 +1177,26 @@
           "isUnique": false
         }
       },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {}
+      "foreignKeys": {
+        "verification_tokens_user_id_users_id_fk": {
+          "name": "verification_tokens_user_id_users_id_fk",
+          "tableFrom": "verification_tokens",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
     }
   },
-  "schemas": {},
+  "enums": {},
   "_meta": {
     "schemas": {},
     "tables": {},

@@ -1,1 +1,0 @@
-ALTER TABLE `orders` ADD `paid` boolean DEFAULT false NOT NULL;

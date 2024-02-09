@@ -1,13 +1,19 @@
 import { relations } from 'drizzle-orm';
-import { mysqlTable, int, varchar } from 'drizzle-orm/mysql-core';
+import { sqliteTable, integer } from 'drizzle-orm/sqlite-core';
 import { products } from './products';
 import { users } from './users';
 // import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 
-export const favoriteProducts = mysqlTable('favorite_products', {
+export const favoriteProducts = sqliteTable('favorite_products', {
+	id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+
 	// relations
-	productId: int('product_id').notNull(),
-	userId: varchar('author_id', { length: 36 }).notNull()
+	productId: integer('product_id', { mode: 'number' })
+		.notNull()
+		.references(() => products.id),
+	userId: integer('author_id', { mode: 'number' })
+		.notNull()
+		.references(() => users.id)
 });
 
 export const favoriteProductsRelations = relations(favoriteProducts, ({ one }) => ({

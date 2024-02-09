@@ -1,1 +1,0 @@
-ALTER TABLE `products` ADD `hidden` boolean DEFAULT false NOT NULL;

@@ -1,1 +1,0 @@
-ALTER TABLE `carts` ADD `address` json;

@@ -1,25 +1,20 @@
-import type { InferModel } from 'drizzle-orm';
-import {
-	mysqlTable,
-	varchar,
-	serial,
-	char,
-} from 'drizzle-orm/mysql-core';
+import type { InferSelectModel, InferInsertModel } from 'drizzle-orm';
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { users } from './users';
 
-export const userAddress = mysqlTable(
-	'user_address',
-	{
-		id: serial('id').primaryKey().autoincrement(),
+export const userAddress = sqliteTable('user_address', {
+	id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
 
-		// address
-		zipCode: varchar('zip_code', { length: 10 }).notNull(),
-        street: varchar('street', { length: 255 }).notNull(),
-        city: varchar('city', { length: 255 }).notNull(),
+	// Address
+	zipCode: text('zip_code', { length: 10 }).notNull(),
+	street: text('street', { length: 255 }).notNull(),
+	city: text('city', { length: 255 }).notNull(),
 
-		// relations
-		userId: char('user_id', { length: 255 }).notNull(),
-	}
-);
+	// relations
+	userId: integer('user_id', { mode: 'number' })
+		.notNull()
+		.references(() => users.id)
+});
 
 // export const addressRelations = relations(address, ({ one }) => ({
 // 	user: one(users, {
@@ -32,4 +27,5 @@ export const userAddress = mysqlTable(
 // 	})
 // }));
 
-export type UserAddress = InferModel<typeof userAddress>;
+export type SelectUserAddress = InferSelectModel<typeof userAddress>;
+export type InsertUserAddress = InferInsertModel<typeof userAddress>;

@@ -11,3 +11,4 @@ vite.config.ts.timestamp-*
 .vercel
 playwright/.auth
 /certs
+mysql_migrations

@@ -1,14 +1,17 @@
 import { userRoles } from '../../../client/constants/dbTypes';
-import { relations, type InferModel } from 'drizzle-orm';
-import {
-	mysqlTable,
-	uniqueIndex,
-	varchar,
-	char,
-	timestamp,
-	text,
-	index
-} from 'drizzle-orm/mysql-core';
+import { relations, type InferSelectModel, type InferInsertModel, sql } from 'drizzle-orm';
+// import {
+// 	mysqlTable,
+// 	uniqueIndex,
+// 	varchar,
+// 	char,
+// 	timestamp,
+// 	text,
+// 	index
+// } from 'drizzle-orm/mysql-core';
+
+import { sqliteTable, integer, text, uniqueIndex, index } from 'drizzle-orm/sqlite-core';
+
 import { verificationTokens } from './verificationTokens';
 import { orders } from './orders';
 import { products } from './products';
@@ -19,21 +22,24 @@ import { carts } from './carts';
 import { favoriteProducts } from './favoriteProducts';
 import { userAddress } from './userAddress';
 import { orderStatusLogs } from './orderStatusLogs';
+// import { createId } from '@paralleldrive/cuid2';
 
-export const users = mysqlTable(
+export const users = sqliteTable(
 	'users',
 	{
-		id: char('id', { length: 255 }).primaryKey(),
-		createdAt: timestamp('created_at').notNull(),
+		id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+		createdAt: integer('created_at', { mode: 'timestamp' })
+			.notNull()
+			.default(sql`CURRENT_TIMESTAMP`),
 
 		// User data
-		email: varchar('email', { length: 320 }).notNull(),
-		fullName: varchar('name', { length: 256 }).notNull(),
+		email: text('email', { length: 320 }).notNull(),
+		fullName: text('name', { length: 256 }).notNull(),
 		role: text('role', { enum: userRoles }).notNull(),
-		phone: char('phone', { length: 15 }).notNull(),
+		phone: text('phone', { length: 15 }).notNull(),
 
 		// relations
-		adviserId: char('adviser_id', { length: 255 })
+		adviserId: text('adviser_id', { length: 255 })
 	},
 	(user) => ({
 		email: uniqueIndex('unique_emailx').on(user.email),
@@ -69,6 +75,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 export const createUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
 
-export type User = InferModel<typeof users>;
-export type Role = User['role'];
+export type SelectUser = InferSelectModel<typeof users>;
+export type InsertUser = InferInsertModel<typeof users>;
+export type Role = SelectUser['role'];
 export type GeneralRole = Extract<Role, 'customer' | 'admin'> | 'moderator';

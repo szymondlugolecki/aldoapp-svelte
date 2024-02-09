@@ -53,41 +53,51 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 		return resolve(event);
 	}
 
-	// AT is invalid, now we check if the RT is valid
+	// AT is invalid (probably expired), now we check if the RT is valid
 	const [rtPayload, rtPayloadError] = await trytm(verifyRefreshToken(refreshToken));
 
 	// Invalid refresh token, nothing we can do here
 	if (rtPayloadError) {
+		// Should I remove the cookies? 🤔
 		return resolve(event);
 	}
 
-	// AT is invalid and RT is valid, so we probably need to refresh
+	/*
+
+		The situation we're in:
+		* AT is expired (invalid)
+		* RT is valid
+
+		so we should refresh both tokens
+
+		But first we will take care of an edge case where
+		the token could possibly be corrupted/invalid (not expired!)
+
+	*/
 
 	// If session in locals does not exist, we get the userId from the RT payload
 	const userId = sessionUser?.id || rtPayload.payload.userId;
-
 	const joseErrName = joseErrorParser(atPayloadError);
-	console.log('Jose Error Name', joseErrName, userId);
+
 	// If the error is other than 'expired', we don't want to refresh the tokens
 	if (joseErrName !== 'expired') {
 		// Unexpected-error
-		console.error(
-			'Unexpected error. Jose threw error that is other than expired',
-			joseErrName,
-			userId
-		);
-		error(500, 'Niespodziewany błąd sesji. Spróbuj zalogować się ponownie');
+		console.error('Unexpected error. Jose threw error other than expired', joseErrName, userId);
+
+		// Should I remove the cookies? 🤔
+
+		if (joseErrName === 'invalid') {
+			error(401, 'Sesja została skorumpowana. To błąd ');
+		}
 	}
 
 	/*
-		AT expired & RT valid
+		We confirmed that the AT is expired, and the RT is valid, now we can refresh the tokens
 	
 		1. Call the db to get the user's data
 		2. Create new AT and RT
 		3. Update the session
 	*/
-
-	// wtf
 
 	const [user, getUserError] = await trytm(
 		db.query.users.findFirst({
@@ -97,18 +107,17 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 					columns: {
 						zipCode: true,
 						city: true,
-						street: true,
+						street: true
 					}
-				},
+				}
 			},
 			columns: {
 				id: true,
 				email: true,
 				fullName: true,
 				role: true,
-				phone: true,
-			},
-
+				phone: true
+			}
 		})
 	);
 
@@ -122,7 +131,10 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 	if (!user) {
 		// Unexpected-error
 		console.error('Zalogowano jako nieistniejący użytkownik. Mógł zostać usunięty');
-		error(500, 'Niespodziewany błąd sesji. Spróbuj zalogować się ponownie');
+		error(
+			500,
+			'Niespodziewany błąd. Sesja istnieje, ale użytkownik nie. Spróbuj zalogować się ponownie.'
+		);
 	}
 
 	// Create new tokens

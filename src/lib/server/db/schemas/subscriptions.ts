@@ -1,16 +1,7 @@
-import { relations, type InferModel } from 'drizzle-orm';
-import {
-	mysqlTable,
-	varchar,
-	timestamp,
-	json,
-	serial,
-	char,
-	uniqueIndex,
-	mediumint
-} from 'drizzle-orm/mysql-core';
+import { relations, type InferSelectModel, type InferInsertModel, sql } from 'drizzle-orm';
+import { sqliteTable, text, integer, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import { users } from './users';
-import type { PushSubscription } from '@block65/webcrypto-web-push/dist/lib/types';
+import type { PushSubscription } from '@block65/webcrypto-web-push';
 
 // interface PushSubscriptionJSON {
 // 	endpoint?: string;
@@ -18,22 +9,26 @@ import type { PushSubscription } from '@block65/webcrypto-web-push/dist/lib/type
 // 	keys?: Record<string, string>;
 // }
 
-export const subscriptions = mysqlTable(
+export const subscriptions = sqliteTable(
 	'subscriptions',
 	{
-		id: serial('id').primaryKey().autoincrement(),
-		createdAt: timestamp('created_at').notNull(),
+		id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+		createdAt: integer('created_at', { mode: 'timestamp' })
+			.notNull()
+			.default(sql`CURRENT_TIMESTAMP`),
 
 		// Subscription data
-		expirationTime: mediumint('expiration_time'),
-		keys: json('keys').$type<PushSubscription['keys']>().notNull(),
-		endpoint: varchar('endpoint', { length: 512 }).notNull(),
+		expirationTime: integer('expiration_time', { mode: 'timestamp' }),
+		keys: text('keys', { mode: 'json' }).$type<PushSubscription['keys']>().notNull(),
+		endpoint: text('endpoint', { length: 512 }).notNull(),
 
 		// Tracking data
-		userAgent: varchar('user_agent', { length: 512 }).notNull(),
+		userAgent: text('user_agent', { length: 512 }).notNull(),
 
 		// relations
-		userId: char('user_id', { length: 255 }).notNull()
+		userId: text('user_id', { length: 255 })
+			.notNull()
+			.references(() => users.id)
 	},
 	(subscription) => ({
 		// indexes
@@ -48,4 +43,5 @@ export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
 	})
 }));
 
-export type Subscription = InferModel<typeof subscriptions>;
+export type SelectSubscription = InferSelectModel<typeof subscriptions>;
+export type InsertSubscription = InferInsertModel<typeof subscriptions>;
