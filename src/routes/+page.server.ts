@@ -1,13 +1,16 @@
 import { redis } from '$lib/server/clients/redis.js';
 import { db } from '$lib/server/db';
-import type { Product } from '$lib/server/db/schemas/products';
+import type { SelectProduct } from '$lib/server/db/schemas/products';
 import { trytm } from '@bdsqqq/try';
 import { inArray } from 'drizzle-orm';
 
 const MINUTE_IN_SECONDS = 60;
 const HOUR_IN_SECONDS = 60 * MINUTE_IN_SECONDS;
 
-type ProductShowcaseReady = Pick<Product, 'id' | 'name' | 'price' | 'encodedURL' | 'image'>;
+export type ProductShowcaseReady = Pick<
+	SelectProduct,
+	'id' | 'name' | 'price' | 'encodedURL' | 'image'
+>;
 
 const cacheNames = {
 	recentlyOrdered: 'recently-ordered',
@@ -75,8 +78,8 @@ const fetchMostBoughtFromDb = async () => {
 		return [];
 	}
 
-	// Should live ~20 hours
-	await redis.set(cacheNames.mostBought, products, { ex: 20 * HOUR_IN_SECONDS });
+	// Should live ~3 hours
+	await redis.set(cacheNames.mostBought, products, { ex: 3 * HOUR_IN_SECONDS });
 
 	return products;
 };
@@ -84,9 +87,7 @@ const fetchMostBoughtFromDb = async () => {
 const fetchRecentlyOrderedFromDb = async () => {
 	const [recentlyOrderedProducts, recentlyOrderedProductsError] = await trytm(
 		db.query.ordersTable.findMany({
-			columns: {
-				// createdAt: true,
-			},
+			columns: {},
 			with: {
 				products: {
 					columns: {},
@@ -120,9 +121,9 @@ const fetchRecentlyOrderedFromDb = async () => {
 		products.map(({ product }) => product)
 	);
 
-	// Cache the results for next 5 hours
-	// Should live ~5 hours
-	await redis.set(cacheNames.recentlyOrdered, products, { ex: 5 * HOUR_IN_SECONDS });
+	// Cache the results for next 30 minutes
+	// Should live 30 minutes
+	await redis.set(cacheNames.recentlyOrdered, products, { ex: 0.5 * HOUR_IN_SECONDS });
 
 	return products;
 };
@@ -145,32 +146,32 @@ const fetchMostBought = async () => {
 	}
 };
 
-const fetchFavoriteProductsFromDb = async () => {
-	// Replace products table with favorite products table once its created
-	const [favoriteProducts, favoriteProductsError] = await trytm(
-		db.query.productsTable.findMany({
-			columns: {
-				id: true,
-				name: true,
-				price: true,
-				encodedURL: true,
-				image: true
-			},
-			limit: 10
-		})
-	);
+// const fetchFavoriteProductsFromDb = async () => {
+// 	// Replace products table with favorite products table once its created
+// 	const [favoriteProducts, favoriteProductsError] = await trytm(
+// 		db.query.productsTable.findMany({
+// 			columns: {
+// 				id: true,
+// 				name: true,
+// 				price: true,
+// 				encodedURL: true,
+// 				image: true
+// 			},
+// 			limit: 10
+// 		})
+// 	);
 
-	if (favoriteProductsError) {
-		console.error('favoriteProductsError', favoriteProductsError);
-		return [];
-	}
+// 	if (favoriteProductsError) {
+// 		console.error('favoriteProductsError', favoriteProductsError);
+// 		return [];
+// 	}
 
-	if (!favoriteProducts.length) {
-		return [];
-	}
+// 	if (!favoriteProducts.length) {
+// 		return [];
+// 	}
 
-	return favoriteProducts;
-};
+// 	return favoriteProducts;
+// };
 
 export const load = async () => {
 	// Hit the redis cache to see if we have these
@@ -179,37 +180,14 @@ export const load = async () => {
 	// @ Favorite products - No need to cache this
 
 	// Fetching from cache/db
-	const [recentlyOrdered, mostBought, favoriteProducts] = await Promise.all([
+	const [recentlyOrdered, mostBought] = await Promise.all([
 		getRecentlyOrdered(),
-		fetchMostBought(),
-		fetchFavoriteProductsFromDb()
+		fetchMostBought()
+		// fetchFavoriteProductsFromDb()
 	]);
-
-	// const subs = await db.query.subscriptionsTable.findMany({
-	// 	columns: {
-	// 		endpoint: true,
-	// 		keys: true,
-	// 		expirationTime: true,
-	// 		userId: true,
-	// 		userAgent: true
-	// 	}
-	// });
-
-	// console.log('subscriptions', subs);
-
-	// const verificationTokens = await db.query.verificationTokensTable.findMany({
-	// 	columns: {
-	// 		userId: true,
-	// 		code: true,
-	// 		userAgent: true
-	// 	}
-	// });
-
-	// console.log('verificationTokens', verificationTokens.length, verificationTokens);
 
 	return {
 		recentlyOrdered,
-		mostBought,
-		favoriteProducts
+		mostBought
 	};
 };

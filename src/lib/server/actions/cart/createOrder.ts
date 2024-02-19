@@ -90,7 +90,7 @@ const createOrder: Action = async ({ locals, request }) => {
 		.map(({ price, quantity }) => [price, quantity])
 		.reduce((prev, [price, quantity]) => prev + Number(price) * Number(quantity), 0);
 
-	const orderId = generateId(10);
+	const orderId = generateId(5);
 
 	const order = {
 		id: orderId,

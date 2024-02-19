@@ -3,16 +3,15 @@
 	import { page } from '$app/stores';
 	import Pagination2 from '$components/custom/Table/Pagination2.svelte';
 	import { orderStatusList } from '$lib/client/constants/index.js';
-	import { parseAddress, cn, dateParser, isAtLeastModerator } from '$lib/client/functions/index.js';
 	import {
-		Table,
-		TableBody,
-		TableCaption,
-		TableCell,
-		TableHead,
-		TableHeader,
-		TableRow
-	} from '$shadcn/table';
+		parseAddress,
+		cn,
+		dateParser,
+		isAtLeastModerator,
+		parsePLN
+	} from '$lib/client/functions/index.js';
+	import * as Table from '$shadcn/table';
+
 	import type { ExtendedCategory, PaginationSettings, User } from '$types';
 	import { flexRender } from '$lib/client/functions';
 	import {
@@ -64,9 +63,9 @@
 		},
 		{
 			id: 'price',
-			header: 'Kwota (z rabatem)',
+			header: 'Suma',
 			accessorKey: 'price',
-			cell: (info) => info.getValue(),
+			cell: (info) => parsePLN(info.getValue() as number),
 			enableSorting: true
 		},
 		{
@@ -223,14 +222,14 @@
 			</Sheet.Content>
 		</Sheet.Root>
 
-		<Table>
-			<TableCaption>{data.profile.fullName} - Historia zamówień</TableCaption>
-			<TableHeader>
+		<Table.Root>
+			<Table.Caption>{data.profile.fullName} - Historia zamówień</Table.Caption>
+			<Table.Header>
 				{#each $table.getHeaderGroups() as headerGroup}
-					<TableRow>
+					<Table.Row>
 						{#each headerGroup.headers as header}
 							{#if !header.isPlaceholder}
-								<TableHead
+								<Table.Head
 									class={cn(
 										`w-[100px]`,
 										header.column.getCanSort() &&
@@ -240,26 +239,26 @@
 									<svelte:component
 										this={flexRender(header.column.columnDef.header, header.getContext())}
 									/>
-								</TableHead>
+								</Table.Head>
 							{/if}
 						{/each}
-					</TableRow>
+					</Table.Row>
 				{/each}
-			</TableHeader>
-			<TableBody>
+			</Table.Header>
+			<Table.Body>
 				{#each $table.getRowModel().rows as row, bodyRowIndex}
-					<TableRow>
+					<Table.Row>
 						{#each row.getVisibleCells() as cell}
-							<TableCell class="font-medium whitespace-pre-line"
+							<Table.Cell class="font-medium whitespace-pre-line"
 								><svelte:component
 									this={flexRender(cell.column.columnDef.cell, cell.getContext())}
-								/></TableCell
+								/></Table.Cell
 							>
 						{/each}
-					</TableRow>
+					</Table.Row>
 				{/each}
-			</TableBody>
-		</Table>
+			</Table.Body>
+		</Table.Root>
 
 		<Pagination2 {paginationSettings} />
 	</div>

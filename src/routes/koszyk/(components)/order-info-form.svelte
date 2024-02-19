@@ -91,8 +91,8 @@
 		</div>
 	</div>
 
-	<div class="grid grid-cols-4 gap-x-4 gap-y-2">
-		<div class="flex flex-col col-span-2 gap-y-3">
+	<div class="grid grid-cols-4 grid-rows-2 gap-x-4 gap-y-5">
+		<div class="flex flex-col col-span-2 row-start-1 sm:row-start-auto gap-y-3">
 			<Label>Metoda płatności<RequiredAsterisk /></Label>
 			<Select.Root
 				name="paymentMethod"
@@ -116,7 +116,7 @@
 			{/if}
 		</div>
 
-		<div class="flex flex-col col-span-2 gap-y-3">
+		<div class="flex flex-col col-span-2 row-start-2 sm:row-start-auto gap-y-3">
 			<Label>Metoda dostawy<RequiredAsterisk /></Label>
 			<Select.Root
 				name="deliveryMethod"

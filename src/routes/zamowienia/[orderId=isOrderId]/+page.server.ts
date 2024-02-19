@@ -97,7 +97,7 @@ export const load = async ({ params, locals }) => {
 	if (fetchOrderError) {
 		// Unexpected-error
 		console.log('fetchOrderError', fetchOrderError);
-		error(500, 'Niespodziewany błąd podczas szukania zamówienia');
+		error(500, 'Błąd serwera podczas szukania zamówienia');
 	}
 
 	if (!rawOrder) {

@@ -7,6 +7,7 @@
 	import { handleFormResponse } from '$lib/client/functions/forms.js';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { toast } from 'svelte-sonner';
+	import { parsePLN } from '$lib/client/functions/index.js';
 
 	export let data;
 
@@ -41,7 +42,7 @@
 					</a>
 				</Card.Title>
 
-				<Card.Description>{product.price.toFixed(2)} zł</Card.Description>
+				<Card.Description>{parsePLN(product.price)}</Card.Description>
 			</Card.Header>
 			<Card.Content>
 				<div class="overflow-hidden rounded-md">

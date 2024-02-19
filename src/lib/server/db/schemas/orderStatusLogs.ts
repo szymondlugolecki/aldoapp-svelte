@@ -9,7 +9,7 @@ export const orderStatusLogsTable = sqliteTable('order_status_logs', {
 
 	// Event
 	event: text('event', { enum: ['CREATED', ...orderEvents] }).notNull(),
-	createdAt: integer('timestamp', { mode: 'timestamp' })
+	createdAt: integer('timestamp', { mode: 'timestamp_ms' })
 		.notNull()
 		.default(sql`CURRENT_TIMESTAMP`),
 

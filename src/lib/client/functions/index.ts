@@ -64,6 +64,14 @@ export const safeParseJSON = (str: string) => {
 	}
 };
 
+export const parsePLN = (amount: string | number) => {
+	const formatted = new Intl.NumberFormat('pl-PL', {
+		style: 'currency',
+		currency: 'PLN'
+	}).format(Number(amount));
+	return formatted;
+};
+
 export const parseAddress = (address: unknown): string | null => {
 	if (!address || !(typeof address === 'string' || typeof address === 'object')) return null;
 

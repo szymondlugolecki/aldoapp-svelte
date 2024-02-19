@@ -16,7 +16,7 @@ export const verificationTokensTable = sqliteTable(
 		code: text('code', { length: 4 }).notNull(),
 		userAgent: text('user_agent', { length: 512 }).notNull(),
 		ipAddress: text('ip_address', { length: 96 }).notNull(),
-		expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
+		expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
 
 		// relations
 		userId: text('user_id')

@@ -1,17 +1,13 @@
 <script lang="ts">
-	import createLoadingToast from '$lib/client/functions/createLoadingToast.js';
 	import { X } from 'lucide-svelte';
 	import { createSelect, melt } from '@melt-ui/svelte';
 	import { Skeleton } from '$shadcn/skeleton';
 	import type { ProductQuantity } from '$lib/client/schemas/order';
-	import type { SuperValidated } from 'sveltekit-superforms';
-	import ProductQuantityForm from './product-quantity-form.svelte';
+
 	import type { SuperForm } from 'sveltekit-superforms/client';
 	import Button from '$components/ui/button/button.svelte';
-	// import * as Form from "$shadcn/form";
 	import { Input } from '$shadcn/input';
 	import { toast } from 'svelte-sonner';
-	import { onMount } from 'svelte';
 
 	const {
 		elements: { trigger, menu, option, group, groupLabel, label },
@@ -141,7 +137,7 @@
 									max={50}
 									placeholder={product.quantity.toString()}
 									name="quantity"
-									class="max-w-[64px]"
+									class="max-w-[58px]"
 									value={product.quantity}
 									on:change={(e) => {
 										console.log(e.currentTarget.value);

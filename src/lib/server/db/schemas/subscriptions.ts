@@ -27,7 +27,7 @@ export const subscriptionsTable = sqliteTable(
 			.default(sql`CURRENT_TIMESTAMP`),
 
 		// Subscription data
-		expirationTime: integer('expiration_time', { mode: 'timestamp' }),
+		expirationTime: integer('expiration_time', { mode: 'timestamp_ms' }),
 		keys: text('keys', { mode: 'json' }).$type<PushSubscription['keys']>().notNull(),
 		endpoint: text('endpoint', { length: 512 }).notNull(),
 

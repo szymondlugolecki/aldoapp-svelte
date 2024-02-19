@@ -62,6 +62,9 @@ dependencies:
   drizzle-zod:
     specifier: ^0.4.1
     version: 0.4.4(drizzle-orm@0.29.3)(zod@3.22.2)
+  embla-carousel-svelte:
+    specifier: 8.0.0-rc23
+    version: 8.0.0-rc23(svelte@4.2.0)
   formsnap:
     specifier: ^0.4.3
     version: 0.4.3(svelte@4.2.0)(sveltekit-superforms@1.6.1)(zod@3.22.2)
@@ -2957,6 +2960,28 @@ packages:
 
   /electron-to-chromium@1.4.523:
     resolution: {integrity: sha512-9AreocSUWnzNtvLcbpng6N+GkXnCcBR80IQkxRC9Dfdyg4gaWNUPBujAHUpKkiUkoSoR9UlhA4zD/IgBklmhzg==}
+
+  /embla-carousel-reactive-utils@8.0.0-rc23(embla-carousel@8.0.0-rc23):
+    resolution: {integrity: sha512-/NPejNksrw1iWthTtrps5LNj6gJzylvfCuNTh2+P0FLSPbX/+RlT84Ab5qnbSS/vdmEs8daJbVvb5Bol9v0OdQ==}
+    peerDependencies:
+      embla-carousel: 8.0.0-rc23
+    dependencies:
+      embla-carousel: 8.0.0-rc23
+    dev: false
+
+  /embla-carousel-svelte@8.0.0-rc23(svelte@4.2.0):
+    resolution: {integrity: sha512-UNrFrhlooF0jIPzwxFLZdKh+pYwz4ge60n+nf2d9LeHmiUdUpkLAud9fGqG+Lp8xYoU6cLG/q4B7o4LY4q0S5A==}
+    peerDependencies:
+      svelte: ^3.49.0 || ^4.0.0
+    dependencies:
+      embla-carousel: 8.0.0-rc23
+      embla-carousel-reactive-utils: 8.0.0-rc23(embla-carousel@8.0.0-rc23)
+      svelte: 4.2.0
+    dev: false
+
+  /embla-carousel@8.0.0-rc23:
+    resolution: {integrity: sha512-ybuDHm+udElyH+XpuemS/W+x8ZhB3a/4UzeTBvsoZUxDSty12ch1f2T0CZxGqIs2FfdaofEOmpLMSvuEPVTMCg==}
+    dev: false
 
   /emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}

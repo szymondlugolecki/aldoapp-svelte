@@ -17,8 +17,8 @@ export const promoCodesTable = sqliteTable(
 		// Promo Code info
 		code: text('code', { length: 32 }).notNull(),
 		discount: real('discount').notNull(), // { precision: 8, scale: 2 }
-		validSince: integer('valid_since', { mode: 'timestamp' }).notNull(),
-		validUntil: integer('valid_until', { mode: 'timestamp' }).notNull(),
+		validSince: integer('valid_since', { mode: 'timestamp_ms' }).notNull(),
+		validUntil: integer('valid_until', { mode: 'timestamp_ms' }).notNull(),
 		// usedCount: int('use_count').notNull(),
 		totalUseLimit: integer('use_limit').notNull(),
 		perUserLimit: integer('per_user_use_limit').notNull(),

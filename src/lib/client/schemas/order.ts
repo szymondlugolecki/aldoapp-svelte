@@ -9,7 +9,7 @@ export const id = z
 		required_error: 'Identyfikator zamówienia jest wymagany',
 		invalid_type_error: 'Nieprawidłowe zamówienie'
 	})
-	.length(10, { message: 'Nieprawidłowe id zamówienia' });
+	.length(5, { message: 'Nieprawidłowe id zamówienia' });
 
 export const deliveryMethod = z.enum(deliveryMethods, {
 	errorMap(issue) {

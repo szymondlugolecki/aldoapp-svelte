@@ -89,7 +89,7 @@
 	<div class="grid gap-y-1">
 		<span class="text-sm font-medium">Przedział cenowy</span>
 
-		<span>{$value[0]} zł - {$value[1]} zł</span>
+		<span class="text-sm">{$value[0]} zł - {$value[1]} zł</span>
 
 		<input type="hidden" name="cena_min" value={$value[0]} />
 		<input type="hidden" name="cena_max" value={$value[1]} />

@@ -32,7 +32,7 @@ export const ordersTable = sqliteTable(
 		}).notNull(),
 		paid: integer('paid', { mode: 'boolean' }).default(false).notNull(),
 
-		estimatedDeliveryDate: integer('estimated_delivery_date', { mode: 'timestamp' }),
+		estimatedDeliveryDate: integer('estimated_delivery_date', { mode: 'timestamp_ms' }),
 		deliveryMethod: text('delivery_method', { enum: deliveryMethods }).notNull(),
 		paymentMethod: text('payment_method', { enum: paymentMethods }).notNull(),
 

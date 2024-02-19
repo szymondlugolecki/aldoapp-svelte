@@ -6,7 +6,7 @@
 	import * as Sheet from '$shadcn/sheet/index.js';
 	import { page } from '$app/stores';
 	import { Input } from '$shadcn/input/index.js';
-	import Filters from './(components)/Filters.svelte';
+	import Filters from './(components)/filters.svelte';
 	import { getSubcategoryName } from '$lib/client/functions';
 	import { builderActions } from 'bits-ui';
 
@@ -47,12 +47,8 @@
 								</Sheet.Description>
 							</Sheet.Header>
 							<Filters bind:selectedCategory bind:selectedSubcategory bind:selectedProducent />
-							<Sheet.Footer>
+							<Sheet.Footer class="flex flex-col gap-y-3">
 								<Sheet.Close asChild let:builder>
-									<Button builders={[builder]} href={$page.url.pathname} variant="link"
-										>Reset</Button
-									>
-
 									<button
 										type="submit"
 										form="store-filter-form"
@@ -61,6 +57,10 @@
 									>
 										Zastosuj
 									</button>
+
+									<Button builders={[builder]} href={$page.url.pathname} variant="secondary"
+										>Reset filtrów</Button
+									>
 								</Sheet.Close>
 							</Sheet.Footer>
 						</Sheet.Content>

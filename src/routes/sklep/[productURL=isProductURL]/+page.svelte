@@ -9,7 +9,7 @@
 	import { CornerDownLeft, Heart, Package, PlusCircle, ShoppingCart } from 'lucide-svelte';
 	import toast from 'svelte-french-toast';
 	import type { Subcategory } from '$types';
-	import { newCategoryUrl, newSubcategoryUrl } from '$lib/client/functions/index.js';
+	import { newCategoryUrl, newSubcategoryUrl, parsePLN } from '$lib/client/functions/index.js';
 	import { handleFormResponse } from '$lib/client/functions/forms.js';
 	import createLoadingToast from '$lib/client/functions/createLoadingToast.js';
 	import { slide } from 'svelte/transition';
@@ -47,7 +47,7 @@
 					</h1>
 				</div>
 
-				<h2 class="text-3xl tracking-tight">{data.product.price} PLN</h2>
+				<h2 class="text-3xl tracking-tight">{parsePLN(data.product.price)}</h2>
 			</div>
 
 			<div>
@@ -108,12 +108,12 @@
 								{/if}
 							</form>
 
-							<form method="post" action="?/favorite" use:enhance>
+							<!-- <form method="post" action="?/favorite" use:enhance>
 								<input type="hidden" name="productId" value={data.product.id} />
 								<button type="submit" class="transition-colors text-muted hover:text-red-600"
 									><Heart size={28} strokeWidth={2} /></button
 								>
-							</form>
+							</form> -->
 						</div>
 					{:else}
 						<Alert.Root variant="default">

@@ -4,7 +4,7 @@
 	// import { Image } from '@unpic/svelte';
 	import Image from '$components/custom/Util/Image.svelte';
 	// import BackgroundImage from '$lib/assets/bg3.png?w=1500&format=avif;webp;jpg&as=picture';
-	import KubotaTractor from '$lib/assets/background/KubotaLX1.jpg?w=1000&format=avif;webp;jpg&as=picture';
+	import BackgroundImage from '$lib/assets/farm_animals.png?w=1000&format=avif;webp;jpg&as=picture';
 	import logo from '$lib/assets/logo.png?w=220&format=avif;webp;jpg&as=picture';
 
 	import Pig from '$lib/assets/category/pig.png?w=250&format=avif;webp;jpg&as=picture';
@@ -16,7 +16,7 @@
 	import { fodderNames } from '$lib/client/constants/index.js';
 	import type { MainCategory } from '$lib/client/constants/dbTypes.js';
 	import { page } from '$app/stores';
-	import type { SvelteComponent } from 'svelte';
+	import ProductCarousel from './(components)/product-carousel.svelte';
 
 	async function createProgenitor() {
 		const createPromise = fetch('/api/progenitor/create', {
@@ -126,36 +126,9 @@
 	/>
 </svelte:head>
 
-<!-- <div class="relative">
-		<div class="absolute inset-0 overflow-hidden">
-			<Image
-				class="w-full h-full brightness-[.4] object-cover object-center aspect-video"
-				loading="eager"
-				meta={BackgroundImage}
-				alt="siema"
-			/>
-		</div>
-		<div
-			class="relative flex flex-col px-4 pt-64 mx-auto text-center sm:max-w-2xl lg:max-w-3xl pb-80 sm:pt-64 sm:pb-[26rem] sm:px-0 gap-y-3 sm:gap-y-6"
-		>
-			<h1 class="text-5xl font-bold tracking-tight text-white sm:text-6xl">Twoje ALDO</h1>
-			<p class="text-base font-semibold text-white sm:text-xl">
-				Zamawiaj gdzie chcesz i kiedy chcesz. W komputerze i w telefonie.
-			</p>
-			<div class="text-center">
-				<Button
-					href="/sklep"
-					variant="default"
-					class="w-full max-w-xs px-3 font-semibold text-black bg-white rounded-md sm:max-w-sm h-9 sm:h-10 sm:py-2 sm:px-4"
-					>Przejdź do sklepu</Button
-				>
-			</div>
-		</div>
-	</div> -->
-
 <section class="flex justify-center h-screen pt-24 -mt-24">
 	<div
-		class="flex flex-col items-center justify-center w-full h-full lg:pb-24 lg:flex-row max-w-7xl gap-y-6"
+		class="flex flex-col items-center justify-center w-full h-full pb-12 lg:pb-24 lg:flex-row max-w-7xl gap-y-6"
 	>
 		<div class="flex flex-col items-center justify-center w-full max-w-md px-4 lg:flex-1 gap-y-3">
 			<div class="flex flex-col gap-y-1">
@@ -172,27 +145,13 @@
 				</div>
 			</div>
 		</div>
-		<div class="flex items-center px-4">
-			<div class="overflow-auto">
-				<div class="collage">
-					{#each entries as [category, label]}
-						<div class="relative w-32 overflow-hidden rounded-lg sm:w-44 aspect-2/3">
-							<Image
-								class="w-full h-full brightness-[.75] object-cover object-center"
-								loading="lazy"
-								meta={categoryPictures[category]}
-								alt={label}
-							/>
-						</div>
-					{/each}
-				</div>
-				<!-- <Image
-					class="object-cover object-center w-full h-full scale-[1.356] -translate-y-4 translate-x-8 aspect-video"
-					loading="eager"
-					meta={KubotaTractor}
-					alt="traktor kubota"
-				/> -->
-			</div>
+		<div class="hidden max-w-xl px-4 lg:flex">
+			<Image
+				class="w-full h-full brightness-[1.05] object-cover object-center rounded-md"
+				loading="lazy"
+				meta={BackgroundImage}
+				alt="Zwierzęta hodowlane"
+			/>
 		</div>
 	</div>
 </section>
@@ -244,57 +203,9 @@
 		</div>
 	</div>
 
-	<div class="flex justify-center px-4 pt-24 sm:pt-32 sm:px-8">
-		<div class="w-full max-w-7xl">
-			<span class="text-xl font-medium">Najczęściej kupowane</span>
-			<div class="flex justify-start px-[10px] pt-6 pb-12">
-				<div class="flex items-center w-auto pb-2 overflow-x-auto gap-x-16 justify-items-center">
-					{#each data.mostBought as product, i}
-						<a href="/sklep/{product.encodedURL}">
-							<div class="flex flex-col w-60 gap-y-1">
-								<div class="overflow-hidden rounded-lg aspect-3/4">
-									<img
-										src={product.image}
-										alt={product.name}
-										class="w-full h-full object-cover object-center scale-[1.15] hover:scale-[1.165] transition-transform"
-									/>
-								</div>
-								<div class="font-medium tracking-tight text-left break-words">
-									{product.name}
-								</div>
-							</div>
-						</a>
-					{/each}
-				</div>
-			</div>
-		</div>
-	</div>
+	<ProductCarousel title="Najczęściej kupowane" products={data.mostBought} />
 
-	<div class="flex justify-center px-4 pt-24 sm:pt-32 sm:px-8">
-		<div class="w-full max-w-7xl">
-			<span class="text-xl font-medium">Twoje ulubione</span>
-			<div class="flex justify-start px-[10px] pt-6 pb-12">
-				<div class="flex items-center w-auto pb-2 overflow-x-auto gap-x-16 justify-items-center">
-					{#each data.mostBought as product, i}
-						<a href="/sklep/{product.encodedURL}">
-							<div class="flex flex-col w-60 gap-y-1">
-								<div class="overflow-hidden rounded-lg aspect-3/4">
-									<img
-										src={product.image}
-										alt={product.name}
-										class="w-full h-full object-cover object-center scale-[1.15] hover:scale-[1.165] transition-transform"
-									/>
-								</div>
-								<div class="font-medium tracking-tight text-left break-words">
-									{product.name}
-								</div>
-							</div>
-						</a>
-					{/each}
-				</div>
-			</div>
-		</div>
-	</div>
+	<ProductCarousel title="Ostatnio kupione" products={data.recentlyOrdered} />
 </main>
 
 <!-- <a href="https://github.com/ciscoheat/sveltekit-rate-limiter">ratelimiter</a> -->
@@ -319,7 +230,7 @@
 > -->
 
 <!-- </div> -->
-<button on:click={createProgenitor} class="px-3 py-2 text-lg">Utwórz protoplastę</button>
+<!-- <button on:click={createProgenitor} class="px-3 py-2 text-lg">Utwórz protoplastę</button> -->
 
 <!-- <h1 class="text-3xl">Strona główna</h1>
 	<h2 class="text-xl">Na razie nic tu nie ma... 😌</h2>
@@ -371,11 +282,3 @@
 		<li>Możliwość płatności online (Dotpay/Przelewy24/Stripe/Paypal????)</li>
 		<li>Page Transition z nowym API Chrome</li>
 	</ul> -->
-
-<style lang="postcss">
-	.collage {
-		@apply grid gap-6 grid-cols-2 overflow-auto [&>*:nth-child(2)]:row-start-2 [&>*:nth-child(3)]:row-start-2;
-		@apply sm:grid-cols-4 sm:[&>*:nth-child(2)]:row-start-1 sm:[&>*:nth-child(3)]:row-start-1;
-		@apply lg:grid-cols-2 lg:[&>*:nth-child(2)]:row-start-2 lg:[&>*:nth-child(3)]:row-start-2;
-	}
-</style>

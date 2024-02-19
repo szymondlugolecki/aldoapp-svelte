@@ -1,24 +1,8 @@
 <script lang="ts">
 	import Summary from './(components)/summary.svelte';
 	import ProductsTable from './(components)/products-table.svelte';
-	import { Input } from '$shadcn/input/index.js';
-	import { Label } from '$shadcn/label/index.js';
-	import RequiredAsterisk from '$components/custom/Util/RequiredAsterisk.svelte';
-	import * as RadioGroup from '$shadcn/radio-group';
-
 	import { superForm } from 'sveltekit-superforms/client';
-	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
-	import { Button } from '$shadcn/button';
-	import { cart$, order$, user$ } from '$lib/client/schemas/index.js';
-	import { validUntil } from '$lib/client/schemas/promoCode.js';
-	// import OrderForm from '$components/custom/Order/OrderForm.svelte';
 
-	import * as Form from '$shadcn/form';
-	import type { SuperValidated } from 'sveltekit-superforms';
-	// import type { OrderForm } from '$lib/client/schemas/order.js';
-	import { page } from '$app/stores';
-	import type { OrderForm } from '$lib/client/schemas/order.js';
-	import { changeCartCustomer } from '$lib/client/schemas/cart';
 	import CustomerForm from './(components)/customer-form.svelte';
 	import OrderInfoForm from './(components)/order-info-form.svelte';
 

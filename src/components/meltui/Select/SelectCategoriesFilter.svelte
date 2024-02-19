@@ -77,11 +77,14 @@
 			transition:slide={{ duration: 150 }}
 		>
 			<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-			<div class="flex flex-col max-h-full gap-2 px-2 py-2 overflow-y-auto" tabindex="0">
+			<div
+				class="flex flex-col max-h-full gap-2 px-2 py-2 overflow-y-auto border rounded-md bg-popover"
+				tabindex="0"
+			>
 				{#each filteredCategoryList as category, index (index)}
 					<li
 						use:melt={$option(toOption(category))}
-						class="relative cursor-pointer scroll-my-2 rounded-md py-2 pl-4 pr-4 hover:bg-blue-100 data-[highlighted]:bg-blue-200 data-[highlighted]:text-blue-900 data-[disabled]:opacity-50"
+						class="relative cursor-pointer scroll-my-2 text-sm rounded-md py-2 pl-4 pr-4 hover:bg-accent data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground data-[disabled]:opacity-50"
 					>
 						{#if $isSelected(category)}
 							<div class="absolute z-10 text-blue-900 check left-2 top-1/2">

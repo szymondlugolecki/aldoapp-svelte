@@ -9,7 +9,7 @@
 	import { Button } from '$shadcn/button';
 	import type { PageServerData } from '../$types';
 	import TableImage from './table-image.svelte';
-	import { cn } from '$lib/client/functions';
+	import { cn, parsePLN } from '$lib/client/functions';
 
 	export let products: PageServerData['order']['products'];
 
@@ -46,13 +46,7 @@
 		table.column({
 			accessor: 'price',
 			header: 'Kwota',
-			cell: ({ value }) => {
-				const formatted = new Intl.NumberFormat('pl-PL', {
-					style: 'currency',
-					currency: 'PLN'
-				}).format(Number(value));
-				return formatted;
-			}
+			cell: ({ value }) => parsePLN(value)
 		}),
 		table.column({
 			accessor: ({ quantity }) => quantity,

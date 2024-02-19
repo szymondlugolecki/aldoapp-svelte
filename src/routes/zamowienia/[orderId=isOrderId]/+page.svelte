@@ -1,24 +1,19 @@
 <script lang="ts">
 	import { confetti } from '@neoconfetti/svelte';
-	import { parseAddress } from '$lib/client/functions/index.js';
+	import { parseAddress, parsePLN } from '$lib/client/functions/index.js';
 	import { page } from '$app/stores';
 	import { paymentMethodsList } from '$lib/client/constants/index.js';
 	import HorizontalOrderSteps from '$components/custom/Steps/HorizontalOrderSteps.svelte';
 	import VerticalOrderSteps from '$components/custom/Steps/VerticalOrderSteps.svelte';
-	import { goto, preloadData, pushState } from '$app/navigation';
 	import { Button } from '$shadcn/button';
 	import ProductsTable from './(components)/products-table.svelte';
-	import * as Form from '$shadcn/form';
-	import { order$ } from '$lib/client/schemas';
-	import MessageAlert from '$components/custom/Form/MessageAlert.svelte';
 	import * as AlertDialog from '$shadcn/alert-dialog';
 	import { CheckCircled } from 'radix-icons-svelte';
 	import { Separator } from '$components/ui/separator';
 	import { superForm } from 'sveltekit-superforms/client';
 	import ErrorMessage from '$components/custom/Form/ErrorMessage.svelte';
 	import Message from '$components/custom/Form/Message.svelte';
-
-	import History from './historia/+page.svelte';
+	import StatusLogs from './(components)/status-logs.svelte';
 
 	export let data;
 	let open = false;
@@ -205,7 +200,7 @@
 						<dt class="font-medium">Całkowita kwota</dt>
 						<dd class="mt-3">
 							<span class="block"
-								><span class="font-semibold text-blue-600">{data.order.price} PLN</span></span
+								><span class="font-semibold text-blue-600">{parsePLN(data.order.price)}</span></span
 							>
 							<!-- <span class="block"
 							>Rabat <span class="font-medium">{data.order.discount} PLN</span></span
@@ -293,53 +288,14 @@
 					</form>
 				</div>
 			</div>
-
-			<Separator />
-
-			<div class="grid grid-cols-2 gap-4">
-				<div class="col-span-2 sm:col-span-1">
-					<div class="">
-						<label
-							for="text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-							>Historia statusu</label
-						>
-					</div>
-					<p class="text-sm text-muted-foreground">Sprawdź jak zmieniał się status zamówienia</p>
-				</div>
-				<div class="sm:justify-self-end sm:place-self-center">
-					<Button
-						href="/zamowienia/{data.order.id}/historia"
-						data-sveltekit-preload-data="hover"
-						on:click={async (e) => {
-							// bail if opening a new tab, or we're on too small a screen
-							if (e.metaKey || innerWidth < 640) return;
-
-							// prevent navigation
-							e.preventDefault();
-
-							// @ts-ignore
-							const { href } = e.currentTarget;
-
-							// run `load` functions (or rather, get the result of the `load` functions
-							// that are already running because of `data-sveltekit-preload-data`)
-							const result = await preloadData(href);
-
-							if (result.type === 'loaded' && result.status === 200) {
-								pushState(href, { historyModalOpen: true });
-							} else {
-								// something bad happened! try navigating
-								goto(href);
-							}
-						}}
-						variant="default"
-						class="max-w-[270px]">Historia statusu</Button
-					>
-				</div>
-			</div>
 		</div>
+
+		<Separator />
+
+		{#if data.statusHistory}
+			<div class="pt-8">
+				<StatusLogs data={data.statusHistory} />
+			</div>
+		{/if}
 	</div>
 </div>
-
-{#if $page.state.historyModalOpen}
-	<History data={data.statusHistory} />
-{/if}
