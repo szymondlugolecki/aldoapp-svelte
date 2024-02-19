@@ -1,24 +1,32 @@
 // import { p } from '$lib/server/clients/pClient';
-import { fail, redirect, error, type Action } from '@sveltejs/kit';
+import { fail, redirect, type Action } from '@sveltejs/kit';
 import { trytm } from '@bdsqqq/try';
-import { accessTokenExpiryDate, jwtName, refreshTokenExpiryDate } from '$lib/server/constants/auth';
-import { createAccessToken, createRefreshToken } from '$lib/server/functions/auth';
+
 import { db } from '$lib/server/db';
-import { verificationTokens as verificationTokensTable } from '$lib/server/db/schemas/verificationTokens';
-import { eq } from 'drizzle-orm';
 import { setError, superValidate } from 'sveltekit-superforms/server';
 import { auth$ } from '$lib/client/schemas';
+import { lucia } from '$lib/server/auth';
 
-const verify = (async ({ request, cookies, locals }) => {
+// import { accessTokenExpiryDate, jwtName, refreshTokenExpiryDate } from '$lib/server/constants/auth';
+// import { createAccessToken, createRefreshToken } from '$lib/server/functions/auth';
+// import { verificationTokensTable } from '$lib/server/db/schemas/verificationTokens';
+
+const verify = (async ({ request, cookies, getClientAddress }) => {
 	const form = await superValidate(request, auth$.verification);
 	if (!form.valid) {
 		return fail(400, { form });
 	}
 
+	console.log('verify', 'getClientAddress', getClientAddress());
+
 	// Check if the token exists & is not expired
 	const [token, fetchTokenError] = await trytm(
-		db.query.verificationTokens.findFirst({
-			where: (verificationTokens, { eq }) => eq(verificationTokens.code, form.data.code),
+		db.query.verificationTokensTable.findFirst({
+			where: (verificationTokens, { eq, and }) =>
+				and(
+					eq(verificationTokens.code, form.data.code),
+					eq(verificationTokens.ipAddress, getClientAddress())
+				),
 			columns: {
 				id: true,
 				expiresAt: true
@@ -49,12 +57,40 @@ const verify = (async ({ request, cookies, locals }) => {
 	if (fetchTokenError) {
 		// Unexpected-error
 		console.log('fetchTokenError', fetchTokenError);
-		return setError(form, 'code', 'Błąd podczas sprawdzania kodu weryfikacyjnego', { status: 500 });
+		return setError(form, 'code', 'Błąd serwera podczas sprawdzania kodu weryfikacyjnego', {
+			status: 500
+		});
 	}
 	// Non-existent/expired
 	if (!token || new Date() > token.expiresAt) {
-		return setError(form, 'code', 'Kod nie istnieje lub jest przedawniony');
+		return setError(form, 'code', 'Kod nie istnieje lub jest przedawniony', { status: 400 });
 	}
+
+	const {
+		user: { address, email, fullName, phone, role }
+	} = token;
+
+	// Create a session
+	const session = await lucia.createSession(token.user.id, {
+		address,
+		email,
+		fullName,
+		phone,
+		role
+	});
+	const sessionCookie = lucia.createSessionCookie(session.id);
+
+	cookies.set(sessionCookie.name, sessionCookie.value, {
+		path: '.',
+		...sessionCookie.attributes
+	});
+
+	redirect(303, '/');
+}) satisfies Action;
+
+export default verify;
+
+/*
 
 	const [createTokens, createTokensError] = await trytm(
 		Promise.all([createAccessToken(token.user), createRefreshToken({ userId: token.user.id })])
@@ -96,7 +132,4 @@ const verify = (async ({ request, cookies, locals }) => {
 		// just continue
 	}
 
-	redirect(303, '/');
-}) satisfies Action;
-
-export default verify;
+*/

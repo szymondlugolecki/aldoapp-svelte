@@ -1,20 +1,22 @@
 // import { p } from '$lib/server/clients/pClient';
-import { error, type Action, fail } from '@sveltejs/kit';
+import { error, type Action, fail, redirect } from '@sveltejs/kit';
 import { trytm } from '@bdsqqq/try';
 import getCustomError from '$lib/client/constants/customErrors';
 import { isAtLeastModerator } from '$lib/client/functions';
-import { addProduct } from '$lib/server/functions/db';
+import { createProduct } from '$lib/server/functions/db';
 import { productURLParser } from '$lib/server/functions/utils';
 import { products$ } from '$lib/client/schemas';
-import { setMessage, superValidate } from 'sveltekit-superforms/server';
+import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
 
 const add: Action = async ({ request, locals }) => {
+	const sessionUser = locals.user;
 	// Must be a moderator or higher
-	if (!locals.session) {
-		error(...getCustomError('not-logged-in'));
+	if (!sessionUser) {
+		redirect(303, '/zaloguj');
+		// error(...getCustomError('not-logged-in'));;
 	}
 
-	if (!isAtLeastModerator(locals.session?.user.role)) {
+	if (!isAtLeastModerator(sessionUser.role)) {
 		error(...getCustomError('insufficient-permissions'));
 	}
 
@@ -29,16 +31,16 @@ const add: Action = async ({ request, locals }) => {
 
 	// Add the product to the database
 	const [, addProductError] = await trytm(
-		addProduct({
-			authorId: locals.session.user.id,
+		createProduct({
+			authorId: sessionUser.id,
 			name,
 			symbol,
 			// description: description || null,
 			// images: imagesURL,
 			category,
-			subcategory: subcategory ?? '',
-			price: price.toFixed(2),
-			weight: weight.toFixed(2),
+			subcategory: subcategory ?? null,
+			price: price,
+			weight: weight,
 			producent: 'deheus',
 			encodedURL,
 			amountLeft: Math.floor(Math.random() * 5), // 0 - 5,
@@ -48,7 +50,7 @@ const add: Action = async ({ request, locals }) => {
 	if (addProductError) {
 		// Unexpected-error
 		console.log('addProductError', addProductError);
-		error(500, 'Wystąpił błąd podczas dodawania produktu');
+		return setError(form, 'Błąd serwera podczas dodawania produktu', { status: 500 });
 	}
 
 	return setMessage(form, 'Dodano produkt');

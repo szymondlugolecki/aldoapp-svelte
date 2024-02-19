@@ -1,34 +1,8 @@
-import { VAPID_PRIVATE_KEY, VAPID_SUBJECT } from '$env/static/private';
+import { VAPID_PRIVATE_KEY, ADMIN_CONTACT_EMAIL } from '$env/static/private';
 import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public';
-// import webpush from 'web-push';
-// import { betterZodParse } from '$lib/client/functions/betterZodParse';
-// import { pushSubscription$ } from '$lib/client/schemas';
-// import type { NotificationContent } from '$types';
-// import { buildPushPayload } from '@block65/webcrypto-web-push';
-import { buildPushPayload } from '@block65/webcrypto-web-push';
-import type {
-	buildPushPayload as BuildPushPayload,
-	VapidKeys,
-	PushMessage,
-	PushSubscription
-} from '@block65/webcrypto-web-push';
 
-import { generatePushHTTPRequest } from 'web-push-edge';
-
-// import {
-// 	type PushSubscription,
-// 	type PushMessage,
-// 	type VapidKeys,
-// 	buildPushPayload
-// } from '@block65/webcrypto-web-push';
-
-const buildPushPayloadTyped = buildPushPayload as typeof BuildPushPayload;
-
-const vapidDetails = {
-	publicKey: PUBLIC_VAPID_PUBLIC_KEY,
-	privateKey: VAPID_PRIVATE_KEY,
-	subject: VAPID_SUBJECT
-} satisfies VapidKeys;
+import { generatePushHTTPRequest, ApplicationServerKeys, generateKeys } from 'web-push-edge';
+import type { PushMessage, PushSubscription } from '@block65/webcrypto-web-push';
 
 export interface PushMessageWithContent extends PushMessage {
 	data: {
@@ -36,6 +10,45 @@ export interface PushMessageWithContent extends PushMessage {
 		message: string;
 	};
 }
+
+const sendPushMessage = async (
+	endpoint: string,
+	keys: ApplicationServerKeys,
+	message: PushMessageWithContent
+) => {
+	const {
+		headers,
+		body,
+		endpoint: fetchEndpoint
+	} = await generatePushHTTPRequest({
+		applicationServerKeys: keys,
+		payload: message,
+		target: {
+			endpoint: endpoint,
+			keys: {
+				p256dh: PUBLIC_VAPID_PUBLIC_KEY,
+				auth: VAPID_PRIVATE_KEY
+			}
+		},
+		adminContact: ADMIN_CONTACT_EMAIL,
+		ttl: 60,
+		urgency: 'low'
+	});
+
+	const res = await fetch(fetchEndpoint, {
+		method: 'POST',
+		headers,
+		body
+	});
+
+	console.log('ok', res.ok, res.status);
+
+	if (res.ok) {
+		return { success: true };
+	} else {
+		return { success: false };
+	}
+};
 
 export const sendNotifications = async (
 	subscriptions: PushSubscription[],
@@ -45,16 +58,17 @@ export const sendNotifications = async (
 
 	// Send a push message to each client specified in the subscriptions array
 	for await (const subscription of subscriptions) {
-		const init = await buildPushPayloadTyped(message, subscription, vapidDetails);
-		const res = await fetch(subscription.endpoint, init);
+		const keys = await generateKeys({
+			publicKey: subscription.keys.p256dh,
+			privateKey: subscription.keys.auth
+		});
+		const { success } = await sendPushMessage(subscription.endpoint, keys, message);
 
-		if (res.ok) {
+		if (success) {
 			results.push(true);
 		} else {
 			results.push(false);
 		}
-
-		console.log('ok', res.ok, res.status);
 
 		break;
 	}

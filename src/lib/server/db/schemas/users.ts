@@ -1,34 +1,30 @@
 import { userRoles } from '../../../client/constants/dbTypes';
 import { relations, type InferSelectModel, type InferInsertModel, sql } from 'drizzle-orm';
-// import {
-// 	mysqlTable,
-// 	uniqueIndex,
-// 	varchar,
-// 	char,
-// 	timestamp,
-// 	text,
-// 	index
-// } from 'drizzle-orm/mysql-core';
+import {
+	sqliteTable,
+	integer,
+	text,
+	uniqueIndex,
+	index,
+	foreignKey
+} from 'drizzle-orm/sqlite-core';
 
-import { sqliteTable, integer, text, uniqueIndex, index } from 'drizzle-orm/sqlite-core';
-
-import { verificationTokens } from './verificationTokens';
-import { orders } from './orders';
-import { products } from './products';
-import { subscriptions } from './subscriptions';
-import { promoCodes } from './promoCodes';
+import { verificationTokensTable } from './verificationTokens';
+import { ordersTable } from './orders';
+import { productsTable } from './products';
+import { subscriptionsTable } from './subscriptions';
+import { promoCodesTable } from './promoCodes';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { carts } from './carts';
-import { favoriteProducts } from './favoriteProducts';
-import { userAddress } from './userAddress';
-import { orderStatusLogs } from './orderStatusLogs';
-// import { createId } from '@paralleldrive/cuid2';
+import { cartsTable } from './carts';
+import { favoriteProductsTable } from './favoriteProducts';
+import { userAddressTable } from './userAddress';
+import { orderStatusLogsTable } from './orderStatusLogs';
 
-export const users = sqliteTable(
-	'users',
+export const usersTable = sqliteTable(
+	'usersTable',
 	{
-		id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-		createdAt: integer('created_at', { mode: 'timestamp' })
+		id: text('id').notNull().primaryKey(), //integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+		createdAt: integer('created_at', { mode: 'timestamp_ms' })
 			.notNull()
 			.default(sql`CURRENT_TIMESTAMP`),
 
@@ -39,43 +35,48 @@ export const users = sqliteTable(
 		phone: text('phone', { length: 15 }).notNull(),
 
 		// relations
-		adviserId: text('adviser_id', { length: 255 })
+		adviserId: text('adviser_id')
 	},
 	(user) => ({
 		email: uniqueIndex('unique_emailx').on(user.email),
-		adviserId: index('adviser_idx').on(user.adviserId)
+		adviserId: index('adviser_idx').on(user.adviserId),
+		adviserReference: foreignKey({
+			columns: [user.adviserId],
+			foreignColumns: [user.id],
+			name: 'users_adviser_id'
+		})
 	})
 );
 
-export const usersRelations = relations(users, ({ one, many }) => ({
-	verificationTokens: many(verificationTokens),
-	customer: many(orders, { relationName: 'order_customer' }),
-	cartOwner: many(orders, { relationName: 'order_cart_owner' }),
-	driver: many(orders, { relationName: 'order_driver' }),
-	products: many(products, { relationName: 'products' }), // authored products
-	subscriptions: many(subscriptions),
-	promoCodes: many(promoCodes),
-	carts: one(carts, {
-		fields: [users.id],
-		references: [carts.ownerId]
+export const usersRelations = relations(usersTable, ({ one, many }) => ({
+	verificationTokens: many(verificationTokensTable),
+	customer: many(ordersTable, { relationName: 'order_customer' }),
+	cartOwner: many(ordersTable, { relationName: 'order_cart_owner' }),
+	driver: many(ordersTable, { relationName: 'order_driver' }),
+	products: many(productsTable, { relationName: 'products' }), // authored products
+	subscriptions: many(subscriptionsTable),
+	promoCodes: many(promoCodesTable),
+	carts: one(cartsTable, {
+		fields: [usersTable.id],
+		references: [cartsTable.ownerId]
 	}),
-	adviser: one(users, {
-		fields: [users.adviserId],
-		references: [users.id],
-		relationName: 'users'
+	adviser: one(usersTable, {
+		fields: [usersTable.adviserId],
+		references: [usersTable.id],
+		relationName: 'usersTable'
 	}),
-	favoriteProducts: many(favoriteProducts, { relationName: 'favorite_products_user' }),
-	statusLogs: many(orderStatusLogs),
-	address: one(userAddress, {
-		fields: [users.id],
-		references: [userAddress.userId]
+	favoriteProducts: many(favoriteProductsTable, { relationName: 'favorite_products_user' }),
+	statusLogs: many(orderStatusLogsTable),
+	address: one(userAddressTable, {
+		fields: [usersTable.id],
+		references: [userAddressTable.userId]
 	})
 }));
 
-export const createUserSchema = createInsertSchema(users);
-export const selectUserSchema = createSelectSchema(users);
+export const createUserSchema = createInsertSchema(usersTable);
+export const selectUserSchema = createSelectSchema(usersTable);
 
-export type SelectUser = InferSelectModel<typeof users>;
-export type InsertUser = InferInsertModel<typeof users>;
+export type SelectUser = InferSelectModel<typeof usersTable>;
+export type InsertUser = InferInsertModel<typeof usersTable>;
 export type Role = SelectUser['role'];
 export type GeneralRole = Extract<Role, 'customer' | 'admin'> | 'moderator';

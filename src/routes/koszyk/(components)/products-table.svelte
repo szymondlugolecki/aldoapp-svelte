@@ -85,7 +85,7 @@
 						<img
 							src={product.image}
 							alt={product.name}
-							class="object-cover object-center w-full h-full transition-transform"
+							class="object-cover object-center w-full h-full transition-transform rounded-md"
 						/>
 					</div>
 				</a>

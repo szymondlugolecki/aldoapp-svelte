@@ -1,30 +1,30 @@
 import { relations } from 'drizzle-orm';
-import { sqliteTable, integer } from 'drizzle-orm/sqlite-core';
-import { products } from './products';
-import { users } from './users';
+import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
+import { productsTable } from './products';
+import { usersTable } from './users';
 // import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 
-export const favoriteProducts = sqliteTable('favorite_products', {
+export const favoriteProductsTable = sqliteTable('favorite_products', {
 	id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
 
 	// relations
 	productId: integer('product_id', { mode: 'number' })
 		.notNull()
-		.references(() => products.id),
-	userId: integer('author_id', { mode: 'number' })
+		.references(() => productsTable.id),
+	userId: text('author_id')
 		.notNull()
-		.references(() => users.id)
+		.references(() => usersTable.id)
 });
 
-export const favoriteProductsRelations = relations(favoriteProducts, ({ one }) => ({
-	user: one(users, {
-		fields: [favoriteProducts.userId],
-		references: [users.id],
+export const favoriteProductsRelations = relations(favoriteProductsTable, ({ one }) => ({
+	user: one(usersTable, {
+		fields: [favoriteProductsTable.userId],
+		references: [usersTable.id],
 		relationName: 'favorite_products_user'
 	}),
-	product: one(products, {
-		fields: [favoriteProducts.productId],
-		references: [products.id],
+	product: one(productsTable, {
+		fields: [favoriteProductsTable.productId],
+		references: [productsTable.id],
 		relationName: 'favorite_products'
 	})
 }));

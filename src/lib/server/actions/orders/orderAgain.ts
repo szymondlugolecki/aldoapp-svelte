@@ -1,14 +1,13 @@
-import getCustomError from '$lib/client/constants/customErrors';
 // import { p } from '$lib/server/clients/pClient';
 import { trytm } from '@bdsqqq/try';
-import { error, fail, type Action, redirect } from '@sveltejs/kit';
+import { fail, type Action, redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
-import { orders } from '$lib/server/db/schemas/orders';
+import { ordersTable } from '$lib/server/db/schemas/orders';
 import { eq } from 'drizzle-orm';
 import { order$ } from '$lib/client/schemas';
 import { setError, superValidate } from 'sveltekit-superforms/server';
 import { addProductsToCart } from '$lib/server/functions/db';
-import { cartProducts } from '$lib/server/db/schemas/cartProducts';
+import { cartProductsTable } from '$lib/server/db/schemas/cartProducts';
 
 /*
 
@@ -20,9 +19,10 @@ What it should do:
 */
 
 const orderAgain = (async (event) => {
-	const sessionUser = event.locals.session?.user;
+	const sessionUser = event.locals.user;
 	if (!sessionUser) {
-		error(...getCustomError('not-logged-in'));
+		redirect(303, '/zaloguj');
+		// error(...getCustomError('not-logged-in'));;
 	}
 
 	const form = await superValidate(event, order$.orderAgainForm);
@@ -33,8 +33,8 @@ const orderAgain = (async (event) => {
 	const { id } = form.data;
 
 	const [order, getOrderError] = await trytm(
-		db.query.orders.findFirst({
-			where: eq(orders.id, id),
+		db.query.ordersTable.findFirst({
+			where: eq(ordersTable.id, id),
 			columns: {
 				id: true
 			},
@@ -57,15 +57,15 @@ const orderAgain = (async (event) => {
 	if (getOrderError) {
 		// Unexpected error
 		console.error('getOrderError', getOrderError);
-		error(500, 'Błąd podczas szukania zamówienia');
+		return setError(form, 'Błąd serwera podczas szukania zamówienia', { status: 500 });
 	}
 	if (!order) {
 		// Order not found
-		return setError(form, 'id', 'Nie znaleziono zamówienia');
+		return setError(form, 'Nie znaleziono zamówienia', { status: 400 });
 	}
 
 	const [cart, getCartError] = await trytm(
-		db.query.carts.findFirst({
+		db.query.cartsTable.findFirst({
 			where: (carts) => eq(carts.ownerId, sessionUser.id),
 			columns: {
 				id: true
@@ -75,21 +75,21 @@ const orderAgain = (async (event) => {
 	if (getCartError) {
 		// Unexpected error
 		console.error('getCartError', getCartError);
-		error(500, 'Błąd podczas szukania Twojego koszyka');
+		return setError(form, 'Błąd serwera podczas szukania koszyka', { status: 500 });
 	}
 	if (!cart) {
 		// Cart not found
-		return setError(form, 'id', 'Nie znaleziono koszyka');
+		return setError(form, 'Nie znaleziono koszyka', { status: 400 });
 	}
 
 	// Clear the cart
 	const [, clearCartError] = await trytm(
-		db.delete(cartProducts).where(eq(cartProducts.cartId, cart.id))
+		db.delete(cartProductsTable).where(eq(cartProductsTable.cartId, cart.id))
 	);
 	if (clearCartError) {
 		// Unexpected error
 		console.error('clearCartError', clearCartError);
-		error(500, 'Błąd podczas opróżniania koszyka');
+		return setError(form, 'Błąd serwera podczas opróżniania koszyka', { status: 500 });
 	}
 
 	// Add products to the cart
@@ -100,7 +100,7 @@ const orderAgain = (async (event) => {
 		)
 	);
 	if (addProductsError) {
-		return setError(form, 'id', 'Błąd podczas dodawania produktów do koszyka');
+		return setError(form, 'Błąd serwera podczas dodawania produktów do koszyka', { status: 500 });
 	}
 
 	redirect(301, '/koszyk');

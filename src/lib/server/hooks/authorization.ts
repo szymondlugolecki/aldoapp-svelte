@@ -11,7 +11,8 @@ export const handleAuthorization: Handle = async ({ event, resolve }) => {
 
 	if (event.url.pathname.startsWith('/admin')) {
 		if (!event.locals.session) {
-			error(...getCustomError('not-logged-in'));
+			redirect(303, '/zaloguj');
+			// error(...getCustomError('not-logged-in'));;
 		}
 
 		if (event.locals.session.user.role) {
@@ -23,7 +24,8 @@ export const handleAuthorization: Handle = async ({ event, resolve }) => {
 
 	if (event.url.pathname.startsWith('/api/update')) {
 		if (!event.locals.session) {
-			error(...getCustomError('not-logged-in'));
+			redirect(303, '/zaloguj');
+			// error(...getCustomError('not-logged-in'));;
 		}
 
 		if (getRoleRank(event.locals.session.user.role) < 1) {

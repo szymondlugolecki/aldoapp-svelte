@@ -3,7 +3,7 @@ import { db } from '$lib/server/db/index.js';
 import { trytm } from '@bdsqqq/try';
 import { error } from '@sveltejs/kit';
 import { sql, eq, gte, lte, or } from 'drizzle-orm';
-import { orders as ordersTable } from '$lib/server/db/schemas/orders.js';
+import { ordersTable } from '$lib/server/db/schemas/orders.js';
 import { clauseConcat, extractParams } from '$lib/server/functions/utils.js';
 import type { BasicUser, OrderSortableColumn } from '$types';
 
@@ -28,7 +28,7 @@ Possible fitlers for orders:
 */
 
 export const load = async ({ params, locals, url }) => {
-	const sessionUser = locals.session?.user;
+	const sessionUser = locals.user;
 	// In order to see order details, user must be:
 	// 1. logged in
 	// 2a. must be the owner of the order
@@ -44,7 +44,7 @@ export const load = async ({ params, locals, url }) => {
 	const { page, sort, order } = extractParams<OrderSortableColumn>(url, sortableColumns);
 
 	const [user, fetchUserError] = await trytm(
-		db.query.users.findFirst({
+		db.query.usersTable.findFirst({
 			where: (user, { eq }) => eq(user.id, userId),
 			with: {
 				adviser: {
@@ -88,8 +88,8 @@ export const load = async ({ params, locals, url }) => {
 	const statusClause = order.status && eq(ordersTable.status, order.status);
 	const cartOwnerClause = order.cartOwnerId && eq(ordersTable.cartOwnerId, order.cartOwnerId);
 	const customerClause = order.customerId && eq(ordersTable.customerId, order.customerId);
-	const priceMinClause = order.priceMin && gte(ordersTable.price, order.priceMin.toString());
-	const priceMaxClause = order.priceMax && lte(ordersTable.price, order.priceMax.toString());
+	const priceMinClause = order.priceMin && gte(ordersTable.price, order.priceMin);
+	const priceMaxClause = order.priceMax && lte(ordersTable.price, order.priceMax);
 
 	console.log('Status', order.status);
 
@@ -107,7 +107,7 @@ export const load = async ({ params, locals, url }) => {
 	const filtersApplied = clausesArr.length;
 
 	const [ordersUngrouped, fetchOrdersError] = await trytm(
-		db.query.orders.findMany({
+		db.query.ordersTable.findMany({
 			where: extendedWhereClause,
 			columns: {
 				id: true,
@@ -174,7 +174,7 @@ export const load = async ({ params, locals, url }) => {
 	}
 
 	const [unsortedCustomersAndCartOwners, fetchCustomersAndCartOwnersError] = await trytm(
-		db.query.orders.findMany({
+		db.query.ordersTable.findMany({
 			where: defaultWhereClause,
 			columns: {},
 			with: {
@@ -243,7 +243,7 @@ export const load = async ({ params, locals, url }) => {
 		profile: user,
 		orders,
 		orderDetails: customersAndCartOwners,
-		count: db
+		count: await db
 			.select({
 				count: sql<number>`count(*)`.mapWith(Number)
 			})

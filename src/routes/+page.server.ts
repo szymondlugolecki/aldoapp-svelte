@@ -17,7 +17,7 @@ const cacheNames = {
 const fetchMostBoughtFromDb = async () => {
 	// Fetch all ordered products
 	const [allOrderedProducts, allOrderedProductsError] = await trytm(
-		db.query.orderProducts.findMany({
+		db.query.orderProductsTable.findMany({
 			columns: {
 				productId: true,
 				quantity: true
@@ -54,7 +54,7 @@ const fetchMostBoughtFromDb = async () => {
 	const tenMostBoughtProducts = productsSorted.map(([id]) => Number(id)).slice(0, 10);
 
 	const [products, mostBoughtProductsError] = await trytm(
-		db.query.products.findMany({
+		db.query.productsTable.findMany({
 			where: (products) => inArray(products.id, tenMostBoughtProducts),
 			columns: {
 				id: true,
@@ -83,7 +83,7 @@ const fetchMostBoughtFromDb = async () => {
 
 const fetchRecentlyOrderedFromDb = async () => {
 	const [recentlyOrderedProducts, recentlyOrderedProductsError] = await trytm(
-		db.query.orders.findMany({
+		db.query.ordersTable.findMany({
 			columns: {
 				// createdAt: true,
 			},
@@ -148,7 +148,7 @@ const fetchMostBought = async () => {
 const fetchFavoriteProductsFromDb = async () => {
 	// Replace products table with favorite products table once its created
 	const [favoriteProducts, favoriteProductsError] = await trytm(
-		db.query.products.findMany({
+		db.query.productsTable.findMany({
 			columns: {
 				id: true,
 				name: true,
@@ -185,7 +185,7 @@ export const load = async () => {
 		fetchFavoriteProductsFromDb()
 	]);
 
-	// const subs = await db.query.subscriptions.findMany({
+	// const subs = await db.query.subscriptionsTable.findMany({
 	// 	columns: {
 	// 		endpoint: true,
 	// 		keys: true,
@@ -197,7 +197,7 @@ export const load = async () => {
 
 	// console.log('subscriptions', subs);
 
-	// const verificationTokens = await db.query.verificationTokens.findMany({
+	// const verificationTokens = await db.query.verificationTokensTable.findMany({
 	// 	columns: {
 	// 		userId: true,
 	// 		code: true,

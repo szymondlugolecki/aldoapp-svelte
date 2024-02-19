@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "9b01e1c3-edef-41ac-99a3-d8939cb589b6",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "c23a5781-cf93-4ad1-8e15-9a84946b8146",
+  "prevId": "9b01e1c3-edef-41ac-99a3-d8939cb589b6",
   "tables": {
     "cart_products": {
       "name": "cart_products",
@@ -836,8 +836,8 @@
         }
       },
       "indexes": {
-        "promo_code_use_idx": {
-          "name": "promo_code_use_idx",
+        "promo_code_uses_idx": {
+          "name": "promo_code_uses_idx",
           "columns": [
             "promocode_used_id"
           ],

@@ -1,5 +1,3 @@
-import { isCuid } from '@paralleldrive/cuid2';
-
 export const match = (param) => {
-	return isCuid(param) || param.toLowerCase() === 'ja';
+	return param.length === 15 || param.toLowerCase() === 'ja';
 };

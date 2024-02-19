@@ -1,16 +1,17 @@
-import { verificationKeysExpirationTime } from '$lib/server/constants/auth';
 import { createVerificationKeys, getUserAgentString } from '$lib/server/functions/auth';
-// import { sendVerificationEmail } from '$lib/server/clients/sendGridClient';
 import { sendVerificationEmail } from '$lib/server/clients/resend';
 import { fail, redirect, type Action } from '@sveltejs/kit';
 import { trytm } from '@bdsqqq/try';
 import { db } from '$lib/server/db';
-import { addVerificationToken } from '$lib/server/functions/db';
 import { auth$ } from '$lib/client/schemas';
 import { superValidate, setError } from 'sveltekit-superforms/server';
 import { UAParser } from 'ua-parser-js';
+import { TimeSpan } from 'oslo';
+import { addVerificationToken } from '$lib/server/functions/db';
 
 const login = (async ({ request, getClientAddress, platform }) => {
+	console.log('login', 'getClientAddress', getClientAddress());
+
 	const form = await superValidate(request, auth$.login);
 	if (!form.valid) {
 		return fail(400, { form });
@@ -20,18 +21,21 @@ const login = (async ({ request, getClientAddress, platform }) => {
 
 	// Check if the user exists (was invited)
 	const [user, fetchUserError] = await trytm(
-		db.query.users.findFirst({ where: (user, { eq }) => eq(user.email, email) })
+		db.query.usersTable.findFirst({ where: (user, { eq }) => eq(user.email, email) })
 	);
 	if (fetchUserError) {
 		// Unexpected-error
 		console.error('fetchUserError', fetchUserError);
-		return setError(form, 'email', 'Błąd podczas szukania użytkownika', { status: 500 });
+		return setError(form, 'Błąd serwera podczas szukania użytkownika', { status: 500 });
 	}
 	if (!user) {
 		return setError(
 			form,
 			'email',
-			'Konto z podanym adresem email nie istnieje. W celu uzyskania dostępu skontaktuj się z administracją'
+			'Konto z podanym adresem email nie istnieje. W celu uzyskania dostępu skontaktuj się z administracją',
+			{
+				status: 404
+			}
 		);
 	}
 
@@ -39,25 +43,27 @@ const login = (async ({ request, getClientAddress, platform }) => {
 	const { code } = createVerificationKeys();
 
 	const userAgentStringified = getUserAgentString(request.headers.get('User-Agent'));
-	const userAgentParsed = UAParser(request.headers.get('User-Agent') || undefined);
+	const userAgentParsed = UAParser(request.headers.get('User-Agent') ?? undefined);
 	const userAgent = `${userAgentParsed.os.name} ${userAgentParsed.os.version}, ${userAgentParsed.browser.name} ${userAgentParsed.browser.version}`;
 	console.log('city', request.headers.get('x-vercel-ip-city'));
 	console.log('platform', platform);
 
+	const verificationTokenExpirationTime = new TimeSpan(1, 'd').milliseconds();
+
 	const [, createTokenError] = await trytm(
 		addVerificationToken({
 			code,
-			userAgent: userAgentStringified,
 			userId: user.id,
-			expiresAt: new Date(Date.now() + verificationKeysExpirationTime),
-			createdAt: new Date()
+			userAgent: userAgentStringified,
+			ipAddress: getClientAddress(),
+			expiresAt: new Date(Date.now() + verificationTokenExpirationTime)
 		})
 	);
 
 	if (createTokenError) {
 		// Unexpected-error
 		console.log('createTokenError', createTokenError);
-		return setError(form, 'email', 'Błąd podczas tworzenia kodu. Spróbuj ponownie', {
+		return setError(form, 'Błąd serwera podczas tworzenia kodu weryfikacyjnego', {
 			status: 500
 		});
 	}
@@ -84,12 +90,8 @@ const login = (async ({ request, getClientAddress, platform }) => {
 
 	if (sendEmailError) {
 		// Unexpected-error
-		return setError(
-			form,
-			'email',
-			'Błąd podczas wysyłania emaila weryfikacyjnego. Spróbuj ponownie',
-			{ status: 500 }
-		);
+		console.error('sendEmailError', sendEmailError);
+		return setError(form, 'Błąd serwera podczas wysyłania emaila weryfikacyjnego', { status: 500 });
 	}
 
 	redirect(303, '/zaloguj/weryfikacja?success=true');

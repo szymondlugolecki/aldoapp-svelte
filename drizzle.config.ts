@@ -18,5 +18,6 @@ export default {
 	dbCredentials: {
 		url: DATABASE_URL,
 		authToken: DATABASE_SECRET
-	}
+	},
+	verbose: true
 } satisfies Config;

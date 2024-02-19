@@ -1,6 +1,6 @@
 import { trytm } from '@bdsqqq/try';
 import { db } from '$lib/server/db';
-import { error, fail, type Action } from '@sveltejs/kit';
+import { error, fail, type Action, redirect } from '@sveltejs/kit';
 import { eq, inArray } from 'drizzle-orm';
 import { isAtLeastModerator } from '$lib/client/functions';
 import { sendNotifications, type PushMessageWithContent } from '$lib/server/functions/push';
@@ -9,17 +9,16 @@ import getCustomError from '$lib/client/constants/customErrors';
 import { pushSubscription$ } from '$lib/client/schemas';
 
 const send: Action = async (event) => {
-	const sessionUser = event.locals.session?.user;
+	const sessionUser = event.locals.user;
 	if (!sessionUser) {
-		error(...getCustomError('not-logged-in'));
+		redirect(303, '/zaloguj');
+		// error(...getCustomError('not-logged-in'));;
 	}
 	if (!isAtLeastModerator(sessionUser.role)) {
 		error(...getCustomError('insufficient-permissions'));
 	}
 
-	console.log('event');
 	const form = await superValidate(event, pushSubscription$.notification);
-	console.log('form', form.errors, form.data);
 
 	if (!form.valid) {
 		return fail(400, { form });
@@ -36,7 +35,7 @@ const send: Action = async (event) => {
 
 	const [subscriptionList, fetchSubscriptionsError] = await trytm(
 		Array.isArray(targets)
-			? db.query.subscriptions.findMany({
+			? db.query.subscriptionsTable.findMany({
 					columns: {
 						endpoint: true,
 						keys: true,
@@ -44,7 +43,7 @@ const send: Action = async (event) => {
 					},
 					where: (subscription) => inArray(subscription.userId, targets)
 			  })
-			: db.query.subscriptions.findMany({
+			: db.query.subscriptionsTable.findMany({
 					columns: {
 						endpoint: true,
 						keys: true,
@@ -57,12 +56,14 @@ const send: Action = async (event) => {
 	if (fetchSubscriptionsError) {
 		// Unexpected-error
 		console.error('fetchSubscriptionsError', fetchSubscriptionsError);
-		error(500, 'Błąd podczas pobierania użytkowników do wysłania powiadomień');
+		return setError(form, 'Błąd serwera podczas szukania docelowych odbiorców wiadomości', {
+			status: 500
+		});
 	}
 
 	const { message, success } = await sendNotifications(subscriptionList, messageObj);
 	if (!success) {
-		return setError(form, 'body', message, { status: 400 });
+		return setError(form, message, { status: 400 });
 	}
 
 	return setMessage(form, message);

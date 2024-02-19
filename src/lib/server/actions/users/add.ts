@@ -1,23 +1,21 @@
 import getCustomError from '$lib/client/constants/customErrors';
-// import { p } from '$lib/server/clients/pClient';
 import { trytm } from '@bdsqqq/try';
-import { error, type Action, fail } from '@sveltejs/kit';
-import { createId } from '@paralleldrive/cuid2';
-import { db } from '$lib/server/db';
-import { createUserSchema, users } from '$lib/server/db/schemas/users';
+import { error, type Action, fail, redirect } from '@sveltejs/kit';
+import { type InsertUser } from '$lib/server/db/schemas/users';
 import { isAtLeastModerator } from '$lib/client/functions';
-import type { z } from 'zod';
 import { user$ } from '$lib/client/schemas';
 import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
-
-type CreateUserSchema = z.infer<typeof createUserSchema>;
+import { createUser } from '$lib/server/functions/db';
+import { generateId } from 'lucia';
 
 const add = (async ({ request, locals }) => {
+	const sessionUser = locals.user;
 	// Only moderators and admins are allowed to add a user
-	if (!locals.session) {
-		error(...getCustomError('not-logged-in'));
+	if (!sessionUser) {
+		redirect(303, '/zaloguj');
+		// error(...getCustomError('not-logged-in'));;
 	}
-	if (!isAtLeastModerator(locals.session?.user.role)) {
+	if (!isAtLeastModerator(sessionUser.role)) {
 		error(...getCustomError('insufficient-permissions'));
 	}
 
@@ -26,20 +24,20 @@ const add = (async ({ request, locals }) => {
 		return fail(400, { form });
 	}
 
-	const userId = createId();
 	const { email, fullName, phone, role } = form.data;
+
+	const userId = generateId(15);
 
 	const newUser = {
 		id: userId,
 		email,
 		fullName,
 		phone,
-		role,
-		createdAt: new Date()
-	} satisfies CreateUserSchema;
+		role
+	} satisfies InsertUser;
 
 	// Add the user to the database
-	const [, addUserError] = await trytm(db.insert(users).values(newUser));
+	const [, addUserError] = await trytm(createUser(newUser));
 
 	if (addUserError) {
 		// Unexpected-error
@@ -47,7 +45,7 @@ const add = (async ({ request, locals }) => {
 		return setError(form, 'Nie udało się dodać użytkownika', { status: 500 });
 	}
 
-	return setMessage(form, 'Pomyślnie dodano użytkownika');
+	return setMessage(form, 'Dodano użytkownika');
 }) satisfies Action;
 
 export default add;

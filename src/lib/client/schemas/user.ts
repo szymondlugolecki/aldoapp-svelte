@@ -6,7 +6,7 @@ export const id = z
 		required_error: 'Identyfikator użytkownika jest wymagany',
 		invalid_type_error: 'Nieprawidłowy użytkownik'
 	})
-	.cuid2({ message: 'Nieprawidłowy użytkownik' });
+	.length(15, { message: 'Nieprawidłowe id użytkownika' });
 
 export const email = z
 	.string({

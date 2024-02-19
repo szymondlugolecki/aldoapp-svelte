@@ -7,14 +7,15 @@ import { isAtLeastModerator } from '$lib/client/functions';
 import { eq } from 'drizzle-orm';
 import { order$ } from '$lib/client/schemas';
 import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
-import { orderAddress } from '$lib/server/db/schemas/orderAddress';
+import { orderAddressTable } from '$lib/server/db/schemas/orderAddress';
 
 const changeOrderAddress = (async ({ request, locals }) => {
-	const sessionUser = locals.session?.user;
+	const sessionUser = locals.user;
 
 	// Only moderators and admins are allowed
 	if (!sessionUser) {
-		error(...getCustomError('not-logged-in'));
+		redirect(303, '/zaloguj');
+		// error(...getCustomError('not-logged-in'));;
 	}
 	if (!isAtLeastModerator(sessionUser.role)) {
 		error(403, 'Nie masz wystarczających uprawień');
@@ -30,19 +31,19 @@ const changeOrderAddress = (async ({ request, locals }) => {
 	// Update the order
 	const [, editOrderPaidError] = await trytm(
 		db
-			.update(orderAddress)
+			.update(orderAddressTable)
 			.set({
 				city,
 				street,
 				zipCode
 			})
-			.where(eq(orderAddress.orderId, id))
+			.where(eq(orderAddressTable.orderId, id))
 	);
 
 	if (editOrderPaidError) {
 		// Unexpected-error
 		console.error('editOrderPaidError', editOrderPaidError);
-		return setError(form, 'city', 'Nie udało się zmienić adresu dostawy', {
+		return setError(form, 'Błąd serwera podczas zmieniania adresu dostawy', {
 			status: 500
 		});
 	}

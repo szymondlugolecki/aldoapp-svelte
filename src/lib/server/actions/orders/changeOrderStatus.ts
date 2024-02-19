@@ -1,13 +1,13 @@
 import getCustomError from '$lib/client/constants/customErrors';
 // import { p } from '$lib/server/clients/pClient';
 import { trytm } from '@bdsqqq/try';
-import { error, fail, type Action } from '@sveltejs/kit';
+import { error, fail, type Action, redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { isAtLeastModerator } from '$lib/client/functions';
 import { orderMachine } from '$lib/client/machines/orderStatus';
 import { interpret } from 'xstate';
 import type { OrderStatus } from '$lib/client/constants/dbTypes';
-import { orders } from '$lib/server/db/schemas/orders';
+import { ordersTable } from '$lib/server/db/schemas/orders';
 import { eq } from 'drizzle-orm';
 import { order$ } from '$lib/client/schemas';
 import { sendNotifications } from '$lib/server/functions/push';
@@ -18,7 +18,7 @@ import {
 } from '$lib/server/constants/messages';
 import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
 import { sendOrderStatusEmail } from '$lib/server/clients/resend';
-import { orderStatusLogs } from '$lib/server/db/schemas/orderStatusLogs';
+import { orderStatusLogsTable } from '$lib/server/db/schemas/orderStatusLogs';
 
 /*
 
@@ -29,20 +29,22 @@ import { orderStatusLogs } from '$lib/server/db/schemas/orderStatusLogs';
 */
 
 const changeOrderStatus = (async ({ request, locals }) => {
-	const sessionUser = locals.session?.user;
+	const sessionUser = locals.user;
 
 	// ! THIS IS REMOVED FOR NOW:
 	// Only moderators and admins are allowed to change order status
-	// ! BUT
+	// BUT
 	// if state=awaitingCustomerDecision then the user
 	// can cancel the order (items are unavailable)
 
 	if (!sessionUser) {
-		error(...getCustomError('not-logged-in'));
+		redirect(303, '/zaloguj');
+		// error(...getCustomError('not-logged-in'));;
 	}
 	if (!isAtLeastModerator(sessionUser.role)) {
 		error(...getCustomError('insufficient-permissions'));
 	}
+
 	const form = await superValidate(request, order$.eventForm);
 	if (!form.valid) {
 		return fail(400, { form });
@@ -50,8 +52,8 @@ const changeOrderStatus = (async ({ request, locals }) => {
 
 	// Validate the user input
 	const { event, id } = form.data;
-	const [previousOrder, getPrevOrderStatusError] = await trytm(
-		db.query.orders.findFirst({
+	const [oldOrder, getPrevOrderStatusError] = await trytm(
+		db.query.ordersTable.findFirst({
 			where: (orders, { eq }) => eq(orders.id, id),
 			columns: {
 				id: true,
@@ -101,13 +103,13 @@ const changeOrderStatus = (async ({ request, locals }) => {
 	if (getPrevOrderStatusError) {
 		// Unexpected-error
 		console.error('getPrevOrderStatusError', getPrevOrderStatusError);
-		return setError(form, 'event', 'Nie udało się zmienić statusu zamówienia', { status: 500 });
+		return setError(form, 'event', 'Bład serwera podczas szukania zamówienia', { status: 500 });
 	}
 
-	if (!previousOrder) {
+	if (!oldOrder) {
 		// Unexpected-error
-		console.error('no error but theres no previous order status O.o', previousOrder);
-		return setError(form, 'event', 'Nie znaleziono zamówienia', { status: 500 });
+		console.error('no error but theres no previous order status O.o', oldOrder);
+		return setError(form, 'event', 'Nie znaleziono zamówienia', { status: 400 });
 	}
 
 	// Check if the user is allowed to change the status
@@ -120,8 +122,8 @@ const changeOrderStatus = (async ({ request, locals }) => {
 	// 	// Not a moderator
 	// 	// Can only change the status if the order status is awaitingCustomerDecision
 	// 	// And they are editing their own order
-	// 	const awaitingCustomerDecision = previousOrder.status === 'awaitingCustomerDecision';
-	// 	const editingItsOwnOrder = previousOrder.customerId === sessionUser.id;
+	// 	const awaitingCustomerDecision = oldOrder.status === 'awaitingCustomerDecision';
+	// 	const editingItsOwnOrder = oldOrder.customerId === sessionUser.id;
 	// 	if (!awaitingCustomerDecision || !editingItsOwnOrder) {
 	// 		throw error(...getCustomError('insufficient-permissions'));
 	// 	}
@@ -131,7 +133,7 @@ const changeOrderStatus = (async ({ request, locals }) => {
 	const service = interpret(orderMachine).onTransition(async (state) => {
 		console.log('Transitioned ->', state.value, state.context);
 	});
-	service.start(previousOrder.status);
+	service.start(oldOrder.status);
 	const serviceSnapshot = service.getSnapshot();
 	// const possibleEvents = serviceSnapshot.nextEvents;
 
@@ -147,34 +149,34 @@ const changeOrderStatus = (async ({ request, locals }) => {
 
 	// Update the order
 	const [, editOrderError] = await trytm(
-		db.transaction(async (tx) => {
-			await tx
-				.update(orders)
+		db.batch([
+			db
+				.update(ordersTable)
 				.set({
 					status: currentState
 				})
-				.where(eq(orders.id, id));
-
-			await tx.insert(orderStatusLogs).values({
+				.where(eq(ordersTable.id, id)),
+			db.insert(orderStatusLogsTable).values({
 				orderId: id,
 				event,
-				userId: sessionUser.id,
-				timestamp: new Date()
-			});
-		})
+				userId: sessionUser.id
+			})
+		])
 	);
 
 	if (editOrderError) {
 		// Unexpected-error
 		console.error('editOrderError', editOrderError);
-		return setError(form, 'event', 'Nie udało się zmienić statusu zamówienia', { status: 500 });
+		return setError(form, 'event', 'Błąd serwera podczas zmieniania statusu zamówienia', {
+			status: 500
+		});
 	}
 
 	// Send push notifications
-	sendNotifications(previousOrder.customer.subscriptions, getOrderStatusPushMessage(event));
+	sendNotifications(oldOrder.customer.subscriptions, getOrderStatusPushMessage(event));
 
 	// Send emails
-	const orderDate = previousOrder.createdAt.toLocaleString('pl-PL', {
+	const orderDate = oldOrder.createdAt.toLocaleString('pl-PL', {
 		timeZone: 'Europe/Warsaw',
 		month: 'long',
 		day: '2-digit',
@@ -183,20 +185,20 @@ const changeOrderStatus = (async ({ request, locals }) => {
 		year: 'numeric'
 	});
 
-	const orderedByAdvisorForCustomer = previousOrder.customer.id !== previousOrder.cartOwner.id;
+	const orderedByAdvisorForCustomer = oldOrder.customer.id !== oldOrder.cartOwner.id;
 
 	const [, sendEmailError] = await trytm(
 		sendOrderStatusEmail({
-			to: [previousOrder.customer.email],
+			to: [oldOrder.customer.email],
 			props: {
-				orderId: previousOrder.id,
+				orderId: oldOrder.id,
 				time: orderDate,
-				price: previousOrder.price,
+				price: oldOrder.price,
 				description: orderStatusEmailDescription(event),
 				preview: orderStatusEmailPreview(event),
-				firstName: previousOrder.customer.fullName.split(' ')[0],
-				cartOwner: orderedByAdvisorForCustomer ? previousOrder.cartOwner : null,
-				driver: previousOrder.driver || null
+				firstName: oldOrder.customer.fullName.split(' ')[0],
+				cartOwner: orderedByAdvisorForCustomer ? oldOrder.cartOwner : null,
+				driver: oldOrder.driver || null
 			}
 		})
 	);
@@ -206,8 +208,10 @@ const changeOrderStatus = (async ({ request, locals }) => {
 		return setError(
 			form,
 			'event',
-			'Błąd podczas wysyłania emaila o zmianie statusu. Spróbuj ponownie',
-			{ status: 500 }
+			'Błąd serwera. Status został zmieniony, ale nie udało się wysłać emaila z powiadomieniem.',
+			{
+				status: 500
+			}
 		);
 	}
 

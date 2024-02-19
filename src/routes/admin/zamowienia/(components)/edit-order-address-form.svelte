@@ -1,19 +1,4 @@
 <script lang="ts">
-	import { Input } from '$shadcn/input';
-	import { Label } from '$shadcn/label';
-	import type { Order } from '$types';
-	import { enhance } from '$app/forms';
-	import createLoadingToast from '$lib/client/functions/createLoadingToast';
-	import { handleFormResponse } from '$lib/client/functions/forms';
-	import type { Address } from '$lib/server/db/schemas/orders';
-	import { cn, parseAddress } from '$lib/client/functions';
-	import type { Product } from '$lib/server/db/schemas/products';
-	import { orderStatusList } from '$lib/client/constants';
-	import SelectStatus from '$meltui/Select/SelectStatus.svelte';
-	import Paid from '$meltui/Switch/Paid.svelte';
-	import { superForm } from 'sveltekit-superforms/client';
-	import * as Dialog from '$shadcn/dialog';
-	import { buttonVariants } from '$components/ui/button';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { OrderAddressForm } from '$lib/client/schemas/order';
 	import OrderId from './order-id.svelte';

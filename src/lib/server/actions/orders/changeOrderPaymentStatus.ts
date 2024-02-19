@@ -4,17 +4,18 @@ import { trytm } from '@bdsqqq/try';
 import { error, fail, type Action } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { isAtLeastModerator } from '$lib/client/functions';
-import { orders } from '$lib/server/db/schemas/orders';
+import { ordersTable } from '$lib/server/db/schemas/orders';
 import { eq } from 'drizzle-orm';
 import { order$ } from '$lib/client/schemas';
 import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
 
 const changeOrderPaymentStatus = (async ({ request, locals }) => {
-	const sessionUser = locals.session?.user;
+	const sessionUser = locals.user;
 
 	// Only moderators and admins are allowed to edit a user
 	if (!sessionUser) {
-		error(...getCustomError('not-logged-in'));
+		redirect(303, '/zaloguj');
+		// error(...getCustomError('not-logged-in'));;
 	}
 	if (!isAtLeastModerator(sessionUser.role)) {
 		error(403, 'Nie masz wystarczających uprawień');
@@ -30,22 +31,22 @@ const changeOrderPaymentStatus = (async ({ request, locals }) => {
 	// Update the order
 	const [, editOrderPaidError] = await trytm(
 		db
-			.update(orders)
+			.update(ordersTable)
 			.set({
 				paid
 			})
-			.where(eq(orders.id, id))
+			.where(eq(ordersTable.id, id))
 	);
 
 	if (editOrderPaidError) {
 		// Unexpected-error
 		console.error('editOrderPaidError', editOrderPaidError);
-		return setError(form, 'paid', 'Nie udało się zmienić statusu płatności zamówienia', {
+		return setError(form, 'paid', 'Błąd serwera podczas zmieniania statusu płatności', {
 			status: 500
 		});
 	}
 
-	return setMessage(form, 'Pomyślnie zmieniono status płatności');
+	return setMessage(form, 'Zmieniono status płatności');
 }) satisfies Action;
 
 export default changeOrderPaymentStatus;

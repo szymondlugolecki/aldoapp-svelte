@@ -13,12 +13,12 @@ import { trytm } from '@bdsqqq/try';
 // 	runtime: 'edge'
 // };
 
-export const load = async ({ locals, depends, url }) => {
-	depends('session');
-	const sessionUser = locals.session?.user;
+export const load = async ({ locals, url }) => {
+	// depends('session');
+	const sessionUser = locals.user;
 
 	const base = {
-		user: locals.session?.user,
+		user: locals.user,
 		url: url.href
 	};
 
@@ -27,7 +27,7 @@ export const load = async ({ locals, depends, url }) => {
 	}
 
 	const [fetchedCart] = await trytm(
-		db.query.carts.findFirst({
+		db.query.cartsTable.findFirst({
 			where: (carts, { eq }) => eq(carts.ownerId, sessionUser.id),
 			with: {
 				customer: {
@@ -89,7 +89,7 @@ export const load = async ({ locals, depends, url }) => {
 		// lazy: {
 		// 	...(isAtLeastModerator(sessionUser.role)
 		// 		? {
-		// 				customers: db.query.users.findMany({
+		// 				customers: db.query.usersTable.findMany({
 		// 					where: (users, { eq, and }) =>
 		// 						and(eq(users.role, 'customer'), eq(users.adviserId, sessionUser.id)),
 		// 					columns: {

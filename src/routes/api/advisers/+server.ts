@@ -4,15 +4,16 @@ import { trytm } from '@bdsqqq/try';
 import { error, json } from '@sveltejs/kit';
 
 export async function GET({ locals }) {
-	const sessionUser = locals.session?.user;
+	const sessionUser = locals.user;
 
 	if (!sessionUser) {
-		error(...getCustomError('not-logged-in'));
+		redirect(303, '/zaloguj');
+		// error(...getCustomError('not-logged-in'));;
 	}
 
 	// Fetch all users with role 'customer' and adviserId equal to sessionUser.id
 	const [advisers, fetchAdvisersError] = await trytm(
-		db.query.users.findMany({
+		db.query.usersTable.findMany({
 			where: (users, { eq, and }) =>
 				and(eq(users.role, 'customer'), eq(users.adviserId, sessionUser.id)),
 			columns: {

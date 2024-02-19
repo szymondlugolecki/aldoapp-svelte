@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db';
 import type { OrderSortableColumn } from '$types';
 import { sql } from 'drizzle-orm';
-import { orders } from '$lib/server/db/schemas/orders.js';
+import { ordersTable } from '$lib/server/db/schemas/orders.js';
 import { extractParams } from '$lib/server/functions/utils';
 import changeOrderStatus from '$lib/server/actions/orders/changeOrderStatus';
 import changePaymentStatus from '$lib/server/actions/orders/changeOrderPaymentStatus.js';
@@ -25,7 +25,7 @@ export const load = async ({ url }) => {
 	console.log('page', page, sort);
 
 	return {
-		orders: await db.query.orders.findMany({
+		orders: await db.query.ordersTable.findMany({
 			limit: pageLimit,
 			offset: (page - 1) * pageLimit,
 			columns: {
@@ -88,7 +88,7 @@ export const load = async ({ url }) => {
 			.select({
 				count: sql<number>`count(*)`.mapWith(Number)
 			})
-			.from(orders),
+			.from(ordersTable),
 		pageLimit,
 		eventForm: await superValidate(order$.eventForm),
 		paymentForm: await superValidate(order$.paymentForm),

@@ -1,21 +1,20 @@
-import getCustomError from '$lib/client/constants/customErrors.js';
 import { settings$ } from '$lib/client/schemas/index.js';
 import { db } from '$lib/server/db';
 import type { Address } from '$lib/server/db/schemas/orders.js';
-import { userAddress } from '$lib/server/db/schemas/userAddress.js';
-import { sleep } from '$lib/server/functions/utils.js';
+import { userAddressTable } from '$lib/server/db/schemas/userAddress.js';
 import { trytm } from '@bdsqqq/try';
-import { error, fail, type Action } from '@sveltejs/kit';
+import { error, fail, type Action, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { message, superValidate } from 'sveltekit-superforms/server';
 
 const address: Action = async (event) => {
-	const sessionUser = event.locals.session?.user;
+	const sessionUser = event.locals.user;
 	if (!sessionUser) {
-		error(...getCustomError('not-logged-in'));
+		redirect(303, '/zaloguj');
+		// error(...getCustomError('not-logged-in'));;
 	}
 
-	await sleep(3);
+	// await sleep(3);
 
 	const form = await superValidate(event, settings$.addressForm);
 	if (!form.valid) {
@@ -39,9 +38,9 @@ const address: Action = async (event) => {
 
 	const [, editAddressError] = await trytm(
 		db
-			.update(userAddress)
+			.update(userAddressTable)
 			.set({ ...address })
-			.where(eq(userAddress.userId, sessionUser.id))
+			.where(eq(userAddressTable.userId, sessionUser.id))
 	);
 
 	if (editAddressError) {
@@ -51,7 +50,7 @@ const address: Action = async (event) => {
 	}
 
 	console.log('success');
-	return message(form, 'Pomyślnie edytowano adres');
+	return message(form, 'Edytowano adres');
 };
 
 export default address;

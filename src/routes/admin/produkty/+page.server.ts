@@ -4,7 +4,7 @@ import add from '$lib/server/actions/product/add';
 import edit from '$lib/server/actions/product/edit';
 // import remove from '$lib/server/actions/product/remove';
 import { db } from '$lib/server/db';
-import { products } from '$lib/server/db/schemas/products';
+import { productsTable } from '$lib/server/db/schemas/products';
 import { sql } from 'drizzle-orm';
 import type { ProductSortableColumn } from '$types';
 import { extractParams } from '$lib/server/functions/utils';
@@ -26,7 +26,7 @@ export const load = async ({ url }) => {
 	const { page, sort } = extractParams<ProductSortableColumn>(url, sortableColumns);
 
 	return {
-		products: await db.query.products.findMany({
+		products: await db.query.productsTable.findMany({
 			columns: {
 				id: true,
 				name: true,
@@ -69,7 +69,7 @@ export const load = async ({ url }) => {
 			.select({
 				count: sql<number>`count(*)`.mapWith(Number)
 			})
-			.from(products),
+			.from(productsTable),
 		addForm: await superValidate(products$.addForm),
 		editForm: await superValidate(products$.editForm)
 	};

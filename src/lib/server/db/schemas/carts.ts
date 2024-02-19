@@ -1,24 +1,24 @@
 import { relations, type InferSelectModel, type InferInsertModel, sql } from 'drizzle-orm';
-import { sqliteTable, integer, index } from 'drizzle-orm/sqlite-core';
-import { users } from './users';
+import { sqliteTable, integer, index, text } from 'drizzle-orm/sqlite-core';
+import { usersTable } from './users';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { cartProducts } from './cartProducts';
+import { cartProductsTable } from './cartProducts';
 
-export const carts = sqliteTable(
+export const cartsTable = sqliteTable(
 	'carts',
 	{
 		id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-		createdAt: integer('created_at', { mode: 'timestamp' })
+		createdAt: integer('created_at', { mode: 'timestamp_ms' })
 			.notNull()
 			.default(sql`CURRENT_TIMESTAMP`),
 
 		// relations
-		customerId: integer('customer_id', { mode: 'number' })
+		customerId: text('customer_id')
 			.notNull()
-			.references(() => users.id), // who receives the product
-		ownerId: integer('owner_id', { mode: 'number' })
+			.references(() => usersTable.id), // who receives the product
+		ownerId: text('owner_id')
 			.notNull()
-			.references(() => users.id) // cart owner - adviser or customer
+			.references(() => usersTable.id) // cart owner - adviser or customer
 		// promoCode
 	},
 	(order) => ({
@@ -28,20 +28,20 @@ export const carts = sqliteTable(
 	})
 );
 
-export const cartsRelations = relations(carts, ({ one, many }) => ({
-	customer: one(users, {
-		fields: [carts.customerId],
-		references: [users.id]
+export const cartsRelations = relations(cartsTable, ({ one, many }) => ({
+	customer: one(usersTable, {
+		fields: [cartsTable.customerId],
+		references: [usersTable.id]
 	}),
-	owner: one(users, {
-		fields: [carts.ownerId],
-		references: [users.id]
+	owner: one(usersTable, {
+		fields: [cartsTable.ownerId],
+		references: [usersTable.id]
 	}),
-	products: many(cartProducts)
+	products: many(cartProductsTable)
 }));
 
-export const createCartSchema = createInsertSchema(carts);
-export const selectCartSchema = createSelectSchema(carts);
+export const createCartSchema = createInsertSchema(cartsTable);
+export const selectCartSchema = createSelectSchema(cartsTable);
 
-export type SelectCart = InferSelectModel<typeof carts>;
-export type InsertCart = InferInsertModel<typeof carts>;
+export type SelectCart = InferSelectModel<typeof cartsTable>;
+export type InsertCart = InferInsertModel<typeof cartsTable>;

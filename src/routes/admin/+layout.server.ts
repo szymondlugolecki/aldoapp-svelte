@@ -2,6 +2,6 @@
 
 // export const load = (({ locals }) => {
 // 	return {
-// 		user: locals.session?.user
+// 		user: locals.user
 // 	};
 // }) satisfies LayoutServerLoad;

@@ -1,3 +1,3 @@
 export const match = (param) => {
-	return !isNaN(Number(param));
+	return param.length === 10;
 };

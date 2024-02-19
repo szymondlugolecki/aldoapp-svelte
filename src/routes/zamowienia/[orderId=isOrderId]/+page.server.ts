@@ -5,19 +5,20 @@ import changeOrderStatus from '$lib/server/actions/orders/changeOrderStatus';
 import orderAgain from '$lib/server/actions/orders/orderAgain';
 import { db } from '$lib/server/db/index.js';
 import { trytm } from '@bdsqqq/try';
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
 
 export const load = async ({ params, locals }) => {
-	const sessionUser = locals.session?.user;
+	const sessionUser = locals.user;
 	if (!sessionUser) {
-		error(...getCustomError('not-logged-in'));
+		redirect(303, '/zaloguj');
+		// error(...getCustomError('not-logged-in'));;
 	}
 
 	const isMod = isAtLeastModerator(sessionUser.role);
 
 	const [rawOrder, fetchOrderError] = await trytm(
-		db.query.orders.findFirst({
+		db.query.ordersTable.findFirst({
 			columns: {
 				id: true,
 				createdAt: true,
@@ -89,7 +90,7 @@ export const load = async ({ params, locals }) => {
 					}
 				}
 			},
-			where: (orders, { eq }) => eq(orders.id, Number(params.orderId))
+			where: (orders, { eq }) => eq(orders.id, params.orderId)
 		})
 	);
 
@@ -126,17 +127,17 @@ export const load = async ({ params, locals }) => {
 	const [statusHistory, getStatusHistoryError] =
 		sessionUser.role === 'admin'
 			? await trytm(
-					db.query.orders.findFirst({
-						where: (orders, { eq }) => eq(orders.id, Number(params.orderId)),
+					db.query.ordersTable.findFirst({
+						where: (orders, { eq }) => eq(orders.id, params.orderId),
 						columns: {
 							id: true
 						},
 						with: {
 							statusLogs: {
-								orderBy: (logs, { desc }) => desc(logs.timestamp),
+								orderBy: (logs, { desc }) => desc(logs.createdAt),
 								columns: {
 									event: true,
-									timestamp: true
+									createdAt: true
 								},
 								with: {
 									user: {

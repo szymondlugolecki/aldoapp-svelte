@@ -14,7 +14,7 @@
 	import type { SubscribeForm } from '$lib/client/schemas/pushSubscription';
 	import { superForm, type FormOptions } from 'sveltekit-superforms/client';
 	import Spinner from '$components/custom/Util/Spinner.svelte';
-	import type { PushSubscription as PushSubscriptionWithKeys } from '@block65/webcrypto-web-push';
+	// import type { PushSubscription as PushSubscriptionWithKeys } from 'web-push-edge';
 
 	let subscribeForm: SuperValidated<SubscribeForm>;
 	export { subscribeForm as form };
@@ -49,13 +49,13 @@
 				return cancel();
 			}
 
-			const { keys } = subscription.toJSON() as PushSubscriptionWithKeys;
+			const { keys } = subscription.toJSON() as PushSubscriptionJSON;
 
 			subscription.endpoint && formData.append('endpoint', subscription.endpoint);
 			subscription.expirationTime &&
 				formData.append('expirationTime', subscription.expirationTime.toString());
-			keys.auth && formData.append('auth', keys.auth);
-			keys.p256dh && formData.append('p256dh', keys.p256dh);
+			keys?.auth && formData.append('auth', keys.auth);
+			keys?.p256dh && formData.append('p256dh', keys.p256dh);
 		}
 	});
 	export let subscriptionExists: boolean;

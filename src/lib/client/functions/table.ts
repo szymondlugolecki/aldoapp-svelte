@@ -3,7 +3,7 @@ import type { SuperValidated } from 'sveltekit-superforms';
 import type { AnyZodObject } from 'zod';
 
 export const createProps = <
-	T extends Record<string, unknown> & { id: number },
+	T extends Record<string, unknown> & { id: number | string },
 	Y extends AnyZodObject
 >(
 	info: CellContext<T, unknown>,

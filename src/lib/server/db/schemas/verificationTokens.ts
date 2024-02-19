@@ -1,13 +1,13 @@
 import { relations, sql, type InferSelectModel, type InferInsertModel } from 'drizzle-orm';
 import { sqliteTable, integer, text, index } from 'drizzle-orm/sqlite-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { users } from './users';
+import { usersTable } from './users';
 
-export const verificationTokens = sqliteTable(
+export const verificationTokensTable = sqliteTable(
 	'verification_tokens',
 	{
 		id: integer('id').primaryKey({ autoIncrement: true }),
-		createdAt: integer('created_at', { mode: 'timestamp' })
+		createdAt: integer('created_at', { mode: 'timestamp_ms' })
 			.notNull()
 			.default(sql`CURRENT_TIMESTAMP`),
 
@@ -15,13 +15,13 @@ export const verificationTokens = sqliteTable(
 		// token: varchar('token', { length: 72 }).notNull(),
 		code: text('code', { length: 4 }).notNull(),
 		userAgent: text('user_agent', { length: 512 }).notNull(),
-		// ipAddress: varchar('ip_address', { length: 46 }).notNull(),
+		ipAddress: text('ip_address', { length: 96 }).notNull(),
 		expiresAt: integer('expires_at', { mode: 'timestamp' }).notNull(),
 
 		// relations
-		userId: integer('user_id', { mode: 'number' })
+		userId: text('user_id')
 			.notNull()
-			.references(() => users.id)
+			.references(() => usersTable.id)
 	},
 	(verificationToken) => ({
 		// indexes
@@ -31,12 +31,16 @@ export const verificationTokens = sqliteTable(
 	})
 );
 
-export const verificationTokensRelations = relations(verificationTokens, ({ one }) => ({
-	user: one(users, { fields: [verificationTokens.userId], references: [users.id] })
+export const verificationTokensRelations = relations(verificationTokensTable, ({ one }) => ({
+	user: one(usersTable, {
+		fields: [verificationTokensTable.userId],
+		references: [usersTable.id],
+		relationName: 'verification_tokens'
+	})
 }));
 
-export const createVerificationTokenSchema = createInsertSchema(verificationTokens);
-export const selectVerificationTokenSchema = createSelectSchema(verificationTokens);
+export const createVerificationTokenSchema = createInsertSchema(verificationTokensTable);
+export const selectVerificationTokenSchema = createSelectSchema(verificationTokensTable);
 
-export type SelectVerificationToken = InferSelectModel<typeof verificationTokens>;
-export type InsertVerificationToken = InferInsertModel<typeof verificationTokens>;
+export type SelectVerificationToken = InferSelectModel<typeof verificationTokensTable>;
+export type InsertVerificationToken = InferInsertModel<typeof verificationTokensTable>;

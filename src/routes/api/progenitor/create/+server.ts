@@ -1,11 +1,11 @@
 import { db } from '$lib/server/db';
-import { addUser } from '$lib/server/functions/db';
+import { createUser } from '$lib/server/functions/db';
 import { trytm } from '@bdsqqq/try';
-import { createId } from '@paralleldrive/cuid2';
 import { error, json } from '@sveltejs/kit';
+import { generateId } from 'lucia';
 
 export async function POST() {
-	const [user, fetchUserError] = await trytm(db.query.users.findFirst());
+	const [user, fetchUserError] = await trytm(db.query.usersTable.findFirst());
 	if (fetchUserError) {
 		error(500, 'Niespodziewany błąd podczas próby pobrania użytkownika');
 	}
@@ -15,8 +15,8 @@ export async function POST() {
 	}
 
 	const [, createProgenitorError] = await trytm(
-		addUser({
-			id: createId(),
+		createUser({
+			id: generateId(15),
 			email: 'szymon.dlugolecki77@gmail.com',
 			fullName: 'Szymon Długołęcki',
 			role: 'admin',

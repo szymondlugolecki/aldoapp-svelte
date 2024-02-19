@@ -1,8 +1,8 @@
 import type { InferSelectModel, InferInsertModel } from 'drizzle-orm';
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
-import { users } from './users';
+import { usersTable } from './users';
 
-export const userAddress = sqliteTable('user_address', {
+export const userAddressTable = sqliteTable('user_address', {
 	id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
 
 	// Address
@@ -11,9 +11,9 @@ export const userAddress = sqliteTable('user_address', {
 	city: text('city', { length: 255 }).notNull(),
 
 	// relations
-	userId: integer('user_id', { mode: 'number' })
+	userId: text('user_id')
 		.notNull()
-		.references(() => users.id)
+		.references(() => usersTable.id)
 });
 
 // export const addressRelations = relations(address, ({ one }) => ({
@@ -27,5 +27,5 @@ export const userAddress = sqliteTable('user_address', {
 // 	})
 // }));
 
-export type SelectUserAddress = InferSelectModel<typeof userAddress>;
-export type InsertUserAddress = InferInsertModel<typeof userAddress>;
+export type SelectUserAddress = InferSelectModel<typeof userAddressTable>;
+export type InsertUserAddress = InferInsertModel<typeof userAddressTable>;

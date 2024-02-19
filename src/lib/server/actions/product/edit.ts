@@ -5,18 +5,21 @@ import getCustomError from '$lib/client/constants/customErrors';
 import { isAtLeastModerator } from '$lib/client/functions';
 import { products$ } from '$lib/client/schemas';
 import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
-import { products, type Product } from '$lib/server/db/schemas/products';
+import { productsTable, type SelectProduct } from '$lib/server/db/schemas/products';
 import { eq } from 'drizzle-orm';
 import { db } from '$lib/server/db';
-import { utapi } from '$lib/server/clients/uploadthing';
+import { put } from '@vercel/blob';
+import { env } from '$env/dynamic/private';
 
 const edit: Action = async ({ request, locals }) => {
+	const sessionUser = locals.user;
 	// Must be a moderator or higher
-	if (!locals.session) {
-		error(...getCustomError('not-logged-in'));
+	if (!sessionUser) {
+		redirect(303, '/zaloguj');
+		// error(...getCustomError('not-logged-in'));;
 	}
 
-	if (!isAtLeastModerator(locals.session?.user.role)) {
+	if (!isAtLeastModerator(sessionUser.role)) {
 		error(...getCustomError('insufficient-permissions'));
 	}
 
@@ -40,20 +43,19 @@ const edit: Action = async ({ request, locals }) => {
 
 	if (image instanceof File) {
 		// One image per product is enough for now
-		const { data, error } = await utapi.uploadFiles(image);
+		const fileBuffer = await image.arrayBuffer();
+		const { url } = await put(image.name, fileBuffer, {
+			token: env.BLOB_READ_WRITE_TOKEN,
+			access: 'public'
+		});
 
-		if (error) {
-			console.error('product.edit.images', error);
-			return setError(form, 'Nie udało się przesłać obrazka', { status: 500 });
-		}
-
-		console.log('imageUrl', imageUrl);
-		imageUrl = data.url;
+		console.log('url', url);
+		imageUrl = url;
 	}
 
 	const newProduct: Partial<
 		Pick<
-			Product,
+			SelectProduct,
 			| 'name'
 			| 'symbol'
 			| 'category'
@@ -84,7 +86,7 @@ const edit: Action = async ({ request, locals }) => {
 	}
 
 	if (price) {
-		newProduct.price = price.toString();
+		newProduct.price = price;
 	}
 
 	if (producent) {
@@ -92,7 +94,7 @@ const edit: Action = async ({ request, locals }) => {
 	}
 
 	if (weight) {
-		newProduct.weight = weight.toString();
+		newProduct.weight = weight;
 	}
 
 	if (description) {
@@ -112,17 +114,17 @@ const edit: Action = async ({ request, locals }) => {
 	// Edit the product in the db
 	const [, editProductError] = await trytm(
 		db
-			.update(products)
+			.update(productsTable)
 			.set({
 				...newProduct
 			})
-			.where(eq(products.id, id))
+			.where(eq(productsTable.id, id))
 	);
 
 	if (editProductError) {
 		// Unexpected-error
 		console.error('editProductError', editProductError);
-		return setError(form, 'Nie udało się edytować użytkownika', { status: 500 });
+		return setError(form, 'Błąd serwera podczas edytowania użytkownika', { status: 500 });
 	}
 
 	return setMessage(form, 'Edytowano produkt');

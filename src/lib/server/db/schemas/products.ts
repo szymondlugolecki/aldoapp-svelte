@@ -1,12 +1,12 @@
 import { mainCategories, producents } from '../../../client/constants/dbTypes';
 import { relations, sql, type InferSelectModel, type InferInsertModel } from 'drizzle-orm';
 import { sqliteTable, integer, text, index, real } from 'drizzle-orm/sqlite-core';
-import { users } from './users';
-import { orderProducts } from './orderProducts';
-import { cartProducts } from './cartProducts';
+import { usersTable } from './users';
+import { orderProductsTable } from './orderProducts';
+import { cartProductsTable } from './cartProducts';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { images } from './images';
-import { favoriteProducts } from './favoriteProducts';
+import { imagesTable } from './images';
+import { favoriteProductsTable } from './favoriteProducts';
 
 export type Customer = {
 	email: string;
@@ -14,11 +14,11 @@ export type Customer = {
 	fullName: string;
 };
 
-export const products = sqliteTable(
+export const productsTable = sqliteTable(
 	'products',
 	{
 		id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-		createdAt: integer('created_at', { mode: 'timestamp' })
+		createdAt: integer('created_at', { mode: 'timestamp_ms' })
 			.notNull()
 			.default(sql`CURRENT_TIMESTAMP`),
 
@@ -37,9 +37,9 @@ export const products = sqliteTable(
 		hidden: integer('hidden', { mode: 'boolean' }).default(false).notNull(),
 
 		// relations
-		authorId: text('author_id', { length: 36 })
+		authorId: text('author_id')
 			.notNull()
-			.references(() => users.id) // user that added this product
+			.references(() => usersTable.id) // user that added this product
 	},
 	(product) => ({
 		// indexes
@@ -49,20 +49,20 @@ export const products = sqliteTable(
 	})
 );
 
-export const productsRelations = relations(products, ({ one, many }) => ({
-	author: one(users, {
-		fields: [products.authorId],
-		references: [users.id],
+export const productsRelations = relations(productsTable, ({ one, many }) => ({
+	author: one(usersTable, {
+		fields: [productsTable.authorId],
+		references: [usersTable.id],
 		relationName: 'products'
 	}),
-	orderProducts: many(orderProducts),
-	cartProducts: many(cartProducts),
-	images: many(images),
-	favoriteProducts: many(favoriteProducts, { relationName: 'favorite_products' })
+	orderProducts: many(orderProductsTable),
+	cartProducts: many(cartProductsTable),
+	images: many(imagesTable),
+	favoriteProducts: many(favoriteProductsTable, { relationName: 'favorite_products' })
 }));
 
-export const createProductSchema = createInsertSchema(products);
-export const selectProductSchema = createSelectSchema(products);
+export const createProductSchema = createInsertSchema(productsTable);
+export const selectProductSchema = createSelectSchema(productsTable);
 
-export type SelectProduct = InferSelectModel<typeof products>;
-export type InsertProduct = InferInsertModel<typeof products>;
+export type SelectProduct = InferSelectModel<typeof productsTable>;
+export type InsertProduct = InferInsertModel<typeof productsTable>;

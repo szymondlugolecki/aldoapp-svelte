@@ -1,14 +1,14 @@
-import { getCustomRedirect } from '$lib/client/constants/customErrors';
 import { isAtLeastModerator } from '$lib/client/functions/index.js';
 import { cart$, order$ } from '$lib/client/schemas';
 import changeProductQuantity from '$lib/server/actions/cart/changeProductQuantity';
 import setCustomer from '$lib/server/actions/cart/setCustomer';
 
-import createOrder from '$lib/server/actions/cart/order.js';
+import createOrder from '$lib/server/actions/cart/createOrder.js';
 import { db } from '$lib/server/db';
-import { trytm } from '@bdsqqq/try';
 import { redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
+import { and, eq } from 'drizzle-orm';
+import { usersTable } from '$lib/server/db/schemas/users.js';
 
 export const actions = {
 	changeProductQuantity,
@@ -17,66 +17,58 @@ export const actions = {
 };
 
 export const load = async ({ locals }) => {
-	const sessionUser = locals.session?.user;
+	const sessionUser = locals.user;
 	if (!sessionUser) {
-		redirect(...getCustomRedirect('login-required', '/koszyk'));
+		redirect(303, '/zaloguj');
 	}
 
-	const [cart] = await trytm(
-		db.query.carts.findFirst({
-			columns: {},
-			where: (carts, { eq }) => eq(carts.ownerId, sessionUser.id),
-			with: {
-				customer: {
-					columns: {},
-					with: {
-						address: {
-							columns: {
-								zipCode: true,
-								city: true,
-								street: true
-							}
-						}
-					}
-				}
+	// const [cart] = await trytm(
+	// 	db.query.cartsTable.findFirst({
+	// 		columns: {},
+	// 		where: (carts, { eq }) => eq(carts.ownerId, sessionUser.id),
+	// 		with: {
+	// 			customer: {
+	// 				columns: {},
+	// 				with: {
+	// 					address: {
+	// 						columns: {
+	// 							zipCode: true,
+	// 							city: true,
+	// 							street: true
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	})
+	// );
+
+	// const defaultAddress = cart?.customer.address;
+
+	if (isAtLeastModerator(sessionUser.role)) {
+		const whereCondition =
+			sessionUser.role === 'admin'
+				? eq(usersTable.role, 'customer')
+				: and(eq(usersTable.role, 'customer'), eq(usersTable.adviserId, sessionUser.id));
+		const customers = await db.query.usersTable.findMany({
+			where: () => whereCondition,
+			columns: {
+				id: true,
+				fullName: true,
+				email: true
 			}
-		})
-	);
+		});
 
-	const defaultAddress = cart?.customer.address;
-
-	const [customers, customersFetchError] = isAtLeastModerator(sessionUser.role)
-		? await trytm(
-				db.query.users.findMany({
-					where: (users, { eq, and }) =>
-						and(eq(users.role, 'customer'), eq(users.adviserId, sessionUser.id)),
-					columns: {
-						id: true,
-						fullName: true,
-						email: true,
-						phone: true
-					},
-					with: {
-						address: {
-							columns: {
-								zipCode: true,
-								city: true,
-								street: true
-							}
-						}
-					}
-				})
-		  )
-		: [null, null];
-
-	if (customersFetchError) {
-		// Unexpected-error
-		console.error(customersFetchError);
+		return {
+			customers,
+			orderForm: await superValidate(order$.create),
+			productQuantityForm: await superValidate(order$.productQuantity),
+			setCustomerForm: await superValidate(cart$.changeCartCustomer)
+		};
 	}
 
-	// Populate the form with default values
 	return {
-		customers,
+		customers: null,
 		orderForm: await superValidate(order$.create),
 		productQuantityForm: await superValidate(order$.productQuantity),
 		setCustomerForm: await superValidate(cart$.changeCartCustomer)

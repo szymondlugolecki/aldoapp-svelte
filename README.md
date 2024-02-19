@@ -20,8 +20,8 @@ Fully featured e-commerce platform built with SvelteKit & TailwindCSS.
 # core
 sveltekit
 typescript
-drizzle-orm + planetscale serverless driver
-meltui
+drizzle-orm + turso
+meltui + shadcn
 
 # styling
 tailwindcss

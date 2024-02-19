@@ -1,14 +1,14 @@
 import { trytm } from '@bdsqqq/try';
 import { db } from '$lib/server/db';
-import { setCartProductQuantity, createCart } from '$lib/server/functions/db';
-import { error, type Action, fail } from '@sveltejs/kit';
+import { setCartProductQuantity } from '$lib/server/functions/db';
+import { type Action, fail, redirect } from '@sveltejs/kit';
 import { cart$ } from '$lib/client/schemas';
-import { setMessage, superValidate } from 'sveltekit-superforms/server';
+import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
 
 const changeProductQuantity: Action = async ({ request, locals }) => {
-	const sessionUser = locals.session?.user;
+	const sessionUser = locals.user;
 	if (!sessionUser) {
-		error(401, 'Nie jesteś zalogowany');
+		redirect(303, '/zaloguj');
 	}
 
 	const form = await superValidate(request, cart$.changeProductQuantity);
@@ -19,27 +19,23 @@ const changeProductQuantity: Action = async ({ request, locals }) => {
 
 	// Fetch user's cart
 	const [cart, fetchCartError] = await trytm(
-		db.query.carts.findFirst({
+		db.query.cartsTable.findFirst({
 			where: (carts, { eq }) => eq(carts.ownerId, sessionUser.id)
 		})
 	);
 
 	if (fetchCartError) {
-		error(500, 'Błąd podczas sprawdzania czy istnieje koszyk');
+		// Unexpected-error
+		console.error('Failed to fetch cart', fetchCartError);
+		return setError(form, 'Błąd serwera podczas pobierania koszyka', { status: 500 });
 	}
 
-	// If no cart, create one
+	// No cart
 	if (!cart) {
 		// This shouldnt technically happen
-		// Once a user is created, a cart is created for them
-		// But just in case
-		const [, createCartError] = await trytm(createCart(sessionUser.id));
-
-		if (createCartError) {
-			error(500, 'Błąd podczas tworzenia koszyka');
-		}
-
-		error(500, 'Spróbuj ponownie');
+		return setError(form, 'Twój koszyk nie istnieje. Skontaktuj się z administratorem', {
+			status: 500
+		});
 	}
 
 	// Change product quantity
@@ -49,7 +45,7 @@ const changeProductQuantity: Action = async ({ request, locals }) => {
 	if (changeProductQuantityError) {
 		// Unexpected-error
 		console.error('Failed to change product quantity', changeProductQuantityError);
-		error(500, 'Błąd podczas zmieniania ilości produktu');
+		return setError(form, 'Błąd serwera podczas zmieniania ilości produktu', { status: 500 });
 	}
 
 	if (quantity === 0) {

@@ -15,7 +15,7 @@ export const load = async ({ params }) => {
 
 	const encodedURL = encodeURIComponent(params.productURL);
 	const [product, findProductError] = await trytm(
-		db.query.products.findFirst({
+		db.query.productsTable.findFirst({
 			columns: {
 				id: true,
 				name: true,

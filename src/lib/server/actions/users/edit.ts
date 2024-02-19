@@ -3,19 +3,20 @@ import { getRoleRank, isAtLeastModerator } from '$lib/client/functions';
 import { user$ } from '$lib/client/schemas';
 import { db } from '$lib/server/db';
 import type { Address } from '$lib/server/db/schemas/orders';
-import { userAddress } from '$lib/server/db/schemas/userAddress';
-import { users, type User } from '$lib/server/db/schemas/users';
+import { userAddressTable } from '$lib/server/db/schemas/userAddress';
+import { usersTable, type SelectUser } from '$lib/server/db/schemas/users';
 import { trytm } from '@bdsqqq/try';
-import { error, type Action, fail } from '@sveltejs/kit';
+import { error, type Action, fail, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
 
 const edit = (async ({ request, locals }) => {
-	const sessionUser = locals.session?.user;
+	const sessionUser = locals.user;
 
 	// Only moderators and admins are allowed to edit a user
 	if (!sessionUser) {
-		error(...getCustomError('not-logged-in'));
+		redirect(303, '/zaloguj');
+		// error(...getCustomError('not-logged-in'));;
 	}
 	if (!isAtLeastModerator(sessionUser.role)) {
 		error(...getCustomError('insufficient-permissions'));
@@ -35,7 +36,7 @@ const edit = (async ({ request, locals }) => {
 
 	// Fetch the user from the database (before the edit)
 	const [userBeforeEdit, userBeforeEditError] = await trytm(
-		db.query.users.findFirst({
+		db.query.usersTable.findFirst({
 			columns: {
 				id: true,
 				email: true,
@@ -82,13 +83,14 @@ const edit = (async ({ request, locals }) => {
 	else {
 		// User is trying to edit a user with higher or equal role
 		if (getRoleRank(sessionUser.role) <= getRoleRank(userBeforeEdit.role)) {
-			return setError(form, 'Nie możesz edytować użytkowników z wyższą lub równą rolą', {
+			return setError(form, 'Nie możesz edytować użytkowników z taką samą lub wyższą rolą', {
 				status: 403
 			});
 		}
 	}
 
-	const newUser: Partial<Pick<User, 'email' | 'fullName' | 'phone' | 'role' | 'adviserId'>> = {};
+	const newUser: Partial<Pick<SelectUser, 'email' | 'fullName' | 'phone' | 'role' | 'adviserId'>> =
+		{};
 	const newAddress: Partial<Address> = {};
 
 	if (email) {
@@ -119,25 +121,17 @@ const edit = (async ({ request, locals }) => {
 		newAddress.street = street;
 	}
 
-	// if (claimAdviser !== undefined) {
-	// 	if (claimAdviser) {
-	// 		newUser.adviserId = sessionUser.id;
-	// 	} else {
-	// 		newUser.adviserId = null;
-	// 	}
-	// }
-
 	if (Object.keys(newUser).length) {
 		const [, editUserError] = await trytm(
 			db
-				.update(users)
+				.update(usersTable)
 				.set({
 					...newUser
 				})
-				.where(eq(users.id, id))
+				.where(eq(usersTable.id, id))
 		);
 		if (editUserError) {
-			return setError(form, 'Nie udało się edytować użytkownika', { status: 500 });
+			return setError(form, 'Błąd serwera podczas edytowania użytkownika', { status: 500 });
 		}
 	}
 
@@ -146,21 +140,12 @@ const edit = (async ({ request, locals }) => {
 	if (Object.keys(newAddress).length) {
 		const [, editUserAddressError] = await trytm(
 			db
-				.insert(userAddress)
-				.values({
-					userId: id,
-					street: newAddress.street || '',
-					zipCode: newAddress.zipCode || '',
-					city: newAddress.city || ''
-				})
-				.onDuplicateKeyUpdate({
-					set: {
-						...newAddress
-					}
-				})
+				.update(userAddressTable)
+				.set({ ...newAddress })
+				.where(eq(userAddressTable.userId, id))
 		);
 		if (editUserAddressError) {
-			return setError(form, 'Nie udało się edytować adresu użytkownika', { status: 500 });
+			return setError(form, 'Błąd serwera podczas edytowania adresu użytkownika', { status: 500 });
 		}
 	}
 

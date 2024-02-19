@@ -4,12 +4,12 @@ import { paymentMethods, deliveryMethods, orderEvents } from '../constants/dbTyp
 import { id as productId } from './products';
 import { addressForm } from './settings';
 
-export const id = z.coerce
-	.number({
-		invalid_type_error: 'Nieprawidłowe id zamówienia',
-		required_error: 'Id zamówienia jest wymagane'
+export const id = z
+	.string({
+		required_error: 'Identyfikator zamówienia jest wymagany',
+		invalid_type_error: 'Nieprawidłowe zamówienie'
 	})
-	.min(0, { message: 'Nieprawidłowe id zamówienia' });
+	.length(10, { message: 'Nieprawidłowe id zamówienia' });
 
 export const deliveryMethod = z.enum(deliveryMethods, {
 	errorMap(issue) {

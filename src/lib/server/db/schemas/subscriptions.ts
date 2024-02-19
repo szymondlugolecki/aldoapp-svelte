@@ -1,7 +1,16 @@
 import { relations, type InferSelectModel, type InferInsertModel, sql } from 'drizzle-orm';
 import { sqliteTable, text, integer, uniqueIndex } from 'drizzle-orm/sqlite-core';
-import { users } from './users';
-import type { PushSubscription } from '@block65/webcrypto-web-push';
+import { usersTable } from './users';
+// import { PushSubscription } from 'web-push-edge';
+
+export interface PushSubscription {
+	endpoint: string;
+	expirationTime?: number | null;
+	keys: {
+		p256dh: string;
+		auth: string;
+	};
+}
 
 // interface PushSubscriptionJSON {
 // 	endpoint?: string;
@@ -9,11 +18,11 @@ import type { PushSubscription } from '@block65/webcrypto-web-push';
 // 	keys?: Record<string, string>;
 // }
 
-export const subscriptions = sqliteTable(
+export const subscriptionsTable = sqliteTable(
 	'subscriptions',
 	{
 		id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-		createdAt: integer('created_at', { mode: 'timestamp' })
+		createdAt: integer('created_at', { mode: 'timestamp_ms' })
 			.notNull()
 			.default(sql`CURRENT_TIMESTAMP`),
 
@@ -26,9 +35,9 @@ export const subscriptions = sqliteTable(
 		userAgent: text('user_agent', { length: 512 }).notNull(),
 
 		// relations
-		userId: text('user_id', { length: 255 })
+		userId: text('user_id')
 			.notNull()
-			.references(() => users.id)
+			.references(() => usersTable.id)
 	},
 	(subscription) => ({
 		// indexes
@@ -36,12 +45,12 @@ export const subscriptions = sqliteTable(
 	})
 );
 
-export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
-	user: one(users, {
-		fields: [subscriptions.userId],
-		references: [users.id]
+export const subscriptionsRelations = relations(subscriptionsTable, ({ one }) => ({
+	user: one(usersTable, {
+		fields: [subscriptionsTable.userId],
+		references: [usersTable.id]
 	})
 }));
 
-export type SelectSubscription = InferSelectModel<typeof subscriptions>;
-export type InsertSubscription = InferInsertModel<typeof subscriptions>;
+export type SelectSubscription = InferSelectModel<typeof subscriptionsTable>;
+export type InsertSubscription = InferInsertModel<typeof subscriptionsTable>;

@@ -10,28 +10,37 @@ CREATE TABLE `cart_products` (
 CREATE TABLE `carts` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`created_at` integer DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	`customer_id` integer NOT NULL,
-	`owner_id` integer NOT NULL,
-	FOREIGN KEY (`customer_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`owner_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+	`customer_id` text NOT NULL,
+	`owner_id` text NOT NULL,
+	FOREIGN KEY (`customer_id`) REFERENCES `usersTable`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`owner_id`) REFERENCES `usersTable`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `favorite_products` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`product_id` integer NOT NULL,
-	`author_id` integer NOT NULL,
+	`author_id` text NOT NULL,
 	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`author_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`author_id`) REFERENCES `usersTable`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `images` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`created_at` integer DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	`url` text(512) NOT NULL,
+	`url` text(1024) NOT NULL,
 	`product_id` integer NOT NULL,
-	`author_id` integer NOT NULL,
+	`author_id` text NOT NULL,
 	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`author_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`author_id`) REFERENCES `usersTable`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE TABLE `order_address` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`zip_code` text(10) NOT NULL,
+	`street` text(255) NOT NULL,
+	`city` text(255) NOT NULL,
+	`order_id` text NOT NULL,
+	FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `order_products` (
@@ -39,13 +48,13 @@ CREATE TABLE `order_products` (
 	`quantity` integer NOT NULL,
 	`price` real NOT NULL,
 	`product_id` integer NOT NULL,
-	`order_id` integer NOT NULL,
+	`order_id` text NOT NULL,
 	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `orders` (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`id` text PRIMARY KEY NOT NULL,
 	`created_at` integer DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`price` real NOT NULL,
 	`discount` real NOT NULL,
@@ -54,19 +63,22 @@ CREATE TABLE `orders` (
 	`estimated_delivery_date` integer,
 	`delivery_method` text NOT NULL,
 	`payment_method` text NOT NULL,
-	`customer_id` text(36) NOT NULL,
-	`cart_owner_id` text(36) NOT NULL,
-	`driver_id` text(36)
+	`customer_id` text NOT NULL,
+	`cart_owner_id` text NOT NULL,
+	`driver_id` text,
+	FOREIGN KEY (`customer_id`) REFERENCES `usersTable`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`cart_owner_id`) REFERENCES `usersTable`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`driver_id`) REFERENCES `usersTable`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `order_status_logs` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`event` text NOT NULL,
 	`timestamp` integer DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	`order_id` integer NOT NULL,
-	`user_id` integer NOT NULL,
+	`order_id` text NOT NULL,
+	`user_id` text NOT NULL,
 	FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`user_id`) REFERENCES `usersTable`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `products` (
@@ -84,18 +96,19 @@ CREATE TABLE `products` (
 	`encoded_url` text(512) NOT NULL,
 	`image` text(2048),
 	`hidden` integer DEFAULT false NOT NULL,
-	`author_id` text(36) NOT NULL,
-	FOREIGN KEY (`author_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+	`author_id` text NOT NULL,
+	FOREIGN KEY (`author_id`) REFERENCES `usersTable`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `promo_code_uses` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`created_at` integer DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	`promocode_used_id` text(36) NOT NULL,
-	`order_id` integer NOT NULL,
-	`user_id` integer NOT NULL,
+	`promocode_used_id` integer NOT NULL,
+	`order_id` text NOT NULL,
+	`user_id` text NOT NULL,
+	FOREIGN KEY (`promocode_used_id`) REFERENCES `promo_codes`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`user_id`) REFERENCES `usersTable`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `promo_codes` (
@@ -110,8 +123,15 @@ CREATE TABLE `promo_codes` (
 	`enabled` integer DEFAULT true NOT NULL,
 	`discount_type` text NOT NULL,
 	`min_cart_value` real NOT NULL,
-	`author_id` text(36) NOT NULL,
-	FOREIGN KEY (`author_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+	`author_id` text NOT NULL,
+	FOREIGN KEY (`author_id`) REFERENCES `usersTable`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE TABLE `sessions` (
+	`id` text PRIMARY KEY NOT NULL,
+	`user_id` text NOT NULL,
+	`expires_at` integer NOT NULL,
+	FOREIGN KEY (`user_id`) REFERENCES `usersTable`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `subscriptions` (
@@ -121,8 +141,8 @@ CREATE TABLE `subscriptions` (
 	`keys` text NOT NULL,
 	`endpoint` text(512) NOT NULL,
 	`user_agent` text(512) NOT NULL,
-	`user_id` text(255) NOT NULL,
-	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+	`user_id` text NOT NULL,
+	FOREIGN KEY (`user_id`) REFERENCES `usersTable`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `user_address` (
@@ -130,18 +150,19 @@ CREATE TABLE `user_address` (
 	`zip_code` text(10) NOT NULL,
 	`street` text(255) NOT NULL,
 	`city` text(255) NOT NULL,
-	`user_id` text(255) NOT NULL,
-	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+	`user_id` text NOT NULL,
+	FOREIGN KEY (`user_id`) REFERENCES `usersTable`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-CREATE TABLE `users` (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+CREATE TABLE `usersTable` (
+	`id` text PRIMARY KEY NOT NULL,
 	`created_at` integer DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`email` text(320) NOT NULL,
 	`name` text(256) NOT NULL,
 	`role` text NOT NULL,
 	`phone` text(15) NOT NULL,
-	`adviser_id` text(255)
+	`adviser_id` text,
+	FOREIGN KEY (`adviser_id`) REFERENCES `usersTable`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `verification_tokens` (
@@ -149,9 +170,10 @@ CREATE TABLE `verification_tokens` (
 	`created_at` integer DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`code` text(4) NOT NULL,
 	`user_agent` text(512) NOT NULL,
+	`ip_address` text(96) NOT NULL,
 	`expires_at` integer NOT NULL,
-	`user_id` integer NOT NULL,
-	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
+	`user_id` text NOT NULL,
+	FOREIGN KEY (`user_id`) REFERENCES `usersTable`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE INDEX `cart_customer_idx` ON `carts` (`customer_id`);--> statement-breakpoint
@@ -167,7 +189,7 @@ CREATE INDEX `promo_code_use_idx` ON `promo_code_uses` (`promocode_used_id`);-->
 CREATE INDEX `user_id_idx` ON `promo_code_uses` (`user_id`);--> statement-breakpoint
 CREATE INDEX `promo_codes_author_idx` ON `promo_codes` (`author_id`);--> statement-breakpoint
 CREATE UNIQUE INDEX `subscription_endpointx` ON `subscriptions` (`endpoint`);--> statement-breakpoint
-CREATE UNIQUE INDEX `unique_emailx` ON `users` (`email`);--> statement-breakpoint
-CREATE INDEX `adviser_idx` ON `users` (`adviser_id`);--> statement-breakpoint
+CREATE UNIQUE INDEX `unique_emailx` ON `usersTable` (`email`);--> statement-breakpoint
+CREATE INDEX `adviser_idx` ON `usersTable` (`adviser_id`);--> statement-breakpoint
 CREATE INDEX `codex` ON `verification_tokens` (`code`);--> statement-breakpoint
 CREATE INDEX `user_agentx` ON `verification_tokens` (`user_agent`);

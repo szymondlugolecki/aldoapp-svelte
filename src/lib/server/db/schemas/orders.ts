@@ -2,11 +2,11 @@ import { deliveryMethods, orderStatus, paymentMethods } from '../../../client/co
 
 import { relations, type InferSelectModel, type InferInsertModel, sql } from 'drizzle-orm';
 import { sqliteTable, text, integer, real, index } from 'drizzle-orm/sqlite-core';
-import { users } from './users';
+import { usersTable } from './users';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { orderProducts } from './orderProducts';
-import { orderAddress } from './orderAddress';
-import { orderStatusLogs } from './orderStatusLogs';
+import { orderProductsTable } from './orderProducts';
+import { orderAddressTable } from './orderAddress';
+import { orderStatusLogsTable } from './orderStatusLogs';
 
 export type Address = {
 	street: string;
@@ -14,11 +14,11 @@ export type Address = {
 	city: string;
 };
 
-export const orders = sqliteTable(
+export const ordersTable = sqliteTable(
 	'orders',
 	{
-		id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-		createdAt: integer('created_at', { mode: 'timestamp' })
+		id: text('id').notNull().primaryKey(),
+		createdAt: integer('created_at', { mode: 'timestamp_ms' })
 			.notNull()
 			.default(sql`CURRENT_TIMESTAMP`),
 
@@ -37,9 +37,13 @@ export const orders = sqliteTable(
 		paymentMethod: text('payment_method', { enum: paymentMethods }).notNull(),
 
 		// relations
-		customerId: text('customer_id', { length: 36 }).notNull(),
-		cartOwnerId: text('cart_owner_id', { length: 36 }).notNull(),
-		driverId: text('driver_id', { length: 36 })
+		customerId: text('customer_id')
+			.notNull()
+			.references(() => usersTable.id),
+		cartOwnerId: text('cart_owner_id')
+			.notNull()
+			.references(() => usersTable.id),
+		driverId: text('driver_id').references(() => usersTable.id)
 		// promoCodeId: int('promo_code_id'),
 	},
 	(order) => ({
@@ -51,36 +55,36 @@ export const orders = sqliteTable(
 	})
 );
 
-export const ordersRelations = relations(orders, ({ one, many }) => ({
-	customer: one(users, {
-		fields: [orders.customerId],
-		references: [users.id],
+export const ordersRelations = relations(ordersTable, ({ one, many }) => ({
+	customer: one(usersTable, {
+		fields: [ordersTable.customerId],
+		references: [usersTable.id],
 		relationName: 'order_customer'
 	}),
-	cartOwner: one(users, {
-		fields: [orders.cartOwnerId],
-		references: [users.id],
+	cartOwner: one(usersTable, {
+		fields: [ordersTable.cartOwnerId],
+		references: [usersTable.id],
 		relationName: 'order_cart_owner'
 	}),
-	driver: one(users, {
-		fields: [orders.driverId],
-		references: [users.id],
+	driver: one(usersTable, {
+		fields: [ordersTable.driverId],
+		references: [usersTable.id],
 		relationName: 'order_driver'
 	}),
 	// promoCode: one(promoCodes, {
-	// 	fields: [orders.promoCodeId],
+	// 	fields: [ordersTable.promoCodeId],
 	// 	references: [promoCodes.id]
 	// }),
-	products: many(orderProducts, { relationName: 'order_products' }),
-	statusLogs: many(orderStatusLogs, { relationName: 'order_status_logs' }),
-	address: one(orderAddress, {
-		fields: [orders.id],
-		references: [orderAddress.orderId]
+	products: many(orderProductsTable, { relationName: 'order_products' }),
+	statusLogs: many(orderStatusLogsTable, { relationName: 'order_status_logs' }),
+	address: one(orderAddressTable, {
+		fields: [ordersTable.id],
+		references: [orderAddressTable.orderId]
 	})
 }));
 
-export const createOrderSchema = createInsertSchema(orders);
-export const selectOrderSchema = createSelectSchema(orders);
+export const createOrderSchema = createInsertSchema(ordersTable);
+export const selectOrderSchema = createSelectSchema(ordersTable);
 
-export type SelectOrder = InferSelectModel<typeof orders>;
-export type InsertOrder = InferInsertModel<typeof orders>;
+export type SelectOrder = InferSelectModel<typeof ordersTable>;
+export type InsertOrder = InferInsertModel<typeof ordersTable>;

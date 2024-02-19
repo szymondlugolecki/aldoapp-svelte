@@ -21,10 +21,11 @@ const sortableColumns: OrderSortableColumn[] = [
 const pageLimit = 10;
 
 export const load = async ({ url, locals }) => {
-	const sessionUser = locals.session?.user;
+	const sessionUser = locals.user;
 
 	if (!sessionUser) {
-		error(...getCustomError('not-logged-in'));
+		redirect(303, '/zaloguj');
+		// error(...getCustomError('not-logged-in'));;
 	}
 	if (!isAtLeastModerator(sessionUser.role)) {
 		error(...getCustomError('insufficient-permissions'));
@@ -70,7 +71,7 @@ export const load = async ({ url, locals }) => {
 	// const filtersApplied = !!statusClause || !!priceClause || !!cartOwnerClause || !!customerClause;
 
 	const [ordersUngrouped, fetchOrdersError] = await trytm(
-		db.query.orders.findMany({
+		db.query.ordersTable.findMany({
 			where: extendedWhereClause,
 			columns: {
 				id: true,

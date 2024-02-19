@@ -18,11 +18,12 @@ export const load = async ({ locals }) => {
 	// Must be logged in
 	const { session } = locals;
 	if (!session) {
-		error(...getCustomError('not-logged-in'));
+		redirect(303, '/zaloguj');
+		// error(...getCustomError('not-logged-in'));;
 	}
 
 	// const [user, fetchUserError] = await trytm(
-	// 	db.query.users.findFirst({
+	// 	db.query.usersTable.findFirst({
 	// 		where: (users, { eq }) => eq(users.id, session.user.id),
 	// 		columns: {
 	// 			email: true,

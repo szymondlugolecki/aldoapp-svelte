@@ -37,11 +37,11 @@
 				<Card.Root class="w-full max-w-2xl">
 					<Card.Header>
 						<Card.Title>Historia</Card.Title>
-						<Card.Description>Liczba pozycji - {data.statusLogs.length}</Card.Description>
+						<Card.Description>Liczba zapisów - {data.statusLogs.length}</Card.Description>
 					</Card.Header>
 					<Card.Content class="grid gap-4 p-4 pt-0 sm:pt-0 sm:p-6">
 						<div>
-							{#each data.statusLogs as { event, user, timestamp }, idx (idx)}
+							{#each data.statusLogs as { event, user, createdAt }, idx (idx)}
 								<div class="flex pb-4 mb-4 last:mb-0 last:pb-0">
 									<div class="grid grid-cols-[25px_1fr] items-start flex-1">
 										<span
@@ -64,7 +64,7 @@
 									</div>
 									<div class="flex items-center">
 										<p class="text-sm text-right text-muted-foreground">
-											{dateParser(timestamp, 'medium')}
+											{dateParser(createdAt, 'medium')}
 										</p>
 									</div>
 								</div>

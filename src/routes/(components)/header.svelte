@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { Popover, PopoverTrigger, PopoverContent } from '$shadcn/popover';
+	import * as Popover from '$shadcn/popover';
 
 	import { salesmenMenu } from '$lib/client/constants';
 	import {
@@ -31,6 +31,7 @@
 	type PageServerParentData = import('../$types').PageServerParentData;
 
 	export let cart: PageServerParentData['cart'];
+	let megamenuOpen = false;
 </script>
 
 <header class="sticky top-0 z-40 w-full bg-background">
@@ -61,8 +62,8 @@
 						)}
 						href="/sklep">Sklep</a
 					>
-					<Popover>
-						<PopoverTrigger asChild let:builder>
+					<Popover.Root bind:open={megamenuOpen}>
+						<Popover.Trigger asChild let:builder>
 							<Button
 								builders={[builder]}
 								variant="link"
@@ -71,8 +72,8 @@
 									activeUrl.startsWith('/kontakty') && 'text-blue-600'
 								)}>Kontakty <ChevronDown size={20} class="ml-1" /></Button
 							>
-						</PopoverTrigger>
-						<PopoverContent class="w-[600px]">
+						</Popover.Trigger>
+						<Popover.Content class="w-[600px]">
 							<div class="grid gap-4">
 								<!-- <div class="space-y-2">
 									<h4 class="font-medium leading-none">Dimensions</h4>
@@ -83,6 +84,7 @@
 										<a
 											href="/kontakty/{element.href}"
 											class="px-2 py-1 pb-4 duration-150 border-b rounded"
+											on:click={() => (megamenuOpen = false)}
 										>
 											<p class="text-lg font-medium leading-6">{element.name}</p>
 											<p>{element.description}</p>
@@ -90,8 +92,8 @@
 									{/each}
 								</div>
 							</div>
-						</PopoverContent>
-					</Popover>
+						</Popover.Content>
+					</Popover.Root>
 
 					<!-- <MegaMenu /> -->
 				</div>

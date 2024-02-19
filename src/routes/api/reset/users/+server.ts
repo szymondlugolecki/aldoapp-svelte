@@ -5,7 +5,7 @@ import { error, json } from '@sveltejs/kit';
 import { ne } from 'drizzle-orm';
 
 export async function POST(event) {
-	if (event.locals.session?.user.role !== 'admin') {
+	if (event.locals.user.role !== 'admin') {
 		error(403, 'Nie masz uprawnień do wykonania tej akcji');
 	}
 

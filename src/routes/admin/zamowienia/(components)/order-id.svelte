@@ -4,7 +4,7 @@
 	const { form } = getForm<EventForm>();
 	const { actions } = getFormField();
 
-	export let orderId: number;
+	export let orderId: string;
 	$form.id = orderId;
 </script>
 

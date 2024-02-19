@@ -1,10 +1,10 @@
 import { relations, type InferSelectModel, type InferInsertModel, sql } from 'drizzle-orm';
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
-import { orders } from './orders';
-import { users } from './users';
+import { ordersTable } from './orders';
+import { usersTable } from './users';
 import { orderEvents } from '../../../client/constants/dbTypes';
 
-export const orderStatusLogs = sqliteTable('order_status_logs', {
+export const orderStatusLogsTable = sqliteTable('order_status_logs', {
 	id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
 
 	// Event
@@ -14,25 +14,25 @@ export const orderStatusLogs = sqliteTable('order_status_logs', {
 		.default(sql`CURRENT_TIMESTAMP`),
 
 	// relations
-	orderId: integer('order_id', { mode: 'number' })
+	orderId: text('order_id')
 		.notNull()
-		.references(() => orders.id),
-	userId: integer('user_id', { mode: 'number' })
+		.references(() => ordersTable.id),
+	userId: text('user_id')
 		.notNull()
-		.references(() => users.id) // user responsible for this status change
+		.references(() => usersTable.id) // user responsible for this status change
 });
 
-export const orderStatusLogsRelations = relations(orderStatusLogs, ({ one }) => ({
-	order: one(orders, {
-		fields: [orderStatusLogs.orderId],
-		references: [orders.id],
+export const orderStatusLogsRelations = relations(orderStatusLogsTable, ({ one }) => ({
+	order: one(ordersTable, {
+		fields: [orderStatusLogsTable.orderId],
+		references: [ordersTable.id],
 		relationName: 'order_status_logs'
 	}),
-	user: one(users, {
-		fields: [orderStatusLogs.userId],
-		references: [users.id]
+	user: one(usersTable, {
+		fields: [orderStatusLogsTable.userId],
+		references: [usersTable.id]
 	})
 }));
 
-export type SelectOrderStatusLogs = InferSelectModel<typeof orderStatusLogs>;
-export type InsertOrderStatusLogs = InferInsertModel<typeof orderStatusLogs>;
+export type SelectOrderStatusLogs = InferSelectModel<typeof orderStatusLogsTable>;
+export type InsertOrderStatusLogs = InferInsertModel<typeof orderStatusLogsTable>;

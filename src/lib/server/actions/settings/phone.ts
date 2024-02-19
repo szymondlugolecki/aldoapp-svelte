@@ -1,16 +1,16 @@
-import getCustomError from '$lib/client/constants/customErrors.js';
 import { settings$ } from '$lib/client/schemas/index.js';
 import { db } from '$lib/server/db';
-import { users } from '$lib/server/db/schemas/users';
+import { usersTable } from '$lib/server/db/schemas/users';
 import { trytm } from '@bdsqqq/try';
-import { error, fail, type Action } from '@sveltejs/kit';
+import { error, fail, type Action, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { setMessage, superValidate } from 'sveltekit-superforms/server';
 
 const phone: Action = async (event) => {
-	const sessionUser = event.locals.session?.user;
+	const sessionUser = event.locals.user;
 	if (!sessionUser) {
-		error(...getCustomError('not-logged-in'));
+		redirect(303, '/zaloguj');
+		// error(...getCustomError('not-logged-in'));;
 	}
 
 	const form = await superValidate(event, settings$.phoneForm);
@@ -20,11 +20,11 @@ const phone: Action = async (event) => {
 
 	const [, editPhoneError] = await trytm(
 		db
-			.update(users)
+			.update(usersTable)
 			.set({
 				phone: form.data.phone
 			})
-			.where(eq(users.id, sessionUser.id))
+			.where(eq(usersTable.id, sessionUser.id))
 	);
 
 	if (editPhoneError) {

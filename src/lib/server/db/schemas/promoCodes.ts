@@ -2,15 +2,15 @@
 import { discountTypes } from '../../../client/constants/dbTypes';
 import { relations, sql, type InferSelectModel, type InferInsertModel } from 'drizzle-orm';
 import { sqliteTable, text, integer, index, real } from 'drizzle-orm/sqlite-core';
-import { users } from './users';
-import { orders } from './orders';
+import { usersTable } from './users';
+import { ordersTable } from './orders';
 // import { users } from './users';
 
-export const promoCodes = sqliteTable(
+export const promoCodesTable = sqliteTable(
 	'promo_codes',
 	{
 		id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-		createdAt: integer('created_at', { mode: 'timestamp' })
+		createdAt: integer('created_at', { mode: 'timestamp_ms' })
 			.notNull()
 			.default(sql`CURRENT_TIMESTAMP`),
 
@@ -29,9 +29,9 @@ export const promoCodes = sqliteTable(
 		// add products list to which the promo code applies
 
 		// relations
-		authorId: text('author_id', { length: 36 })
+		authorId: text('author_id')
 			.notNull()
-			.references(() => users.id)
+			.references(() => usersTable.id)
 	},
 	(product) => ({
 		// indexes
@@ -39,55 +39,57 @@ export const promoCodes = sqliteTable(
 	})
 );
 
-export const promoCodesRelations = relations(promoCodes, ({ one, many }) => ({
-	author: one(users, {
-		fields: [promoCodes.authorId],
-		references: [users.id]
+export const promoCodesRelations = relations(promoCodesTable, ({ one, many }) => ({
+	author: one(usersTable, {
+		fields: [promoCodesTable.authorId],
+		references: [usersTable.id]
 	}),
-	orders: many(orders),
-	uses: many(promoCodeUsages)
+	// orders: many(ordersTable),
+	uses: many(promoCodeUsagesTable)
 }));
 
-export const promoCodeUsages = sqliteTable(
+export const promoCodeUsagesTable = sqliteTable(
 	'promo_code_uses',
 	{
 		id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-		createdAt: integer('created_at', { mode: 'timestamp' })
+		createdAt: integer('created_at', { mode: 'timestamp_ms' })
 			.notNull()
 			.default(sql`CURRENT_TIMESTAMP`),
 
-		promoCodeId: text('promocode_used_id', { length: 36 }).notNull(),
-		orderId: integer('order_id', { mode: 'number' })
+		promoCodeId: integer('promocode_used_id', { mode: 'number' })
 			.notNull()
-			.references(() => orders.id),
-		userId: integer('user_id', { mode: 'number' })
+			.references(() => promoCodesTable.id),
+		orderId: text('order_id')
 			.notNull()
-			.references(() => users.id)
+			.references(() => ordersTable.id),
+		userId: text('user_id')
+			.notNull()
+			.references(() => usersTable.id)
 	},
 	(promoCodeUsage) => ({
 		// indexes
-		promoCodeId: index('promo_code_use_idx').on(promoCodeUsage.promoCodeId),
+		promoCodeId: index('promo_code_uses_idx').on(promoCodeUsage.promoCodeId),
 		userId: index('user_id_idx').on(promoCodeUsage.userId)
 	})
 );
 
-export const promoCodesUsagesRelations = relations(promoCodeUsages, ({ one }) => ({
-	order: one(orders, {
-		fields: [promoCodeUsages.orderId],
-		references: [orders.id]
+export const promoCodesUsagesRelations = relations(promoCodeUsagesTable, ({ one }) => ({
+	order: one(ordersTable, {
+		fields: [promoCodeUsagesTable.orderId],
+		references: [ordersTable.id]
 	}),
-	promoCode: one(promoCodes, {
-		fields: [promoCodeUsages.promoCodeId],
-		references: [promoCodes.id]
+	promoCode: one(promoCodesTable, {
+		fields: [promoCodeUsagesTable.promoCodeId],
+		references: [promoCodesTable.id]
 	}),
-	user: one(users, {
-		fields: [promoCodeUsages.userId],
-		references: [users.id]
+	user: one(usersTable, {
+		fields: [promoCodeUsagesTable.userId],
+		references: [usersTable.id]
 	})
 }));
 
-export type SelectPromoCode = InferSelectModel<typeof promoCodes>;
-export type InsertPromoCode = InferInsertModel<typeof promoCodes>;
+export type SelectPromoCode = InferSelectModel<typeof promoCodesTable>;
+export type InsertPromoCode = InferInsertModel<typeof promoCodesTable>;
 
-export type SelectPromoCodeUsage = InferSelectModel<typeof promoCodeUsages>;
-export type InsertPromoCodeUsage = InferInsertModel<typeof promoCodeUsages>;
+export type SelectPromoCodeUsage = InferSelectModel<typeof promoCodeUsagesTable>;
+export type InsertPromoCodeUsage = InferInsertModel<typeof promoCodeUsagesTable>;

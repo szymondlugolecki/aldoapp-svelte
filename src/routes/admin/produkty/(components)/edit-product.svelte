@@ -8,13 +8,11 @@
 	import { enhance } from '$app/forms';
 	import createLoadingToast from '$lib/client/functions/createLoadingToast';
 	import { handleFormResponse } from '$lib/client/functions/forms';
-	import type { Product } from '$lib/server/db/schemas/products';
 
 	import * as Form from '$shadcn/form';
 	import * as Dialog from '$shadcn/dialog';
 
 	import { fodderCategories2, fodderNames, producentsList } from '$lib/client/constants';
-	import type { Image } from '$lib/server/db/schemas/images';
 	import SelectProducent from '$components/meltui/Select/SelectProducent.svelte';
 	import { createSlider, melt, createCombobox } from '@melt-ui/svelte';
 	import { cn, getSubcategoryName } from '$lib/client/functions';
@@ -102,7 +100,7 @@
 	// console.log('product', product);
 </script>
 
-<Dialog.Root bind:open>
+<Dialog.Root bind:open closeOnOutsideClick={false}>
 	{#if key !== 'images' || (key === 'images' && !product.image)}
 		<Dialog.Trigger class={cn(buttonVariants({ variant: 'link' }), 'whitespace-pre')}>
 			{cellOverride || value}
@@ -189,7 +187,13 @@
 				<Form.Field {config} name={key}>
 					<Form.Item>
 						<Form.Label>{label}</Form.Label>
-						<Form.Input required value={product.weight} type="number" spellcheck="false" />
+						<Form.Input
+							required
+							value={product.weight}
+							type="number"
+							spellcheck="false"
+							step="0.01"
+						/>
 						<Form.Validation />
 					</Form.Item>
 				</Form.Field>

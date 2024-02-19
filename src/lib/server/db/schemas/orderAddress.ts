@@ -1,35 +1,27 @@
-import type { InferModel } from 'drizzle-orm';
-import {
-	mysqlTable,
-	varchar,
-	serial,
-	int,
-} from 'drizzle-orm/mysql-core';
+import { type InferSelectModel, type InferInsertModel, relations } from 'drizzle-orm';
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { ordersTable } from './orders';
 
-export const orderAddress = mysqlTable(
-	'order_address',
-	{
-		id: serial('id').primaryKey().autoincrement(),
+export const orderAddressTable = sqliteTable('order_address', {
+	id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
 
-		// address
-		zipCode: varchar('zip_code', { length: 10 }).notNull(),
-        street: varchar('street', { length: 255 }).notNull(),
-        city: varchar('city', { length: 255 }).notNull(),
+	// address
+	zipCode: text('zip_code', { length: 10 }).notNull(),
+	street: text('street', { length: 255 }).notNull(),
+	city: text('city', { length: 255 }).notNull(),
 
-		// relations
-		orderId: int('order_id').notNull()
-	}
-);
+	// relations
+	orderId: text('order_id')
+		.notNull()
+		.references(() => ordersTable.id)
+});
 
-// export const addressRelations = relations(address, ({ one }) => ({
-// 	user: one(users, {
-// 		fields: [address.userId],
-// 		references: [users.id]
-// 	}),
-//     order: one(orders, {
-// 		fields: [address.userId],
-// 		references: [orders.id]
-// 	})
-// }));
+export const addressRelations = relations(orderAddressTable, ({ one }) => ({
+	order: one(ordersTable, {
+		fields: [orderAddressTable.orderId],
+		references: [ordersTable.id]
+	})
+}));
 
-export type OrderAddress = InferModel<typeof orderAddress>;
+export type SelectOrderAddress = InferSelectModel<typeof orderAddressTable>;
+export type InsertOrderAddress = InferInsertModel<typeof orderAddressTable>;

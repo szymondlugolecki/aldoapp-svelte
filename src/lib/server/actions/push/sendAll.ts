@@ -1,16 +1,17 @@
 import { trytm } from '@bdsqqq/try';
 import { db } from '$lib/server/db';
-import { error, fail, type Action } from '@sveltejs/kit';
+import { error, fail, type Action, redirect } from '@sveltejs/kit';
 import { isAtLeastModerator } from '$lib/client/functions';
 import { sendNotifications, type PushMessageWithContent } from '$lib/server/functions/push';
-import { setMessage, superValidate } from 'sveltekit-superforms/server';
+import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
 import getCustomError from '$lib/client/constants/customErrors';
 import { pushSubscription$ } from '$lib/client/schemas';
 
 const sendAll: Action = async ({ locals, request }) => {
-	const sessionUser = locals.session?.user;
+	const sessionUser = locals.user;
 	if (!sessionUser) {
-		error(...getCustomError('not-logged-in'));
+		redirect(303, '/zaloguj');
+		// error(...getCustomError('not-logged-in'));;
 	}
 	if (!isAtLeastModerator(sessionUser.role)) {
 		error(...getCustomError('insufficient-permissions'));
@@ -32,7 +33,7 @@ const sendAll: Action = async ({ locals, request }) => {
 	} satisfies PushMessageWithContent;
 
 	const [subs, fetchSubscriptionsError] = await trytm(
-		db.query.subscriptions.findMany({
+		db.query.subscriptionsTable.findMany({
 			columns: {
 				endpoint: true,
 				keys: true,
@@ -44,10 +45,15 @@ const sendAll: Action = async ({ locals, request }) => {
 	if (fetchSubscriptionsError) {
 		// Unexpected-error
 		console.error('fetchSubscriptionsError', fetchSubscriptionsError);
-		error(500, 'Błąd podczas pobierania użytkowników do wysłania powiadomień');
+		return setError(form, 'Błąd serwera podczas szukania docelowych odbiorców wiadomości', {
+			status: 500
+		});
 	}
 
-	sendNotifications(subs, messageObj);
+	const { success, message } = await sendNotifications(subs, messageObj);
+	console.log('sendAll:');
+	console.log('success', success);
+	console.log('message', message);
 
 	return setMessage(form, 'Wysłano powiadomienia');
 };

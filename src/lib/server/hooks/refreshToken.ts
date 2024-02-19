@@ -24,7 +24,7 @@ import { db } from '../db';
 // 2. After refreshing both tokens
 
 export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
-	const sessionUser = event.locals.session?.user;
+	const sessionUser = event.locals.user;
 
 	// Verify user's access token on every request
 	const accessToken = event.cookies.get(jwtName.access);
@@ -87,7 +87,7 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 		// Should I remove the cookies? 🤔
 
 		if (joseErrName === 'invalid') {
-			error(401, 'Sesja została skorumpowana. To błąd ');
+			error(401, 'Sesja została skorumpowana. Zaloguj się ponownie.');
 		}
 	}
 
@@ -100,7 +100,7 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 	*/
 
 	const [user, getUserError] = await trytm(
-		db.query.users.findFirst({
+		db.query.usersTable.findFirst({
 			where: (users, { eq }) => eq(users.id, userId),
 			with: {
 				address: {
@@ -131,6 +131,21 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 	if (!user) {
 		// Unexpected-error
 		console.error('Zalogowano jako nieistniejący użytkownik. Mógł zostać usunięty');
+
+		// Logging out
+		event.cookies.set(jwtName.access, '', {
+			path: '/',
+			secure: false,
+			maxAge: 0
+		});
+		event.cookies.set(jwtName.refresh, '', {
+			path: '/',
+			secure: false,
+			maxAge: 0
+		});
+		event.locals.session = null;
+		await resolve(event);
+
 		error(
 			500,
 			'Niespodziewany błąd. Sesja istnieje, ale użytkownik nie. Spróbuj zalogować się ponownie.'
@@ -169,5 +184,5 @@ export const handleTokenRefresh: Handle = async ({ event, resolve }) => {
 		expires: accessTokenExpirationDate
 	};
 
-	return resolve(event);
+	return await resolve(event);
 };

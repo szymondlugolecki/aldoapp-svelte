@@ -319,7 +319,7 @@
 > -->
 
 <!-- </div> -->
-<!-- <button on:click={createProgenitor} class="px-3 py-2 text-lg">Utwórz protoplastę</button> -->
+<button on:click={createProgenitor} class="px-3 py-2 text-lg">Utwórz protoplastę</button>
 
 <!-- <h1 class="text-3xl">Strona główna</h1>
 	<h2 class="text-xl">Na razie nic tu nie ma... 😌</h2>

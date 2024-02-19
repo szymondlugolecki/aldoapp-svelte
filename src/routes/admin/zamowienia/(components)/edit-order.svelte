@@ -7,7 +7,6 @@
 	import { handleFormResponse } from '$lib/client/functions/forms';
 	import type { Address } from '$lib/server/db/schemas/orders';
 	import { cn, parseAddress } from '$lib/client/functions';
-	import type { Product } from '$lib/server/db/schemas/products';
 	import { orderStatusList } from '$lib/client/constants';
 	import SelectStatus from '$meltui/Select/SelectStatus.svelte';
 	import Paid from '$meltui/Switch/Paid.svelte';
@@ -34,7 +33,7 @@
 	let cellOverride = undefined as string | undefined | null;
 
 	if (key === 'address') {
-		cellOverride = parseAddress(order.address);
+		cellOverride = parseAddress(order.address) || 'Brak';
 	} else if (key === 'status') {
 		cellOverride = orderStatusList[order.status];
 	} else if (key === 'paid') {

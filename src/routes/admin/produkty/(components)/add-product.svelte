@@ -27,7 +27,7 @@
 	};
 </script>
 
-<Dialog.Root bind:open>
+<Dialog.Root bind:open closeOnOutsideClick={false}>
 	<Dialog.Trigger class={buttonVariants({ variant: 'outline' })}>Dodaj produkt</Dialog.Trigger>
 	<Dialog.Content class="sm:max-w-[425px]">
 		<Dialog.Header>
@@ -80,7 +80,7 @@
 			<Form.Field {config} name="weight">
 				<Form.Item>
 					<Form.Label>Waga (kg)<RequiredAsterisk /></Form.Label>
-					<Form.Input type="number" placeholder="25" required />
+					<Form.Input type="number" placeholder="25" required step="0.01" />
 					<Form.Validation />
 				</Form.Item>
 			</Form.Field>

@@ -1,18 +1,17 @@
 import { trytm } from '@bdsqqq/try';
 import { db } from '$lib/server/db';
-import { error, fail, type Action } from '@sveltejs/kit';
-import getCustomError from '$lib/client/constants/customErrors';
-import { subscriptions } from '$lib/server/db/schemas/subscriptions';
+import { fail, type Action, redirect } from '@sveltejs/kit';
+import { subscriptionsTable } from '$lib/server/db/schemas/subscriptions';
 import { and, eq } from 'drizzle-orm';
 import { getUserAgentString } from '$lib/server/functions/auth';
-import { setMessage, superValidate } from 'sveltekit-superforms/server';
+import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
 import { pushSubscription$ } from '$lib/client/schemas';
 
 const unsubscribe: Action = async ({ locals, request }) => {
-	console.log('unsubscribing XD');
-	const sessionUser = locals.session?.user;
+	const sessionUser = locals.user;
 	if (!sessionUser) {
-		error(...getCustomError('not-logged-in'));
+		redirect(303, '/zaloguj');
+		// error(...getCustomError('not-logged-in'));;
 	}
 
 	const form = await superValidate(request, pushSubscription$.unsubscribe);
@@ -24,7 +23,7 @@ const unsubscribe: Action = async ({ locals, request }) => {
 
 	// Check if subscription exists
 	const [currentSubscription, fetchSubscriptionError] = await trytm(
-		db.query.subscriptions.findFirst({
+		db.query.subscriptionsTable.findFirst({
 			where: (subscription) =>
 				and(eq(subscription.userId, sessionUser.id), eq(subscription.userAgent, userAgent))
 		})
@@ -32,23 +31,32 @@ const unsubscribe: Action = async ({ locals, request }) => {
 	if (fetchSubscriptionError) {
 		// Unexpected-error
 		console.error('fetchSubscriptionError', fetchSubscriptionError);
-		error(500, 'Błąd podczas szukania subskrypcji');
+		return setError(form, 'Błąd serwera podczas szukania subskrypcji', {
+			status: 500
+		});
 	}
 
 	if (!currentSubscription) {
-		return setMessage(form, 'Subskrypcja nie istnieje');
+		return setError(form, 'Subskrypcja nie istnieje', { status: 400 });
 	}
 
 	const [, deleteSubscriptionError] = await trytm(
 		db
-			.delete(subscriptions)
-			.where(and(eq(subscriptions.userId, sessionUser.id), eq(subscriptions.userAgent, userAgent)))
+			.delete(subscriptionsTable)
+			.where(
+				and(
+					eq(subscriptionsTable.userId, sessionUser.id),
+					eq(subscriptionsTable.userAgent, userAgent)
+				)
+			)
 	);
 	if (deleteSubscriptionError) {
-		error(500, 'Błąd przy usuwaniu subskrypcji powiadomień');
+		return setError(form, 'Błąd serwera podczas usuwania subskrypcji', {
+			status: 500
+		});
 	}
 
-	return setMessage(form, 'Pomyślnie odsubskrybowano');
+	return setMessage(form, 'Odsubskrybowano');
 };
 
 export default unsubscribe;
