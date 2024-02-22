@@ -18,87 +18,87 @@
 	import { page } from '$app/stores';
 	import ProductCarousel from './(components)/product-carousel.svelte';
 
-	async function createProgenitor() {
-		const createPromise = fetch('/api/progenitor/create', {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json'
-			}
-		});
+	// async function createProgenitor() {
+	// 	const createPromise = fetch('/api/progenitor/create', {
+	// 		method: 'POST',
+	// 		headers: {
+	// 			'content-type': 'application/json'
+	// 		}
+	// 	});
 
-		toast.promise(createPromise, {
-			loading: 'Tworzenie protoplasty...',
-			success: 'Protoplasta utworzony pomyślnie!',
-			error: 'Wystąpił błąd podczas tworzenia protoplasty!'
-		});
+	// 	toast.promise(createPromise, {
+	// 		loading: 'Tworzenie protoplasty...',
+	// 		success: 'Protoplasta utworzony pomyślnie!',
+	// 		error: 'Wystąpił błąd podczas tworzenia protoplasty!'
+	// 	});
 
-		const response = await createPromise;
-		const json = await response.json();
-		console.log('Response', json);
-	}
+	// 	const response = await createPromise;
+	// 	const json = await response.json();
+	// 	console.log('Response', json);
+	// }
 
-	async function removeAllOrders() {
-		const createPromise = fetch('/api/reset/orders', {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json'
-			}
-		});
+	// async function removeAllOrders() {
+	// 	const createPromise = fetch('/api/reset/orders', {
+	// 		method: 'POST',
+	// 		headers: {
+	// 			'content-type': 'application/json'
+	// 		}
+	// 	});
 
-		toast.promise(createPromise, {
-			loading: 'Usuwanie zamówień...',
-			success: 'Zamówienia usunięte pomyślnie',
-			error: 'Wystąpił błąd podczas usuwania zamówień!'
-		});
+	// 	toast.promise(createPromise, {
+	// 		loading: 'Usuwanie zamówień...',
+	// 		success: 'Zamówienia usunięte pomyślnie',
+	// 		error: 'Wystąpił błąd podczas usuwania zamówień!'
+	// 	});
 
-		const response = await createPromise;
-		const json = await response.json();
-		console.log('Response', json);
-	}
+	// 	const response = await createPromise;
+	// 	const json = await response.json();
+	// 	console.log('Response', json);
+	// }
 
-	async function removeAllProducts() {
-		const response = await fetch('/api/reset/products', {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json'
-			}
-		});
-		const json = await response.json();
-		console.log('Response', json);
-	}
+	// async function removeAllProducts() {
+	// 	const response = await fetch('/api/reset/products', {
+	// 		method: 'POST',
+	// 		headers: {
+	// 			'content-type': 'application/json'
+	// 		}
+	// 	});
+	// 	const json = await response.json();
+	// 	console.log('Response', json);
+	// }
 
-	async function removeAllUsers() {
-		const response = await fetch('/api/reset/users', {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json'
-			}
-		});
-		const json = await response.json();
-		console.log('Response', json);
-	}
+	// async function removeAllUsers() {
+	// 	const response = await fetch('/api/reset/users', {
+	// 		method: 'POST',
+	// 		headers: {
+	// 			'content-type': 'application/json'
+	// 		}
+	// 	});
+	// 	const json = await response.json();
+	// 	console.log('Response', json);
+	// }
 
-	async function removeAllSubscriptions() {
-		const response = await fetch('/api/reset/subscriptions', {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json'
-			}
-		});
-		const json = await response.json();
-		console.log('Response', json);
-	}
+	// async function removeAllSubscriptions() {
+	// 	const response = await fetch('/api/reset/subscriptions', {
+	// 		method: 'POST',
+	// 		headers: {
+	// 			'content-type': 'application/json'
+	// 		}
+	// 	});
+	// 	const json = await response.json();
+	// 	console.log('Response', json);
+	// }
 
-	async function removeAllTokens() {
-		const response = await fetch('/api/reset/tokens', {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json'
-			}
-		});
-		const json = await response.json();
-		console.log('Response', json);
-	}
+	// async function removeAllTokens() {
+	// 	const response = await fetch('/api/reset/tokens', {
+	// 		method: 'POST',
+	// 		headers: {
+	// 			'content-type': 'application/json'
+	// 		}
+	// 	});
+	// 	const json = await response.json();
+	// 	console.log('Response', json);
+	// }
 
 	export let data;
 
