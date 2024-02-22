@@ -1,16 +1,17 @@
 import { db } from '$lib/server/db';
-import { users } from '$lib/server/db/schemas/users.js';
+import { usersTable } from '$lib/server/db/schemas/users.js';
 import { trytm } from '@bdsqqq/try';
 import { error, json } from '@sveltejs/kit';
 import { ne } from 'drizzle-orm';
 
 export async function POST(event) {
-	if (event.locals.user.role !== 'admin') {
+	const sessionUser = event.locals.user;
+	if (sessionUser?.role !== 'admin') {
 		error(403, 'Nie masz uprawnień do wykonania tej akcji');
 	}
 
 	const [, deleteAllUsersError] = await trytm(
-		db.delete(users).where(ne(users.email, 'szymon.dlugolecki77@gmail.com'))
+		db.delete(usersTable).where(ne(usersTable.email, 'szymon.dlugolecki77@gmail.com'))
 	);
 
 	if (deleteAllUsersError) {

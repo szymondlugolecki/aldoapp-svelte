@@ -1,7 +1,7 @@
 import { trytm } from '@bdsqqq/try';
 import { db } from '$lib/server/db';
 import { fail, type Action, redirect } from '@sveltejs/kit';
-import { sendNotifications } from '$lib/server/functions/push';
+import { sendNotifications } from '$lib/server/functions/push2';
 import { pushSubscription$ } from '$lib/client/schemas';
 import { subscriptionsTable, type SelectSubscription } from '$lib/server/db/schemas/subscriptions';
 import { getPushMessage } from '$lib/server/constants/messages';

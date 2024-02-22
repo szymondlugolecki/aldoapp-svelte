@@ -2,7 +2,7 @@ import { trytm } from '@bdsqqq/try';
 import { db } from '$lib/server/db';
 import { error, fail, type Action, redirect } from '@sveltejs/kit';
 import { isAtLeastModerator } from '$lib/client/functions';
-import { sendNotifications, type PushMessageWithContent } from '$lib/server/functions/push';
+import { sendNotifications, type PushMessageWithContent } from '$lib/server/functions/push2';
 import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
 import getCustomError from '$lib/client/constants/customErrors';
 import { pushSubscription$ } from '$lib/client/schemas';

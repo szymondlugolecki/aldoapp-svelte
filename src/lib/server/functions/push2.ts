@@ -2,7 +2,25 @@ import { VAPID_PRIVATE_KEY, ADMIN_CONTACT_EMAIL } from '$env/static/private';
 import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public';
 
 import { generatePushHTTPRequest, ApplicationServerKeys, generateKeys } from 'web-push-edge';
-import type { PushMessage, PushSubscription } from '@block65/webcrypto-web-push';
+import type { Jsonifiable, RequireAtLeastOne } from 'type-fest';
+
+interface PushMessage {
+	data: Jsonifiable;
+	options?: RequireAtLeastOne<{
+		ttl?: number;
+		topic?: string;
+		urgency?: 'low' | 'normal' | 'high';
+	}>;
+}
+
+interface PushSubscription {
+	endpoint: string;
+	expirationTime: null | unknown;
+	keys: {
+		auth: string;
+		p256dh: string;
+	};
+}
 
 export interface PushMessageWithContent extends PushMessage {
 	data: {

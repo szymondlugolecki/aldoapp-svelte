@@ -1,14 +1,15 @@
 import { db } from '$lib/server/db';
-import { verificationTokens } from '$lib/server/db/schemas/verificationTokens.js';
+import { verificationTokensTable } from '$lib/server/db/schemas/verificationTokens.js';
 import { trytm } from '@bdsqqq/try';
 import { error, json } from '@sveltejs/kit';
 
 export async function POST(event) {
-	if (event.locals.user.role !== 'admin') {
+	const sessionUser = event.locals.user;
+	if (sessionUser?.role !== 'admin') {
 		error(403, 'Nie masz uprawnień do wykonania tej akcji');
 	}
 
-	const [, deleteAllTokensError] = await trytm(db.delete(verificationTokens));
+	const [, deleteAllTokensError] = await trytm(db.delete(verificationTokensTable));
 
 	if (deleteAllTokensError) {
 		console.error('deleteAllTokensError blad', deleteAllTokensError);

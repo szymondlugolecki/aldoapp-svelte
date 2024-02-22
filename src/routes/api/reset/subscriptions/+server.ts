@@ -1,14 +1,15 @@
 import { db } from '$lib/server/db';
-import { subscriptions } from '$lib/server/db/schemas/subscriptions.js';
+import { subscriptionsTable } from '$lib/server/db/schemas/subscriptions.js';
 import { trytm } from '@bdsqqq/try';
 import { error, json } from '@sveltejs/kit';
 
 export async function POST(event) {
-	if (event.locals.user.role !== 'admin') {
+	const sessionUser = event.locals.user;
+	if (sessionUser?.role !== 'admin') {
 		error(403, 'Nie masz uprawnień do wykonania tej akcji');
 	}
 
-	const [, deleteAllSubscriptionsError] = await trytm(db.delete(subscriptions));
+	const [, deleteAllSubscriptionsError] = await trytm(db.delete(subscriptionsTable));
 
 	if (deleteAllSubscriptionsError) {
 		console.error('deleteAllSubscriptionsError blad', deleteAllSubscriptionsError);

@@ -8,9 +8,6 @@ dependencies:
   '@bdsqqq/try':
     specifier: ^2.3.1
     version: 2.3.1
-  '@block65/webcrypto-web-push':
-    specifier: latest
-    version: 0.3.2
   '@libsql/client':
     specifier: ^0.4.3
     version: 0.4.3
@@ -113,6 +110,9 @@ dependencies:
   tailwindcss-animate:
     specifier: ^1.0.6
     version: 1.0.7(tailwindcss@3.3.3)
+  type-fest:
+    specifier: ^4.10.3
+    version: 4.10.3
   ua-parser-js:
     specifier: 1.0.36
     version: 1.0.36
@@ -136,6 +136,9 @@ dependencies:
     version: 0.7.3(zod@3.22.2)
 
 devDependencies:
+  '@block65/webcrypto-web-push':
+    specifier: ^0.3.2
+    version: 0.3.2
   '@melt-ui/pp':
     specifier: ^0.1.2
     version: 0.1.2(@melt-ui/svelte@0.57.2)(svelte@4.2.0)
@@ -280,7 +283,7 @@ packages:
     engines: {node: '>=16.0.0'}
     dependencies:
       serialize-error: 11.0.2
-    dev: false
+    dev: true
 
   /@block65/webcrypto-web-push@0.3.2:
     resolution: {integrity: sha512-WMuMGSTx0VzlPELeHyxCoTogdWciIutevVRFk79KEg+10wX+GnxyCGSGceEEN/6XREwrcgr7KzX6HVOaBAWs7A==}
@@ -288,7 +291,7 @@ packages:
     dependencies:
       '@block65/custom-error': 11.0.1
       base64-arraybuffer: 1.0.2
-    dev: false
+    dev: true
 
   /@deno/shim-deno-test@0.4.0:
     resolution: {integrity: sha512-oYWcD7CpERZy/TXMTM9Tgh1HD/POHlbY9WpzmAk+5H8DohcxG415Qws8yLGlim3EaKBT2v3lJv01x4G0BosnaQ==}
@@ -2377,7 +2380,7 @@ packages:
   /base64-arraybuffer@1.0.2:
     resolution: {integrity: sha512-I3yl4r9QB5ZRY3XuJVEPfc2XhZO6YweFPI+UovAzn+8/hb3oJ6lnysaFcjVpkCPfVWFUDvoZ8kmVDP7WyRtYtQ==}
     engines: {node: '>= 0.6.0'}
-    dev: false
+    dev: true
 
   /base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
@@ -4716,7 +4719,7 @@ packages:
     engines: {node: '>=14.16'}
     dependencies:
       type-fest: 2.19.0
-    dev: false
+    dev: true
 
   /set-blocking@2.0.0:
     resolution: {integrity: sha512-KiKBS8AnWGEyLzofFfmvKwpdPzqiy16LvQfK3yv/fVH7Bj13/wl3JSR1J+rfgRE9q7xUJK4qvgS8raSOeLUehw==}
@@ -5294,6 +5297,11 @@ packages:
   /type-fest@2.19.0:
     resolution: {integrity: sha512-RAH822pAdBgcNMAfWnCBU3CFZcfZ/i1eZjwFU/dsLKumyuuP3niueg2UAukXYF0E2AAoc82ZSSf9J0WQBinzHA==}
     engines: {node: '>=12.20'}
+    dev: true
+
+  /type-fest@4.10.3:
+    resolution: {integrity: sha512-JLXyjizi072smKGGcZiAJDCNweT8J+AuRxmPZ1aG7TERg4ijx9REl8CNhbr36RV4qXqL1gO1FF9HL8OkVmmrsA==}
+    engines: {node: '>=16'}
     dev: false
 
   /type@1.2.0:

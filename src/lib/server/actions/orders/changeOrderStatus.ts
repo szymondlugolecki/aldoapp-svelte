@@ -10,7 +10,7 @@ import type { OrderStatus } from '$lib/client/constants/dbTypes';
 import { ordersTable } from '$lib/server/db/schemas/orders';
 import { eq } from 'drizzle-orm';
 import { order$ } from '$lib/client/schemas';
-import { sendNotifications } from '$lib/server/functions/push';
+import { sendNotifications } from '$lib/server/functions/push2';
 import {
 	getOrderStatusPushMessage,
 	orderStatusEmailDescription,

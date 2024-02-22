@@ -7,7 +7,7 @@ import { orderProductsTable } from '../db/schemas/orderProducts';
 import { cartsTable, type SelectCart } from '../db/schemas/carts';
 import { and, eq } from 'drizzle-orm';
 import { userAddressTable } from '../db/schemas/userAddress';
-import { sendNotifications } from './push';
+import { sendNotifications } from './push2';
 import { getPushMessage } from '../constants/messages';
 import { orderAddressTable } from '../db/schemas/orderAddress';
 import { sendOrderCreatedEmail } from '../clients/resend';
