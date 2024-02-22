@@ -1,5 +1,5 @@
 // import { p } from '$lib/server/clients/pClient';
-import { error, type Action, fail } from '@sveltejs/kit';
+import { error, type Action, fail, redirect } from '@sveltejs/kit';
 import { trytm } from '@bdsqqq/try';
 import getCustomError from '$lib/client/constants/customErrors';
 import { isAtLeastModerator } from '$lib/client/functions';

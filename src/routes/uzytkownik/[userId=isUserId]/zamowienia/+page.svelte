@@ -29,7 +29,7 @@
 
 	import { Filter } from 'lucide-svelte';
 	import { Button, buttonVariants } from '$shadcn/button';
-	import Filters from './(components)/filters.svelte';
+	import Filters from './(components)/filters-c.svelte';
 	import { builderActions } from 'bits-ui';
 	import { onMount } from 'svelte';
 	import type { mainCategories } from '$lib/client/constants/dbTypes';
