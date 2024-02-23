@@ -190,6 +190,7 @@ const changeOrderStatus = (async ({ request, locals }) => {
 	const [, sendEmailError] = await trytm(
 		sendOrderStatusEmail({
 			to: [oldOrder.customer.email],
+			from: 'Zamówienia <admin@twojealdo.pl>',
 			props: {
 				orderId: oldOrder.id,
 				time: orderDate,

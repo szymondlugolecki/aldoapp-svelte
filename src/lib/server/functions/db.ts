@@ -103,6 +103,7 @@ export const createNewOrder = async ({
 	//  Email sending logic
 	await sendOrderCreatedEmail({
 		to: [customer.email],
+		from: 'Zamówienia <admin@twojealdo.pl>',
 		props: {
 			orderId: order.id,
 			time: orderDate,
