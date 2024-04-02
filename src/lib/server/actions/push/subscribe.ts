@@ -85,7 +85,11 @@ const subscribe: Action = async ({ locals, request }) => {
 		});
 	}
 
-	await sendNotifications([{ endpoint, expirationTime, keys }], getPushMessage('subscribed'));
+	try {
+		await sendNotifications([{ endpoint, expirationTime, keys }], getPushMessage('subscribed'));
+	} catch (error) {
+		console.error('sendNotifications error', error);
+	}
 
 	return setMessage(form, 'Zasubskrybowano');
 };

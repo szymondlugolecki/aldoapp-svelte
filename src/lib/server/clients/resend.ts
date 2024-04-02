@@ -5,7 +5,7 @@ import { RESEND_API_KEY } from '$env/static/private';
 import { render } from 'svelte-email';
 import type { OrderProduct } from '$types';
 
-const from = 'onboarding@resend.dev';
+const from = 'admin@twojealdo.pl'; //'onboarding@resend.dev';
 
 interface EmailData {
 	to: string[];

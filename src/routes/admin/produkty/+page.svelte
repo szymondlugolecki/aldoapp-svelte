@@ -280,7 +280,9 @@
 <section class="w-full h-full p-2 space-y-3">
 	<div class="flex justify-between space-x-3 lg:space-x-0">
 		<Input class="max-w-xl" type="text" placeholder="Wyszukaj..." />
-		<AdminAddDialog form={data.addForm} />
+		{#if data.user?.role === 'admin'}
+			<AdminAddDialog form={data.addForm} />
+		{/if}
 	</div>
 	<Table>
 		<TableCaption>Lista produktów</TableCaption>

@@ -20,7 +20,7 @@
 
 	$: justOrdered = $page.url.searchParams.get('success') === 'true';
 
-	console.log('data.statusHistory', data.statusHistory);
+	// console.log('data.statusHistory', data.statusHistory);
 
 	// onMount(() => {
 	// 	if (justOrdered) {

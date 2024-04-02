@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 dependencies:
   '@bdsqqq/try':
     specifier: ^2.3.1
@@ -5615,3 +5611,7 @@ packages:
       undici: 5.23.0
       zod: 3.22.2
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false

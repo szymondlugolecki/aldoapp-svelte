@@ -50,10 +50,14 @@ const sendAll: Action = async ({ locals, request }) => {
 		});
 	}
 
-	const { success, message } = await sendNotifications(subs, messageObj);
-	console.log('sendAll:');
-	console.log('success', success);
-	console.log('message', message);
+	try {
+		const { success, message } = await sendNotifications(subs, messageObj);
+		console.log('sendAll:');
+		console.log('success', success);
+		console.log('message', message);
+	} catch (error) {
+		console.error('sendAll error:', error);
+	}
 
 	return setMessage(form, 'Wysłano powiadomienia');
 };

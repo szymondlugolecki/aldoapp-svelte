@@ -12,8 +12,8 @@
 		'/admin': 'Start',
 		'/admin/zamowienia': 'Zamówienia',
 		'/admin/uzytkownicy': 'Użytkownicy',
-		'/admin/produkty': 'Produkty',
-		'/admin/analityka': 'Analityka'
+		'/admin/produkty': 'Produkty'
+		// '/admin/analityka': 'Analityka'
 	};
 
 	const getSubpageLabel = (pathname: string) => {
@@ -38,7 +38,7 @@
 			<!-- <Tab {pathname} href="/admin/zamowienia2">Zamówienia 2</Tab> -->
 			<Tab {pathname} href="/admin/uzytkownicy">Użytkownicy</Tab>
 			<Tab {pathname} href="/admin/produkty">Produkty</Tab>
-			<Tab {pathname} href="/admin/analityka">Analityka</Tab>
+			<!-- <Tab {pathname} href="/admin/analityka">Analityka</Tab> -->
 		</TabsList>
 		<TabsContent class="space-y-4">
 			<slot />

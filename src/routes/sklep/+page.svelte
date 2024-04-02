@@ -15,7 +15,7 @@
 		onUpdated: ({ form }) => {
 			const errors = form.errors._errors;
 			if (form.message) {
-				toast.success('Sukces', {
+				toast('Sukces', {
 					description: form.message
 				});
 			} else if (errors) {
@@ -70,9 +70,7 @@
 						{/if}
 					</form>
 				{:else}
-					<Button class="p-0 xxs:py-2 xxs:px-4" variant="default" disabled
-						>Musisz się zalogować</Button
-					>
+					<Button class="p-0 xxs:py-2 xxs:px-4" variant="default" disabled>Zaloguj się...</Button>
 				{/if}
 			</Card.Footer>
 		</Card.Root>

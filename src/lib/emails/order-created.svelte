@@ -129,7 +129,7 @@
 			<Text style={paragraph}
 				>Zamówienie przyjęte do realizacji. Będziemy Cię na bieżąco informować o zmianie statusu.</Text
 			>
-			<Link href="https://aldoapp-svelte.vercel.app/zamowienia/{orderId}"
+			<Link href="https://twojealdo.pl/zamowienia/{orderId}"
 				>Kliknij tutaj, aby sprawdzić szczegóły zamówienia</Link
 			>
 			<Hr style={hr} />

@@ -83,7 +83,7 @@
 </script>
 
 <!-- <Toaster position="bottom-right" /> -->
-<Toaster theme="system" />
+<Toaster />
 
 <div class="relative">
 	<div

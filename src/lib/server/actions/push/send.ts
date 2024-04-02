@@ -61,12 +61,18 @@ const send: Action = async (event) => {
 		});
 	}
 
-	const { message, success } = await sendNotifications(subscriptionList, messageObj);
-	if (!success) {
-		return setError(form, message, { status: 400 });
+	let msg = '';
+	try {
+		const { message, success } = await sendNotifications(subscriptionList, messageObj);
+		if (!success) {
+			return setError(form, message, { status: 400 });
+		}
+		msg = message;
+	} catch (error) {
+		console.error('sendNotifications error', error);
 	}
 
-	return setMessage(form, message);
+	return setMessage(form, msg);
 };
 
 export default send;
