@@ -71,6 +71,7 @@ const login = (async ({ request, getClientAddress, platform }) => {
 	const [, sendEmailError] = await trytm(
 		sendVerificationEmail({
 			to: [email],
+			from: 'Logowanie <admin@twojealdo.pl>',
 			props: {
 				code,
 				device: userAgent,
