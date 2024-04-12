@@ -27,6 +27,7 @@
 
 		const params = new URLSearchParams($page.url.searchParams.toString());
 		params.set('szukaj', queryString);
+		params.set('strona', '1');
 		goto(`?${params.toString()}`, { keepFocus: true });
 	};
 </script>

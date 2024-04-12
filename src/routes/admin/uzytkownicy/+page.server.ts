@@ -5,7 +5,7 @@ import { db } from '$lib/server/db';
 import { usersTable } from '$lib/server/db/schemas/users.js';
 import { clauseConcat, extractParams } from '$lib/server/functions/utils';
 import type { UserSortableColumn } from '$types';
-import { like, or } from 'drizzle-orm';
+import { like, or, sql } from 'drizzle-orm';
 import { superValidate } from 'sveltekit-superforms/server';
 
 const sortableColumns: UserSortableColumn[] = ['fullName', 'email', 'role', 'createdAt'];
@@ -62,9 +62,18 @@ export const load = async ({ url }) => {
 		where: extendedWhereClause
 	});
 
+	const count = (
+		await db
+			.select({
+				count: sql<number>`count(*)`.mapWith(Number)
+			})
+			.from(usersTable)
+			.where(extendedWhereClause)
+	)[0].count;
+
 	return {
 		users,
-		count: users.length,
+		count,
 		pageLimit,
 		addForm: await superValidate(user$.addForm),
 		editForm: await superValidate(user$.editForm),

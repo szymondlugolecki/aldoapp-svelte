@@ -39,8 +39,6 @@
 
 	type ParsedUser = (typeof data.users)[number];
 
-	const { count } = data;
-
 	const defaultColumns: ColumnDef<ParsedUser>[] = [
 		{
 			id: 'id',
@@ -193,13 +191,13 @@
 	});
 
 	$: table = createSvelteTable(options);
-	let searchParam = $page.url.searchParams.get('szukaj');
-	let pageParam = $page.url.searchParams.get('strona');
-	let currentPage = !isNaN(Number(pageParam)) ? Math.max(Number(pageParam), 1) : 1;
+	$: searchParam = $page.url.searchParams.get('szukaj');
+	$: pageParam = $page.url.searchParams.get('strona');
+	$: currentPage = !isNaN(Number(pageParam)) ? Math.max(Number(pageParam), 1) : 1;
 
-	let paginationSettings = {
+	$: paginationSettings = {
 		page: currentPage,
-		count,
+		count: data.count,
 		perPage: data.pageLimit,
 		defaultPage: 1,
 		siblingCount: 1,
@@ -214,6 +212,7 @@
 
 		const params = new URLSearchParams($page.url.searchParams.toString());
 		params.set('szukaj', queryString);
+		params.set('strona', '1');
 		goto(`?${params.toString()}`, { keepFocus: true });
 	};
 </script>
