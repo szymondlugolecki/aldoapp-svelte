@@ -23,6 +23,7 @@ export const clauseConcat = (...clauses: (SQL<unknown> | undefined | string | 0)
 
 export const extractParams = <T extends string>(url: URL, sortableColumns?: T[]) => {
 	// URL Params
+	const search = url.searchParams.get('szukaj') || undefined;
 	const page = !isNaN(Number(url.searchParams.get('strona')))
 		? Math.max(Number(url.searchParams.get('strona')), 1)
 		: 1;
@@ -86,6 +87,7 @@ export const extractParams = <T extends string>(url: URL, sortableColumns?: T[])
 	};
 
 	return {
+		search,
 		page,
 		sort,
 		order,

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { cn, dateParser, flexRender } from '$lib/client/functions';
+	import { cn, dateParser, debounce, flexRender } from '$lib/client/functions';
 
 	import {
 		createSvelteTable,
@@ -13,7 +13,6 @@
 		type PaginationState
 	} from '@tanstack/svelte-table';
 	import { writable } from 'svelte/store';
-	import Pagination from '$components/custom/Table/Pagination.svelte';
 	import TableHyperlink from '$components/custom/Table/TableHyperlink.svelte';
 
 	import AdminEditDialog from '$routes/admin/produkty/(components)/edit-product.svelte';
@@ -32,29 +31,17 @@
 	import { Button } from '$shadcn/button';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import Pagination2 from '$components/custom/Table/Pagination2.svelte';
 	import type { PaginationSettings } from '$types';
-	import { superForm } from 'sveltekit-superforms/client';
 	import { createProps, setSorting } from '$lib/client/functions/table.js';
 
 	import type { EditProductForm } from '$lib/client/schemas/products.js';
+	import { number } from 'zod';
+	import Pagination3 from '$components/custom/Pagination3.svelte';
 	// import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
 
 	export let data;
 
-	const { count } = data.count[0];
-	// const { form, errors, enhance, message } = superForm(data.addForm, {
-	// 	resetForm: true
-	// });
-
-	// const {
-	// 	form: registerForm,
-	// 	errors: registerErrors,
-	// 	enhance: registerEnhance,
-	// 	message: registerMessage
-	// } = superForm(data.editForm, {
-	// 	resetForm: true
-	// });
+	const { count } = data;
 
 	type ParsedProduct = (typeof data.products)[number];
 
@@ -258,14 +245,28 @@
 	});
 
 	$: table = createSvelteTable(options);
-	$: pageParam = $page.url.searchParams.get('strona');
-	$: currentPage = !isNaN(Number(pageParam)) ? Math.max(Number(pageParam), 1) : 1;
+	let searchParam = $page.url.searchParams.get('szukaj');
+	let pageParam = $page.url.searchParams.get('strona');
+	let currentPage = !isNaN(Number(pageParam)) ? Math.max(Number(pageParam), 1) : 1;
 
-	const paginationSettings: PaginationSettings = {
+	let paginationSettings = {
+		page: currentPage,
 		count,
 		perPage: data.pageLimit,
 		defaultPage: 1,
-		siblingCount: 1
+		siblingCount: 1,
+		onPageChange: (page) => {
+			setPage(page);
+		}
+	} satisfies PaginationSettings;
+
+	const search = (event: KeyboardEvent) => {
+		const input = event.target as HTMLInputElement;
+		const queryString = input.value;
+
+		const params = new URLSearchParams($page.url.searchParams.toString());
+		params.set('szukaj', queryString);
+		goto(`?${params.toString()}`, { keepFocus: true });
 	};
 </script>
 
@@ -279,11 +280,23 @@
 
 <section class="w-full h-full p-2 space-y-3">
 	<div class="flex justify-between space-x-3 lg:space-x-0">
-		<Input class="max-w-xl" type="text" placeholder="Wyszukaj..." />
+		<Input
+			class="max-w-xl"
+			type="text"
+			placeholder="Wyszukaj..."
+			value={searchParam}
+			on:keyup={debounce(search, 300)}
+			spellcheck={false}
+		/>
 		{#if data.user?.role === 'admin'}
 			<AdminAddDialog form={data.addForm} />
 		{/if}
 	</div>
+
+	{#key currentPage}
+		<Pagination3 bind:paginationSettings />
+	{/key}
+
 	<Table>
 		<TableCaption>Lista produktów</TableCaption>
 		<TableHeader>
@@ -325,6 +338,5 @@
 		</TableBody>
 	</Table>
 
-	<Pagination2 {paginationSettings} />
-	<Pagination {currentPage} {setPage} rowsPerPage={data.pageLimit} totalRows={count} />
+	<Pagination3 {paginationSettings} />
 </section>

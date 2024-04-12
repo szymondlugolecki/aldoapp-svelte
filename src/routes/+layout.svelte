@@ -31,25 +31,6 @@
 		// 	toast.success('Before install prompt!');
 		// 	deferredInstallEvent = e as BeforeInstallPromptEvent;
 		// });
-		// $settings.theme = 'dark';
-		// unsubscribe = settings.subscribe(({ theme }) => {
-		// 	switch (theme) {
-		// 		case 'light':
-		// 			document.documentElement.classList.remove('dark');
-		// 			break;
-		// 		case 'dark':
-		// 			document.documentElement.classList.add('dark');
-		// 			break;
-		// 		default:
-		// 			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-		// 			if (prefersDark) {
-		// 				document.documentElement.classList.add('dark');
-		// 			} else {
-		// 				document.documentElement.classList.remove('dark');
-		// 			}
-		// 			break;
-		// 	}
-		// });
 	});
 
 	onDestroy(() => {

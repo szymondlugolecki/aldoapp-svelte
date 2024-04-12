@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { cn, dateParser, flexRender } from '$lib/client/functions';
+	import { cn, dateParser, debounce, flexRender } from '$lib/client/functions';
 	import type { PaginationSettings } from '$types';
 
 	import {
@@ -29,7 +29,7 @@
 	import { Input } from '$shadcn/input';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import Pagination2 from '$components/custom/Table/Pagination2.svelte';
+	import Pagination3 from '$components/custom/Pagination3.svelte';
 	import { createProps } from '$lib/client/functions/table';
 	// import { superForm } from 'sveltekit-superforms/client';
 
@@ -39,9 +39,7 @@
 
 	type ParsedUser = (typeof data.users)[number];
 
-	let count = data.count[0].count;
-
-	console.log(data.users);
+	const { count } = data;
 
 	const defaultColumns: ColumnDef<ParsedUser>[] = [
 		{
@@ -171,11 +169,8 @@
 		}
 	};
 
-	let currentPage = 1;
-
 	const setPage = (pageIndex: number) => {
 		currentPage = pageIndex + 1;
-		console.log('setting page index to', pageIndex);
 		$table.setPageIndex(pageIndex);
 	};
 
@@ -198,22 +193,29 @@
 	});
 
 	$: table = createSvelteTable(options);
+	let searchParam = $page.url.searchParams.get('szukaj');
+	let pageParam = $page.url.searchParams.get('strona');
+	let currentPage = !isNaN(Number(pageParam)) ? Math.max(Number(pageParam), 1) : 1;
 
-	$: pageParam = $page.url.searchParams.get('strona');
-	$: currentPage = !isNaN(Number(pageParam)) ? Math.max(Number(pageParam), 1) : 1;
-
-	const paginationSettings: PaginationSettings = {
+	let paginationSettings = {
+		page: currentPage,
 		count,
 		perPage: data.pageLimit,
 		defaultPage: 1,
-		siblingCount: 2,
-		onPageChange: ({ next }) => {
-			setPage(next - 1);
-			return next;
+		siblingCount: 1,
+		onPageChange: (page) => {
+			setPage(page);
 		}
-	};
+	} satisfies PaginationSettings;
 
-	// const { form, errors } = superForm(data.addForm);
+	const search = (event: KeyboardEvent) => {
+		const input = event.target as HTMLInputElement;
+		const queryString = input.value;
+
+		const params = new URLSearchParams($page.url.searchParams.toString());
+		params.set('szukaj', queryString);
+		goto(`?${params.toString()}`, { keepFocus: true });
+	};
 </script>
 
 <svelte:head>
@@ -226,11 +228,20 @@
 
 <section class="w-full h-full p-2 space-y-3">
 	<div class="flex justify-between space-x-3 lg:space-x-0">
-		<Input class="max-w-xl" type="text" placeholder="Wyszukaj..." />
+		<Input
+			class="max-w-xl"
+			type="text"
+			placeholder="Wyszukaj..."
+			value={searchParam}
+			on:keyup={debounce(search, 300)}
+			spellcheck={false}
+		/>
 		{#if data.user?.role === 'admin'}
 			<AdminAddDialog form={data.addForm} />
 		{/if}
 	</div>
+
+	<Pagination3 {paginationSettings} />
 
 	<Table>
 		<TableCaption>Lista użytkowników</TableCaption>
@@ -272,6 +283,5 @@
 		</TableBody>
 	</Table>
 
-	<Pagination2 {paginationSettings} />
-	<!-- <Pagination {currentPage} {setPage} rowsPerPage={data.pageLimit} totalRows={count} /> -->
+	<Pagination3 {paginationSettings} />
 </section>

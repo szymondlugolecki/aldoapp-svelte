@@ -7,27 +7,6 @@
 	import { cn } from '$lib/utils';
 
 	import { mode } from 'mode-watcher';
-
-	export let data;
-	let subscriptionExists = false;
-
-	const getSubscription = async () => {
-		// Check if service worker is supported/exists
-		const registration = await getRegistration();
-		if (!registration) {
-			subscriptionExists = false;
-			return;
-		}
-
-		const sub = await registration.pushManager.getSubscription();
-		if (!sub) {
-			subscriptionExists = false;
-			return;
-		}
-
-		subscriptionExists = true;
-		return sub;
-	};
 </script>
 
 <!-- <SuperDebug data={data.unsubscribeForm} /> -->

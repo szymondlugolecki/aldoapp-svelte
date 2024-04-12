@@ -33,7 +33,7 @@
 	const noAdminRoles = userRoles.filter((role) => role !== 'admin');
 
 	export let form: SuperValidated<EditUserForm>;
-	console.log('user role', $page.data.user?.role, user.role);
+	// console.log('user role', $page.data.user?.role, user.role);
 	const roles = $page.data.user?.role === 'admin' ? userRoles : noAdminRoles;
 
 	let cellOverride: string | undefined = undefined;

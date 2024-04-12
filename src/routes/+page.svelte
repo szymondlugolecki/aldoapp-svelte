@@ -208,8 +208,8 @@
 	<ProductCarousel title="Ostatnio kupione" products={data.recentlyOrdered} />
 </main>
 
-<!-- <a href="https://github.com/ciscoheat/sveltekit-rate-limiter">ratelimiter</a> -->
-<!-- <button on:click={removeAllOrders} class="px-3 py-2 text-lg text-white bg-gray-800"
+<!-- <a href="https://github.com/ciscoheat/sveltekit-rate-limiter">ratelimiter</a>
+<button on:click={removeAllOrders} class="px-3 py-2 text-lg text-white bg-gray-800"
 	>Usun zamowienia</button
 > -->
 

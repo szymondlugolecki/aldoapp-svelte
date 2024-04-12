@@ -166,6 +166,7 @@
 					name={key}
 					id={key}
 					placeholder="Tu wpisz opis produktu..."
+					spellcheck="false"
 				/>
 			{:else if key === 'category' || key === 'subcategory'}
 				<SelectCategories bind:combobox={categoryCombobox} bind:subcategoryCombobox />

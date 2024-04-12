@@ -14,7 +14,7 @@
 	];
 </script>
 
-<div class="hidden p-10 pb-16 gap-y-6 md:block">
+<div class="block p-10 pb-16 gap-y-6">
 	<div class="gap-y-0.5">
 		<h1 class="text-2xl font-bold tracking-tight">Ustawienia</h1>
 		<p class="text-muted-foreground">Zarządzaj ustawieniami konta i aplikacji</p>

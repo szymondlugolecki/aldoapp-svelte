@@ -15,10 +15,10 @@ export const cartsTable = sqliteTable(
 		// relations
 		customerId: text('customer_id')
 			.notNull()
-			.references(() => usersTable.id), // who receives the product
+			.references(() => usersTable.id, { onDelete: 'cascade' }), // who receives the product
 		ownerId: text('owner_id')
 			.notNull()
-			.references(() => usersTable.id) // cart owner - adviser or customer
+			.references(() => usersTable.id, { onDelete: 'cascade' }) // cart owner - adviser or customer
 		// promoCode
 	},
 	(order) => ({

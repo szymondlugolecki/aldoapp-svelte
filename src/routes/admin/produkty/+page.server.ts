@@ -5,13 +5,13 @@ import edit from '$lib/server/actions/product/edit';
 // import remove from '$lib/server/actions/product/remove';
 import { db } from '$lib/server/db';
 import { productsTable } from '$lib/server/db/schemas/products';
-import { sql } from 'drizzle-orm';
+import { like, or } from 'drizzle-orm';
 import type { ProductSortableColumn } from '$types';
-import { extractParams } from '$lib/server/functions/utils';
+import { clauseConcat, extractParams } from '$lib/server/functions/utils';
 import { superValidate } from 'sveltekit-superforms/server';
 import { products$ } from '$lib/client/schemas/index.js';
 
-const pageLimit = 10;
+const pageLimit = 8;
 const sortableColumns: ProductSortableColumn[] = [
 	'name',
 	'price',
@@ -23,53 +23,65 @@ const sortableColumns: ProductSortableColumn[] = [
 ];
 
 export const load = async ({ url }) => {
-	const { page, sort } = extractParams<ProductSortableColumn>(url, sortableColumns);
+	const { search, page, sort } = extractParams<ProductSortableColumn>(url, sortableColumns);
 
-	return {
-		products: await db.query.productsTable.findMany({
-			columns: {
-				id: true,
-				name: true,
-				price: true,
-				weight: true,
-				producent: true,
-				category: true,
-				subcategory: true,
-				createdAt: true,
-				symbol: true,
-				encodedURL: true,
-				description: true,
-				image: true,
-				hidden: true
-			},
-			with: {
-				author: {
-					columns: {
-						id: true,
-						fullName: true,
-						email: true
-					}
-				},
-				images: {
-					columns: {
-						id: true,
-						url: true
-					}
+	const searchTemplateString = `%${search}%`;
+	const searchClause =
+		search &&
+		or(
+			like(productsTable.id, searchTemplateString),
+			like(productsTable.name, searchTemplateString),
+			like(productsTable.symbol, searchTemplateString)
+		);
+
+	const clausesArr = [searchClause];
+
+	const extendedWhereClause = clauseConcat(...clausesArr);
+
+	const products = await db.query.productsTable.findMany({
+		columns: {
+			id: true,
+			name: true,
+			price: true,
+			weight: true,
+			producent: true,
+			category: true,
+			subcategory: true,
+			createdAt: true,
+			symbol: true,
+			encodedURL: true,
+			description: true,
+			image: true,
+			hidden: true
+		},
+		with: {
+			author: {
+				columns: {
+					id: true,
+					fullName: true,
+					email: true
 				}
 			},
-			offset: (page - 1) * pageLimit,
-			orderBy: sort
-				? (products, { asc, desc }) =>
-						sort.descending ? desc(products[sort.by]) : asc(products[sort.by])
-				: (products, { desc }) => desc(products.createdAt),
-			limit: pageLimit
-		}),
+			images: {
+				columns: {
+					id: true,
+					url: true
+				}
+			}
+		},
+		offset: (page - 1) * pageLimit,
+		orderBy: sort
+			? (productsTable, { asc, desc }) =>
+					sort.descending ? desc(productsTable[sort.by]) : asc(productsTable[sort.by])
+			: (productsTable, { desc }) => desc(productsTable.createdAt),
+		limit: pageLimit,
+		where: extendedWhereClause
+	});
+
+	return {
+		products,
 		pageLimit,
-		count: await db
-			.select({
-				count: sql<number>`count(*)`.mapWith(Number)
-			})
-			.from(productsTable),
+		count: products.length,
 		addForm: await superValidate(products$.addForm),
 		editForm: await superValidate(products$.editForm)
 	};

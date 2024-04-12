@@ -17,10 +17,10 @@ export const imagesTable = sqliteTable(
 		// relations
 		productId: integer('product_id', { mode: 'number' })
 			.notNull()
-			.references(() => productsTable.id),
+			.references(() => productsTable.id, { onDelete: 'cascade' }),
 		authorId: text('author_id')
 			.notNull()
-			.references(() => usersTable.id) // user who added the image
+			.references(() => usersTable.id, { onDelete: 'cascade' }) // user who added the image
 	},
 	(product) => ({
 		// indexes

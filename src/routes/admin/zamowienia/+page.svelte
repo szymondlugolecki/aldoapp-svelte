@@ -27,7 +27,7 @@
 	import { betterZodParse } from '$lib/client/functions/betterZodParse.js';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import Pagination2 from '$components/custom/Table/Pagination2.svelte';
+	import Pagination3 from '$components/custom/Pagination3.svelte';
 	import { deliveryMethodsList, paymentMethodsList } from '$lib/client/constants/index.js';
 
 	export let data;
@@ -208,11 +208,8 @@
 		}
 	};
 
-	let currentPage = 1;
-
 	const setPage = (pageIndex: number) => {
 		currentPage = pageIndex + 1;
-		console.log('setting page index to', pageIndex);
 		$table.setPageIndex(pageIndex);
 	};
 
@@ -232,16 +229,19 @@
 	});
 
 	$: table = createSvelteTable(options);
+	let pageParam = $page.url.searchParams.get('strona');
+	let currentPage = !isNaN(Number(pageParam)) ? Math.max(Number(pageParam), 1) : 1;
 
-	$: pageParam = $page.url.searchParams.get('strona');
-	$: currentPage = !isNaN(Number(pageParam)) ? Math.max(Number(pageParam), 1) : 1;
-
-	const paginationSettings: PaginationSettings = {
+	let paginationSettings = {
+		page: currentPage,
 		count,
 		perPage: data.pageLimit,
 		defaultPage: 1,
-		siblingCount: 1
-	};
+		siblingCount: 1,
+		onPageChange: (page) => {
+			setPage(page);
+		}
+	} satisfies PaginationSettings;
 </script>
 
 <svelte:head>
@@ -255,6 +255,8 @@
 	<div class="flex">
 		<Input class="max-w-xl" type="text" placeholder="Wyszukaj..." />
 	</div>
+
+	<Pagination3 {paginationSettings} />
 
 	<Table.Root>
 		<Table.Caption>Lista zamówień</Table.Caption>
@@ -294,6 +296,5 @@
 		</Table.Body>
 	</Table.Root>
 
-	<Pagination2 {paginationSettings} />
-	<!-- <Pagination {currentPage} {setPage} rowsPerPage={data.pageLimit} totalRows={count} /> -->
+	<Pagination3 {paginationSettings} />
 </section>

@@ -19,3 +19,37 @@ export const getRegistration = async () => {
 	}
 	return registration;
 };
+
+export const getSubscription = async () => {
+	const isPushSupported = checkIfIsPushSupported();
+	if (!isPushSupported) {
+		return null;
+	}
+
+	// Check if service worker is supported/exists
+	const registration = await getRegistration();
+	if (!registration) {
+		return null;
+	}
+
+	const sub = await registration.pushManager.getSubscription();
+	if (!sub) {
+		return null;
+	}
+
+	return sub;
+};
+
+export const checkIfIsPushSupported = () => {
+	if (!('serviceWorker' in navigator)) {
+		// Service Worker isn't supported on this browser, disable or hide UI.
+		return false;
+	}
+
+	if (!('PushManager' in window)) {
+		// Push isn't supported on this browser, disable or hide UI.
+		return false;
+	}
+
+	return true;
+};

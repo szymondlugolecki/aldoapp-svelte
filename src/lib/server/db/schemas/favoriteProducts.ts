@@ -10,10 +10,10 @@ export const favoriteProductsTable = sqliteTable('favorite_products', {
 	// relations
 	productId: integer('product_id', { mode: 'number' })
 		.notNull()
-		.references(() => productsTable.id),
+		.references(() => productsTable.id, { onDelete: 'cascade' }),
 	userId: text('author_id')
 		.notNull()
-		.references(() => usersTable.id)
+		.references(() => usersTable.id, { onDelete: 'cascade' })
 });
 
 export const favoriteProductsRelations = relations(favoriteProductsTable, ({ one }) => ({

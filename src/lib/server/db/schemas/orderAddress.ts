@@ -13,7 +13,7 @@ export const orderAddressTable = sqliteTable('order_address', {
 	// relations
 	orderId: text('order_id')
 		.notNull()
-		.references(() => ordersTable.id)
+		.references(() => ordersTable.id, { onDelete: 'cascade' })
 });
 
 export const addressRelations = relations(orderAddressTable, ({ one }) => ({

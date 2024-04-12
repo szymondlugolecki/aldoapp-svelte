@@ -7,8 +7,10 @@
 	import { page } from '$app/stores';
 	import { Input } from '$shadcn/input/index.js';
 	import Filters from './(components)/filters-c.svelte';
-	import { getSubcategoryName } from '$lib/client/functions';
+	import { getSubcategoryName, debounce } from '$lib/client/functions';
 	import { builderActions } from 'bits-ui';
+	import { goto } from '$app/navigation';
+	// import { debounce } from '@melt-ui/svelte/internal/helpers';
 
 	export let data;
 
@@ -18,6 +20,15 @@
 	$: selectedProducent = ($page.url.searchParams.get('producent') || 'all') as ExtendedProducent;
 
 	$: mainStorePage = $page.url.pathname === '/sklep';
+
+	const search = (event: KeyboardEvent) => {
+		const input = event.target as HTMLInputElement;
+		const queryString = input.value;
+
+		const params = new URLSearchParams($page.url.searchParams.toString());
+		params.set('szukaj', queryString);
+		goto(`?${params.toString()}`, { keepFocus: true });
+	};
 </script>
 
 <svelte:head>
@@ -33,7 +44,12 @@
 		<div class="flex flex-col w-full h-full sm:px-4">
 			<div class="sticky top-[96px] flex flex-col w-full bg-background z-10">
 				<div class="flex justify-between w-full py-2 sm:py-4 gap-x-3">
-					<Input type="text" class="w-full sm:max-w-xs" placeholder="Szukaj..." />
+					<Input
+						type="text"
+						class="w-full sm:max-w-xs"
+						placeholder="Szukaj..."
+						on:keyup={debounce(search, 300)}
+					/>
 					<Sheet.Root>
 						<Sheet.Trigger asChild let:builder>
 							<Button builders={[builder]} variant="outline">Kategorie</Button>

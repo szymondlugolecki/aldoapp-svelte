@@ -12,10 +12,10 @@ export const orderProductsTable = sqliteTable('order_products', {
 	// relations
 	productId: integer('product_id')
 		.notNull()
-		.references(() => productsTable.id),
+		.references(() => productsTable.id, { onDelete: 'cascade' }),
 	orderId: text('order_id')
 		.notNull()
-		.references(() => ordersTable.id)
+		.references(() => ordersTable.id, { onDelete: 'cascade' })
 });
 
 export const orderProductsRelations = relations(orderProductsTable, ({ one }) => ({

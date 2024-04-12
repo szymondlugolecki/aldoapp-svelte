@@ -39,11 +39,11 @@ export const ordersTable = sqliteTable(
 		// relations
 		customerId: text('customer_id')
 			.notNull()
-			.references(() => usersTable.id),
+			.references(() => usersTable.id, { onDelete: 'cascade' }),
 		cartOwnerId: text('cart_owner_id')
 			.notNull()
-			.references(() => usersTable.id),
-		driverId: text('driver_id').references(() => usersTable.id)
+			.references(() => usersTable.id, { onDelete: 'cascade' }),
+		driverId: text('driver_id').references(() => usersTable.id, { onDelete: 'cascade' })
 		// promoCodeId: int('promo_code_id'),
 	},
 	(order) => ({

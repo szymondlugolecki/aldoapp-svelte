@@ -37,7 +37,7 @@ export const subscriptionsTable = sqliteTable(
 		// relations
 		userId: text('user_id')
 			.notNull()
-			.references(() => usersTable.id)
+			.references(() => usersTable.id, { onDelete: 'cascade' })
 	},
 	(subscription) => ({
 		// indexes

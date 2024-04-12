@@ -13,3 +13,4 @@ playwright/.auth
 /certs
 mysql_migrations
 pnpm-lock.yaml
+*.xls

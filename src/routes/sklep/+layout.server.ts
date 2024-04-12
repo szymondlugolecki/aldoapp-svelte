@@ -2,7 +2,7 @@ import { db } from '$lib/server/db';
 import { productsTable } from '$lib/server/db/schemas/products';
 import { clauseConcat, extractParams } from '$lib/server/functions/utils';
 import type { ProductSortableColumn } from '$types';
-import { eq, gte, lte, sql } from 'drizzle-orm';
+import { eq, gte, lte, sql, like, or } from 'drizzle-orm';
 
 const pageLimit = 10;
 const sortableColumns: ProductSortableColumn[] = [
@@ -16,12 +16,20 @@ const sortableColumns: ProductSortableColumn[] = [
 ];
 
 export const load = async ({ url }) => {
-	const { page, sort, product } = extractParams<ProductSortableColumn>(url, sortableColumns);
+	const { search, sort, product } = extractParams<ProductSortableColumn>(url, sortableColumns);
 	const defaultWhereClause = eq(productsTable.hidden, false);
 	// or();
 	// eq(productsTable.customerId, userId),
 	// eq(productsTable.cartOwnerId, userId)
 
+	const searchTemplateString = `%${search}%`;
+	const searchClause =
+		search &&
+		or(
+			like(productsTable.id, searchTemplateString),
+			like(productsTable.name, searchTemplateString),
+			like(productsTable.symbol, searchTemplateString)
+		);
 	const producentClause = product.producent && eq(productsTable.producent, product.producent);
 	const categoryClause = product.category && eq(productsTable.category, product.category);
 	const subcategoryClause =
@@ -29,10 +37,9 @@ export const load = async ({ url }) => {
 	const priceMinClause = product.priceMin && gte(productsTable.price, product.priceMin);
 	const priceMaxClause = product.priceMax && lte(productsTable.price, product.priceMax);
 
-	// console.log('Status', product.status);
-
 	const clausesArr = [
 		defaultWhereClause,
+		searchClause,
 		producentClause,
 		categoryClause,
 		subcategoryClause,
@@ -69,14 +76,14 @@ export const load = async ({ url }) => {
 				},
 				images: true
 			},
-			offset: (page - 1) * pageLimit,
+			// offset: (page - 1) * pageLimit,
 			...(sort
 				? {
 						orderBy: (orders, { asc, desc }) =>
 							sort.descending ? desc(orders[sort.by]) : asc(orders[sort.by])
 				  }
-				: {}),
-			limit: pageLimit
+				: {})
+			// limit: pageLimit
 		}),
 		pageLimit,
 		count: await db

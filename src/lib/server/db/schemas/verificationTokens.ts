@@ -21,7 +21,7 @@ export const verificationTokensTable = sqliteTable(
 		// relations
 		userId: text('user_id')
 			.notNull()
-			.references(() => usersTable.id)
+			.references(() => usersTable.id, { onDelete: 'cascade' })
 	},
 	(verificationToken) => ({
 		// indexes

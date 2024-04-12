@@ -15,6 +15,13 @@
       "when": 1708290591009,
       "tag": "0001_amused_switch",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1712587355970,
+      "tag": "0002_hot_power_man",
+      "breakpoints": true
     }
   ]
 }

@@ -17,7 +17,7 @@
 </svelte:head>
 
 <section class="flex flex-col w-full p-2 gap-y-3">
-	<div class="flex flex-col gap-y-0">
+	<!-- <div class="flex flex-col gap-y-0">
 		<h2 class="text-lg font-semibold">Powiadomienie Push</h2>
 		<p class="text-sm text-muted-foreground">Do wszystkich użytkowników</p>
 	</div>
@@ -66,5 +66,5 @@
 				>
 			{/if}
 		</Form.Root>
-	</div>
+	</div> -->
 </section>

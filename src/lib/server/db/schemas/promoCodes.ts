@@ -31,7 +31,7 @@ export const promoCodesTable = sqliteTable(
 		// relations
 		authorId: text('author_id')
 			.notNull()
-			.references(() => usersTable.id)
+			.references(() => usersTable.id, { onDelete: 'cascade' })
 	},
 	(product) => ({
 		// indexes

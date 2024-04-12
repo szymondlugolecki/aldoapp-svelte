@@ -1,6 +1,10 @@
 <script lang="ts">
 	import toast from 'svelte-french-toast';
-	import { base64StringToUint8Arr, getRegistration } from '$lib/client/functions/api/push.js';
+	import {
+		base64StringToUint8Arr,
+		getRegistration,
+		getSubscription
+	} from '$lib/client/functions/api/push.js';
 	import { getContext, onMount } from 'svelte';
 	import { Button } from '$components/ui/button/index.js';
 	import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public';
@@ -14,6 +18,7 @@
 
 	let subscribeForm: SuperValidated<SubscribeForm>;
 	export { subscribeForm as form };
+
 	const { form, enhance, submitting } = superForm(subscribeForm, {
 		onResult: async ({ result }) => {
 			if (result.type !== 'success') {
@@ -30,7 +35,7 @@
 			} else {
 				toast.success('Sukces');
 			}
-			await getSubscription();
+			// await getSubscription();
 		},
 		onSubmit: async ({ cancel, formData }) => {
 			const success = await requestSubscription();
@@ -53,14 +58,6 @@
 			keys?.auth && formData.append('auth', keys.auth);
 			keys?.p256dh && formData.append('p256dh', keys.p256dh);
 		}
-	});
-	export let subscriptionExists: boolean;
-	export let getSubscription: () => Promise<PushSubscription | undefined>;
-
-	onMount(async () => {
-		// loading = true;
-		await getSubscription();
-		// loading = false;
 	});
 
 	const requestNotificationPermission = async () => {
@@ -109,7 +106,6 @@
 				applicationServerKey: base64StringToUint8Arr(PUBLIC_VAPID_PUBLIC_KEY)
 			});
 			if (newSubscription) {
-				await getSubscription();
 				return true;
 			}
 		}
@@ -124,7 +120,6 @@
 					applicationServerKey: base64StringToUint8Arr(PUBLIC_VAPID_PUBLIC_KEY)
 				});
 				if (newSubscription) {
-					await getSubscription();
 					return true;
 				}
 			} else {
@@ -135,14 +130,12 @@
 	};
 </script>
 
-{#if !subscriptionExists}
-	<form action="?/subscribe" method="post" use:enhance>
-		<Form.Button disabled={$submitting}>
-			{#if $submitting}
-				<Spinner />
-			{:else}
-				Włącz
-			{/if}
-		</Form.Button>
-	</form>
-{/if}
+<form action="?/subscribe" method="post" use:enhance>
+	<Form.Button disabled={$submitting}>
+		{#if $submitting}
+			<Spinner />
+		{:else}
+			Włącz
+		{/if}
+	</Form.Button>
+</form>

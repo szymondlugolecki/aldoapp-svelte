@@ -39,7 +39,7 @@ export const productsTable = sqliteTable(
 		// relations
 		authorId: text('author_id')
 			.notNull()
-			.references(() => usersTable.id) // user that added this product
+			.references(() => usersTable.id, { onDelete: 'cascade' }) // user that added this product
 	},
 	(product) => ({
 		// indexes

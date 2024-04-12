@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Alert from '$components/custom/Alerts/Alert.svelte';
 	import { roleColors, roleNames } from '$lib/client/constants/index.js';
-	import { cn, dateParser } from '$lib/client/functions/index.js';
+	import { cn, dateParser, isAtLeastModerator } from '$lib/client/functions/index.js';
 	import { onMount } from 'svelte';
 	import type { Order } from '$types';
 	import { createAvatar, createTabs, melt } from '@melt-ui/svelte';
@@ -58,7 +58,9 @@
 			<TabsList>
 				<Tab {pathname} href="/uzytkownik/{pathUser}">Informacje</Tab>
 				<Tab {pathname} href="/uzytkownik/{pathUser}/zamowienia">Zamówienia</Tab>
-				<Tab {pathname} href="/uzytkownik/{pathUser}/inne">Inne</Tab>
+				{#if data.user && isAtLeastModerator(data.user.role)}
+					<Tab {pathname} href="/uzytkownik/{pathUser}/inne">Inne</Tab>
+				{/if}
 			</TabsList>
 		</div>
 		<TabsContent class="">

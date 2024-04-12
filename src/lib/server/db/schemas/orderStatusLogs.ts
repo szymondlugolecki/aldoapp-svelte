@@ -16,10 +16,10 @@ export const orderStatusLogsTable = sqliteTable('order_status_logs', {
 	// relations
 	orderId: text('order_id')
 		.notNull()
-		.references(() => ordersTable.id),
+		.references(() => ordersTable.id, { onDelete: 'cascade' }),
 	userId: text('user_id')
 		.notNull()
-		.references(() => usersTable.id) // user responsible for this status change
+		.references(() => usersTable.id, { onDelete: 'cascade' }) // user responsible for this status change
 });
 
 export const orderStatusLogsRelations = relations(orderStatusLogsTable, ({ one }) => ({

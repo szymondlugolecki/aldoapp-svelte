@@ -44,7 +44,7 @@ export const usersTable = sqliteTable(
 			columns: [user.adviserId],
 			foreignColumns: [user.id],
 			name: 'users_adviser_id'
-		})
+		}).onDelete('cascade')
 	})
 );
 

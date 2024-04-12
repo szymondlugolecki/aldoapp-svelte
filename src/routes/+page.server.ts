@@ -56,7 +56,7 @@ const fetchMostBoughtFromDb = async () => {
 	const productsSorted = Object.entries(groupedProducts).sort((a, b) => b[1] - a[1]);
 	const tenMostBoughtProducts = productsSorted.map(([id]) => Number(id)).slice(0, 10);
 
-	const [products, mostBoughtProductsError] = await trytm(
+	const [mostBoughtProducts, mostBoughtProductsError] = await trytm(
 		db.query.productsTable.findMany({
 			where: (products) => inArray(products.id, tenMostBoughtProducts),
 			columns: {
@@ -64,9 +64,10 @@ const fetchMostBoughtFromDb = async () => {
 				name: true,
 				price: true,
 				encodedURL: true,
-				image: true
+				image: true,
+				hidden: true
 			},
-			limit: 10
+			limit: 8
 		})
 	);
 
@@ -74,9 +75,11 @@ const fetchMostBoughtFromDb = async () => {
 		console.error('mostBoughtProductsError', mostBoughtProductsError);
 		return [];
 	}
-	if (!products.length) {
+	if (!mostBoughtProducts.length) {
 		return [];
 	}
+
+	const products = mostBoughtProducts.filter((product) => !product.hidden);
 
 	// Should live ~3 hours
 	await redis.set(cacheNames.mostBought, products, { ex: 3 * HOUR_IN_SECONDS });
@@ -98,13 +101,14 @@ const fetchRecentlyOrderedFromDb = async () => {
 								name: true,
 								price: true,
 								encodedURL: true,
-								image: true
+								image: true,
+								hidden: true
 							}
 						}
 					}
 				}
 			},
-			limit: 10,
+			limit: 8,
 			orderBy: (orders, { desc }) => [desc(orders.createdAt)]
 		})
 	);
@@ -117,9 +121,9 @@ const fetchRecentlyOrderedFromDb = async () => {
 		return [];
 	}
 
-	const products = recentlyOrderedProducts.flatMap(({ products }) =>
-		products.map(({ product }) => product)
-	);
+	const products = recentlyOrderedProducts
+		.flatMap(({ products }) => products.map(({ product }) => product))
+		.filter((product) => !product.hidden);
 
 	// Cache the results for next 30 minutes
 	// Should live 30 minutes

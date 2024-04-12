@@ -4,7 +4,7 @@
 	const { form } = getForm<EditUserForm>();
 	const { actions } = getFormField();
 
-	export let userId: number;
+	export let userId: string;
 	$form.id = userId.toString();
 </script>
 

@@ -1,5 +1,3 @@
-import type { createPagination } from '@melt-ui/svelte';
-
 export * from './ProductTypes';
 export * from './UserTypes';
 export * from './OrderTypes';
@@ -20,4 +18,11 @@ export type Outlets = 'surowe' | 'myszyniec' | 'ełk' | 'wójtowo';
 export type CellTypes = 'text' | 'date' | 'email' | 'checkbox' | 'phone' | 'adviser' | 'role';
 export type TableType = 'users' | 'orders' | 'products' | 'promoCodes';
 
-export type PaginationSettings = Parameters<typeof createPagination>[0];
+export type PaginationSettings = {
+	page: number;
+	perPage: number;
+	count: number;
+	onPageChange: (page: number) => void;
+	defaultPage: number;
+	siblingCount: number;
+};
