@@ -83,7 +83,6 @@
 		"svelte-email": "^0.0.4",
 		"svelte-french-toast": "^1.1.0",
 		"svelte-inview": "^4.0.1",
-		"svelte-local-storage-store": "^0.4.0",
 		"svelte-sonner": "^0.3.11",
 		"tailwind-merge": "^1.13.2",
 		"tailwind-variants": "^0.1.14",
