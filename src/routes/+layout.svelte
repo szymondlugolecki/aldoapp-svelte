@@ -5,14 +5,11 @@
 	import Footer from './(components)/footer.svelte';
 	// import toast, { Toaster } from 'svelte-french-toast';
 	import { Toaster } from '$shadcn/sonner';
+	import { ModeWatcher } from 'mode-watcher';
 
 	import { onDestroy, onMount } from 'svelte';
-	import { settings } from '$lib/client/stores/settings';
 	import type { BeforeInstallPromptEvent } from '../app';
 	import type { Unsubscriber } from 'svelte/store';
-	import { Contact, Home, ShoppingCart } from 'lucide-svelte';
-	import { cn } from '$lib/client/functions';
-	import { page } from '$app/stores';
 	import PhoneMenu from './(components)/phone-menu.svelte';
 	import ScrollToTop from './(components)/scroll-to-top.svelte';
 	import { inview } from 'svelte-inview';
@@ -34,27 +31,25 @@
 		// 	toast.success('Before install prompt!');
 		// 	deferredInstallEvent = e as BeforeInstallPromptEvent;
 		// });
-
 		// $settings.theme = 'dark';
-
-		unsubscribe = settings.subscribe(({ theme }) => {
-			switch (theme) {
-				case 'light':
-					document.documentElement.classList.remove('dark');
-					break;
-				case 'dark':
-					document.documentElement.classList.add('dark');
-					break;
-				default:
-					const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-					if (prefersDark) {
-						document.documentElement.classList.add('dark');
-					} else {
-						document.documentElement.classList.remove('dark');
-					}
-					break;
-			}
-		});
+		// unsubscribe = settings.subscribe(({ theme }) => {
+		// 	switch (theme) {
+		// 		case 'light':
+		// 			document.documentElement.classList.remove('dark');
+		// 			break;
+		// 		case 'dark':
+		// 			document.documentElement.classList.add('dark');
+		// 			break;
+		// 		default:
+		// 			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+		// 			if (prefersDark) {
+		// 				document.documentElement.classList.add('dark');
+		// 			} else {
+		// 				document.documentElement.classList.remove('dark');
+		// 			}
+		// 			break;
+		// 	}
+		// });
 	});
 
 	onDestroy(() => {
@@ -85,6 +80,7 @@
 <!-- <Toaster position="bottom-right" /> -->
 <Toaster />
 
+<ModeWatcher />
 <div class="relative">
 	<div
 		class="absolute inset-0 h-screen -z-50"

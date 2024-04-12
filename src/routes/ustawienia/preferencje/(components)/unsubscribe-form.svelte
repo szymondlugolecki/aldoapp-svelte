@@ -1,7 +1,4 @@
 <script lang="ts">
-	import { Separator } from '$shadcn/separator';
-	import ThemeSwitch from '$meltui/Switch/ThemeSwitch.svelte';
-	import { cn } from '$lib/utils.js';
 	import toast from 'svelte-french-toast';
 	import { base64StringToUint8Arr, getRegistration } from '$lib/client/functions/api/push.js';
 	import { onMount } from 'svelte';

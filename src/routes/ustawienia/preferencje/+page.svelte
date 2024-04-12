@@ -1,13 +1,12 @@
 <script lang="ts">
 	import { Separator } from '$shadcn/separator';
-	import { settings } from '$lib/client/stores/settings';
-
 	import ThemeSwitch from '$meltui/Switch/ThemeSwitch.svelte';
 	import SubscribeForm from './(components)/subscribe-form.svelte';
 	import UnsubscribeForm from './(components)/unsubscribe-form.svelte';
 	import { getRegistration } from '$lib/client/functions/api/push';
-	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
 	import { cn } from '$lib/utils';
+
+	import { mode } from 'mode-watcher';
 
 	export let data;
 	let subscriptionExists = false;
@@ -51,13 +50,13 @@
 			</p>
 		</div>
 		<div class="sm:justify-self-end sm:place-self-center">
-			<ThemeSwitch defaultChecked={$settings.theme === 'dark'} />
+			<ThemeSwitch theme={$mode} />
 		</div>
 	</div>
 
 	<Separator class="w-full" />
 
-	<div class="grid grid-cols-2 gap-4">
+	<!-- <div class="grid grid-cols-2 gap-4">
 		<div class="col-span-2 sm:col-span-1">
 			<div class="flex items-center gap-x-2">
 				<label
@@ -79,5 +78,5 @@
 			<SubscribeForm {getSubscription} {subscriptionExists} form={data.subscribeForm} />
 			<UnsubscribeForm {getSubscription} {subscriptionExists} form={data.unsubscribeForm} />
 		</div>
-	</div>
+	</div> -->
 </div>
