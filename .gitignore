@@ -12,3 +12,4 @@ vite.config.ts.timestamp-*
 playwright/.auth
 /certs
 mysql_migrations
+pnpm-lock.yaml

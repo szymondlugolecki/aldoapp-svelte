@@ -15,7 +15,8 @@ const config = {
 	  ]),
 	kit: {
 		adapter: adapter({
-			runtime: 'edge'
+			runtime: 'edge',
+			regions: ['fra1']
 		}),
 		alias: {
 			'$components/*': 'src/components/*',
