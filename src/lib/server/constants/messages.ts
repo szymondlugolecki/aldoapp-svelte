@@ -56,7 +56,7 @@ export const orderStatusEmailDescription = (event: OrderEvent) => {
 		case 'IS_AVAILABLE_FOR_SHIPMENT':
 			return 'Zweryfikowaliśmy Twoje zamówienie. Teraz przystąpimy do realizacji';
 		case 'IS_UNAVAILABLE':
-			return 'Niestety przynajmniej jeden z zamówionych produktów nie jest dostępny w naszym magazynie. Podejmij decyzję o kontynuowaniu lub anulowaniu zamówienia na stronie zamówienia lub kontaktując się z nami.';
+			return 'Nie udało się zweryfikować zamówienia. Skontaktujemy się z Tobą.';
 		case 'DELIVERED':
 			return 'Zamówienie zostało zrealizowane. Dziękujemy za zakupy.';
 		// case 'KEEP_WAITING':
@@ -81,7 +81,7 @@ export const orderStatusEmailPreview = (event: OrderEvent) => {
 		case 'IS_AVAILABLE_FOR_SHIPMENT':
 			return 'Zamówienie zweryfikowane';
 		case 'IS_UNAVAILABLE':
-			return 'Produkty są niedostępne';
+			return 'Nie udało się zweryfikować zamówienia';
 		case 'DELIVERED':
 			return 'Dostarczono zamówienie';
 		case 'SHIPPED':

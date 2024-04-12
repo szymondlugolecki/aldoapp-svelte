@@ -59,7 +59,7 @@
 				<div use:melt={$root} class="flex items-center gap-x-2">
 					{#each Array.from({ length: 4 }) as _, i}
 						<input
-							class="text-lg text-center rounded-md shadow-sm square-12"
+							class="text-lg text-center rounded-md shadow-sm square-12 border-input bg-muted text-muted-foreground"
 							use:melt={$input()}
 							aria-invalid={$errors.code ? 'true' : undefined}
 						/>

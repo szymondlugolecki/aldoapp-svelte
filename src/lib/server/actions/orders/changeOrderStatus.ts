@@ -143,9 +143,14 @@ const changeOrderStatus = (async ({ request, locals }) => {
 		return setError(form, 'event', 'Nieprawidłowy status zamówienia', { status: 400 });
 	}
 
+	console.log('\n\n\n', 'event', event);
+	console.log('Next Events ->', serviceSnapshot.nextEvents);
+
 	// Event is possible, update the machine
 	service.send(event);
 	const currentState = service.getSnapshot().value as OrderStatus;
+
+	console.log('changing the status from', oldOrder.status, 'to', currentState);
 
 	// Update the order
 	const [, editOrderError] = await trytm(
@@ -173,7 +178,11 @@ const changeOrderStatus = (async ({ request, locals }) => {
 	}
 
 	// Send push notifications
-	sendNotifications(oldOrder.customer.subscriptions, getOrderStatusPushMessage(event));
+	try {
+		sendNotifications(oldOrder.customer.subscriptions, getOrderStatusPushMessage(event));
+	} catch (error) {
+		console.error('sendNotifications error', error);
+	}
 
 	// Send emails
 	const orderDate = oldOrder.createdAt.toLocaleString('pl-PL', {
@@ -190,6 +199,7 @@ const changeOrderStatus = (async ({ request, locals }) => {
 	const [, sendEmailError] = await trytm(
 		sendOrderStatusEmail({
 			to: [oldOrder.customer.email],
+			from: 'Zamówienia <admin@twojealdo.pl>',
 			props: {
 				orderId: oldOrder.id,
 				time: orderDate,

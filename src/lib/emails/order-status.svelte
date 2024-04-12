@@ -100,7 +100,7 @@
 			<Text style={codeParagraph}>{preview}</Text>
 
 			<Text style={paragraph}>{description}</Text>
-			<Link href="https://aldoapp-svelte.vercel.app/zamowienia/{orderId}"
+			<Link href="https://twojealdo.pl/zamowienia/{orderId}"
 				>Kliknij tutaj, aby sprawdzić szczegóły zamówienia</Link
 			>
 			<Hr style={hr} />

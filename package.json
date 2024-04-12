@@ -19,7 +19,6 @@
 		"drop": "drizzle-kit drop"
 	},
 	"devDependencies": {
-		"@block65/webcrypto-web-push": "^0.3.2",
 		"@melt-ui/pp": "^0.1.2",
 		"@playwright/test": "^1.31.2",
 		"@sveltejs/adapter-auto": "^3.0.0",
@@ -60,11 +59,9 @@
 		"@bdsqqq/try": "^2.3.1",
 		"@libsql/client": "^0.4.3",
 		"@lucia-auth/adapter-drizzle": "^1.0.2",
-		"@lucia-auth/adapter-sqlite": "^3.0.0",
 		"@melt-ui/svelte": "^0.57.2",
 		"@neoconfetti/svelte": "^1.0.0",
 		"@paralleldrive/cuid2": "^2.2.0",
-		"@planetscale/database": "^1.7.0",
 		"@tailwindcss/typography": "^0.5.9",
 		"@tanstack/svelte-table": "^8.9.2",
 		"@upstash/redis": "^1.22.0",
@@ -83,7 +80,6 @@
 		"mode-watcher": "^0.1.2",
 		"oslo": "^1.1.1",
 		"radix-icons-svelte": "^1.2.1",
-		"string-ts": "^2.0.0",
 		"svelte-email": "^0.0.4",
 		"svelte-french-toast": "^1.1.0",
 		"svelte-inview": "^4.0.1",
@@ -96,9 +92,6 @@
 		"ua-parser-js": "1.0.36",
 		"uploadthing": "^6.3.1",
 		"web-push-edge": "^0.1.1",
-		"webpush-webcrypto": "^1.0.3",
-		"wretch": "^2.7.0",
-		"xstate": "^4.38.2",
-		"zod_utilz": "^0.7.3"
+		"xstate": "^4.38.2"
 	}
 }

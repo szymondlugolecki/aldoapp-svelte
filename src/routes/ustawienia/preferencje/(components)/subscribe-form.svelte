@@ -9,7 +9,7 @@
 	import { Button } from '$components/ui/button/index.js';
 	import { PUBLIC_VAPID_PUBLIC_KEY } from '$env/static/public';
 	import { pushSubscription$ } from '$lib/client/schemas';
-	import * as Form from '$shadcn/form/';
+	import * as Form from '$shadcn/form';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { SubscribeForm } from '$lib/client/schemas/pushSubscription';
 	import { superForm, type FormOptions } from 'sveltekit-superforms/client';
