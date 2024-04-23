@@ -43,14 +43,20 @@ const edit: Action = async ({ request, locals }) => {
 
 	if (image instanceof File) {
 		// One image per product is enough for now
-		const fileBuffer = await image.arrayBuffer();
-		const { url } = await put(image.name, fileBuffer, {
-			token: env.BLOB_READ_WRITE_TOKEN,
-			access: 'public'
-		});
+		try {
+			const fileBuffer = await image.arrayBuffer();
+			const { url } = await put(image.name, fileBuffer, {
+				token: env.BLOB_READ_WRITE_TOKEN,
+				access: 'public'
+			});
 
-		console.log('url', url);
-		imageUrl = url;
+			console.log('url', url);
+			imageUrl = url;
+		} catch (error) {
+			// Unexpected-error
+			console.error('addProductImageError', error);
+			return setError(form, 'Błąd serwera podczas dodawania zdjęcia', { status: 500 });
+		}
 	}
 
 	const newProduct: Partial<
@@ -110,6 +116,11 @@ const edit: Action = async ({ request, locals }) => {
 	}
 
 	console.log('newProduct', newProduct);
+
+	if (Object.keys(newProduct).length === 0) {
+		console.log('brak danych do edycji produktu');
+		return setError(form, 'Brak danych do edycji', { status: 400 });
+	}
 
 	// Edit the product in the db
 	const [, editProductError] = await trytm(
