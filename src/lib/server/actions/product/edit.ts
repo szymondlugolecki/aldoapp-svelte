@@ -10,6 +10,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { put } from '@vercel/blob';
 import { env } from '$env/dynamic/private';
+import { betterZodParse } from '$lib/client/functions/betterZodParse';
 
 const edit: Action = async ({ request, locals }) => {
 	const sessionUser = locals.user;
@@ -33,15 +34,32 @@ const edit: Action = async ({ request, locals }) => {
 		return setError(form, 'Nie podano żadnych danych do edycji', { status: 400 });
 	}
 
-	const { id, name, symbol, category, subcategory, price, producent, weight, description, hidden } =
-		form.data;
+	const {
+		id,
+		name,
+		symbol,
+		category,
+		subcategory,
+		price,
+		producent,
+		weight,
+		description,
+		hidden
+		// image
+	} = form.data;
 
 	let imageUrl: string | null = null;
 
-	const image = formData.get('images');
-	console.log('formData.image', image);
+	const imageEntry = formData.get('images');
+	console.log('formData.image', imageEntry);
 
-	if (image instanceof File) {
+	const [image, imageErrors] = betterZodParse(products$.image, imageEntry);
+
+	if (imageErrors) {
+		return setError(form, 'image', imageErrors[0], { status: 400 });
+	}
+
+	if (image) {
 		// One image per product is enough for now
 		try {
 			const fileBuffer = await image.arrayBuffer();

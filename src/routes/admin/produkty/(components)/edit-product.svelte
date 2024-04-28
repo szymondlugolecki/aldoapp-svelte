@@ -96,8 +96,6 @@
 
 	let open = false;
 	let files: File | undefined = undefined;
-
-	// console.log('product', product);
 </script>
 
 <Dialog.Root bind:open closeOnOutsideClick={false}>

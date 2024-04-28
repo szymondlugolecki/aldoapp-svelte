@@ -258,8 +258,6 @@
 		}
 	} satisfies PaginationSettings;
 
-	console.log('paginationSettings', paginationSettings);
-
 	const search = (event: KeyboardEvent) => {
 		const input = event.target as HTMLInputElement;
 		const queryString = input.value;
@@ -269,8 +267,6 @@
 		params.set('strona', '1');
 		goto(`?${params.toString()}`, { keepFocus: true, invalidateAll: true });
 	};
-
-	console.log('');
 </script>
 
 <svelte:head>
