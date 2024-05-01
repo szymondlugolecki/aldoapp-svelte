@@ -5,7 +5,7 @@ import edit from '$lib/server/actions/product/edit';
 // import remove from '$lib/server/actions/product/remove';
 import { db } from '$lib/server/db';
 import { productsTable } from '$lib/server/db/schemas/products';
-import { like, or } from 'drizzle-orm';
+import { like, or, sql } from 'drizzle-orm';
 import type { ProductSortableColumn } from '$types';
 import { clauseConcat, extractParams } from '$lib/server/functions/utils';
 import { superValidate } from 'sveltekit-superforms';
@@ -79,10 +79,19 @@ export const load = async ({ url }) => {
 		where: extendedWhereClause
 	});
 
+	const count = (
+		await db
+			.select({
+				count: sql<number>`count(*)`.mapWith(Number)
+			})
+			.from(productsTable)
+			.where(extendedWhereClause)
+	)[0].count;
+
 	return {
 		products,
 		pageLimit,
-		count: products.length,
+		count,
 		addForm: await superValidate(zod(products$.addForm)),
 		editForm: await superValidate(zod(products$.editForm))
 	};
