@@ -82,7 +82,7 @@ export const load = async ({ url }) => {
 	return {
 		products,
 		pageLimit,
-		count,
+		count: products.length,
 		addForm: await superValidate(zod(products$.addForm)),
 		editForm: await superValidate(zod(products$.editForm))
 	};
