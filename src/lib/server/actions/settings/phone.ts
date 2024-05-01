@@ -2,9 +2,10 @@ import { settings$ } from '$lib/client/schemas/index.js';
 import { db } from '$lib/server/db';
 import { usersTable } from '$lib/server/db/schemas/users';
 import { trytm } from '@bdsqqq/try';
-import { error, fail, type Action, redirect } from '@sveltejs/kit';
+import { error, type Action, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
-import { setMessage, superValidate } from 'sveltekit-superforms/server';
+import { setMessage, superValidate, fail } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 
 const phone: Action = async (event) => {
 	const sessionUser = event.locals.user;
@@ -13,7 +14,7 @@ const phone: Action = async (event) => {
 		// error(...getCustomError('not-logged-in'));;
 	}
 
-	const form = await superValidate(event, settings$.phoneForm);
+	const form = await superValidate(event, zod(settings$.phoneForm));
 	if (!form.valid) {
 		return fail(400, { form });
 	}

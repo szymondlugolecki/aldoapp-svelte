@@ -6,7 +6,8 @@ import orderAgain from '$lib/server/actions/orders/orderAgain';
 import { db } from '$lib/server/db/index.js';
 import { trytm } from '@bdsqqq/try';
 import { error, redirect } from '@sveltejs/kit';
-import { superValidate } from 'sveltekit-superforms/server';
+import { superValidate, fail } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 
 export const load = async ({ params, locals }) => {
 	const sessionUser = locals.user;
@@ -161,8 +162,8 @@ export const load = async ({ params, locals }) => {
 
 	return {
 		order,
-		orderAgainForm: await superValidate(order$.orderAgainForm),
-		orderStatusHistoryForm: await superValidate(order$.orderStatusHistoryForm),
+		orderAgainForm: await superValidate(zod(order$.orderAgainForm)),
+		orderStatusHistoryForm: await superValidate(zod(order$.orderStatusHistoryForm)),
 		statusHistory
 	};
 };

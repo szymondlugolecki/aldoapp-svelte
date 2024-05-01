@@ -289,7 +289,7 @@
 			spellcheck={false}
 		/>
 		{#if data.user?.role === 'admin'}
-			<AdminAddDialog form={data.addForm} />
+			<AdminAddDialog superform={data.addForm} />
 		{/if}
 	</div>
 

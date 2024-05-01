@@ -3,9 +3,26 @@
 
 	import * as Form from '$shadcn/form';
 	import { auth$ } from '$lib/client/schemas/index.js';
-	import MessageAlert from '$components/custom/Form/MessageAlert.svelte';
 	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import { superForm } from 'sveltekit-superforms';
+	import { toast } from 'svelte-sonner';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { Input } from '$components/ui/input';
 	export let data;
+
+	const form = superForm(data.form, {
+		validators: zodClient(auth$.login),
+		onUpdated: ({ form: f }) => {
+			if (f.valid) {
+				console.log(f, f.message, f.posted, f.errors);
+				// toast.success(`You submitted ${JSON.stringify(f.data, null, 2)}`);
+				toast.success(`Sukces`);
+			} else {
+				toast.error('Błąd');
+			}
+		}
+	});
+	const { form: formData, enhance, delayed, submitting } = form;
 </script>
 
 <svelte:head>
@@ -21,31 +38,24 @@
 				Bezpieczne bezhasłowe logowanie <Lock size={14} class="ml-1" />
 			</p>
 		</div>
-		<Form.Root
-			schema={auth$.login}
-			form={data.form}
-			let:config
-			let:submitting
-			method="POST"
-			class="flex flex-col gap-y-6"
-		>
-			<Form.Field {config} name="email">
-				<Form.Item>
+
+		<form method="POST" use:enhance class="flex flex-col gap-y-6">
+			<Form.Field {form} name="email">
+				<Form.Control let:attrs>
 					<Form.Label>Adres email</Form.Label>
-					<Form.Input type="email" required minlength={3} />
-					<Form.Description>Wyślemy Ci 4 cyfrowy kod weryfikacyjny</Form.Description>
-					<Form.Validation />
-				</Form.Item>
+					<Input {...attrs} type="email" required minlength={3} bind:value={$formData.email} />
+				</Form.Control>
+				<Form.Description>Wyślemy Ci 4 cyfrowy kod weryfikacyjny</Form.Description>
+				<Form.FieldErrors />
 			</Form.Field>
 
-			<MessageAlert />
-			<Form.Button disabled={submitting}>
-				{#if submitting}
+			<Form.Button disabled={$submitting}>
+				{#if $submitting}
 					<Spinner />
 				{:else}
-					<Send class="w-4 h-4 mr-2" /> Wyślij kod
+					Wyślij kod <Send class="w-4 h-4 ml-2" />
 				{/if}
 			</Form.Button>
-		</Form.Root>
+		</form>
 	</div>
 </section>

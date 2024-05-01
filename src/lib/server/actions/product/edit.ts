@@ -1,15 +1,16 @@
 // import { p } from '$lib/server/clients/pClient';
-import { error, type Action, fail, redirect } from '@sveltejs/kit';
+import { error, type Action, redirect } from '@sveltejs/kit';
 import { trytm } from '@bdsqqq/try';
 import getCustomError from '$lib/client/constants/customErrors';
 import { isAtLeastModerator } from '$lib/client/functions';
 import { products$ } from '$lib/client/schemas';
-import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
+import { setError, setMessage, superValidate, fail } from 'sveltekit-superforms';
 import { productsTable, type SelectProduct } from '$lib/server/db/schemas/products';
 import { eq } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { put } from '@vercel/blob';
 import { env } from '$env/dynamic/private';
+import { zod } from 'sveltekit-superforms/adapters';
 
 const edit: Action = async ({ request, locals }) => {
 	const sessionUser = locals.user;
@@ -24,7 +25,7 @@ const edit: Action = async ({ request, locals }) => {
 	}
 
 	const formData = await request.formData();
-	const form = await superValidate(formData, products$.editForm);
+	const form = await superValidate(formData, zod(products$.editForm));
 
 	if (!form.valid) return fail(400, { form });
 
@@ -33,15 +34,28 @@ const edit: Action = async ({ request, locals }) => {
 		return setError(form, 'Nie podano żadnych danych do edycji', { status: 400 });
 	}
 
-	const { id, name, symbol, category, subcategory, price, producent, weight, description, hidden } =
-		form.data;
+	const {
+		id,
+		name,
+		symbol,
+		category,
+		subcategory,
+		price,
+		producent,
+		weight,
+		description,
+		hidden,
+		images
+	} = form.data;
 
 	let imageUrl: string | null = null;
 
-	const image = formData.get('images');
-	console.log('formData.image', image);
+	// We're handling only one image at once for now
+	const image = images;
 
-	if (image instanceof File) {
+	console.log('formData.images', image);
+
+	if (image) {
 		// One image per product is enough for now
 		try {
 			const fileBuffer = await image.arrayBuffer();

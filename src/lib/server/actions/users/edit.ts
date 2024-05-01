@@ -6,9 +6,10 @@ import type { Address } from '$lib/server/db/schemas/orders';
 import { userAddressTable } from '$lib/server/db/schemas/userAddress';
 import { usersTable, type SelectUser } from '$lib/server/db/schemas/users';
 import { trytm } from '@bdsqqq/try';
-import { error, type Action, fail, redirect } from '@sveltejs/kit';
+import { error, type Action, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
-import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
+import { setError, setMessage, superValidate, fail } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 
 const edit = (async ({ request, locals }) => {
 	const sessionUser = locals.user;
@@ -22,7 +23,7 @@ const edit = (async ({ request, locals }) => {
 		error(...getCustomError('insufficient-permissions'));
 	}
 
-	const form = await superValidate(request, user$.editForm);
+	const form = await superValidate(request, zod(user$.editForm));
 	if (!form.valid) {
 		return fail(400, { form });
 	}

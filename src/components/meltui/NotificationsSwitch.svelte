@@ -74,7 +74,7 @@
 	<fieldset>
 		<legend class="mb-4 text-lg font-medium"> Email Notifications </legend>
 		<div class="space-y-4">
-			<Form.Field {config} name="subscribe">
+			<Form.Field {form} name="subscribe">
 				<Form.Item class="flex flex-row items-center justify-between p-4 border rounded-lg">
 					<div class="space-y-0.5">
 						<Form.Label>Powiadomienia Push</Form.Label>
@@ -83,7 +83,7 @@
 						>
 					</div>
 					<Form.Switch aria-readonly disabled />
-				</Form.Item>
+				</Form.Control>
 			</Form.Field>
 		</div>
 	</fieldset>

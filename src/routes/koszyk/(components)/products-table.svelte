@@ -4,7 +4,7 @@
 	import { Skeleton } from '$shadcn/skeleton';
 	import type { ProductQuantity } from '$lib/client/schemas/order';
 
-	import type { SuperForm } from 'sveltekit-superforms/client';
+	import type { Infer, SuperForm } from 'sveltekit-superforms/client';
 	import Button from '$components/ui/button/button.svelte';
 	import { Input } from '$shadcn/input';
 	import { toast } from 'svelte-sonner';
@@ -27,7 +27,7 @@
 	// export let form: SuperValidated<ProductQuantity>;
 	export let products: NonNullable<PageServerParentData['cart']>['products'];
 
-	export let productQuantityForm: SuperForm<ProductQuantity>;
+	export let productQuantityForm: SuperForm<Infer<ProductQuantity>>;
 	const { enhance, delayed, formId, submitting, errors, form } = productQuantityForm;
 
 	errors.subscribe((e) => {

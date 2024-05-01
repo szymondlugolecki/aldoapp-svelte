@@ -1,12 +1,13 @@
 // import { p } from '$lib/server/clients/pClient';
-import { error, type Action, fail, redirect } from '@sveltejs/kit';
+import { error, type Action, redirect } from '@sveltejs/kit';
 import { trytm } from '@bdsqqq/try';
 import getCustomError from '$lib/client/constants/customErrors';
 import { isAtLeastModerator } from '$lib/client/functions';
 import { createProduct } from '$lib/server/functions/db';
 import { productURLParser } from '$lib/server/functions/utils';
 import { products$ } from '$lib/client/schemas';
-import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
+import { setError, setMessage, superValidate, fail } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 
 const add: Action = async ({ request, locals }) => {
 	const sessionUser = locals.user;
@@ -20,7 +21,7 @@ const add: Action = async ({ request, locals }) => {
 		error(...getCustomError('insufficient-permissions'));
 	}
 
-	const form = await superValidate(request, products$.addForm);
+	const form = await superValidate(request, zod(products$.addForm));
 	if (!form.valid) {
 		return fail(400, { form });
 	}

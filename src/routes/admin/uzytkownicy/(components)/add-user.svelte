@@ -1,23 +1,51 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import * as Form from '$shadcn/form';
 	import * as Dialog from '$shadcn/dialog';
+	import * as Select from '$components/ui/select';
 
 	import { userRoles } from '$lib/client/constants/dbTypes';
 	import { roleNames } from '$lib/client/constants';
-	import { user$ } from '$lib/client/schemas';
+	import { products$, user$ } from '$lib/client/schemas';
 	import type { AddUserForm } from '$lib/client/schemas/user';
 	import { buttonVariants } from '$shadcn/button';
 	import RequiredAsterisk from '$components/custom/Util/RequiredAsterisk.svelte';
-	import { cn } from '$lib/client/functions';
+	import { getAvailableRoleNames } from '$lib/client/functions';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { toast } from 'svelte-sonner';
+	import { Input } from '$components/ui/input';
+	import Spinner from '$components/custom/Util/Spinner.svelte';
 
 	const noAdminRoles = userRoles.filter((role) => role !== 'admin');
 
-	export let form: SuperValidated<AddUserForm>;
-	const roles = $page.data.user?.role === 'admin' ? userRoles : noAdminRoles;
+	export let superform: SuperValidated<Infer<AddUserForm>>;
+
+	const availableRoleNames = getAvailableRoleNames($page.data.user?.role);
 
 	let open = false;
+
+	const form = superForm(superform, {
+		validators: zodClient(user$.addForm),
+		onUpdated: ({ form: f }) => {
+			if (f.valid) {
+				open = false;
+				console.log(f, f.message, f.posted, f.errors);
+				// toast.success(`You submitted ${JSON.stringify(f.data, null, 2)}`);
+				toast.success(`Sukces`);
+			} else {
+				toast.error('Błąd');
+			}
+		}
+	});
+	const { form: formData, enhance, delayed, submitting } = form;
+
+	$: selectedRole = $formData.role
+		? {
+				label: roleNames[$formData.role],
+				value: $formData.role
+		  }
+		: undefined;
 </script>
 
 <Dialog.Root bind:open>
@@ -29,70 +57,85 @@
 				Po dodaniu, użytkownik będzie mógł zalogować się do aplikacji
 			</Dialog.Description>
 		</Dialog.Header>
-		<Form.Root
-			method="POST"
-			action="?/add"
-			{form}
-			schema={user$.addForm}
-			let:config
-			class="flex flex-col gap-y-2"
-			options={{
-				onResult: ({ result }) => {
-					console.log('result', result);
-					if (result.type === 'success') {
-						open = false;
-					}
-				}
-			}}
-		>
-			<Form.Field {config} name="fullName">
-				<Form.Item>
+
+		<form method="POST" class="flex flex-col gap-y-2" action="?/edit" use:enhance>
+			<Form.Field {form} name="fullName">
+				<Form.Control let:attrs>
 					<Form.Label>Imię i nazwisko<RequiredAsterisk /></Form.Label>
-					<Form.Input required placeholder="Jan Kowalski" spellcheck="false" />
-					<Form.Validation />
-				</Form.Item>
+					<Input
+						{...attrs}
+						bind:value={$formData.fullName}
+						required
+						placeholder="Jan Kowalski"
+						spellcheck="false"
+					/>
+				</Form.Control>
+				<Form.FieldErrors />
 			</Form.Field>
 
-			<Form.Field {config} name="email">
-				<Form.Item>
+			<Form.Field {form} name="email">
+				<Form.Control let:attrs>
 					<Form.Label>Email<RequiredAsterisk /></Form.Label>
-					<Form.Input
+					<Input
+						{...attrs}
 						type="email"
 						required
 						placeholder="jan.kowalski@gmail.com"
 						spellcheck="false"
+						bind:value={$formData.email}
 					/>
-					<Form.Validation />
-				</Form.Item>
+					<Form.FieldErrors />
+				</Form.Control>
 			</Form.Field>
 
-			<Form.Field {config} name="phone">
-				<Form.Item>
+			<Form.Field {form} name="phone">
+				<Form.Control let:attrs>
 					<Form.Label>Numer telefonu<RequiredAsterisk /></Form.Label>
-					<Form.Input type="tel" placeholder="123456789" required minlength={9} />
-					<Form.Validation />
-				</Form.Item>
+					<Input
+						{...attrs}
+						bind:value={$formData.phone}
+						type="tel"
+						placeholder="123456789"
+						required
+						minlength={9}
+					/>
+					<Form.FieldErrors />
+				</Form.Control>
 			</Form.Field>
 
-			<Form.Field {config} name="role">
-				<Form.Item>
+			<Form.Field {form} name="role">
+				<Form.Control let:attrs>
 					<Form.Label>Rola<RequiredAsterisk /></Form.Label>
-					<Form.Select se required>
-						<Form.SelectTrigger placeholder="Wybierz rolę" />
-						<Form.SelectContent>
-							{#each roles.filter((r) => r !== 'banned') as role}
-								<Form.SelectItem value={role} class={cn(role === 'admin' && 'text-red-500')}
-									>{roleNames[role]}</Form.SelectItem
-								>
+					<Select.Root
+						selected={selectedRole}
+						onSelectedChange={(v) => {
+							v && ($formData.role = v.value);
+						}}
+					>
+						<Select.Trigger {...attrs}>
+							<Select.Value placeholder="Wybierz rolę dla użytkownika" />
+						</Select.Trigger>
+						<Select.Content>
+							{#each Object.entries(availableRoleNames) as [label, value]}
+								<Select.Item {value} {label} />
 							{/each}
-						</Form.SelectContent>
-					</Form.Select>
-					<Form.Validation />
-				</Form.Item>
+						</Select.Content>
+					</Select.Root>
+					<input hidden bind:value={$formData.role} name={attrs.name} />
+				</Form.Control>
+				<Form.Description>Wybierz rolę dla użytkownika</Form.Description>
+				<Form.FieldErrors />
 			</Form.Field>
+
 			<div class="flex justify-end">
-				<Form.Button class="w-20">Dodaj</Form.Button>
+				<Form.Button class="w-20" disabled={$submitting}>
+					{#if $delayed}
+						<Spinner />
+					{:else}
+						Zapisz
+					{/if}
+				</Form.Button>
 			</div>
-		</Form.Root>
+		</form>
 	</Dialog.Content>
 </Dialog.Root>

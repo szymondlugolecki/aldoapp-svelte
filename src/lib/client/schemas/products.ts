@@ -128,7 +128,7 @@ export const editForm = z.object({
 	price: price.optional(),
 	weight: weight.optional(),
 	producent: producent.optional(),
-	image: image.optional().nullish(),
+	images: image.optional(),
 	hidden: hidden.optional()
 });
 

@@ -1,7 +1,10 @@
+import eslintPluginSvelte from 'eslint-plugin-svelte';
+
 module.exports = {
+	...eslintPluginSvelte.configs['flat/recommended'],
 	root: true,
 	parser: '@typescript-eslint/parser',
-	extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
+	extends: ['plugin:svelte/recommended', 'eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
 	plugins: ['svelte3', '@typescript-eslint'],
 	ignorePatterns: ['*.cjs'],
 	overrides: [{ files: ['*.svelte'], processor: 'svelte3/svelte3' }],
@@ -17,4 +20,5 @@ module.exports = {
 		es2017: true,
 		node: true
 	}
+
 };

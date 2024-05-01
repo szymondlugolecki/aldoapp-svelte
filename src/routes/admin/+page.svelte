@@ -3,7 +3,6 @@
 	import { pushSubscription$ } from '$lib/client/schemas/index.js';
 	import * as Form from '$shadcn/form';
 	import Spinner from '$components/custom/Util/Spinner.svelte';
-	import MessageAlert from '$components/custom/Form/MessageAlert.svelte';
 
 	export let data;
 </script>
@@ -31,16 +30,16 @@
 			let:config
 			let:submitting
 		>
-			<Form.Field {config} name="title">
-				<Form.Item>
+			<Form.Field {form} name="title">
+				<Form.Control let:attrs>
 					<Form.Label>Tytuł</Form.Label>
 					<Form.Input spellcheck="false" placeholder="Uwaga, promocja!" disabled={submitting} />
-					<Form.Validation />
-				</Form.Item>
+					<Form.FieldErrors />
+				</Form.Control>
 			</Form.Field>
 
-			<Form.Field {config} name="body">
-				<Form.Item>
+			<Form.Field {form} name="body">
+				<Form.Control let:attrs>
 					<Form.Label>Wiadomość</Form.Label>
 					<Form.Textarea
 						spellcheck="false"
@@ -52,11 +51,9 @@
 						>Wiadomość zostanie wysłana do wszystkich użytkowników, którzy włączyli Powiadomienia
 						Push w ustawieniach</Form.Description
 					>
-					<Form.Validation />
-				</Form.Item>
+					<Form.FieldErrors />
+				</Form.Control>
 			</Form.Field>
-
-			<MessageAlert />
 
 			{#if submitting}
 				<Spinner />

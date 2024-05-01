@@ -1,30 +1,38 @@
 <script lang="ts">
-	import type { SelectOption } from '@melt-ui/svelte';
-
 	import * as Dialog from '$shadcn/dialog';
 	import * as Form from '$shadcn/form';
 
-	import { mainCategories, type MainCategory, type Producent } from '$lib/client/constants/dbTypes';
 	import { buttonVariants } from '$components/ui/button';
 	import { products$ } from '$lib/client/schemas';
 	import type { AddProductForm } from '$lib/client/schemas/products';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import RequiredAsterisk from '$components/custom/Util/RequiredAsterisk.svelte';
-	import { fodderNames } from '$lib/client/constants';
-	import { getSubcategories, getSubcategoryName } from '$lib/client/functions';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { toast } from 'svelte-sonner';
+	import SelectCategories from './select-categories-add.svelte';
+	import { Input } from '$components/ui/input';
+	import Spinner from '$components/custom/Util/Spinner.svelte';
 	// import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
 
 	// export let enhance: ReturnType<typeof superForm>['enhance'];
-	export let form: SuperValidated<AddProductForm>;
+	export let superform: SuperValidated<Infer<AddProductForm>>;
 
 	let open = false;
 
-	$: selectedCategory = undefined as MainCategory | undefined;
-	$: subcategories = getSubcategories(selectedCategory);
-
-	const onSelectedChange = (change: SelectOption<unknown> | undefined) => {
-		selectedCategory = change?.value as MainCategory | undefined;
-	};
+	const form = superForm(superform, {
+		validators: zodClient(products$.addForm),
+		onUpdated: ({ form: f }) => {
+			if (f.valid) {
+				open = false;
+				console.log(f, f.message, f.posted, f.errors);
+				// toast.success(`You submitted ${JSON.stringify(f.data, null, 2)}`);
+				toast.success(`Sukces`);
+			} else {
+				toast.error('Błąd');
+			}
+		}
+	});
+	const { form: formData, enhance, delayed, submitting } = form;
 </script>
 
 <Dialog.Root bind:open closeOnOutsideClick={false}>
@@ -37,7 +45,7 @@
 
 		<!-- <div class="overflow-y-auto h-52"><SuperDebug data={form} /></div> -->
 
-		<Form.Root
+		<!-- <Form.Root
 			method="POST"
 			action="?/add"
 			{form}
@@ -52,77 +60,74 @@
 					}
 				}
 			}}
-		>
-			<Form.Field {config} name="name">
-				<Form.Item>
+		> -->
+
+		<form method="POST" class="flex flex-col gap-y-2" action="?/edit" use:enhance>
+			<Form.Field {form} name="name">
+				<Form.Control let:attrs>
 					<Form.Label>Nazwa<RequiredAsterisk required /></Form.Label>
-					<Form.Input required spellcheck="false" />
-					<Form.Validation />
-				</Form.Item>
+					<Input {...attrs} bind:value={$formData.name} required spellcheck="false" />
+				</Form.Control>
+				<Form.FieldErrors />
 			</Form.Field>
 
-			<Form.Field {config} name="symbol">
-				<Form.Item>
+			<Form.Field {form} name="symbol">
+				<Form.Control let:attrs>
 					<Form.Label>Kod produktu<RequiredAsterisk required /></Form.Label>
-					<Form.Input required placeholder="ABCD-1234" spellcheck="false" />
-					<Form.Validation />
-				</Form.Item>
+					<Input
+						{...attrs}
+						bind:value={$formData.symbol}
+						required
+						placeholder="ABCD-1234"
+						spellcheck="false"
+					/>
+				</Form.Control>
+				<Form.FieldErrors />
 			</Form.Field>
 
-			<Form.Field {config} name="price">
-				<Form.Item>
+			<Form.Field {form} name="price">
+				<Form.Control let:attrs>
 					<Form.Label>Cena<RequiredAsterisk /></Form.Label>
-					<Form.Input type="number" placeholder="50" required step="0.01" />
-					<Form.Validation />
-				</Form.Item>
+					<Input
+						{...attrs}
+						bind:value={$formData.price}
+						type="number"
+						placeholder="50"
+						required
+						step="0.01"
+					/>
+				</Form.Control>
+				<Form.FieldErrors />
 			</Form.Field>
 
-			<Form.Field {config} name="weight">
-				<Form.Item>
+			<Form.Field {form} name="weight">
+				<Form.Control let:attrs>
 					<Form.Label>Waga (kg)<RequiredAsterisk /></Form.Label>
-					<Form.Input type="number" placeholder="25" required step="0.01" />
-					<Form.Validation />
-				</Form.Item>
+					<Input
+						{...attrs}
+						bind:value={$formData.weight}
+						type="number"
+						placeholder="25"
+						required
+						step="0.01"
+					/>
+				</Form.Control>
+				<Form.FieldErrors />
 			</Form.Field>
 
-			<Form.Field {config} name="category">
-				<Form.Item>
-					<Form.Label>Kategoria<RequiredAsterisk /></Form.Label>
-					<Form.Select required {onSelectedChange}>
-						<Form.SelectTrigger placeholder="Wybierz kategorię" />
-						<Form.SelectContent>
-							{#each mainCategories as category}
-								<Form.SelectItem value={category}>{fodderNames[category]}</Form.SelectItem>
-							{/each}
-						</Form.SelectContent>
-					</Form.Select>
-					<Form.Validation />
-				</Form.Item>
-			</Form.Field>
+			<SelectCategories {form} />
 
-			{#key selectedCategory}
-				{#if selectedCategory && subcategories.length}
-					<Form.Field {config} name="subcategory">
-						<Form.Item>
-							<Form.Label>Podkategoria<RequiredAsterisk /></Form.Label>
-							<Form.Select required>
-								<Form.SelectTrigger placeholder="Wybierz podkategorię" />
-								<Form.SelectContent>
-									{#each subcategories as subcategory}
-										<Form.SelectItem value={subcategory}
-											>{getSubcategoryName(selectedCategory, subcategory)}</Form.SelectItem
-										>
-									{/each}
-								</Form.SelectContent>
-							</Form.Select>
-							<Form.Validation />
-						</Form.Item>
-					</Form.Field>
-				{/if}
-			{/key}
-
-			<Form.Button>Dodaj</Form.Button>
-		</Form.Root>
+			<div class="flex justify-end">
+				<Form.Button class="w-20" disabled={$submitting}>
+					{#if $delayed}
+						<Spinner />
+					{:else}
+						Zapisz
+					{/if}
+				</Form.Button>
+			</div>
+		</form>
+		<!-- </Form.Root> -->
 
 		<!-- <form method="post" action="?/add" use:enhance>
 			<div class="flex flex-col gap-y-2">

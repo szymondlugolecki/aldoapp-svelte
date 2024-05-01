@@ -10,7 +10,20 @@ import { flexRender as flexRenderOrig } from '@tanstack/svelte-table';
 import { userRoles, type MainCategory } from '../constants/dbTypes';
 
 import { user$ } from '../schemas';
-import { fodderCategories2 } from '../constants';
+import { fodderCategories2, roleNames } from '../constants';
+import type { Optional } from '$types/UtilityTypes';
+
+export const getAvailableRoleNames = (userRole: Role) => {
+	if (userRole === 'admin') {
+		return roleNames;
+	}
+	if (getRoleRank(userRole) >= 1) {
+		const roleNamesCopy: Optional<typeof roleNames, 'admin'> = { ...roleNames };
+		delete roleNamesCopy.admin;
+		return roleNamesCopy;
+	}
+	return [];
+};
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const debounce = (callback: Function, wait = 300) => {

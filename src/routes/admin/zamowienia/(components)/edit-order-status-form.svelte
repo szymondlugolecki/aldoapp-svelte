@@ -8,19 +8,22 @@
 	import type { OrderEvent } from '$types';
 	import type { OrderStatus } from '$lib/client/constants/dbTypes';
 
-	import type { SuperValidated } from 'sveltekit-superforms';
-	import type { EventForm } from '$lib/client/schemas/order';
-	import OrderId from './order-id.svelte';
-
+	import * as Select from '$components/ui/select';
 	import * as Form from '$shadcn/form';
+
+	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
+	import type { EventForm } from '$lib/client/schemas/order';
+
 	import { order$ } from '$lib/client/schemas';
 	import Feedback from '$components/custom/Form/Feedback.svelte';
 	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { toast } from 'svelte-sonner';
 	type ExtendedOrder = import('../$types').PageServerData['orders'];
 
 	export let order: ExtendedOrder[number];
 
-	export let form: SuperValidated<EventForm>;
+	export let superform: SuperValidated<Infer<EventForm>>;
 	export let open: boolean;
 
 	const availableEvents = getNextEvents(order.status);
@@ -37,62 +40,71 @@
 			availableEvents.splice(availableEvents.indexOf('IS_AVAILABLE_FOR_SHIPMENT'), 1);
 		}
 	}
+
+	const form = superForm(superform, {
+		validators: zodClient(order$.eventForm),
+		onUpdated: ({ form: f }) => {
+			if (f.valid) {
+				open = false;
+				console.log(f, f.message, f.posted, f.errors);
+				// toast.success(`You submitted ${JSON.stringify(f.data, null, 2)}`);
+				toast.success(`Sukces`);
+			} else {
+				toast.error('Błąd');
+			}
+		}
+	});
+	const { form: formData, enhance, delayed, submitting } = form;
+
+	$: selectedStatus = $formData.event
+		? {
+				label: orderEventsList[$formData.event],
+				value: $formData.event
+		  }
+		: undefined;
 </script>
 
-<Form.Root
-	method="POST"
-	action="?/changeOrderStatus"
-	{form}
-	let:message
-	let:delayed
-	let:timeout
-	let:submitting
-	schema={order$.eventForm}
-	let:config
-	class="flex flex-col gap-y-2"
-	options={{
-		onResult: ({ result }) => {
-			console.log('result', result);
-			if (result.type === 'success') {
-				open = false;
-			}
-		},
-		id: order.id.toString(),
-		delayMs: 1000,
-		timeoutMs: 8000
-	}}
->
-	<Form.Field {config} name="event">
-		<Form.Item>
+<form method="POST" action="?/changeOrderStatus" use:enhance class="flex flex-col gap-y-2">
+	<Form.Field {form} name="event">
+		<Form.Control let:attrs>
 			<Form.Label>Status</Form.Label>
-			<Form.Select>
-				<Form.SelectTrigger placeholder="Zmień status zamówienia" />
-				<Form.SelectContent>
+			<Select.Root
+				selected={selectedStatus}
+				onSelectedChange={(v) => {
+					v && ($formData.event = v.value);
+				}}
+			>
+				<Select.Trigger {...attrs}>
+					<Select.Value placeholder="Zmień status zamówienia" />
+				</Select.Trigger>
+				<Select.Content>
 					{#each availableEvents as event}
-						<Form.SelectItem value={event}>{orderEventsList[event]}</Form.SelectItem>
+						<Select.Item value={event} label={orderEventsList[event]} />
 					{/each}
-				</Form.SelectContent>
-			</Form.Select>
-			<Form.Description>
-				Użytkownik automatycznie zostanie poinformowany o zmianie statusu.
-			</Form.Description>
-			<Form.Validation />
-		</Form.Item>
+				</Select.Content>
+			</Select.Root>
+			<input hidden bind:value={$formData.event} name={attrs.name} />
+		</Form.Control>
+		<Form.Description>
+			Użytkownik automatycznie zostanie poinformowany o zmianie statusu.
+		</Form.Description>
+		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Field {config} name="id">
-		<OrderId orderId={order.id} />
+	<Form.Field {form} name="id" hidden={true}>
+		<Form.Control let:attrs>
+			<input {...attrs} type="hidden" bind:value={order.id} />
+		</Form.Control>
 	</Form.Field>
-
-	<Feedback {message} {timeout} />
 
 	<div class="flex justify-end">
-		<Form.Button class="w-20" disabled={submitting}>
-			{#if delayed}
+		<Form.Button class="w-20" disabled={$submitting}>
+			{#if $delayed}
 				<Spinner />
 			{:else}
 				Zapisz
 			{/if}
 		</Form.Button>
 	</div>
-</Form.Root>
+</form>
+<!-- </Form.Root> -->

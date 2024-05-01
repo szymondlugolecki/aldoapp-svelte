@@ -5,7 +5,6 @@
 	import { createPinInput, melt } from '@melt-ui/svelte';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { auth$ } from '$lib/client/schemas';
-	import MessageAlert from '$components/custom/Form/MessageAlert.svelte';
 	import Spinner from '$components/custom/Util/Spinner.svelte';
 	import { derived, writable } from 'svelte/store';
 	import { page } from '$app/stores';
@@ -80,7 +79,7 @@
 				{#if $submitting}
 					<Spinner />
 				{:else}
-					<Key class="w-4 h-4 mr-2" /> Zweryfikuj
+					Zweryfikuj <Key class="w-4 h-4 ml-2" />
 				{/if}
 			</button>
 			<input use:melt={$hiddenInput} />

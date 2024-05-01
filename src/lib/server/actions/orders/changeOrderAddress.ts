@@ -1,12 +1,13 @@
-import getCustomError from '$lib/client/constants/customErrors';
+// import getCustomError from '$lib/client/constants/customErrors';
 // import { p } from '$lib/server/clients/pClient';
 import { trytm } from '@bdsqqq/try';
-import { error, fail, type Action } from '@sveltejs/kit';
+import { error, redirect, type Action } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { isAtLeastModerator } from '$lib/client/functions';
 import { eq } from 'drizzle-orm';
 import { order$ } from '$lib/client/schemas';
-import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
+import { setError, setMessage, superValidate, fail } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 import { orderAddressTable } from '$lib/server/db/schemas/orderAddress';
 
 const changeOrderAddress = (async ({ request, locals }) => {
@@ -21,7 +22,7 @@ const changeOrderAddress = (async ({ request, locals }) => {
 		error(403, 'Nie masz wystarczających uprawień');
 	}
 
-	const form = await superValidate(request, order$.orderAddressForm);
+	const form = await superValidate(request, zod(order$.orderAddressForm));
 	if (!form.valid) {
 		return fail(400, { form });
 	}

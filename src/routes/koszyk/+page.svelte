@@ -5,6 +5,8 @@
 
 	import CustomerForm from './(components)/customer-form.svelte';
 	import OrderInfoForm from './(components)/order-info-form.svelte';
+	import { toast } from 'svelte-sonner';
+	// import { toast } from 'svelte-sonner';
 
 	export let data;
 
@@ -21,8 +23,12 @@
 		...pQFormRest
 	} = superForm(data.productQuantityForm, {
 		delayMs: 1000,
-		onSubmit: ({ formData }) => {
+		onSubmit: ({ formData, cancel }) => {
 			const id = formData.get('productId');
+			if (!id) {
+				toast.error('Błąd. Spróbuj ponownie.');
+				return cancel();
+			}
 			$pQFormId = id?.toString();
 		},
 		resetForm: true
@@ -32,9 +38,7 @@
 		formId: orderFormId,
 		submitting: orderSubmitting,
 		...orderFormRest
-	} = superForm(data.orderForm, {
-		resetForm: true
-	});
+	} = superForm(data.orderForm);
 
 	$: defaultValues = {
 		fullName: data.cart?.customer.fullName || '',
@@ -47,7 +51,7 @@
 		}
 	};
 
-	$: console.log('orderFormId', orderFormId);
+	// $: console.log('orderFormId', orderFormId);
 </script>
 
 <svelte:head>
@@ -71,7 +75,7 @@
 							id: data.user.id,
 							fullName: data.user.fullName
 						}}
-						setCustomerForm={data.setCustomerForm}
+						superform={data.setCustomerForm}
 					/>
 				{/if}
 
@@ -99,9 +103,16 @@
 						<Summary
 							{subtotal}
 							orderFormId={$orderFormId}
-							isRecalculating={$productQuantitySubmitting}
+							isRecalculating={false}
 							disableOrderButton={$orderSubmitting}
 						/>
+
+						<!-- <Summary
+						{subtotal}
+						orderFormId={$orderFormId}
+						isRecalculating={$productQuantitySubmitting}
+						disableOrderButton={$orderSubmitting}
+					/> -->
 					{/if}
 				</div>
 			</div>

@@ -3,10 +3,6 @@
 	import { settings$ } from '$lib/client/schemas/index.js';
 	import { Separator } from '$shadcn/separator';
 	import Spinner from '$components/custom/Util/Spinner.svelte';
-	import MessageAlert from '$components/custom/Form/MessageAlert.svelte';
-	import AddressForm from './(components)/address-form.svelte';
-	import PhoneForm from './(components)/phone-form.svelte';
-	import EmailForm from './(components)/email-form.svelte';
 
 	// export let data;
 </script>

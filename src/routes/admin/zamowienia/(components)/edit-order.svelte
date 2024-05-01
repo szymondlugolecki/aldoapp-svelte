@@ -4,7 +4,7 @@
 	import { orderStatusList } from '$lib/client/constants';
 	import * as Dialog from '$shadcn/dialog';
 	import { buttonVariants } from '$components/ui/button';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import type { EventForm, PaymentForm, OrderAddressForm } from '$lib/client/schemas/order';
 	import EditOrderAddressForm from './edit-order-address-form.svelte';
 	import EditOrderStatusForm from './edit-order-status-form.svelte';
@@ -15,9 +15,9 @@
 	export let key: keyof ExtendedOrder[number];
 	export let value: ExtendedOrder[keyof ExtendedOrder];
 	export let order: ExtendedOrder[number];
-	export let addressForm: SuperValidated<OrderAddressForm>;
-	export let statusForm: SuperValidated<EventForm>;
-	export let paymentForm: SuperValidated<PaymentForm>;
+	export let addressForm: SuperValidated<Infer<OrderAddressForm>>;
+	export let statusForm: SuperValidated<Infer<EventForm>>;
+	export let paymentForm: SuperValidated<Infer<PaymentForm>>;
 	export let userRole: Role | undefined;
 
 	let cellOverride = undefined as string | undefined | null;
@@ -44,7 +44,7 @@
 		</Dialog.Header>
 
 		{#if key === 'address'}
-			<EditOrderAddressForm bind:open {order} form={addressForm} />
+			<EditOrderAddressForm bind:open {order} superform={addressForm} />
 		{:else if key === 'status' && userRole}
 			{#if order.status === 'delivered'}
 				<p class="text-center">Zamówienie zostało dostarczone</p>
@@ -53,12 +53,12 @@
 			{:else if order.status === 'cancelled'}
 				<p class="text-center">Zamówienie zostało anulowane</p>
 			{:else if userRole !== 'driver' || (userRole === 'driver' && order.status === 'awaitingDelivery')}
-				<EditOrderStatusForm bind:open {order} form={statusForm} />
+				<EditOrderStatusForm bind:open {order} superform={statusForm} />
 			{:else}
 				<p class="text-center">Nie możesz zmienić statusu tego zamówienia</p>
 			{/if}
 		{:else if key === 'paid'}
-			<EditOrderPaymentForm bind:open {order} form={paymentForm} />
+			<EditOrderPaymentForm bind:open {order} superform={paymentForm} />
 		{/if}
 	</Dialog.Content>
 </Dialog.Root>

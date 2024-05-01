@@ -1,7 +1,7 @@
 import getCustomError from '$lib/client/constants/customErrors';
 // import { p } from '$lib/server/clients/pClient';
 import { trytm } from '@bdsqqq/try';
-import { error, fail, type Action, redirect } from '@sveltejs/kit';
+import { error, type Action, redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { isAtLeastModerator } from '$lib/client/functions';
 import { orderMachine } from '$lib/client/machines/orderStatus';
@@ -16,9 +16,10 @@ import {
 	orderStatusEmailDescription,
 	orderStatusEmailPreview
 } from '$lib/server/constants/messages';
-import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
+import { setError, setMessage, superValidate, fail } from 'sveltekit-superforms';
 import { sendOrderStatusEmail } from '$lib/server/clients/resend';
 import { orderStatusLogsTable } from '$lib/server/db/schemas/orderStatusLogs';
+import { zod } from 'sveltekit-superforms/adapters';
 
 /*
 
@@ -45,7 +46,7 @@ const changeOrderStatus = (async ({ request, locals }) => {
 		error(...getCustomError('insufficient-permissions'));
 	}
 
-	const form = await superValidate(request, order$.eventForm);
+	const form = await superValidate(request, zod(order$.eventForm));
 	if (!form.valid) {
 		return fail(400, { form });
 	}

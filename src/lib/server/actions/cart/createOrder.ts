@@ -1,9 +1,10 @@
 import { trytm } from '@bdsqqq/try';
 import { db } from '$lib/server/db';
-import { type Action, fail, redirect } from '@sveltejs/kit';
+import { type Action, redirect } from '@sveltejs/kit';
 import { createNewOrder } from '$lib/server/functions/db';
 import type { InsertOrder } from '$lib/server/db/schemas/orders';
-import { setError, superValidate } from 'sveltekit-superforms/server';
+import { setError, superValidate, fail } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 import { order$ } from '$lib/client/schemas';
 import { generateId } from 'lucia';
 
@@ -14,7 +15,7 @@ const createOrder: Action = async ({ locals, request }) => {
 		// error(...getCustomError('not-logged-in'));;
 	}
 
-	const form = await superValidate(request, order$.create);
+	const form = await superValidate(request, zod(order$.create));
 	if (!form.valid) {
 		return fail(400, {
 			form

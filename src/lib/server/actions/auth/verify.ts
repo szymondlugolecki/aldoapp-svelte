@@ -1,9 +1,10 @@
 // import { p } from '$lib/server/clients/pClient';
-import { fail, redirect, type Action } from '@sveltejs/kit';
+import { redirect, type Action } from '@sveltejs/kit';
 import { trytm } from '@bdsqqq/try';
 
 import { db } from '$lib/server/db';
-import { setError, superValidate } from 'sveltekit-superforms/server';
+import { setError, superValidate, fail } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 import { auth$ } from '$lib/client/schemas';
 import { lucia } from '$lib/server/auth';
 
@@ -12,7 +13,7 @@ import { lucia } from '$lib/server/auth';
 // import { verificationTokensTable } from '$lib/server/db/schemas/verificationTokens';
 
 const verify = (async ({ request, cookies, getClientAddress }) => {
-	const form = await superValidate(request, auth$.verification);
+	const form = await superValidate(request, zod(auth$.verification));
 	if (!form.valid) {
 		return fail(400, { form });
 	}

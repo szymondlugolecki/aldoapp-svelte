@@ -21,10 +21,10 @@
 	<div class="flex flex-col w-full gap-y-2">
 		<h2 class="text-lg font-medium">Adres email</h2>
 
-		<MessageAlert />
+		<!-- <MessageAlert /> -->
 
 		<div class="grid grid-cols-4 gap-x-4 gap-y-2">
-			<Form.Field {config} name="email">
+			<Form.Field {form} name="email">
 				<Form.Item class="col-span-4 sm:col-span-2">
 					<Form.Label>Adres email</Form.Label>
 					<Form.Input
@@ -34,8 +34,8 @@
 						minlength={3}
 						disabled={submitting}
 					/>
-					<Form.Validation />
-				</Form.Item>
+					<Form.FieldErrors />
+				</Form.Control>
 			</Form.Field>
 		</div>
 	</div>

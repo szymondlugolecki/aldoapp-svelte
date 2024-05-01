@@ -1,18 +1,26 @@
 import { createVerificationKeys, getUserAgentString } from '$lib/server/functions/auth';
 import { sendVerificationEmail } from '$lib/server/clients/resend';
-import { fail, redirect, type Action } from '@sveltejs/kit';
+import { redirect, type Action } from '@sveltejs/kit';
 import { trytm } from '@bdsqqq/try';
 import { db } from '$lib/server/db';
 import { auth$ } from '$lib/client/schemas';
-import { superValidate, setError } from 'sveltekit-superforms/server';
+import { superValidate, setError, fail } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 import { UAParser } from 'ua-parser-js';
 import { TimeSpan } from 'oslo';
 import { addVerificationToken } from '$lib/server/functions/db';
 
+/*
+
+Importing fail from superforms instead of @sveltejs/kit
+
+
+*/
+
 const login = (async ({ request, getClientAddress, platform }) => {
 	console.log('login', 'getClientAddress', getClientAddress());
 
-	const form = await superValidate(request, auth$.login);
+	const form = await superValidate(request, zod(auth$.login));
 	if (!form.valid) {
 		return fail(400, { form });
 	}

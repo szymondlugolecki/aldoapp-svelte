@@ -3,9 +3,10 @@ import { db } from '$lib/server/db';
 import type { Address } from '$lib/server/db/schemas/orders.js';
 import { userAddressTable } from '$lib/server/db/schemas/userAddress.js';
 import { trytm } from '@bdsqqq/try';
-import { error, fail, type Action, redirect } from '@sveltejs/kit';
+import { error, type Action, redirect } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
-import { message, superValidate } from 'sveltekit-superforms/server';
+import { message, superValidate, fail } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 
 const address: Action = async (event) => {
 	const sessionUser = event.locals.user;
@@ -16,7 +17,7 @@ const address: Action = async (event) => {
 
 	// await sleep(3);
 
-	const form = await superValidate(event, settings$.addressForm);
+	const form = await superValidate(event, zod(settings$.addressForm));
 	if (!form.valid) {
 		return fail(400, { form });
 	}

@@ -21,15 +21,15 @@
 	<div class="flex flex-col w-full gap-y-2">
 		<h2 class="text-lg font-medium">Numer telefonu</h2>
 
-		<MessageAlert />
+		<!-- <MessageAlert /> -->
 
 		<div class="grid grid-cols-4 gap-x-4 gap-y-2">
-			<Form.Field {config} name="phone">
+			<Form.Field {form} name="phone">
 				<Form.Item class="col-span-4 sm:col-span-2">
 					<Form.Label>Numer telefonu</Form.Label>
 					<Form.Input spellcheck="false" required type="tel" minlength={9} disabled={submitting} />
-					<Form.Validation />
-				</Form.Item>
+					<Form.FieldErrors />
+				</Form.Control>
 			</Form.Field>
 		</div>
 	</div>

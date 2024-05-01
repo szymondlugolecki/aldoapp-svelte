@@ -1,11 +1,12 @@
 import { trytm } from '@bdsqqq/try';
 import { db } from '$lib/server/db';
-import { error, fail, type Action, redirect } from '@sveltejs/kit';
+import { error, type Action, redirect } from '@sveltejs/kit';
 import { isAtLeastModerator } from '$lib/client/functions';
 import { sendNotifications, type PushMessageWithContent } from '$lib/server/functions/push2';
-import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
+import { setError, setMessage, superValidate, fail } from 'sveltekit-superforms';
 import getCustomError from '$lib/client/constants/customErrors';
 import { pushSubscription$ } from '$lib/client/schemas';
+import { zod } from 'sveltekit-superforms/adapters';
 
 const sendAll: Action = async ({ locals, request }) => {
 	const sessionUser = locals.user;
@@ -17,7 +18,9 @@ const sendAll: Action = async ({ locals, request }) => {
 		error(...getCustomError('insufficient-permissions'));
 	}
 
-	const form = await superValidate(request, pushSubscription$.notificationAll, { id: 'sendAll' });
+	const form = await superValidate(request, zod(pushSubscription$.notificationAll), {
+		id: 'sendAll'
+	});
 	if (!form.valid) {
 		return fail(400, { form });
 	}

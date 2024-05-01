@@ -1,22 +1,17 @@
 <script lang="ts">
 	import { Input } from '$shadcn/input/index.js';
 	import { Label } from '$shadcn/label/index.js';
-	import * as RadioGroup from '$shadcn/radio-group';
 	import RequiredAsterisk from '$components/custom/Util/RequiredAsterisk.svelte';
-	import { order$ } from '$lib/client/schemas/index.js';
 	import * as Select from '$shadcn/select';
 
-	import * as Form from '$shadcn/form';
-	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { OrderForm } from '$lib/client/schemas/order.js';
-	import type { SuperForm } from 'sveltekit-superforms/client';
+	import type { Infer, SuperForm } from 'sveltekit-superforms/client';
 	import { page } from '$app/stores';
-	import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
 
 	type PageServerData = import('../$types').PageServerData;
 	type PageLayoutData = import('../$types').PageServerParentData;
 
-	export let orderForm: SuperForm<OrderForm>;
+	export let orderForm: SuperForm<Infer<OrderForm>>;
 
 	export let defaultValues: {
 		fullName: string;
@@ -31,24 +26,6 @@
 
 	const { form, message, errors, enhance, formId } = orderForm;
 </script>
-
-<!-- <Form.Root form={form} schema={someSchema} let:config let:enhance asChild>
-	<form method="POST" use:enhance>
-		<Form.Field {config} let:actions name="email">
-			svelte-ignore a11y-label-has-associated-control / applied by action
-			<label use:actions.label> Email </label>
-			<input use:actions.input />
-			<span use:actions.description> Please use your company email. </span>
-			<span use:actions.validation>
-				{#if $errors}
-					{#each $errors.email as error}
-						{error}
-					{/each}
-				{/if}
-			</span>
-		</Form.Field>
-	</form>
-</Form.Root> -->
 
 <form method="POST" action="?/createOrder" id={$formId} class="flex flex-col gap-y-4" use:enhance>
 	<div class="grid grid-cols-4 gap-y-3 gap-x-4">

@@ -8,70 +8,74 @@
 	import type { OrderEvent } from '$types';
 	import type { OrderStatus } from '$lib/client/constants/dbTypes';
 
-	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { EventForm, PaymentForm } from '$lib/client/schemas/order';
-	import OrderId from './order-id.svelte';
+
+	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
+	import type { OrderAddressForm } from '$lib/client/schemas/order';
 
 	import * as Form from '$shadcn/form';
 	import { order$ } from '$lib/client/schemas';
-	import Feedback from '$components/custom/Form/Feedback.svelte';
 	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { Input } from '$components/ui/input';
+	import { toast } from 'svelte-sonner';
+	import { Switch } from '$components/ui/switch';
+
 	type ExtendedOrder = import('../$types').PageServerData['orders'];
 
 	export let order: ExtendedOrder[number];
 
-	export let form: SuperValidated<PaymentForm>;
+	export let superform: SuperValidated<Infer<PaymentForm>>;
 	export let open: boolean;
+
+	const form = superForm(superform, {
+		validators: zodClient(order$.paymentForm),
+		onUpdated: ({ form: f }) => {
+			if (f.valid) {
+				open = false;
+				console.log(f, f.message, f.posted, f.errors);
+				// toast.success(`You submitted ${JSON.stringify(f.data, null, 2)}`);
+				toast.success(`Sukces`);
+			} else {
+				toast.error('Błąd');
+			}
+		}
+	});
+	const { form: formData, enhance, delayed, submitting } = form;
 
 	const availableEvents = getNextEvents(order.status);
 </script>
 
-<Form.Root
-	method="POST"
-	action="?/changePaymentStatus"
-	{form}
-	let:message
-	let:delayed
-	let:timeout
-	let:submitting
-	schema={order$.paymentForm}
-	let:config
-	class="flex flex-col gap-y-2"
-	options={{
-		onResult: ({ result }) => {
-			console.log('result', result);
-			if (result.type === 'success') {
-				open = false;
-			}
-		},
-		id: order.id.toString(),
-		delayMs: 1000,
-		timeoutMs: 8000
-	}}
->
-	<Form.Field {config} name="paid">
-		<Form.Item class="flex flex-row items-center justify-between p-4 border rounded-lg">
-			<div class="space-y-0.5">
+<form method="POST" action="?/changePaymentStatus" use:enhance class="flex flex-col gap-y-2">
+	<Form.Field {form} name="paid">
+		<Form.Control let:attrs>
+			<div class="flex flex-row items-center justify-between p-4 border rounded-lg">
 				<Form.Label>Opłacono</Form.Label>
-				<Form.Description />
+				<Form.Description>
+					Użytkownik zostanie poinformowany o zmianie statusu zamówienia (email, PUSH)
+				</Form.Description>
 			</div>
-			<Form.Switch />
-		</Form.Item>
+			<Switch includeInput {...attrs} bind:checked={$formData.paid} />
+		</Form.Control>
+		<Form.Description />
+		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Field {config} name="id">
-		<OrderId orderId={order.id} />
+	<Form.Field {form} name="id" hidden={true}>
+		<Form.Control let:attrs>
+			<input {...attrs} type="hidden" bind:value={order.id} />
+		</Form.Control>
 	</Form.Field>
 
-	<Feedback {message} {timeout} />
+	<!-- <Feedback {message} {timeout} /> -->
 
 	<div class="flex justify-end">
-		<Form.Button class="w-20" disabled={submitting}>
-			{#if delayed}
+		<Form.Button class="w-20" disabled={$submitting}>
+			{#if $delayed}
 				<Spinner />
 			{:else}
 				Zapisz
 			{/if}
 		</Form.Button>
 	</div>
-</Form.Root>
+</form>

@@ -5,8 +5,9 @@ import { db } from '$lib/server/db';
 import { usersTable } from '$lib/server/db/schemas/users.js';
 import { clauseConcat, extractParams } from '$lib/server/functions/utils';
 import type { UserSortableColumn } from '$types';
-import { like, or } from 'drizzle-orm';
-import { superValidate } from 'sveltekit-superforms/server';
+import { like, or, sql } from 'drizzle-orm';
+import { superValidate, fail } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 
 const sortableColumns: UserSortableColumn[] = ['fullName', 'email', 'role', 'createdAt'];
 
@@ -66,8 +67,8 @@ export const load = async ({ url }) => {
 		users,
 		count: users.length,
 		pageLimit,
-		addForm: await superValidate(user$.addForm),
-		editForm: await superValidate(user$.editForm),
+		addForm: await superValidate(zod(user$.addForm)),
+		editForm: await superValidate(zod(user$.editForm)),
 		advisers: await db.query.usersTable.findMany({
 			where: (users, { eq }) => eq(users.role, 'adviser'),
 			columns: {

@@ -2,30 +2,22 @@
 	import { Textarea } from '$shadcn/textarea';
 
 	import { Input } from '$shadcn/input';
-	import { Label } from '$shadcn/label';
-
-	import type { Category, ExtendedCategory, ExtendedSubcategory, Subcategory, User } from '$types';
-	import { enhance } from '$app/forms';
-	import createLoadingToast from '$lib/client/functions/createLoadingToast';
-	import { handleFormResponse } from '$lib/client/functions/forms';
 
 	import * as Form from '$shadcn/form';
 	import * as Dialog from '$shadcn/dialog';
 
 	import { fodderCategories2, fodderNames, producentsList } from '$lib/client/constants';
-	import SelectProducent from '$components/meltui/Select/SelectProducent.svelte';
-	import { createSlider, melt, createCombobox } from '@melt-ui/svelte';
-	import { cn, getSubcategoryName } from '$lib/client/functions';
-	import type { Producent } from '$lib/client/constants/dbTypes';
-	import SelectCategories from '$components/meltui/Select/SelectCategories.svelte';
-	import RequiredAsterisk from '$components/custom/Util/RequiredAsterisk.svelte';
-	import ProductId from './product-id.svelte';
-	import Feedback from '$components/custom/Form/Feedback.svelte';
+	import { cn } from '$lib/client/functions';
 	import { products$ } from '$lib/client/schemas';
 	import { buttonVariants } from '$components/ui/button';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import { superForm, type SuperValidated, type Infer, fileProxy } from 'sveltekit-superforms';
 	import type { EditProductForm } from '$lib/client/schemas/products';
 	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import * as Select from '$components/ui/select';
+	import SelectCategories from './select-categories-edit.svelte';
+	import SelectProducent from './select-producent.svelte';
+	import { toast } from 'svelte-sonner';
 
 	type ExtendedProduct = import('../$types').PageServerData['products'];
 
@@ -36,7 +28,7 @@
 
 	export { product as item };
 
-	export let form: SuperValidated<EditProductForm>;
+	export let superform: SuperValidated<Infer<EditProductForm>>;
 
 	let cellOverride: string | undefined;
 
@@ -58,46 +50,31 @@
 		cellOverride = product.hidden ? 'Tak' : 'Nie';
 	}
 
-	const subcategory = product.subcategory as Subcategory | undefined;
+	let open = false;
 
-	$: subcategoryCombobox = createCombobox<Subcategory>({
-		forceVisible: true,
-		defaultSelected: subcategory
-			? {
-					value: subcategory,
-					label: getSubcategoryName(product.category, subcategory)
-			  }
-			: undefined
-	});
-
-	$: ({
-		states: { selected: selectedSubcategoryStore }
-	} = subcategoryCombobox);
-
-	$: categoryCombobox = createCombobox<Category>({
-		forceVisible: true,
-		defaultSelected: product.category
-			? { value: product.category, label: fodderNames[product.category] }
-			: undefined,
-		onSelectedChange: ({ curr, next }) => {
-			if (curr?.value !== next?.value) {
-				$selectedSubcategoryStore = undefined;
+	const form = superForm(superform, {
+		validators: zodClient(products$.editForm),
+		onUpdated: ({ form: f }) => {
+			if (f.valid) {
+				open = false;
+				console.log(f, f.message, f.posted, f.errors);
+				// toast.success(`You submitted ${JSON.stringify(f.data, null, 2)}`);
+				toast.success(`Sukces`);
+			} else {
+				toast.error('Błąd');
 			}
-			return next;
 		}
 	});
+	const { form: formData, enhance, delayed, submitting } = form;
 
-	$: producentCombobox = createCombobox<Producent>({
-		forceVisible: true,
-		defaultSelected: product.producent
-			? { value: product.producent, label: producentsList[product.producent] }
-			: undefined
-	});
+	$: isHidden = $formData.hidden
+		? {
+				label: 'Ukryty',
+				value: $formData.hidden
+		  }
+		: undefined;
 
-	let open = false;
-	let files: File | undefined = undefined;
-
-	// console.log('product', product);
+	const file = fileProxy(form, 'images');
 </script>
 
 <Dialog.Root bind:open closeOnOutsideClick={false}>
@@ -117,7 +94,9 @@
 			<Dialog.Title>Edytuj produkt</Dialog.Title>
 			<Dialog.Description>Po dokonaniu zmian wciśnij przycisk Zapisz</Dialog.Description>
 		</Dialog.Header>
-		<Form.Root
+
+		<form method="POST" action="?/edit" use:enhance class="flex flex-col gap-y-2">
+			<!-- <Form.Root
 			method="POST"
 			action="?/edit"
 			{form}
@@ -138,116 +117,150 @@
 				},
 				id: product.id.toString(),
 				delayMs: 1000,
-				timeoutMs: 8000
+				timeoutMs: 8000,
+				validationMethod: key === 'image' ? 'submit-only' : 'auto'
 			}}
 			enctype="multipart/form-data"
-		>
+		> -->
+
+			<!-- <Form.Field {form} name="username">
+				<Form.Control let:attrs>
+					<Form.Label>Username</Form.Label>
+					<Input {...attrs} bind:value={$formData.username} />
+				</Form.Control>
+				<Form.Description>This is your public display name.</Form.Description>
+				<Form.FieldErrors />
+			</Form.Field> -->
+
 			{#if key === 'name'}
-				<Form.Field {config} name={key}>
-					<Form.Item>
+				<Form.Field {form} name={key}>
+					<Form.Control let:attrs>
 						<Form.Label>{label}</Form.Label>
-						<Form.Input required value={product.name} spellcheck="false" />
-						<Form.Validation />
-					</Form.Item>
+						<Input {...attrs} bind:value={$formData.name} required spellcheck="false" />
+					</Form.Control>
+					<Form.Description>Nazwa produktu w sklepie</Form.Description>
+					<Form.FieldErrors />
 				</Form.Field>
 			{:else if key === 'symbol'}
-				<Form.Field {config} name={key}>
-					<Form.Item>
+				<Form.Field {form} name={key}>
+					<Form.Control let:attrs>
 						<Form.Label>{label}</Form.Label>
-						<Form.Input required value={product.symbol} spellcheck="false" />
-						<Form.Validation />
-					</Form.Item>
+						<Input {...attrs} required bind:value={$formData.symbol} spellcheck="false" />
+					</Form.Control>
+					<Form.Description>Kod produktu w sklepie</Form.Description>
+					<Form.FieldErrors />
 				</Form.Field>
 			{:else if key === 'encodedURL'}
 				<a href={product.encodedURL} class="underline">Link</a>
 			{:else if key === 'description'}
-				<Textarea
-					value={product.description}
-					name={key}
-					id={key}
-					placeholder="Tu wpisz opis produktu..."
-					spellcheck="false"
-				/>
+				<Form.Field {form} name={key}>
+					<Form.Control let:attrs>
+						<Form.Label>Bio</Form.Label>
+						<Textarea
+							{...attrs}
+							placeholder="Tu wpisz opis produktu..."
+							class="resize-none"
+							bind:value={$formData.description}
+							spellcheck="false"
+						/>
+						<Form.Description>Możesz nieobowiązkowo dodać opis produktu</Form.Description>
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
 			{:else if key === 'category' || key === 'subcategory'}
-				<SelectCategories bind:combobox={categoryCombobox} bind:subcategoryCombobox />
+				<SelectCategories {form} />
 			{:else if key === 'price'}
-				<Form.Field {config} name={key}>
-					<Form.Item>
+				<Form.Field {form} name={key}>
+					<Form.Control let:attrs>
 						<Form.Label>{label}</Form.Label>
-						<Form.Input
+						<Input
+							{...attrs}
 							required
-							value={product.price}
+							bind:value={$formData.price}
 							type="number"
 							spellcheck="false"
 							step="0.01"
 						/>
-						<Form.Validation />
-					</Form.Item>
+					</Form.Control>
+					<Form.FieldErrors />
 				</Form.Field>
 			{:else if key === 'weight'}
-				<Form.Field {config} name={key}>
-					<Form.Item>
+				<Form.Field {form} name={key}>
+					<Form.Control let:attrs>
 						<Form.Label>{label}</Form.Label>
-						<Form.Input
+						<Input
+							{...attrs}
 							required
-							value={product.weight}
+							bind:value={$formData.weight}
 							type="number"
 							spellcheck="false"
 							step="0.01"
 						/>
-						<Form.Validation />
-					</Form.Item>
+					</Form.Control>
+					<Form.FieldErrors />
 				</Form.Field>
 			{:else if key === 'producent'}
-				<SelectProducent bind:combobox={producentCombobox} />
-			{:else if key === 'images'}
-				<Form.Field {config} name="images">
-					<Form.Item>
+				<!-- <SelectProducent bind:combobox={producentCombobox} /> -->
+				<SelectProducent {form} />
+			{:else if key === 'image'}
+				<Form.Field {form} name="images">
+					<Form.Control let:attrs>
 						<Form.Label>Zdjęcie</Form.Label>
-						<Form.Input type="file" accept="image/*" bind:value={files} />
-						<Form.Description>Wybierz zdjęcie produktu</Form.Description>
-						<Form.Validation />
-					</Form.Item>
+						<Input
+							{...attrs}
+							type="file"
+							accept="image/png, image/jpg, image/jpeg, image/webp, image/avif"
+							bind:files={$file}
+						/>
+					</Form.Control>
+					<Form.Description>Wybierz zdjęcie produktu</Form.Description>
+					<Form.FieldErrors />
 				</Form.Field>
 			{:else if key === 'hidden'}
-				<Form.Field {config} name="hidden">
-					<Form.Item>
+				<Form.Field {form} name="hidden">
+					<Form.Control let:attrs>
 						<Form.Label>Ukryty</Form.Label>
-						<Form.Select
-							required
-							selected={{
-								value: product.hidden,
-								label: product.hidden ? 'Tak' : 'Nie'
+
+						<Select.Root
+							selected={isHidden}
+							onSelectedChange={(v) => {
+								v && ($formData.hidden = v.value);
 							}}
 						>
-							<Form.SelectTrigger placeholder="Czy produkt ma być ukryty?" />
-							<Form.SelectContent>
-								<Form.SelectItem value={false}>Nie</Form.SelectItem>
-								<Form.SelectItem value={true}>Tak</Form.SelectItem>
-							</Form.SelectContent>
-						</Form.Select>
-						<Form.Description>Ukryte produkty nie będą wyświetlane w sklepie.</Form.Description>
-						<Form.Validation />
-					</Form.Item>
+							<Select.Trigger {...attrs}>
+								<Select.Value placeholder="Wybierz czy ukryć przedmiot" />
+							</Select.Trigger>
+							<Select.Content>
+								<Select.Item value={false} label="Nie" />
+								<Select.Item value={true} label="Tak" />
+							</Select.Content>
+						</Select.Root>
+						<input hidden bind:value={$formData.hidden} name={attrs.name} />
+					</Form.Control>
+					<Form.Description>Ukryte produkty nie będą wyświetlane w sklepie.</Form.Description>
+					<Form.FieldErrors />
 				</Form.Field>
 			{/if}
 
-			<Form.Field {config} name="id">
-				<ProductId productId={product.id} />
+			<Form.Field {form} name="id" hidden={true}>
+				<Form.Control let:attrs>
+					<input {...attrs} type="hidden" value={product.id} />
+				</Form.Control>
 			</Form.Field>
 
-			<Feedback {message} {timeout} />
+			<!-- <Feedback message={$message} {timeout} /> -->
 
 			<div class="flex justify-end">
-				<Form.Button class="w-20" disabled={submitting}>
-					{#if delayed}
+				<Form.Button class="w-20" disabled={$submitting}>
+					{#if $delayed}
 						<Spinner />
 					{:else}
 						Zapisz
 					{/if}
 				</Form.Button>
 			</div>
-		</Form.Root>
+			<!-- </Form.Root> -->
+		</form>
 	</Dialog.Content>
 
 	<!-- <div class="flex flex-col gap-y-2">

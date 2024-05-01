@@ -1,13 +1,14 @@
 // import { p } from '$lib/server/clients/pClient';
 import { trytm } from '@bdsqqq/try';
-import { fail, type Action, redirect } from '@sveltejs/kit';
+import { type Action, redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { ordersTable } from '$lib/server/db/schemas/orders';
 import { eq } from 'drizzle-orm';
 import { order$ } from '$lib/client/schemas';
-import { setError, superValidate } from 'sveltekit-superforms/server';
+import { setError, superValidate, fail } from 'sveltekit-superforms';
 import { addProductsToCart } from '$lib/server/functions/db';
 import { cartProductsTable } from '$lib/server/db/schemas/cartProducts';
+import { zod } from 'sveltekit-superforms/adapters';
 
 /*
 
@@ -25,7 +26,7 @@ const orderAgain = (async (event) => {
 		// error(...getCustomError('not-logged-in'));;
 	}
 
-	const form = await superValidate(event, order$.orderAgainForm);
+	const form = await superValidate(event, zod(order$.orderAgainForm));
 	if (!form.valid) {
 		return fail(400, { form });
 	}

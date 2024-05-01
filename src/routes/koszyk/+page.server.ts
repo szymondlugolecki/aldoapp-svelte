@@ -6,9 +6,10 @@ import setCustomer from '$lib/server/actions/cart/setCustomer';
 import createOrder from '$lib/server/actions/cart/createOrder.js';
 import { db } from '$lib/server/db';
 import { redirect } from '@sveltejs/kit';
-import { superValidate } from 'sveltekit-superforms/server';
+import { superValidate } from 'sveltekit-superforms';
 import { and, eq } from 'drizzle-orm';
 import { usersTable } from '$lib/server/db/schemas/users.js';
+import { zod } from 'sveltekit-superforms/adapters';
 
 export const actions = {
 	changeProductQuantity,
@@ -61,16 +62,16 @@ export const load = async ({ locals }) => {
 
 		return {
 			customers,
-			orderForm: await superValidate(order$.create),
-			productQuantityForm: await superValidate(order$.productQuantity),
-			setCustomerForm: await superValidate(cart$.changeCartCustomer)
+			orderForm: await superValidate(zod(order$.create)),
+			productQuantityForm: await superValidate(zod(order$.productQuantity)),
+			setCustomerForm: await superValidate(zod(cart$.changeCartCustomer))
 		};
 	}
 
 	return {
 		customers: null,
-		orderForm: await superValidate(order$.create),
-		productQuantityForm: await superValidate(order$.productQuantity),
-		setCustomerForm: await superValidate(cart$.changeCartCustomer)
+		orderForm: await superValidate(zod(order$.create)),
+		productQuantityForm: await superValidate(zod(order$.productQuantity)),
+		setCustomerForm: await superValidate(zod(cart$.changeCartCustomer))
 	};
 };

@@ -1,5 +1,5 @@
 import type { CellContext, SortingState } from '@tanstack/svelte-table';
-import type { SuperValidated } from 'sveltekit-superforms';
+import type { Infer, SuperValidated } from 'sveltekit-superforms';
 import type { AnyZodObject } from 'zod';
 
 export const createProps = <
@@ -7,7 +7,7 @@ export const createProps = <
 	Y extends AnyZodObject
 >(
 	info: CellContext<T, unknown>,
-	form: SuperValidated<Y>,
+	form: SuperValidated<Infer<Y>>,
 	extraArgs: Record<string, unknown> = {}
 ) => {
 	const value = info.getValue();

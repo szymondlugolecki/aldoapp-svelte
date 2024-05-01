@@ -68,3 +68,4 @@ export const notificationAll = z.object({
 
 export type SubscribeForm = typeof subscription;
 export type UnsubscribeForm = typeof unsubscribe;
+export type NotificationForm = typeof notification;

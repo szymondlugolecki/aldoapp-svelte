@@ -12,18 +12,13 @@
 	export let data;
 
 	const { form, enhance } = superForm(data.form, {
-		onUpdated: ({ form }) => {
-			const errors = form.errors._errors;
-			if (form.message) {
-				toast('Sukces', {
-					description: form.message
-				});
-			} else if (errors) {
-				errors.forEach((error) => {
-					toast('Niepowodzenie', {
-						description: error
-					});
-				});
+		onUpdated: ({ form: f }) => {
+			if (f.valid) {
+				console.log(f, f.message, f.posted, f.errors);
+				// toast.success(`You submitted ${JSON.stringify(f.data, null, 2)}`);
+				toast.success(`Sukces`);
+			} else {
+				toast.error('Błąd');
 			}
 		}
 	});

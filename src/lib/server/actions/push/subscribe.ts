@@ -1,6 +1,6 @@
 import { trytm } from '@bdsqqq/try';
 import { db } from '$lib/server/db';
-import { fail, type Action, redirect } from '@sveltejs/kit';
+import { type Action, redirect } from '@sveltejs/kit';
 import { sendNotifications } from '$lib/server/functions/push2';
 import { pushSubscription$ } from '$lib/client/schemas';
 import { subscriptionsTable, type SelectSubscription } from '$lib/server/db/schemas/subscriptions';
@@ -9,7 +9,8 @@ import { getUserAgentString } from '$lib/server/functions/auth';
 import { and, eq } from 'drizzle-orm';
 // import { betterZodParse } from '$lib/client/functions/betterZodParse';
 // import { safeParseJSON } from '$lib/client/functions';
-import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
+import { setError, setMessage, superValidate, fail } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 
 const subscribe: Action = async ({ locals, request }) => {
 	console.log('subscribing XD');
@@ -34,7 +35,7 @@ const subscribe: Action = async ({ locals, request }) => {
 	// 	return fail(400, { errors: invalidSubscription[0] });
 	// }
 
-	const form = await superValidate(request, pushSubscription$.subscription);
+	const form = await superValidate(request, zod(pushSubscription$.subscription));
 	// form.data.keys = JSON.parse(form.data.keys);
 	if (!form.valid) {
 		return fail(400, { form });

@@ -1,5 +1,5 @@
-import getCustomError from '$lib/client/constants/customErrors.js';
-import { error } from '@sveltejs/kit';
+// import getCustomError from '$lib/client/constants/customErrors.js';
+import { redirect } from '@sveltejs/kit';
 // import address from '$lib/server/actions/settings/address.js';
 // import email from '$lib/server/actions/settings/email.js';
 // import phone from '$lib/server/actions/settings/phone.js';

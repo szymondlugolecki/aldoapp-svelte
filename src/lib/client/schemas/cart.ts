@@ -14,3 +14,5 @@ export const changeProductQuantity = z.object({
 export const changeCartCustomer = z.object({
 	customerId: userId
 });
+
+export type CartCustomerForm = typeof changeCartCustomer;

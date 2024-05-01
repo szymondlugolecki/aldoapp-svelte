@@ -1,12 +1,13 @@
 import getCustomError from '$lib/client/constants/customErrors';
 import { trytm } from '@bdsqqq/try';
-import { error, type Action, fail, redirect } from '@sveltejs/kit';
+import { error, type Action, redirect } from '@sveltejs/kit';
 import { type InsertUser } from '$lib/server/db/schemas/users';
 import { isAtLeastModerator } from '$lib/client/functions';
 import { user$ } from '$lib/client/schemas';
-import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
+import { setError, setMessage, superValidate, fail } from 'sveltekit-superforms';
 import { createUser } from '$lib/server/functions/db';
 import { generateId } from 'lucia';
+import { zod } from 'sveltekit-superforms/adapters';
 
 const add = (async ({ request, locals }) => {
 	const sessionUser = locals.user;
@@ -19,7 +20,7 @@ const add = (async ({ request, locals }) => {
 		error(...getCustomError('insufficient-permissions'));
 	}
 
-	const form = await superValidate(request, user$.addForm);
+	const form = await superValidate(request, zod(user$.addForm));
 	if (!form.valid) {
 		return fail(400, { form });
 	}

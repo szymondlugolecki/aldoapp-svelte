@@ -6,7 +6,15 @@
 	// import AlertDescription from '$shadcn/alert/AlertDescription.svelte';
 	import { Button } from '$shadcn/button';
 	import { Separator } from '$shadcn/separator';
-	import { CornerDownLeft, Heart, Package, PlusCircle, ShoppingCart } from 'lucide-svelte';
+	import {
+		CornerDownLeft,
+		Heart,
+		Package,
+		PlusCircle,
+		ScanBarcode,
+		ShoppingBag,
+		ShoppingCart
+	} from 'lucide-svelte';
 	import toast from 'svelte-french-toast';
 	import type { Subcategory } from '$types';
 	import { newCategoryUrl, newSubcategoryUrl, parsePLN } from '$lib/client/functions/index.js';
@@ -15,7 +23,6 @@
 	import { slide } from 'svelte/transition';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { Reload } from 'radix-icons-svelte';
-	import MessageAlert from '$components/custom/Form/MessageAlert.svelte';
 	import ErrorMessage from '$components/custom/Form/ErrorMessage.svelte';
 	import Message from '$components/custom/Form/Message.svelte';
 
@@ -101,9 +108,9 @@
 											Proszę czekać
 										</Button>
 									{/if}
-									<button
-										class="w-full p-2 font-semibold text-white transition-colors bg-blue-700 rounded-sm hover:bg-blue-700/80"
-										type="submit">Dodaj do koszyka</button
+									<Button
+										class="w-full p-2 text-lg font-semibold text-white transition-colors rounded-sm bg-cyan-600 hover:bg-cyan-700/80"
+										type="submit">Dodaj do koszyka <ShoppingBag class="w-5 h-5 ml-2" /></Button
 									>
 								{/if}
 							</form>

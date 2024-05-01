@@ -6,8 +6,9 @@ import { extractParams } from '$lib/server/functions/utils';
 import changeOrderStatus from '$lib/server/actions/orders/changeOrderStatus';
 import changePaymentStatus from '$lib/server/actions/orders/changeOrderPaymentStatus.js';
 import changeOrderAddress from '$lib/server/actions/orders/changeOrderAddress.js';
-import { superValidate } from 'sveltekit-superforms/server';
+import { superValidate, fail } from 'sveltekit-superforms';
 import { order$ } from '$lib/client/schemas';
+import { zod } from 'sveltekit-superforms/adapters';
 
 const sortableColumns: OrderSortableColumn[] = [
 	'status',
@@ -90,9 +91,9 @@ export const load = async ({ url }) => {
 			})
 			.from(ordersTable),
 		pageLimit,
-		eventForm: await superValidate(order$.eventForm),
-		paymentForm: await superValidate(order$.paymentForm),
-		addressForm: await superValidate(order$.orderAddressForm)
+		eventForm: await superValidate(zod(order$.eventForm)),
+		paymentForm: await superValidate(zod(order$.paymentForm)),
+		addressForm: await superValidate(zod(order$.orderAddressForm))
 	};
 };
 

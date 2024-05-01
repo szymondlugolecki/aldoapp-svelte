@@ -1,11 +1,12 @@
 import { trytm } from '@bdsqqq/try';
 import { db } from '$lib/server/db';
-import { fail, type Action, redirect } from '@sveltejs/kit';
+import { type Action, redirect } from '@sveltejs/kit';
 import { subscriptionsTable } from '$lib/server/db/schemas/subscriptions';
 import { and, eq } from 'drizzle-orm';
 import { getUserAgentString } from '$lib/server/functions/auth';
-import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
+import { setError, setMessage, superValidate, fail } from 'sveltekit-superforms';
 import { pushSubscription$ } from '$lib/client/schemas';
+import { zod } from 'sveltekit-superforms/adapters';
 
 const unsubscribe: Action = async ({ locals, request }) => {
 	const sessionUser = locals.user;
@@ -14,7 +15,7 @@ const unsubscribe: Action = async ({ locals, request }) => {
 		// error(...getCustomError('not-logged-in'));;
 	}
 
-	const form = await superValidate(request, pushSubscription$.unsubscribe);
+	const form = await superValidate(request, zod(pushSubscription$.unsubscribe));
 	if (!form.valid) {
 		return fail(400, { form });
 	}

@@ -8,8 +8,9 @@ import { productsTable } from '$lib/server/db/schemas/products';
 import { like, or } from 'drizzle-orm';
 import type { ProductSortableColumn } from '$types';
 import { clauseConcat, extractParams } from '$lib/server/functions/utils';
-import { superValidate } from 'sveltekit-superforms/server';
+import { superValidate } from 'sveltekit-superforms';
 import { products$ } from '$lib/client/schemas/index.js';
+import { zod } from 'sveltekit-superforms/adapters';
 
 const pageLimit = 8;
 const sortableColumns: ProductSortableColumn[] = [
@@ -81,9 +82,9 @@ export const load = async ({ url }) => {
 	return {
 		products,
 		pageLimit,
-		count: products.length,
-		addForm: await superValidate(products$.addForm),
-		editForm: await superValidate(products$.editForm)
+		count,
+		addForm: await superValidate(zod(products$.addForm)),
+		editForm: await superValidate(zod(products$.editForm))
 	};
 };
 

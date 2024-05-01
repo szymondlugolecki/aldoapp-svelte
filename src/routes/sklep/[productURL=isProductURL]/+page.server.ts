@@ -3,15 +3,16 @@ import { trytm } from '@bdsqqq/try';
 import { error } from '@sveltejs/kit';
 
 import changeProductQuantity from '$lib/server/actions/cart/changeProductQuantity';
-import { superValidate } from 'sveltekit-superforms/server';
+import { superValidate, fail } from 'sveltekit-superforms';
 import { cart$ } from '$lib/client/schemas';
+import { zod } from 'sveltekit-superforms/adapters';
 
 export const actions = {
 	changeProductQuantity
 };
 
 export const load = async ({ params }) => {
-	const addProductForm = await superValidate(cart$.changeProductQuantity);
+	const addProductForm = await superValidate(zod(cart$.changeProductQuantity));
 
 	const encodedURL = encodeURIComponent(params.productURL);
 	const [product, findProductError] = await trytm(

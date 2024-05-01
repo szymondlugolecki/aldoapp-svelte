@@ -1,9 +1,10 @@
 import { trytm } from '@bdsqqq/try';
 import { db } from '$lib/server/db';
 import { setCartProductQuantity } from '$lib/server/functions/db';
-import { type Action, fail, redirect } from '@sveltejs/kit';
+import { type Action, redirect } from '@sveltejs/kit';
 import { cart$ } from '$lib/client/schemas';
-import { setError, setMessage, superValidate } from 'sveltekit-superforms/server';
+import { setError, setMessage, superValidate, fail } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 
 const changeProductQuantity: Action = async ({ request, locals }) => {
 	const sessionUser = locals.user;
@@ -11,7 +12,7 @@ const changeProductQuantity: Action = async ({ request, locals }) => {
 		redirect(303, '/zaloguj');
 	}
 
-	const form = await superValidate(request, cart$.changeProductQuantity);
+	const form = await superValidate(request, zod(cart$.changeProductQuantity));
 	console.log('form.id', form.id);
 	if (!form.valid) {
 		return fail(400, { form });
