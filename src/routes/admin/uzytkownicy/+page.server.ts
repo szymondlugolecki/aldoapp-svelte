@@ -72,8 +72,18 @@ export const load = async ({ url }) => {
 			.where(extendedWhereClause)
 	)[0].count;
 
+	const count = (
+		await db
+			.select({
+				count: sql<number>`count(*)`.mapWith(Number)
+			})
+			.from(usersTable)
+			.where(extendedWhereClause)
+	)[0].count;
+
 	return {
 		users,
+		count,
 		count,
 		pageLimit,
 		addForm: await superValidate(zod(user$.addForm)),

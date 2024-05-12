@@ -1,5 +1,5 @@
 import { errors, jwtVerify, SignJWT } from 'jose';
-import { PUBLIC_WEBSITE_URL } from '$env/static/public';
+// import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 import { jwtConfig } from '../constants/auth';
 import type { JWTAccessTokenResult, JWTRefreshTokenResult, SessionUser } from '$types';
 import { UAParser } from 'ua-parser-js';
@@ -15,8 +15,8 @@ export const createVerificationKeys = () => ({
 		.join('')
 });
 
-export const createVerificationLink = (token: string) =>
-	`${PUBLIC_WEBSITE_URL}/zaloguj/weryfikacja/${token}`;
+// export const createVerificationLink = (token: string) =>
+// 	`${PUBLIC_WEBSITE_URL}/zaloguj/weryfikacja/${token}`;
 
 export const createRefreshToken = (payload: { userId: SelectUser['id'] }) =>
 	new SignJWT(payload)

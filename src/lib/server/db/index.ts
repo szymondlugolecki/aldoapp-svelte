@@ -145,118 +145,118 @@ export const db = drizzle(client, {
 // 	console.log('Progenitor created');
 // };
 
-const addProductsFromExcel = async () => {
-	const workbook = XLSX.readFile('products.xls');
+// const addProductsFromExcel = async () => {
+// 	const workbook = XLSX.readFile('products.xls');
 
-	const worksheet = workbook.Sheets['Towary'];
+// 	const worksheet = workbook.Sheets['Towary'];
 
-	interface ExcelProduct {
-		Symbol: string;
-		Nazwa: string;
-		Opis: string;
-		'Nazwa Stawki VAT': string;
-		'Wartość stawki VAT': number;
-		JM: string;
-		PKWiU: string;
-		Dostawca?: string;
-		'Cena1 Netto': string;
-		'Cena1 Brutto': string;
-		'Cena2 Netto': string;
-		'Cena2 Brutto': string;
-		'Cena3 Netto': string;
-		'Cena3 Brutto': string;
-		'Cena4 Netto': string;
-		'Cena4 Brutto': string;
-		'Cena5 Netto': string;
-		'Cena5 Brutto': string;
-		'Cena6 Netto': string;
-		'Cena6 Brutto': string;
-		'Cena7 Netto': string;
-		'Cena7 Brutto': string;
-		'Cena8 Netto': string;
-		'Cena8 Brutto': string;
-		'Cena9 Netto': string;
-		'Cena9 Brutto': string;
-		'Cena10 Netto': string;
-		'Cena10 Brutto': string;
-	}
+// 	interface ExcelProduct {
+// 		Symbol: string;
+// 		Nazwa: string;
+// 		Opis: string;
+// 		'Nazwa Stawki VAT': string;
+// 		'Wartość stawki VAT': number;
+// 		JM: string;
+// 		PKWiU: string;
+// 		Dostawca?: string;
+// 		'Cena1 Netto': string;
+// 		'Cena1 Brutto': string;
+// 		'Cena2 Netto': string;
+// 		'Cena2 Brutto': string;
+// 		'Cena3 Netto': string;
+// 		'Cena3 Brutto': string;
+// 		'Cena4 Netto': string;
+// 		'Cena4 Brutto': string;
+// 		'Cena5 Netto': string;
+// 		'Cena5 Brutto': string;
+// 		'Cena6 Netto': string;
+// 		'Cena6 Brutto': string;
+// 		'Cena7 Netto': string;
+// 		'Cena7 Brutto': string;
+// 		'Cena8 Netto': string;
+// 		'Cena8 Brutto': string;
+// 		'Cena9 Netto': string;
+// 		'Cena9 Brutto': string;
+// 		'Cena10 Netto': string;
+// 		'Cena10 Brutto': string;
+// 	}
 
-	const data = XLSX.utils.sheet_to_json(worksheet) as ExcelProduct[];
-	// console.log('data x', data);
+// 	const data = XLSX.utils.sheet_to_json(worksheet) as ExcelProduct[];
+// 	// console.log('data x', data);
 
-	const record = await db.query.usersTable.findFirst({
-		columns: {
-			id: true
-		},
-		where: (users, { eq }) => eq(users.email, 'szymon.dlugolecki77@gmail.com')
-	});
+// 	const record = await db.query.usersTable.findFirst({
+// 		columns: {
+// 			id: true
+// 		},
+// 		where: (users, { eq }) => eq(users.email, 'szymon.dlugolecki77@gmail.com')
+// 	});
 
-	if (!record) {
-		throw new Error('Progenitor not found');
-	}
+// 	if (!record) {
+// 		throw new Error('Progenitor not found');
+// 	}
 
-	const { id: ownerId } = record;
+// 	const { id: ownerId } = record;
 
-	const productsList: InsertProduct[] = [];
+// 	const productsList: InsertProduct[] = [];
 
-	data.forEach((product) => {
-		console.log('price', product['Cena1 Brutto'], parseFloat(product['Cena1 Brutto']));
-		const price = parseFloat(product['Cena1 Brutto']);
-		const { Nazwa: name, Opis: description, Symbol: symbol } = product;
+// 	data.forEach((product) => {
+// 		console.log('price', product['Cena1 Brutto'], parseFloat(product['Cena1 Brutto']));
+// 		const price = parseFloat(product['Cena1 Brutto']);
+// 		const { Nazwa: name, Opis: description, Symbol: symbol } = product;
 
-		let producent: 'deheus' | 'unknown' = 'unknown';
-		let weight = 0;
+// 		let producent: 'deheus' | 'unknown' = 'unknown';
+// 		let weight = 0;
 
-		// Weight
-		const nameSqueezed = name.split(' ').join('');
-		const unitIndex = nameSqueezed.indexOf('kg');
-		if (unitIndex !== -1) {
-			let index = unitIndex - 1;
-			while (!isNaN(Number(nameSqueezed.slice(index, unitIndex)))) {
-				if (nameSqueezed[index] === '-' || nameSqueezed[index] === '.') {
-					break;
-				}
-				index--;
-			}
+// 		// Weight
+// 		const nameSqueezed = name.split(' ').join('');
+// 		const unitIndex = nameSqueezed.indexOf('kg');
+// 		if (unitIndex !== -1) {
+// 			let index = unitIndex - 1;
+// 			while (!isNaN(Number(nameSqueezed.slice(index, unitIndex)))) {
+// 				if (nameSqueezed[index] === '-' || nameSqueezed[index] === '.') {
+// 					break;
+// 				}
+// 				index--;
+// 			}
 
-			weight = Number(nameSqueezed.slice(index + 1, unitIndex));
-			// console.log("weight", weight, "kg", name);
-		}
+// 			weight = Number(nameSqueezed.slice(index + 1, unitIndex));
+// 			// console.log("weight", weight, "kg", name);
+// 		}
 
-		// Producent
-		console.log('dostawca', product['Dostawca']);
-		const dostawca = product['Dostawca'];
-		if (dostawca === 'DEHEUS') {
-			producent = 'deheus';
-		}
+// 		// Producent
+// 		console.log('dostawca', product['Dostawca']);
+// 		const dostawca = product['Dostawca'];
+// 		if (dostawca === 'DEHEUS') {
+// 			producent = 'deheus';
+// 		}
 
-		// Category
-		const category = 'bydlo' as MainCategory;
-		const subcategory = 'pasze-krowy-mleczne' as Subcategory;
+// 		// Category
+// 		const category = 'bydlo' as MainCategory;
+// 		const subcategory = 'pasze-krowy-mleczne' as Subcategory;
 
-		const encodedURL = productURLParser(name, symbol);
+// 		const encodedURL = productURLParser(name, symbol);
 
-		const insertProduct = {
-			symbol,
-			name,
-			description,
-			price,
-			weight,
-			producent,
-			category,
-			subcategory,
-			amountLeft: 0,
-			encodedURL,
-			authorId: ownerId
-		};
+// 		const insertProduct = {
+// 			symbol,
+// 			name,
+// 			description,
+// 			price,
+// 			weight,
+// 			producent,
+// 			category,
+// 			subcategory,
+// 			amountLeft: 0,
+// 			encodedURL,
+// 			authorId: ownerId
+// 		};
 
-		productsList.push(insertProduct);
-	});
+// 		productsList.push(insertProduct);
+// 	});
 
-	// console.log('productsList', productsList);
+// 	// console.log('productsList', productsList);
 
-	await db.insert(productsTable).values(productsList);
-};
+// 	await db.insert(productsTable).values(productsList);
+// };
 
 // addProductsFromExcel();
 // createProgenitorIfNotExists();

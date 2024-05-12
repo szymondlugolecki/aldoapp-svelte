@@ -137,9 +137,9 @@
 	});
 
 	$: table = createSvelteTable(options);
-	let searchParam = $page.url.searchParams.get('szukaj');
-	let pageParam = $page.url.searchParams.get('strona');
-	let currentPage = !isNaN(Number(pageParam)) ? Math.max(Number(pageParam), 1) : 1;
+	$: searchParam = $page.url.searchParams.get('szukaj');
+	$: pageParam = $page.url.searchParams.get('strona');
+	$: currentPage = !isNaN(Number(pageParam)) ? Math.max(Number(pageParam), 1) : 1;
 
 	$: paginationSettings = {
 		page: currentPage,
@@ -158,7 +158,8 @@
 
 		const params = new URLSearchParams($page.url.searchParams.toString());
 		params.set('szukaj', queryString);
-		goto(`?${params.toString()}`, { keepFocus: true });
+		params.set('strona', '1');
+		goto(`?${params.toString()}`, { keepFocus: true, invalidateAll: true });
 	};
 </script>
 
