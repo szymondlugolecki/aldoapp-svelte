@@ -53,19 +53,45 @@
 	let open = false;
 
 	const form = superForm(superform, {
+		id: `${key}-${product.id}`,
 		validators: zodClient(products$.editForm),
 		onUpdated: ({ form: f }) => {
+			console.log(f, f.message, f.posted, f.errors);
 			if (f.valid) {
 				open = false;
-				console.log(f, f.message, f.posted, f.errors);
 				// toast.success(`You submitted ${JSON.stringify(f.data, null, 2)}`);
 				toast.success(`Sukces`);
 			} else {
 				toast.error('Błąd');
 			}
+		},
+		onSubmit: ({ formData }) => {
+			formData.set('id', product.id.toString());
 		}
 	});
 	const { form: formData, enhance, delayed, submitting } = form;
+
+	$formData.id = product.id;
+
+	// switch (key) {
+	// 	case 'id':
+	// 		break;
+	// 	case 'createdAt':
+	// 		break;
+	// 	case 'adviser':
+	// 		break;
+	// 	case 'address':
+	// 		$formData.city = user.address.city;
+	// 		$formData.zipCode = user.address.zipCode;
+	// 		$formData.street = user.address.street;
+	// 		break;
+	// 	case 'role':
+	// 		$formData.role = user.role;
+	// 		break;
+	// 	default:
+	// 		$formData[key] = user[key];
+	// 		break;
+	// }
 
 	$: isHidden = $formData.hidden
 		? {
@@ -96,42 +122,6 @@
 		</Dialog.Header>
 
 		<form method="POST" action="?/edit" use:enhance class="flex flex-col gap-y-2">
-			<!-- <Form.Root
-			method="POST"
-			action="?/edit"
-			{form}
-			let:message
-			let:delayed
-			let:timeout
-			let:submitting
-			schema={products$.editForm}
-			let:config
-			let:errors
-			class="flex flex-col gap-y-2"
-			options={{
-				onResult: ({ result }) => {
-					console.log('result', result);
-					if (result.type === 'success') {
-						open = false;
-					}
-				},
-				id: product.id.toString(),
-				delayMs: 1000,
-				timeoutMs: 8000,
-				validationMethod: key === 'image' ? 'submit-only' : 'auto'
-			}}
-			enctype="multipart/form-data"
-		> -->
-
-			<!-- <Form.Field {form} name="username">
-				<Form.Control let:attrs>
-					<Form.Label>Username</Form.Label>
-					<Input {...attrs} bind:value={$formData.username} />
-				</Form.Control>
-				<Form.Description>This is your public display name.</Form.Description>
-				<Form.FieldErrors />
-			</Form.Field> -->
-
 			{#if key === 'name'}
 				<Form.Field {form} name={key}>
 					<Form.Control let:attrs>

@@ -22,7 +22,7 @@ export const getAvailableRoleNames = (userRole: Role) => {
 		delete roleNamesCopy.admin;
 		return roleNamesCopy;
 	}
-	return [];
+	return {} as typeof roleNames;
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-types

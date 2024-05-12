@@ -62,7 +62,7 @@
 			}}
 		> -->
 
-		<form method="POST" class="flex flex-col gap-y-2" action="?/edit" use:enhance>
+		<form method="POST" class="flex flex-col gap-y-2" action="?/add" use:enhance>
 			<Form.Field {form} name="name">
 				<Form.Control let:attrs>
 					<Form.Label>Nazwa<RequiredAsterisk required /></Form.Label>
@@ -115,7 +115,7 @@
 				<Form.FieldErrors />
 			</Form.Field>
 
-			<SelectCategories {form} />
+			<SelectCategories {form} required />
 
 			<div class="flex justify-end">
 				<Form.Button class="w-20" disabled={$submitting}>

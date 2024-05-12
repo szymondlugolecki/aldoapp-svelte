@@ -100,13 +100,13 @@
 
 				<div class="flex-none flex items-center gap-1.5">
 					<!-- Cart -->
-					{#if $page.data.user}
+					{#if $page.data.me}
 						<CartPreview {cart} pathname={$page.url.pathname} />
 					{/if}
 
 					<!-- User Menu -->
-					{#if $page.data.user}
-						<UserMenu user={$page.data.user} />
+					{#if $page.data.me}
+						<UserMenu user={$page.data.me} />
 					{:else}
 						<Button href="/zaloguj" variant="default" class="mr-1">Zaloguj się</Button>
 					{/if}

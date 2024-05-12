@@ -51,7 +51,7 @@
 				</div>
 			</Card.Content>
 			<Card.Footer class="self-end justify-end mt-auto">
-				{#if $page.data.user}
+				{#if $page.data.me}
 					<form method="post" action="?/changeProductQuantity" use:enhance>
 						<input type="hidden" name="productId" value={product.id} />
 						<input type="hidden" name="quantity" value="1" />
@@ -65,7 +65,7 @@
 						{/if}
 					</form>
 				{:else}
-					<Button class="p-0 xxs:py-2 xxs:px-4" variant="default" disabled>Zaloguj się...</Button>
+					<Button class="p-0 xxs:py-2 xxs:px-4" variant="default" disabled>Zaloguj się</Button>
 				{/if}
 			</Card.Footer>
 		</Card.Root>

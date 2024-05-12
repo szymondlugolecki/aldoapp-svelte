@@ -87,7 +87,7 @@
 
 			<div>
 				<div class="flex flex-col w-full mt-6 gap-y-2">
-					{#if $page.data.user}
+					{#if $page.data.me}
 						<div class="flex items-center gap-x-6">
 							<form
 								class="flex items-center w-full max-w-xs gap-x-6"

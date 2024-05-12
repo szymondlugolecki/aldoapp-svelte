@@ -6,9 +6,10 @@
 	import { getSubcategories, getSubcategoryName } from '$lib/client/functions';
 	import { type Infer, type SuperForm } from 'sveltekit-superforms';
 	import type { AddProductForm } from '$lib/client/schemas/products';
+	import RequiredAsterisk from '$components/custom/Util/RequiredAsterisk.svelte';
 
 	export { product as item };
-
+	export let required: boolean | undefined = undefined;
 	export let form: SuperForm<Infer<AddProductForm>>;
 
 	const { form: formData } = form;
@@ -33,7 +34,7 @@
 
 <Form.Field {form} name="category">
 	<Form.Control let:attrs>
-		<Form.Label>Kategoria</Form.Label>
+		<Form.Label>Kategoria<RequiredAsterisk {required} /></Form.Label>
 
 		<Select.Root
 			selected={selectedCategory}
@@ -59,7 +60,7 @@
 {#if $formData.category}
 	<Form.Field {form} name="subcategory">
 		<Form.Control let:attrs>
-			<Form.Label>Podkategoria</Form.Label>
+			<Form.Label>Podkategoria<RequiredAsterisk {required} /></Form.Label>
 
 			<Select.Root
 				selected={selectedSubcategory}

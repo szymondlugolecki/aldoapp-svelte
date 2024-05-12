@@ -18,7 +18,7 @@ export const load = async ({ locals, url }) => {
 	const sessionUser = locals.user;
 
 	const base = {
-		user: locals.user,
+		me: locals.user,
 		url: url.href
 	};
 

@@ -5,6 +5,8 @@ import type { SelectProduct } from '$lib/server/db/schemas/products';
 type FodderCategories = typeof fodderCategories2;
 type UnionOfKeys<T> = T extends Record<string, any> ? keyof T : never;
 
+export type Product = SelectProduct;
+
 export type Category = MainCategory;
 export type Subcategory =
 	| UnionOfKeys<FodderCategories['bydlo']>

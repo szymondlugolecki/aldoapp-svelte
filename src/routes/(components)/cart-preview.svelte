@@ -1,5 +1,6 @@
 <script lang="ts">
 	// import { page } from '$app/stores';
+	import Button from '$components/ui/button/button.svelte';
 	import { cn } from '$lib/client/functions';
 	import type { Cart } from '$types';
 	import { createPopover, melt } from '@melt-ui/svelte';
@@ -88,22 +89,24 @@
 				{#if cart.products.length}
 					<span class="text-sm">Suma: {cartTotal} PLN</span>
 
-					<button
+					<a
+						href="/koszyk"
 						use:melt={$close}
 						class="inline-flex items-center justify-center h-10 px-4 py-2 text-sm font-medium transition-colors rounded-md bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background"
 					>
-						<a href="/koszyk" class="w-full">Przejdź do koszyka</a>
-					</button>
+						Przejdź do koszyka
+					</a>
 				{:else}
 					<span class="text-sm">Brak produktów w koszyku</span>
 
 					{#if pathname !== '/sklep'}
-						<button
+						<a
+							href="/sklep"
 							use:melt={$close}
 							class="inline-flex items-center justify-center h-10 px-4 py-2 text-sm font-medium transition-colors rounded-md bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background"
 						>
-							<a href="/sklep" class="w-full">Przejdź do sklepu</a>
-						</button>
+							Przejdź do sklepu
+						</a>
 					{/if}
 				{/if}
 			{:else}

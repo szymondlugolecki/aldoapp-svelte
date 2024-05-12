@@ -23,7 +23,7 @@ export const createProps = <
 		label,
 		key,
 		item,
-		form,
+		superform: form,
 		...extraArgs
 	};
 };

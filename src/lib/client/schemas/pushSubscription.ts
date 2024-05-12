@@ -56,7 +56,8 @@ export const notification = z.object({
 	targets: z
 		.array(userId)
 		.min(1, { message: 'Wybierz przynajmniej jednego użytkownika' })
-		.or(userId),
+		.or(userId)
+		.default([]),
 	title,
 	body
 });

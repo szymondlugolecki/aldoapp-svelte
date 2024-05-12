@@ -1,4 +1,4 @@
-const customErrors = {
+export const customErrors = {
 	'not-logged-in': [401, 'Nie jesteś zalogowany'],
 	'insufficient-permissions': [403, 'Nie masz wystarczających uprawień'],
 	'not-found': [404, 'Nic nie znaleziono']

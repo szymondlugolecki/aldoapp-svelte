@@ -150,7 +150,7 @@ const edit = (async ({ request, locals }) => {
 		}
 	}
 
-	return setMessage(form, 'Edytowano użytkownika');
+	redirect(303, `/admin/uzytkownicy`);
 }) satisfies Action;
 
 export default edit;

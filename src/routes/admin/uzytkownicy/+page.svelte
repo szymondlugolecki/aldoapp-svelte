@@ -1,6 +1,13 @@
 <script lang="ts">
-	import { cn, dateParser, debounce, flexRender } from '$lib/client/functions';
-	import type { PaginationSettings } from '$types';
+	import {
+		cn,
+		dateParser,
+		debounce,
+		flexRender,
+		parseAddress,
+		phoneParser
+	} from '$lib/client/functions';
+	import type { PaginationSettings, User } from '$types';
 
 	import {
 		createSvelteTable,
@@ -8,7 +15,6 @@
 		getPaginationRowModel,
 		type ColumnDef,
 		type TableOptions,
-		type SortingState,
 		type Updater,
 		type PaginationState
 	} from '@tanstack/svelte-table';
@@ -34,87 +40,66 @@
 	// import { superForm } from 'sveltekit-superforms/client';
 
 	import type { EditUserForm } from '$lib/client/schemas/user.js';
+	import { roleNames } from '$lib/client/constants';
+	import type { UserRole } from '$lib/client/constants/dbTypes';
+	import type { Address } from '$lib/server/db/schemas/orders';
+	import UserMiniProfile from './(components)/user-mini-profile.svelte';
 
 	export let data;
 
 	type ParsedUser = (typeof data.users)[number];
 
-	const { count } = data;
-
 	const defaultColumns: ColumnDef<ParsedUser>[] = [
 		{
-			id: 'id',
+			header: 'Akcja',
 			accessorKey: 'id',
-			enableSorting: false
+			cell: (info) =>
+				flexRender(TableHyperlink, {
+					href: `/admin/uzytkownicy/edit/${info.getValue()}`,
+					text: 'Edytuj'
+				}),
+			footer: (info) => info.column.id
 		},
 		{
-			id: 'profileUrl',
 			header: 'Profil użytkownika',
-			accessorKey: 'id',
-			cell: (info) =>
-				flexRender(TableHyperlink, { href: `/uzytkownik/${info.getValue()}`, text: 'Sprawdź' }),
-			enableSorting: false
-		},
-		{
-			id: 'fullName',
-			header: 'Imię i nazwisko',
 			accessorKey: 'fullName',
-			cell: (info) =>
-				flexRender(AdminEditDialog, createProps<ParsedUser, EditUserForm>(info, data.editForm)),
-			enableSorting: true
+			cell: (info) => flexRender(UserMiniProfile, { info }),
+			footer: (info) => info.column.id
 		},
 		{
-			id: 'email',
-			header: 'Email',
-			accessorKey: 'email',
-			cell: (info) =>
-				flexRender(AdminEditDialog, createProps<ParsedUser, EditUserForm>(info, data.editForm)),
-			enableSorting: true
-		},
-		{
-			id: 'role',
-			header: 'Rola',
-			accessorKey: 'role',
-			cell: (info) =>
-				flexRender(AdminEditDialog, createProps<ParsedUser, EditUserForm>(info, data.editForm))
-		},
-		{
-			id: 'phone',
 			header: 'Telefon',
 			accessorKey: 'phone',
 			cell: (info) =>
-				flexRender(AdminEditDialog, createProps<ParsedUser, EditUserForm>(info, data.editForm)),
-			enableSorting: false
+				typeof info.getValue() === 'string' ? phoneParser(info.getValue() as string) : 'Brak',
+			footer: (info) => info.column.id
 		},
 		{
-			id: 'address',
+			header: 'Rola',
+			accessorKey: 'role',
+			cell: (info) => roleNames[info.getValue() as UserRole],
+			footer: (info) => info.column.id
+		},
+		{
 			header: 'Adres',
 			accessorKey: 'address',
-			cell: (info) =>
-				flexRender(AdminEditDialog, createProps<ParsedUser, EditUserForm>(info, data.editForm)),
-			enableSorting: false
+			cell: (info) => parseAddress(info.getValue() as Address) || 'Brak',
+			footer: (info) => info.column.id
 		},
 		{
-			id: 'adviser',
 			header: 'Doradca',
 			accessorKey: 'adviser',
 			cell: (info) =>
-				flexRender(
-					AdminEditDialog,
-					createProps<ParsedUser, EditUserForm>(info, data.editForm, {
-						advisers: data.advisers
-					})
-				)
+				(info.getValue() as Pick<User, 'id' | 'fullName' | 'email'> | undefined)?.fullName ||
+				'Brak',
+			footer: (info) => info.column.id
 		},
 		{
-			id: 'createdAt',
-			header: 'Dołączył',
+			header: 'Dołączył(a)',
 			accessorKey: 'createdAt',
 			cell: (info) => dateParser(info.getValue() as Date, 'short')
 		}
 	];
 
-	let sorting: SortingState = [];
 	let pagination: PaginationState = {
 		pageIndex: 0,
 		pageSize: data.pageLimit
@@ -125,34 +110,6 @@
 			...options,
 			data: data.users
 		}));
-	};
-
-	const setSorting = (updater: any) => {
-		if (updater instanceof Function) {
-			sorting = updater(sorting);
-		} else {
-			sorting = updater;
-		}
-
-		const url = new URLSearchParams($page.url.searchParams);
-		if (sorting && sorting[0]) {
-			url.set('sort', sorting[0].id);
-			url.set('desc', sorting[0].desc.toString());
-			if (url.get('strona')) {
-				url.set('strona', currentPage.toString());
-			}
-		}
-
-		goto(`?${url.toString()}`).then(() => {
-			options.update((options) => ({
-				...options,
-				state: {
-					...options.state,
-					data: data.users,
-					sorting
-				}
-			}));
-		});
 	};
 
 	const setPagination = (updater: Updater<PaginationState>) => {
@@ -181,14 +138,11 @@
 		getPaginationRowModel: getPaginationRowModel(),
 		state: {
 			columnVisibility: {
-				id: false
-			},
-			sorting
+				id: true
+			}
 		},
-		enableSorting: true,
-		onSortingChange: setSorting,
+		enableSorting: false,
 		onPaginationChange: setPagination,
-		manualSorting: true,
 		manualPagination: true
 	});
 
@@ -197,9 +151,9 @@
 	let pageParam = $page.url.searchParams.get('strona');
 	let currentPage = !isNaN(Number(pageParam)) ? Math.max(Number(pageParam), 1) : 1;
 
-	let paginationSettings = {
+	$: paginationSettings = {
 		page: currentPage,
-		count,
+		count: data.count,
 		perPage: data.pageLimit,
 		defaultPage: 1,
 		siblingCount: 1,
@@ -236,12 +190,12 @@
 			on:keyup={debounce(search, 300)}
 			spellcheck={false}
 		/>
-		{#if data.user?.role === 'admin'}
+		{#if data.me?.role === 'admin'}
 			<AdminAddDialog superform={data.addForm} />
 		{/if}
 	</div>
 
-	<Pagination3 {paginationSettings} />
+	<Pagination3 bind:paginationSettings />
 
 	<Table>
 		<TableCaption>Lista użytkowników</TableCaption>
@@ -283,5 +237,5 @@
 		</TableBody>
 	</Table>
 
-	<Pagination3 {paginationSettings} />
+	<Pagination3 bind:paginationSettings />
 </section>

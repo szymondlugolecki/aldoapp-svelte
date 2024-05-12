@@ -65,32 +65,6 @@
 </script>
 
 <form method="POST" action="?/changeOrderStatus" use:enhance class="flex flex-col gap-y-2">
-	<Form.Field {form} name="event">
-		<Form.Control let:attrs>
-			<Form.Label>Status</Form.Label>
-			<Select.Root
-				selected={selectedStatus}
-				onSelectedChange={(v) => {
-					v && ($formData.event = v.value);
-				}}
-			>
-				<Select.Trigger {...attrs}>
-					<Select.Value placeholder="Zmień status zamówienia" />
-				</Select.Trigger>
-				<Select.Content>
-					{#each availableEvents as event}
-						<Select.Item value={event} label={orderEventsList[event]} />
-					{/each}
-				</Select.Content>
-			</Select.Root>
-			<input hidden bind:value={$formData.event} name={attrs.name} />
-		</Form.Control>
-		<Form.Description>
-			Użytkownik automatycznie zostanie poinformowany o zmianie statusu.
-		</Form.Description>
-		<Form.FieldErrors />
-	</Form.Field>
-
 	<Form.Field {form} name="id" hidden={true}>
 		<Form.Control let:attrs>
 			<input {...attrs} type="hidden" bind:value={order.id} />

@@ -10,6 +10,7 @@ import { superValidate } from 'sveltekit-superforms';
 import { and, eq } from 'drizzle-orm';
 import { usersTable } from '$lib/server/db/schemas/users.js';
 import { zod } from 'sveltekit-superforms/adapters';
+import { trytm } from '@bdsqqq/try';
 
 export const actions = {
 	changeProductQuantity,
@@ -46,6 +47,33 @@ export const load = async ({ locals }) => {
 
 	// const defaultAddress = cart?.customer.address;
 
+	const [cart] = await trytm(
+		db.query.cartsTable.findFirst({
+			columns: {},
+			where: (carts, { eq }) => eq(carts.ownerId, sessionUser.id),
+			with: {
+				customer: {
+					columns: {
+						id: true
+					}
+				}
+			}
+		})
+	);
+
+	const forms = {
+		orderForm: await superValidate(zod(order$.create)),
+		productQuantityForm: await superValidate(zod(order$.productQuantity)),
+		setCustomerForm: await superValidate(
+			cart
+				? {
+						customerId: cart.customer.id
+				  }
+				: undefined,
+			zod(cart$.changeCartCustomer)
+		)
+	};
+
 	if (isAtLeastModerator(sessionUser.role)) {
 		const whereCondition =
 			sessionUser.role === 'admin'
@@ -62,16 +90,12 @@ export const load = async ({ locals }) => {
 
 		return {
 			customers,
-			orderForm: await superValidate(zod(order$.create)),
-			productQuantityForm: await superValidate(zod(order$.productQuantity)),
-			setCustomerForm: await superValidate(zod(cart$.changeCartCustomer))
+			...forms
 		};
 	}
 
 	return {
 		customers: null,
-		orderForm: await superValidate(zod(order$.create)),
-		productQuantityForm: await superValidate(zod(order$.productQuantity)),
-		setCustomerForm: await superValidate(zod(cart$.changeCartCustomer))
+		...forms
 	};
 };

@@ -3,9 +3,6 @@ import type { OrderSortableColumn } from '$types';
 import { sql } from 'drizzle-orm';
 import { ordersTable } from '$lib/server/db/schemas/orders.js';
 import { extractParams } from '$lib/server/functions/utils';
-import changeOrderStatus from '$lib/server/actions/orders/changeOrderStatus';
-import changePaymentStatus from '$lib/server/actions/orders/changeOrderPaymentStatus.js';
-import changeOrderAddress from '$lib/server/actions/orders/changeOrderAddress.js';
 import { superValidate, fail } from 'sveltekit-superforms';
 import { order$ } from '$lib/client/schemas';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -23,7 +20,13 @@ const pageLimit = 10;
 export const load = async ({ url }) => {
 	const { page, sort } = extractParams<OrderSortableColumn>(url, sortableColumns);
 
-	console.log('page', page, sort);
+	const { count } = (
+		await db
+			.select({
+				count: sql<number>`count(*)`.mapWith(Number)
+			})
+			.from(ordersTable)
+	)[0];
 
 	return {
 		orders: await db.query.ordersTable.findMany({
@@ -85,20 +88,7 @@ export const load = async ({ url }) => {
 						sort.descending ? desc(orders[sort.by]) : asc(orders[sort.by])
 				: (orders, { desc }) => desc(orders.createdAt)
 		}),
-		count: await db
-			.select({
-				count: sql<number>`count(*)`.mapWith(Number)
-			})
-			.from(ordersTable),
-		pageLimit,
-		eventForm: await superValidate(zod(order$.eventForm)),
-		paymentForm: await superValidate(zod(order$.paymentForm)),
-		addressForm: await superValidate(zod(order$.orderAddressForm))
+		count,
+		pageLimit
 	};
-};
-
-export const actions = {
-	changeOrderStatus,
-	changePaymentStatus,
-	changeOrderAddress
 };

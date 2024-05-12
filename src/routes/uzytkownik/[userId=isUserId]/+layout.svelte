@@ -58,7 +58,7 @@
 			<TabsList>
 				<Tab {pathname} href="/uzytkownik/{pathUser}">Informacje</Tab>
 				<Tab {pathname} href="/uzytkownik/{pathUser}/zamowienia">Zamówienia</Tab>
-				{#if data.user && isAtLeastModerator(data.user.role)}
+				{#if data.me && isAtLeastModerator(data.me.role)}
 					<Tab {pathname} href="/uzytkownik/{pathUser}/inne">Inne</Tab>
 				{/if}
 			</TabsList>

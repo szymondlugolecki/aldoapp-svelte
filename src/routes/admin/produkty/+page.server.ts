@@ -1,8 +1,4 @@
-// import { p } from '$lib/server/clients/pClient';
-
 import add from '$lib/server/actions/product/add';
-import edit from '$lib/server/actions/product/edit';
-// import remove from '$lib/server/actions/product/remove';
 import { db } from '$lib/server/db';
 import { productsTable } from '$lib/server/db/schemas/products';
 import { like, or, sql } from 'drizzle-orm';
@@ -79,26 +75,23 @@ export const load = async ({ url }) => {
 		where: extendedWhereClause
 	});
 
-	const count = (
+	const { count } = (
 		await db
 			.select({
 				count: sql<number>`count(*)`.mapWith(Number)
 			})
 			.from(productsTable)
 			.where(extendedWhereClause)
-	)[0].count;
+	)[0];
 
 	return {
 		products,
 		pageLimit,
 		count,
-		addForm: await superValidate(zod(products$.addForm)),
-		editForm: await superValidate(zod(products$.editForm))
+		addForm: await superValidate(zod(products$.addForm))
 	};
 };
 
 export const actions = {
-	add,
-	edit
-	// remove
+	add
 };

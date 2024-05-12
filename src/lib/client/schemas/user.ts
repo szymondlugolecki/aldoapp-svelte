@@ -3,7 +3,7 @@ import { userRoles } from '../constants/dbTypes';
 
 export const id = z
 	.string({
-		required_error: 'Identyfikator użytkownika jest wymagany',
+		required_error: 'Użytkownik jest wymagany',
 		invalid_type_error: 'Nieprawidłowy użytkownik'
 	})
 	.length(15, { message: 'Nieprawidłowe id użytkownika' });
@@ -12,8 +12,8 @@ export const email = z
 	.string({
 		required_error: 'Email jest wymagany'
 	})
-	.min(1, { message: 'Nieprawidłowy email' })
-	.max(120, { message: 'Nieprawidłowy email' })
+	.min(3, { message: 'Nieprawidłowy email' })
+	.max(150, { message: 'Nieprawidłowy email' })
 	.email({ message: 'Nieprawidłowy email' })
 	.toLowerCase();
 
@@ -57,8 +57,8 @@ export const zipCode = z
 	.string({
 		required_error: 'Kod pocztowy jest wymagany'
 	})
-	.min(5, { message: 'Nieprawidłowy kod pocztowy' }) // should be of length 6
-	.max(10, { message: 'Nieprawidłowy kod pocztowy' })
+	.min(3, { message: 'Nieprawidłowy kod pocztowy' })
+	.max(15, { message: 'Nieprawidłowy kod pocztowy' })
 	.trim();
 
 export const city = z
@@ -82,7 +82,7 @@ export const addForm = z.object({
 });
 
 export const editForm = z.object({
-	id: id.default('' as unknown as string),
+	id,
 	email: email.optional(),
 	fullName: fullName.optional(),
 	role: role.optional(),
@@ -91,10 +91,6 @@ export const editForm = z.object({
 	zipCode: zipCode.optional(),
 	city: city.optional(),
 	adviserId: id.optional()
-	// claimAdviser: z
-	// 	.union([z.boolean(), z.literal('true'), z.literal('false')])
-	// 	.transform((value) => value === true || value === 'true')
-	// 	.optional()
 });
 
 export type AddUserForm = typeof addForm;

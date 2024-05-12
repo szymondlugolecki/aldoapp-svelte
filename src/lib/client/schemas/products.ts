@@ -91,17 +91,25 @@ export const producent = z.enum(PRODUCENTS, {
 	}
 });
 
-const MAX_FILE_SIZE = 500000;
-const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const MAX_FILE_SIZE = 5_000_000;
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/avif'];
 
 export const image = z
-	.any()
-	.refine((files) => files?.length === 1, 'Wymagane jest jedno zdjęcie.')
-	.refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, `Maksymalny rozmiar zdjęcia to 5MB.`)
+	.instanceof(File, { message: 'Wymagane jest jedno zdjęcie' })
+	.refine((f) => f.size <= MAX_FILE_SIZE, 'Maksymalny rozmiar zdjęcia to 5 MB')
 	.refine(
-		(files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
-		'.jpg, .jpeg, .png and .webp są dozwolone.'
+		(f) => ACCEPTED_IMAGE_TYPES.includes(f.type),
+		'Dozwolone formaty: jpg, jpeg, png, webp, avif.'
 	);
+
+// z
+// 	.any()
+// 	.refine((files) => files?.length <= 1, 'Wymagane jest jedno zdjęcie.')
+// 	.refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, `Maksymalny rozmiar zdjęcia to 5MB.`)
+// 	.refine(
+// 		(files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
+// 		'Dozwolone formaty: jpg, jpeg, png, webp, avif.'
+// 	);
 
 export const hidden = z.boolean({
 	invalid_type_error: 'Nieprawidłowa wartość dla: ukryty',
@@ -122,7 +130,7 @@ export const editForm = z.object({
 	id,
 	name: name.optional(),
 	symbol: symbol.optional(),
-	description: description.optional(),
+	description: description.optional().nullable(),
 	category: category.optional(),
 	subcategory: subcategory.optional(),
 	price: price.optional(),

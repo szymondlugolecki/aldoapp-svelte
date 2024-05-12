@@ -2,13 +2,14 @@
 	import Spinner from '$components/custom/Util/Spinner.svelte';
 	import { Button } from '$components/ui/button';
 	import { Skeleton } from '$shadcn/skeleton';
+	import { ShoppingBasket } from 'lucide-svelte';
 
 	export let subtotal: string;
 	export let isRecalculating: boolean;
 	export let disableOrderButton: boolean;
 	export let orderFormId: string;
 
-	$: console.log('summary', orderFormId);
+	$: console.log('orderFormId', orderFormId);
 </script>
 
 <div class="flex flex-col border-y border-border">
@@ -55,11 +56,11 @@
 
 	<div class="flex items-center justify-end w-full p-6">
 		<div class="">
-			<Button form={orderFormId} disabled={isRecalculating || disableOrderButton}>
+			<Button type="submit" form={orderFormId} disabled={isRecalculating || disableOrderButton}>
 				{#if disableOrderButton}
 					<Spinner />
 				{:else}
-					Zamawiam
+					Zamawiam <ShoppingBasket class="ml-1 square-5" />
 				{/if}
 			</Button>
 		</div>

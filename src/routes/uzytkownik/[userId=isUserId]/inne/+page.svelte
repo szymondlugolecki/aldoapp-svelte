@@ -12,10 +12,9 @@
 
 	export let data;
 
-	export let superform: SuperValidated<Infer<NotificationForm>>;
-	export let open: boolean;
+	let open = false;
 
-	const form = superForm(superform, {
+	const form = superForm(data.form, {
 		validators: zodClient(pushSubscription$.notification),
 		onUpdated: ({ form: f }) => {
 			if (f.valid) {
@@ -46,8 +45,9 @@
 						bind:value={$formData.title}
 						spellcheck="false"
 						placeholder="Zamówienie gotowe"
-						disabled={$submitting}
+						disabled={true}
 					/>
+					<!-- disabled={$submitting} -->
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
@@ -59,9 +59,11 @@
 						spellcheck="false"
 						placeholder="Zapraszamy po odbiór zamówienia"
 						class="resize-none"
-						disabled={$submitting}
 						bind:value={$formData.body}
+						disabled={true}
 					/>
+					<!-- disabled={$submitting} -->
+
 					<Form.Description
 						>Wiadomość zostanie dostarczona pod warunkiem, że użytkownik włączył powiadomienia w
 						ustawieniach</Form.Description
@@ -77,7 +79,7 @@
 				<Form.FieldErrors />
 			</Form.Field>
 
-			<Form.Button class="w-20" disabled={$submitting}>
+			<Form.Button disabled={true}>
 				{#if $delayed}
 					<Spinner />
 				{:else}

@@ -8,11 +8,7 @@
 	import type { Infer, SuperForm } from 'sveltekit-superforms/client';
 	import { page } from '$app/stores';
 
-	type PageServerData = import('../$types').PageServerData;
-	type PageLayoutData = import('../$types').PageServerParentData;
-
 	export let orderForm: SuperForm<Infer<OrderForm>>;
-
 	export let defaultValues: {
 		fullName: string;
 		email: string;
@@ -24,7 +20,11 @@
 		};
 	};
 
+	// export let formId: string;
+
 	const { form, message, errors, enhance, formId } = orderForm;
+
+	$: console.log('formId X', $formId);
 </script>
 
 <form method="POST" action="?/createOrder" id={$formId} class="flex flex-col gap-y-4" use:enhance>

@@ -156,7 +156,7 @@
 		state: {
 			sorting,
 			columnVisibility: {
-				customer: !!$page.data.user && isAtLeastModerator($page.data.user.role)
+				customer: !!$page.data.me && isAtLeastModerator($page.data.me.role)
 			}
 		},
 		enableSorting: true,

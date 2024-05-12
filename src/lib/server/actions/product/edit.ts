@@ -53,8 +53,6 @@ const edit: Action = async ({ request, locals }) => {
 	// We're handling only one image at once for now
 	const image = images;
 
-	console.log('formData.images', image);
-
 	if (image) {
 		// One image per product is enough for now
 		try {
@@ -152,7 +150,7 @@ const edit: Action = async ({ request, locals }) => {
 		return setError(form, 'Błąd serwera podczas edytowania użytkownika', { status: 500 });
 	}
 
-	return setMessage(form, 'Edytowano produkt');
+	redirect(303, `/admin/produkty`);
 };
 
 export default edit;

@@ -9,19 +9,20 @@
 
 	import { tick } from 'svelte';
 	import { toast } from 'svelte-sonner';
-	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
+	import SuperDebug, { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { cn } from '$lib/utils';
 	import { Check } from 'lucide-svelte';
 	import { CaretSort } from 'radix-icons-svelte';
 	import type { CartCustomerForm } from '$lib/client/schemas/cart';
+
 	type PageServerData = import('../$types').PageServerData;
 
 	type Customers = NonNullable<PageServerData['customers']>;
 
 	export let customers: Customers;
 	export let superform: SuperValidated<Infer<CartCustomerForm>>;
-	export let user: {
+	export let me: {
 		id: string;
 		fullName: string;
 	};
@@ -31,17 +32,16 @@
 		onUpdated: ({ form: f }) => {
 			if (f.valid) {
 				console.log(f, f.message, f.posted, f.errors);
-				// toast.success(`You submitted ${JSON.stringify(f.data, null, 2)}`);
-				toast.success(`Sukces`);
 			} else {
 				toast.error('Błąd');
 			}
 		},
-		invalidateAll: true
+		invalidateAll: true,
+		resetForm: false
 	});
 	const { form: formData, enhance, delayed, submitting } = form;
 
-	const userCombobox = { value: user.id, label: `${user.fullName} (Ty)` };
+	const userCombobox = { value: me.id, label: `${me.fullName} (Ty)` };
 
 	const customersCombobox = customers
 		? [
@@ -55,6 +55,8 @@
 
 	let open = false;
 
+	$: console.log('', customersCombobox);
+
 	function closeAndFocusTrigger(triggerId: string) {
 		open = false;
 		tick().then(() => {
@@ -64,7 +66,6 @@
 </script>
 
 <form method="POST" action="?/setCustomer" use:enhance class="flex items-center w-full gap-x-3">
-	<!-- Select customer -->
 	<Form.Field {form} name="customerId" class="flex flex-col">
 		<Popover.Root bind:open let:ids>
 			<Form.Control let:attrs>
@@ -82,7 +83,7 @@
 						'Wybierz klienta...'}
 					<CaretSort class="w-4 h-4 ml-2 opacity-50 shrink-0" />
 				</Popover.Trigger>
-				<input hidden value={$formData.customerId} name={attrs.name} />
+				<input hidden bind:value={$formData.customerId} name={attrs.name} />
 			</Form.Control>
 			<Popover.Content class="w-[200px] p-0">
 				<Command.Root>

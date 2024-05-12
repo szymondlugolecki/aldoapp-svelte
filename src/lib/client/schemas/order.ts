@@ -3,6 +3,7 @@ import { paymentMethods, deliveryMethods, orderEvents } from '../constants/dbTyp
 // import { id as userId, city, zipCode, street } from './user';
 import { id as productId } from './products';
 import { addressForm } from './settings';
+import { city, street, zipCode } from './user';
 
 export const id = z
 	.string({
@@ -37,29 +38,34 @@ export const paymentMethod = z.enum(paymentMethods, {
 	}
 });
 
+const event = z.enum(orderEvents, {
+	errorMap(issue) {
+		switch (issue.code) {
+			case 'invalid_type':
+				return { message: 'Nieprawidłowy status' };
+			case 'invalid_enum_value':
+				return { message: 'Nieprawidłowy status' };
+			default:
+				return { message: 'Niespodziewany błąd: status' };
+		}
+	}
+});
+
 export const eventForm = z.object({
 	id,
-	event: z.enum(orderEvents, {
-		errorMap(issue) {
-			switch (issue.code) {
-				case 'invalid_type':
-					return { message: 'Nieprawidłowy status' };
-				case 'invalid_enum_value':
-					return { message: 'Nieprawidłowy status' };
-				default:
-					return { message: 'Niespodziewany błąd: status' };
-			}
-		}
-	})
+	event
 });
 
 export const status = z.object({});
 
+const paid = z
+	.union([z.boolean(), z.literal('true'), z.literal('false')])
+	.transform((value) => value === true || value === 'true')
+	.default(false);
+
 export const paymentForm = z.object({
 	id,
-	paid: z
-		.union([z.boolean(), z.literal('true'), z.literal('false')])
-		.transform((value) => value === true || value === 'true')
+	paid
 });
 
 export const orderAddressForm = addressForm.merge(
@@ -92,6 +98,15 @@ export const create = z.object({
 	// zipCode: zipCode,
 	// city: city,
 	// saveAddress: saveAddress.optional()
+});
+
+export const editForm = z.object({
+	id,
+	event,
+	street: street.optional(),
+	zipCode: zipCode.optional(),
+	city: city.optional()
+	// paid,
 });
 
 export const orderAgainForm = z.object({

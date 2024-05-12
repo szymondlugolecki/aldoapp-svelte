@@ -6,6 +6,8 @@
 	import CustomerForm from './(components)/customer-form.svelte';
 	import OrderInfoForm from './(components)/order-info-form.svelte';
 	import { toast } from 'svelte-sonner';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { order$ } from '$lib/client/schemas';
 	// import { toast } from 'svelte-sonner';
 
 	export let data;
@@ -38,7 +40,18 @@
 		formId: orderFormId,
 		submitting: orderSubmitting,
 		...orderFormRest
-	} = superForm(data.orderForm);
+	} = superForm(data.orderForm, {
+		validators: zodClient(order$.create),
+		onUpdated: ({ form: f }) => {
+			console.log(f, f.message, f.posted, f.errors);
+			if (f.valid) {
+				toast.success(`Sukces`);
+			} else {
+				toast.error('Błąd');
+			}
+		},
+		invalidateAll: true
+	});
 
 	$: defaultValues = {
 		fullName: data.cart?.customer.fullName || '',
@@ -50,8 +63,6 @@
 			zipCode: ''
 		}
 	};
-
-	// $: console.log('orderFormId', orderFormId);
 </script>
 
 <svelte:head>
@@ -59,25 +70,25 @@
 	<meta name="description" content="Dokończ składanie zamówienia." />
 </svelte:head>
 
-<!-- <SuperDebug data={form} /> -->
-
 <section class="flex justify-center w-full pt-3 pb-3 sm:pt-6 sm:pb-40">
-	{#if data.user && data.cart && data.cart.products.length}
+	{#if data.me && data.cart && data.cart.products.length}
 		<div class="flex flex-col items-start w-full max-w-6xl gap-8 px-4 pb-8 lg:flex-row sm:px-10">
 			<!-- Form -->
 			<div class="flex flex-col w-full gap-y-4">
 				<h1 class="text-lg font-medium">Dane zamówienia</h1>
 
-				{#if data.customers}
-					<CustomerForm
-						customers={data.customers}
-						user={{
-							id: data.user.id,
-							fullName: data.user.fullName
-						}}
-						superform={data.setCustomerForm}
-					/>
-				{/if}
+				{#key data.customers}
+					{#if data.customers}
+						<CustomerForm
+							customers={data.customers}
+							me={{
+								id: data.me.id,
+								fullName: data.me.fullName
+							}}
+							superform={data.setCustomerForm}
+						/>
+					{/if}
+				{/key}
 
 				<OrderInfoForm
 					orderForm={{
@@ -103,16 +114,9 @@
 						<Summary
 							{subtotal}
 							orderFormId={$orderFormId}
-							isRecalculating={false}
+							isRecalculating={$productQuantitySubmitting}
 							disableOrderButton={$orderSubmitting}
 						/>
-
-						<!-- <Summary
-						{subtotal}
-						orderFormId={$orderFormId}
-						isRecalculating={$productQuantitySubmitting}
-						disableOrderButton={$orderSubmitting}
-					/> -->
 					{/if}
 				</div>
 			</div>

@@ -24,25 +24,25 @@
 	/>
 </svelte:head>
 
-<section class="w-full flex justify-center items-center flex-col">
+<section class="flex flex-col items-center justify-center w-full">
 	{#if visible}
-		<div class="text-center w-full px-6 sm:px-2">
-			<p class="text-6xl font-bold mb-1" in:fly={{ y: -200, duration: 1000 }}>⚠️</p>
-			<h1 class="text-3xl sm:text-4xl font-bold mb-3" in:fly={{ y: -200, duration: 1000 }}>
+		<div class="w-full px-6 text-center sm:px-2">
+			<p class="mb-1 text-6xl font-bold" in:fly={{ y: -200, duration: 1000 }}>⚠️</p>
+			<h1 class="mb-3 text-3xl font-bold sm:text-4xl" in:fly={{ y: -200, duration: 1000 }}>
 				Błąd {data.statusCode}
 			</h1>
-			<h2 class="text-xl sm:text-2xl font-semibold" in:fade={{ duration: 1350 }}>
+			<h2 class="text-xl font-semibold sm:text-2xl" in:fade={{ duration: 1350 }}>
 				{data.message} 😔
 			</h2>
 		</div>
-		<div class="flex space-x-3 items-center mt-2" in:fade={{ duration: 1350 }}>
+		<div class="flex items-center mt-2 space-x-3" in:fade={{ duration: 1350 }}>
 			<a href="/" class="text-primary hover:text-primary-focus">Strona główna</a>
-			{#if data.user}
+			{#if data.me}
 				<a href="/api/logout" class="text-primary hover:text-primary-focus">Wyloguj się</a>
 			{:else}
 				<a
 					href="/zaloguj"
-					class="text-white hover:bg-primary-focus duration-200 bg-primary rounded-md px-3 py-2"
+					class="px-3 py-2 text-white duration-200 rounded-md hover:bg-primary-focus bg-primary"
 					>Zaloguj się</a
 				>
 			{/if}

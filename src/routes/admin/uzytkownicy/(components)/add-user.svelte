@@ -21,20 +21,20 @@
 
 	export let superform: SuperValidated<Infer<AddUserForm>>;
 
-	const availableRoleNames = getAvailableRoleNames($page.data.user?.role);
+	const availableRoleNames = getAvailableRoleNames($page.data.me?.role);
 
 	let open = false;
 
 	const form = superForm(superform, {
 		validators: zodClient(user$.addForm),
 		onUpdated: ({ form: f }) => {
+			console.log(f, f.message, f.posted, f.errors);
 			if (f.valid) {
 				open = false;
-				console.log(f, f.message, f.posted, f.errors);
 				// toast.success(`You submitted ${JSON.stringify(f.data, null, 2)}`);
 				toast.success(`Sukces`);
 			} else {
-				toast.error('Błąd');
+				toast('Błąd');
 			}
 		}
 	});
@@ -58,7 +58,7 @@
 			</Dialog.Description>
 		</Dialog.Header>
 
-		<form method="POST" class="flex flex-col gap-y-2" action="?/edit" use:enhance>
+		<form method="POST" class="flex flex-col gap-y-2" action="?/add" use:enhance>
 			<Form.Field {form} name="fullName">
 				<Form.Control let:attrs>
 					<Form.Label>Imię i nazwisko<RequiredAsterisk /></Form.Label>
@@ -68,6 +68,7 @@
 						required
 						placeholder="Jan Kowalski"
 						spellcheck="false"
+						type="text"
 					/>
 				</Form.Control>
 				<Form.FieldErrors />
@@ -116,7 +117,7 @@
 							<Select.Value placeholder="Wybierz rolę dla użytkownika" />
 						</Select.Trigger>
 						<Select.Content>
-							{#each Object.entries(availableRoleNames) as [label, value]}
+							{#each Object.entries(availableRoleNames) as [value, label]}
 								<Select.Item {value} {label} />
 							{/each}
 						</Select.Content>
