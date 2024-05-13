@@ -219,6 +219,6 @@
 
 		<EditPageNavigationButtons delayed={$delayed} submitting={$submitting} {reset} />
 
-		<SuperDebug data={$formData} />
+		<!-- <SuperDebug data={$formData} /> -->
 	</form>
 </EditLayout>

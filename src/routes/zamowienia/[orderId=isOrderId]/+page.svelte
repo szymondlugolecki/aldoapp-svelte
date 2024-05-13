@@ -212,7 +212,11 @@
 						class="border-border ss:[&:not(:last-child)]:border-b-0 [&:not(:last-child)]:border-b [&:not(:last-child)]:pb-3"
 					>
 						<dt class="font-medium">Adres dostawy</dt>
-						<dd class="mt-3 whitespace-pre-line">{parseAddress(data.order.address) || 'Brak'}</dd>
+						<dd class="mt-3 whitespace-pre-line">
+							{Object.values(data.order.address).join('').length > 3
+								? parseAddress(data.order.address)
+								: 'Brak'}
+						</dd>
 					</div>
 					<div
 						class="border-border ss:[&:not(:last-child)]:border-b-0 [&:not(:last-child)]:border-b [&:not(:last-child)]:pb-3"
