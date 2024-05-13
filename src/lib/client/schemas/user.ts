@@ -50,22 +50,18 @@ export const street = z
 	.string({
 		required_error: 'Ulica i numer są wymagane'
 	})
-	.min(3, { message: 'Nieprawidłowa ulica i numer' })
 	.trim();
 
 export const zipCode = z
 	.string({
 		required_error: 'Kod pocztowy jest wymagany'
 	})
-	.min(3, { message: 'Nieprawidłowy kod pocztowy' })
-	.max(15, { message: 'Nieprawidłowy kod pocztowy' })
 	.trim();
 
 export const city = z
 	.string({
 		required_error: 'Miasto jest wymagane'
 	})
-	.min(3, { message: 'Nieprawidłowe miasto' })
 	.trim();
 
 export const address = z.object({

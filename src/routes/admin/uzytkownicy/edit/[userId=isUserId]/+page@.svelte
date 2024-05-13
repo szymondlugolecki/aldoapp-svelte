@@ -39,11 +39,11 @@
 		id: data.user.id,
 		validators: zod(user$.editForm),
 		onUpdated: ({ form: f }) => {
-			console.log(f, f.message, f.posted, f.errors);
 			if (f.valid) {
 				toast.success(`Sukces`);
 			} else {
-				toast.error('Błąd');
+				const errors = f.errors['_errors'];
+				toast.error(errors ? errors[0] : 'Niespodziewany błąd');
 			}
 		},
 		invalidateAll: true
@@ -195,36 +195,30 @@
 
 		<Form.Field {form} name="city">
 			<Form.Control let:attrs>
-				<Form.Label>Miasto<RequiredAsterisk /></Form.Label>
-				<Input {...attrs} required bind:value={$formData.city} spellcheck="false" />
+				<Form.Label>Miasto</Form.Label>
+				<Input {...attrs} bind:value={$formData.city} spellcheck="false" />
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 
 		<Form.Field {form} name="zipCode">
 			<Form.Control let:attrs>
-				<Form.Label>Kod pocztowy<RequiredAsterisk /></Form.Label>
-				<Input
-					{...attrs}
-					required
-					minlength={5}
-					bind:value={$formData.zipCode}
-					spellcheck="false"
-				/>
+				<Form.Label>Kod pocztowy</Form.Label>
+				<Input {...attrs} minlength={5} bind:value={$formData.zipCode} spellcheck="false" />
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 
 		<Form.Field {form} name="street">
 			<Form.Control let:attrs>
-				<Form.Label>Ulica i numer domu<RequiredAsterisk /></Form.Label>
-				<Input {...attrs} required bind:value={$formData.street} spellcheck="false" />
+				<Form.Label>Ulica i numer domu</Form.Label>
+				<Input {...attrs} bind:value={$formData.street} spellcheck="false" />
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
 
 		<EditPageNavigationButtons delayed={$delayed} submitting={$submitting} {reset} />
 
-		<!-- <SuperDebug data={$formData} /> -->
+		<SuperDebug data={$formData} />
 	</form>
 </EditLayout>

@@ -47,7 +47,8 @@
 			if (f.valid) {
 				toast.success(`Sukces`);
 			} else {
-				toast.error('Błąd');
+				const errors = f.errors['_errors'];
+				toast.error(errors ? errors[0] : 'Niespodziewany błąd');
 			}
 		},
 		invalidateAll: true

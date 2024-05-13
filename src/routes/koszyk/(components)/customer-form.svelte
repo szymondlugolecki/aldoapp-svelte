@@ -33,7 +33,8 @@
 			if (f.valid) {
 				console.log(f, f.message, f.posted, f.errors);
 			} else {
-				toast.error('Błąd');
+				const errors = f.errors['_errors'];
+				toast.error(errors ? errors[0] : 'Niespodziewany błąd');
 			}
 		},
 		invalidateAll: true,

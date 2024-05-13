@@ -31,8 +31,6 @@
 		delayMs: 1000,
 		timeoutMs: 10000
 	});
-
-	let selectedImagePreview = 0;
 </script>
 
 <section class="max-w-2xl px-4 pt-4 mx-auto lg:max-w-6xl sm:px-0 pb-14">

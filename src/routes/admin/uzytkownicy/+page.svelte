@@ -82,7 +82,8 @@
 		{
 			header: 'Adres',
 			accessorKey: 'address',
-			cell: (info) => parseAddress(info.getValue() as Address) || 'Brak',
+			accessorFn: (user) =>
+				Object.values(user.address).join('').length > 3 ? parseAddress(user.address) : 'Brak',
 			footer: (info) => info.column.id
 		},
 		{
