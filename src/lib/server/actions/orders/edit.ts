@@ -8,7 +8,6 @@ import { setError, setMessage, superValidate, fail } from 'sveltekit-superforms'
 import { productsTable, type SelectProduct } from '$lib/server/db/schemas/products';
 import { eq, sql } from 'drizzle-orm';
 import { db } from '$lib/server/db';
-import { put } from '@vercel/blob';
 import { env } from '$env/dynamic/private';
 import { zod } from 'sveltekit-superforms/adapters';
 import { ordersTable, type SelectOrder } from '$lib/server/db/schemas/orders';
