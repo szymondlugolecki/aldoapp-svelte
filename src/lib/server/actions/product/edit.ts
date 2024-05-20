@@ -11,6 +11,7 @@ import { db } from '$lib/server/db';
 import { put } from '@vercel/blob';
 import { env } from '$env/dynamic/private';
 import { zod } from 'sveltekit-superforms/adapters';
+import { utapi } from '$lib/server/clients/uploadthing';
 
 const edit: Action = async ({ request, locals }) => {
 	const sessionUser = locals.user;
@@ -55,15 +56,35 @@ const edit: Action = async ({ request, locals }) => {
 
 	if (image) {
 		// One image per product is enough for now
+
+		// Vercel Blob
+		// try {
+		// 	const fileBuffer = await image.arrayBuffer();
+		// 	const { url } = await put(image.name, fileBuffer, {
+		// 		token: env.BLOB_READ_WRITE_TOKEN,
+		// 		access: 'public'
+		// 	});
+
+		// 	console.log('url', url);
+		// 	imageUrl = url;
+		// } catch (error) {
+		// 	// Unexpected-error
+		// 	console.error('addProductImageError', error);
+		// 	return setError(form, 'Błąd serwera podczas dodawania zdjęcia', { status: 500 });
+		// }
+
+		// Uploadthing
 		try {
 			const fileBuffer = await image.arrayBuffer();
-			const { url } = await put(image.name, fileBuffer, {
-				token: env.BLOB_READ_WRITE_TOKEN,
-				access: 'public'
-			});
+			const newFile = new File([fileBuffer], image.name);
+			const { data, error } = await utapi.uploadFiles(newFile);
 
-			console.log('url', url);
-			imageUrl = url;
+			if (error) {
+				throw error;
+			}
+
+			console.log('data', data);
+			imageUrl = data.url;
 		} catch (error) {
 			// Unexpected-error
 			console.error('addProductImageError', error);
