@@ -14,3 +14,4 @@ playwright/.auth
 mysql_migrations
 pnpm-lock.yaml
 *.xls
+static/pasze/*
