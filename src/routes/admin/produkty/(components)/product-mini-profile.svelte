@@ -2,6 +2,7 @@
 	import { parsePLN } from '$lib/client/functions';
 	import type { Product } from '$types';
 	import type { CellContext } from '@tanstack/svelte-table';
+	import { Image } from '@unpic/svelte';
 
 	export let info: CellContext<Product, unknown>;
 
@@ -14,7 +15,9 @@
 
 <div class="flex items-center gap-x-3">
 	<div class="w-16 overflow-hidden rounded-lg">
-		<a class="underline" href="/sklep/{encodedURL}"><img src={image} alt="Brak zdjęcia" /> </a>
+		<a class="underline" href="/sklep/{encodedURL}">
+			<Image src={image || '/product-placeholder.webp'} layout="fullWidth" alt="Zdjęcie produktu" />
+		</a>
 	</div>
 	<div>
 		<p>{name}</p>

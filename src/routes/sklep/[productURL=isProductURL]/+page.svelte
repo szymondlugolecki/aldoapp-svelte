@@ -25,6 +25,7 @@
 	import { Reload } from 'radix-icons-svelte';
 	import ErrorMessage from '$components/custom/Form/ErrorMessage.svelte';
 	import Message from '$components/custom/Form/Message.svelte';
+	import { Image } from '@unpic/svelte';
 
 	export let data;
 	const { enhance, message, errors, delayed, timeout } = superForm(data.addProductForm, {
@@ -39,7 +40,11 @@
 		<div class="max-w-md overflow-hidden rounded-md aspect-2/3">
 			<a href="/sklep/{data.product.encodedURL}">
 				<div class="">
-					<img src={data.product.image} alt={data.product.name} />
+					<Image
+						src={data.product.image || '/product-placeholder.webp'}
+						layout="fullWidth"
+						alt="Zdjęcie produktu"
+					/>
 				</div>
 			</a>
 		</div>
