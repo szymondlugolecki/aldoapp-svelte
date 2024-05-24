@@ -2,91 +2,91 @@ import { db } from '$lib/server/db/index.js';
 import { productsTable, type SelectProduct } from '$lib/server/db/schemas/products.js';
 import { json } from '@sveltejs/kit';
 
-import JPEG_ENC_WASM from '@jsquash/jpeg/codec/enc/mozjpeg_enc.wasm?url';
+// import JPEG_ENC_WASM from '$lib/assets/codecs/mozjpeg_enc.wasm?url';
 
-import JPEG_DEC_WASM from '@jsquash/jpeg/codec/dec/mozjpeg_dec.wasm?url';
-import AVIF_DEC_WASM from '@jsquash/avif/codec/dec/avif_dec.wasm?url';
-import JXL_DEC_WASM from '@jsquash/jxl/codec/dec/jxl_dec.wasm?url';
-import PNG_DEC_WASM from '@jsquash/png/codec/pkg/squoosh_png_bg.wasm?url';
-import WEBP_DEC_WASM from '@jsquash/webp/codec/dec/webp_dec.wasm?url';
+// import JPEG_DEC_WASM from '$lib/assets/codecs/mozjpeg_dec_codec.wasm?url';
+// import AVIF_DEC_WASM from '$lib/assets/codecs/avif_dec.wasm?url';
+// import JXL_DEC_WASM from '$lib/assets/codecs/jxl_dec.wasm?url';
+// import PNG_DEC_WASM from '$lib/assets/codecs/squoosh_png_bg.wasm?url';
+// import WEBP_DEC_WASM from '$lib/assets/codecs/webp_dec.wasm?url';
 
-import encode, { init as jpegEncInit } from '@jsquash/jpeg/encode';
-import decodeJpeg, { init as initDecJpeg } from '@jsquash/jpeg/decode';
-import decodeAvif, { init as initDecAvif } from '@jsquash/avif/decode';
-import decodeWebp, { init as initDecWebp } from '@jsquash/webp/decode';
-import decodeJpg, { init as initDecJpg } from '@jsquash/jxl/decode';
-import decodePng, { init as initDecPng } from '@jsquash/png/decode';
+// import encode, { init as jpegEncInit } from '@jsquash/jpeg/encode';
+// import decodeJpeg, { init as initDecJpeg } from '@jsquash/jpeg/decode';
+// import decodeAvif, { init as initDecAvif } from '@jsquash/avif/decode';
+// import decodeWebp, { init as initDecWebp } from '@jsquash/webp/decode';
+// import decodeJpg, { init as initDecJpg } from '@jsquash/jxl/decode';
+// import decodePng, { init as initDecPng } from '@jsquash/png/decode';
 
-import { trytm } from '@bdsqqq/try';
-import { utapi } from '$lib/server/clients/uploadthing';
-import type { BatchItem, BatchResponse } from 'drizzle-orm/batch';
-import { eq } from 'drizzle-orm';
-import resize from '@jsquash/resize';
-import Jimp from 'jimp';
+// import { trytm } from '@bdsqqq/try';
+// import { utapi } from '$lib/server/clients/uploadthing';
+// import type { BatchItem, BatchResponse } from 'drizzle-orm/batch';
+// import { eq } from 'drizzle-orm';
+// import resize from '@jsquash/resize';
+// import Jimp from 'jimp';
 
-interface ProductWithImage extends SelectProduct {
-	image: string;
-}
+// interface ProductWithImage extends SelectProduct {
+// 	image: string;
+// }
 
-type SvelteKitFetch = (
-	input: URL | RequestInfo,
-	init?: RequestInit | undefined
-) => Promise<Response>;
+// type SvelteKitFetch = (
+// 	input: URL | RequestInfo,
+// 	init?: RequestInit | undefined
+// ) => Promise<Response>;
 
-type ImageType = 'avif' | 'jpeg' | 'jpg' | 'png' | 'webp';
+// type ImageType = 'avif' | 'jpeg' | 'jpg' | 'png' | 'webp';
 
-const decode = async (image: Blob, fetch: SvelteKitFetch) => {
-	const buffer = await image.arrayBuffer();
-	const imageType = image.type.split('/')[1] as ImageType;
+// const decode = async (image: Blob, fetch: SvelteKitFetch) => {
+// 	const buffer = await image.arrayBuffer();
+// 	const imageType = image.type.split('/')[1] as ImageType;
 
-	console.log('imageType', imageType);
+// 	console.log('imageType', imageType);
 
-	switch (imageType) {
-		case 'jpeg': {
-			const wasmFile = await fetch(JPEG_DEC_WASM);
-			const wasmArrayBuffer = await wasmFile.arrayBuffer();
-			const wasmModule = new WebAssembly.Module(wasmArrayBuffer);
+// 	switch (imageType) {
+// 		case 'jpeg': {
+// 			const wasmFile = await fetch(JPEG_DEC_WASM);
+// 			const wasmArrayBuffer = await wasmFile.arrayBuffer();
+// 			const wasmModule = new WebAssembly.Module(wasmArrayBuffer);
 
-			await initDecJpeg(wasmModule);
-			return decodeJpeg(buffer);
-		}
-		case 'avif': {
-			const wasmFile = await fetch(AVIF_DEC_WASM);
-			const wasmArrayBuffer = await wasmFile.arrayBuffer();
-			const wasmModule = new WebAssembly.Module(wasmArrayBuffer);
+// 			await initDecJpeg(wasmModule);
+// 			return decodeJpeg(buffer);
+// 		}
+// 		case 'avif': {
+// 			const wasmFile = await fetch(AVIF_DEC_WASM);
+// 			const wasmArrayBuffer = await wasmFile.arrayBuffer();
+// 			const wasmModule = new WebAssembly.Module(wasmArrayBuffer);
 
-			await initDecAvif(wasmModule);
-			return decodeAvif(buffer);
-		}
-		case 'webp': {
-			const wasmFile = await fetch(WEBP_DEC_WASM);
-			const wasmArrayBuffer = await wasmFile.arrayBuffer();
-			const wasmModule = new WebAssembly.Module(wasmArrayBuffer);
+// 			await initDecAvif(wasmModule);
+// 			return decodeAvif(buffer);
+// 		}
+// 		case 'webp': {
+// 			const wasmFile = await fetch(WEBP_DEC_WASM);
+// 			const wasmArrayBuffer = await wasmFile.arrayBuffer();
+// 			const wasmModule = new WebAssembly.Module(wasmArrayBuffer);
 
-			await initDecWebp(wasmModule);
-			return decodeWebp(buffer);
-		}
-		case 'jpg': {
-			const wasmFile = await fetch(JXL_DEC_WASM);
-			const wasmArrayBuffer = await wasmFile.arrayBuffer();
-			const wasmModule = new WebAssembly.Module(wasmArrayBuffer);
+// 			await initDecWebp(wasmModule);
+// 			return decodeWebp(buffer);
+// 		}
+// 		case 'jpg': {
+// 			const wasmFile = await fetch(JXL_DEC_WASM);
+// 			const wasmArrayBuffer = await wasmFile.arrayBuffer();
+// 			const wasmModule = new WebAssembly.Module(wasmArrayBuffer);
 
-			await initDecJpg(wasmModule);
-			return decodeJpg(buffer);
-		}
-		case 'png': {
-			const wasmFile = await fetch(PNG_DEC_WASM);
-			const wasmArrayBuffer = await wasmFile.arrayBuffer();
-			const wasmModule = new WebAssembly.Module(wasmArrayBuffer);
+// 			await initDecJpg(wasmModule);
+// 			return decodeJpg(buffer);
+// 		}
+// 		case 'png': {
+// 			const wasmFile = await fetch(PNG_DEC_WASM);
+// 			const wasmArrayBuffer = await wasmFile.arrayBuffer();
+// 			const wasmModule = new WebAssembly.Module(wasmArrayBuffer);
 
-			await initDecPng(wasmModule);
-			return decodePng(buffer);
-		}
+// 			await initDecPng(wasmModule);
+// 			return decodePng(buffer);
+// 		}
 
-		default:
-			break;
-	}
-};
+// 		default:
+// 			break;
+// 	}
+// };
 
 export const POST = async ({ fetch }) => {
 	return json({ success: false, message: 'Not implemented' });
