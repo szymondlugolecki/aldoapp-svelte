@@ -177,8 +177,13 @@ const fetchMostBought = async () => {
 // 	return favoriteProducts;
 // };
 
-// import wasmModule from '@jsquash/webp/codec/dec/webp_dec.wasm?module';
-// console.log('wasmModule', typeof wasmModule, wasmModule);
+import wasmModuleInit from '$lib/assets/codecs/webp_dec.wasm?init';
+import wasmModuleURL from '$lib/assets/codecs/webp_enc.wasm?url';
+import wasmModule from '$lib/assets/codecs/webp_enc.wasm?module';
+
+console.log('wasmModuleURL', typeof wasmModuleURL, wasmModuleURL);
+console.log('wasmModule', typeof wasmModule, wasmModule);
+
 // console.log(wasmModule.default, Object.keys(wasmModule));
 
 export const load = async ({ fetch }) => {
@@ -186,6 +191,11 @@ export const load = async ({ fetch }) => {
 	// @ Most bought
 	// @ Recently ordered
 	// @ Favorite products - No need to cache this
+
+	const instance = await wasmModuleInit();
+	console.log('instance');
+
+	const { exports } = (await WebAssembly.instantiate(wasmModule)) as any;
 
 	// const name = '1780-W25';
 	// const extension = 'jpg';

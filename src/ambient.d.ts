@@ -1,4 +1,19 @@
-declare module '$lib/assets/*' {
+declare module '$lib/assets/*.wasm?init' {
+	const initWasm: (options?: WebAssembly.Imports) => Promise<WebAssembly.Instance>;
+	export default initWasm;
+}
+
+declare module '$lib/assets/*.wasm?url' {
+	const src: string;
+	export default src;
+}
+
+declare module '*.wasm?module' {
+	const module: WebAssembly.Module;
+	export default module;
+}
+
+declare module '$lib/assets/*.[png|jpg|jpeg|webp|avif]' {
 	const image: Record<string, any>[];
 	export default image;
 }
