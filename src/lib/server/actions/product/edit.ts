@@ -9,7 +9,6 @@ import { productsTable, type SelectProduct } from '$lib/server/db/schemas/produc
 import { eq } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { put } from '@vercel/blob';
-import { env } from '$env/dynamic/private';
 import { zod } from 'sveltekit-superforms/adapters';
 import { utapi } from '$lib/server/clients/uploadthing';
 
@@ -20,6 +19,9 @@ import AVIF_DEC_WASM from '@jsquash/avif/codec/dec/avif_dec.wasm?url';
 import JXL_DEC_WASM from '@jsquash/jxl/codec/dec/jxl_dec.wasm?url';
 import PNG_DEC_WASM from '@jsquash/png/codec/pkg/squoosh_png_bg.wasm?url';
 import WEBP_DEC_WASM from '@jsquash/webp/codec/dec/webp_dec.wasm?url';
+
+// import { env } from '$env/dynamic/private'
+// env.NODE_ENV === 'development'
 
 import encode, { init as jpegEncInit } from '@jsquash/jpeg/encode';
 import decodeJpeg, { init as initDecJpeg } from '@jsquash/jpeg/decode';

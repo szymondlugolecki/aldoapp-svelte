@@ -72,7 +72,7 @@
 						{/if}
 					</form>
 				{:else}
-					<Button class="p-0 xxs:py-2 xxs:px-4" variant="default" disabled>Zaloguj się</Button>
+					<Button disabled class="p-0 px-2 xxs:py-2 xxs:px-4" variant="default">Zaloguj się</Button>
 				{/if}
 			</Card.Footer>
 		</Card.Root>

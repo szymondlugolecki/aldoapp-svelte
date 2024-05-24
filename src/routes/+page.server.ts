@@ -177,11 +177,38 @@ const fetchMostBought = async () => {
 // 	return favoriteProducts;
 // };
 
-export const load = async () => {
+// import wasmModule from '@jsquash/webp/codec/dec/webp_dec.wasm?module';
+// console.log('wasmModule', typeof wasmModule, wasmModule);
+// console.log(wasmModule.default, Object.keys(wasmModule));
+
+export const load = async ({ fetch }) => {
 	// Hit the redis cache to see if we have these
 	// @ Most bought
 	// @ Recently ordered
 	// @ Favorite products - No need to cache this
+
+	// const name = '1780-W25';
+	// const extension = 'jpg';
+	// const type = `image/${extension}`;
+
+	// // Fetch the image
+	// const response = await fetch(`/pasze/${name}.${extension}`);
+	// if (!response.ok) {
+	// 	console.error('No image found');
+	// }
+
+	// console.log('type', type);
+
+	// const image = new File([await response.arrayBuffer()], name);
+
+	// const { instance, module } = await WebAssembly.instantiateStreaming(wasmModule);
+
+	// console.log('module exist?', module, Object.keys(module));
+	// console.log('instance exist?', instance, Object.keys(instance));
+
+	// const decodedImg = await module.decode(image);
+
+	// console.log('decodedImg', decodedImg.length);
 
 	// Fetching from cache/db
 	const [recentlyOrdered, mostBought] = await Promise.all([

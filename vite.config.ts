@@ -19,6 +19,7 @@ export default defineConfig({
 	// 			  }
 	// 			: undefined
 	// },
+	assetsInclude: ['**/*.wasm', '**/*.wasm?url'],
 	optimizeDeps: {
 		exclude: [
 			'@jsquash/png',
