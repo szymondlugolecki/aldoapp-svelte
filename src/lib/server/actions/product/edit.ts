@@ -8,17 +8,24 @@ import { setError, setMessage, superValidate, fail } from 'sveltekit-superforms'
 import { productsTable, type SelectProduct } from '$lib/server/db/schemas/products';
 import { eq } from 'drizzle-orm';
 import { db } from '$lib/server/db';
-import { put } from '@vercel/blob';
 import { zod } from 'sveltekit-superforms/adapters';
 import { utapi } from '$lib/server/clients/uploadthing';
 
-import JPEG_ENC_WASM from '$lib/assets/codecs/mozjpeg_enc_codec.wasm?url';
+import JPEG_ENC_WASM from '@jsquash/jpeg/codec/enc/mozjpeg_enc.wasm?url';
 
-import JPEG_DEC_WASM from '$lib/assets/codecs/mozjpeg_dec_codec.wasm?url';
-import AVIF_DEC_WASM from '$lib/assets/codecs/avif_dec_codec.wasm?url';
-import JXL_DEC_WASM from '$lib/assets/codecs/jxl_dec_codec.wasm?url';
-import PNG_DEC_WASM from '$lib/assets/codecs/png_codec.wasm?url';
-import WEBP_DEC_WASM from '$lib/assets/codecs/webp_dec_codec.wasm?url';
+import JPEG_DEC_WASM from '@jsquash/jpeg/codec/dec/mozjpeg_dec.wasm?url';
+import AVIF_DEC_WASM from '@jsquash/avif/codec/dec/avif_dec.wasm?url';
+import JXL_DEC_WASM from '@jsquash/jxl/codec/dec/jxl_dec.wasm?url';
+import PNG_DEC_WASM from '@jsquash/png/codec/pkg/squoosh_png_bg.wasm?url';
+import WEBP_DEC_WASM from '@jsquash/webp/codec/dec/webp_dec.wasm?url';
+
+// import JPEG_ENC_WASM from '$lib/assets/codecs/mozjpeg_enc_codec.wasm?url';
+
+// import JPEG_DEC_WASM from '$lib/assets/codecs/mozjpeg_dec_codec.wasm?url';
+// import AVIF_DEC_WASM from '$lib/assets/codecs/avif_dec_codec.wasm?url';
+// import JXL_DEC_WASM from '$lib/assets/codecs/jxl_dec_codec.wasm?url';
+// import PNG_DEC_WASM from '$lib/assets/codecs/png_codec.wasm?url';
+// import WEBP_DEC_WASM from '$lib/assets/codecs/webp_dec_codec.wasm?url';
 
 // import { env } from '$env/dynamic/private'
 // env.NODE_ENV === 'development'
@@ -96,7 +103,6 @@ const edit: Action = async ({ request, locals, fetch }) => {
 		redirect(303, '/zaloguj');
 		// error(...getCustomError('not-logged-in'));;
 	}
-
 	if (!isAtLeastModerator(sessionUser.role)) {
 		error(...getCustomError('insufficient-permissions'));
 	}

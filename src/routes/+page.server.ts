@@ -177,12 +177,12 @@ const fetchMostBought = async () => {
 // 	return favoriteProducts;
 // };
 
-import wasmModuleInit from '$lib/assets/codecs/webp_dec_codec.wasm?init';
-import wasmModuleURL from '$lib/assets/codecs/webp_enc_codec.wasm?url';
-import wasmModule from '$lib/assets/codecs/webp_enc_codec.wasm?module';
+// import wasmModuleInit from '$lib/assets/codecs/webp_dec_codec.wasm?init';
+// import wasmModuleURL from '$lib/assets/codecs/webp_enc_codec.wasm?url';
+// import wasmModule from '$lib/assets/codecs/webp_enc_codec.wasm?module';
 
-console.log('wasmModuleURL', typeof wasmModuleURL, wasmModuleURL);
-console.log('wasmModule', typeof wasmModule, wasmModule);
+// console.log('wasmModuleURL', typeof wasmModuleURL, wasmModuleURL);
+// console.log('wasmModule', typeof wasmModule, wasmModule);
 
 // console.log(wasmModule.default, Object.keys(wasmModule));
 
@@ -192,10 +192,10 @@ export const load = async ({ fetch }) => {
 	// @ Recently ordered
 	// @ Favorite products - No need to cache this
 
-	const instance = await wasmModuleInit();
-	console.log('instance');
+	// const instance = await wasmModuleInit();
+	// console.log('instance');
 
-	const { exports } = (await WebAssembly.instantiate(wasmModule)) as any;
+	// const { exports } = (await WebAssembly.instantiate(wasmModule)) as any;
 
 	// const name = '1780-W25';
 	// const extension = 'jpg';

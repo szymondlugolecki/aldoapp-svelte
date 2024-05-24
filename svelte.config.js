@@ -7,7 +7,7 @@ import sequence from 'svelte-sequential-preprocessor'
 const config = {
 	// Consult https://kit.svelte.dev/docs/integrations#preprocessors
 	// for more information about preprocessors
-	
+
 	preprocess: sequence([
 		// ... other preprocessors
 		vitePreprocess(),
@@ -16,7 +16,8 @@ const config = {
 	kit: {
 		adapter: adapter({
 			runtime: 'edge',
-			regions: ['fra1']
+			regions: ['fra1'],
+			external: ['@jsquash/jpeg', '@jsquash/avif', '@jsquash/webp', '@jsquash/jxl', '@jsquash/png']
 		}),
 		alias: {
 			'$components/*': 'src/components/*',
