@@ -177,9 +177,9 @@ const fetchMostBought = async () => {
 // 	return favoriteProducts;
 // };
 
-import wasmModuleInit from '$lib/assets/codecs/webp_dec.wasm?init';
-import wasmModuleURL from '$lib/assets/codecs/webp_enc.wasm?url';
-import wasmModule from '$lib/assets/codecs/webp_enc.wasm?module';
+import wasmModuleInit from '$lib/assets/codecs/webp_dec_codec.wasm?init';
+import wasmModuleURL from '$lib/assets/codecs/webp_enc_codec.wasm?url';
+import wasmModule from '$lib/assets/codecs/webp_enc_codec.wasm?module';
 
 console.log('wasmModuleURL', typeof wasmModuleURL, wasmModuleURL);
 console.log('wasmModule', typeof wasmModule, wasmModule);
