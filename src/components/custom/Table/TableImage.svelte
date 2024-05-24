@@ -4,6 +4,6 @@
 	export let alt: string;
 </script>
 
-<a target="_blank" {href} class="aspect-3/4 w-fit">
-	<img src={imgSrc} {alt} height="96px" width="72px" class="aspect-3/4" />
+<a target="_blank" {href} class="aspect-2/3 w-fit">
+	<img src={imgSrc} {alt} height="96px" width="72px" class="aspect-2/3" />
 </a>

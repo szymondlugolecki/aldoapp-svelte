@@ -197,9 +197,10 @@ const changeOrderStatus = (async ({ request, locals }) => {
 
 	const orderedByAdvisorForCustomer = oldOrder.customer.id !== oldOrder.cartOwner.id;
 
+	// ! sending the email to the adviser for now
 	const [, sendEmailError] = await trytm(
 		sendOrderStatusEmail({
-			to: [oldOrder.customer.email],
+			to: [oldOrder.cartOwner.email],
 			from: 'Zamówienia <admin@twojealdo.pl>',
 			props: {
 				orderId: oldOrder.id,

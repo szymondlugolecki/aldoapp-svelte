@@ -8,6 +8,7 @@
 	import { superForm } from 'sveltekit-superforms/client';
 	import { toast } from 'svelte-sonner';
 	import { parsePLN } from '$lib/client/functions/index.js';
+	import { Image } from '@unpic/svelte';
 
 	export let data;
 
@@ -42,11 +43,17 @@
 			<Card.Content>
 				<div class="overflow-hidden rounded-md">
 					<a href={`/sklep/${product.encodedURL}`}>
-						<img
+						<Image
+							src={product.image || '/product-placeholder.webp'}
+							layout="fullWidth"
+							alt="Zdjęcie produktu"
+						/>
+
+						<!-- <img
 							src={product.image}
 							alt="Zdjęcie produktu"
 							class="scale-[1] object-cover hover:scale-[1.025] duration-150 max-h-[552px]"
-						/>
+						/> -->
 					</a>
 				</div>
 			</Card.Content>

@@ -105,9 +105,10 @@ export const createNewOrder = async ({
 		year: 'numeric'
 	});
 
+	// ! sending the email to the adviser for now
 	//  Email sending logic
 	await sendOrderCreatedEmail({
-		to: [customer.email],
+		to: [cartOwner.email],
 		from: 'Zamówienia <admin@twojealdo.pl>',
 		props: {
 			orderId: order.id,

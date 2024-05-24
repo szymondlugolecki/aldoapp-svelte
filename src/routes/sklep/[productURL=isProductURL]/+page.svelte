@@ -36,7 +36,7 @@
 <section class="max-w-2xl px-4 pt-4 mx-auto lg:max-w-6xl sm:px-0 pb-14">
 	<div class="grid lg:grid-cols-2 lg:gap-x-8 gap-y-4 lg:items-start">
 		<!-- Images -->
-		<div class="max-w-md overflow-hidden rounded-md aspect-3/4">
+		<div class="max-w-md overflow-hidden rounded-md aspect-2/3">
 			<a href="/sklep/{data.product.encodedURL}">
 				<div class="">
 					<img src={data.product.image} alt={data.product.name} />

@@ -13,7 +13,81 @@ import { env } from '$env/dynamic/private';
 import { zod } from 'sveltekit-superforms/adapters';
 import { utapi } from '$lib/server/clients/uploadthing';
 
-const edit: Action = async ({ request, locals }) => {
+import JPEG_ENC_WASM from '@jsquash/jpeg/codec/enc/mozjpeg_enc.wasm?url';
+
+import JPEG_DEC_WASM from '@jsquash/jpeg/codec/dec/mozjpeg_dec.wasm?url';
+import AVIF_DEC_WASM from '@jsquash/avif/codec/dec/avif_dec.wasm?url';
+import JXL_DEC_WASM from '@jsquash/jxl/codec/dec/jxl_dec.wasm?url';
+import PNG_DEC_WASM from '@jsquash/png/codec/pkg/squoosh_png_bg.wasm?url';
+import WEBP_DEC_WASM from '@jsquash/webp/codec/dec/webp_dec.wasm?url';
+
+import encode, { init as jpegEncInit } from '@jsquash/jpeg/encode';
+import decodeJpeg, { init as initDecJpeg } from '@jsquash/jpeg/decode';
+import decodeAvif, { init as initDecAvif } from '@jsquash/avif/decode';
+import decodeWebp, { init as initDecWebp } from '@jsquash/webp/decode';
+import decodeJpg, { init as initDecJpg } from '@jsquash/jxl/decode';
+import decodePng, { init as initDecPng } from '@jsquash/png/decode';
+
+import Jimp from 'jimp';
+
+type ImageType = 'avif' | 'jpeg' | 'jpg' | 'png' | 'webp';
+type SvelteKitFetch = (
+	input: URL | RequestInfo,
+	init?: RequestInit | undefined
+) => Promise<Response>;
+
+const decode = async (image: Blob, fetch: SvelteKitFetch) => {
+	const buffer = await image.arrayBuffer();
+	const imageType = image.type.split('/')[1] as ImageType;
+
+	switch (imageType) {
+		case 'jpeg': {
+			const wasmFile = await fetch(JPEG_DEC_WASM);
+			const wasmArrayBuffer = await wasmFile.arrayBuffer();
+			const wasmModule = new WebAssembly.Module(wasmArrayBuffer);
+
+			await initDecJpeg(wasmModule);
+			return decodeJpeg(buffer);
+		}
+		case 'avif': {
+			const wasmFile = await fetch(AVIF_DEC_WASM);
+			const wasmArrayBuffer = await wasmFile.arrayBuffer();
+			const wasmModule = new WebAssembly.Module(wasmArrayBuffer);
+
+			await initDecAvif(wasmModule);
+			return decodeAvif(buffer);
+		}
+		case 'webp': {
+			const wasmFile = await fetch(WEBP_DEC_WASM);
+			const wasmArrayBuffer = await wasmFile.arrayBuffer();
+			const wasmModule = new WebAssembly.Module(wasmArrayBuffer);
+
+			await initDecWebp(wasmModule);
+			return decodeWebp(buffer);
+		}
+		case 'jpg': {
+			const wasmFile = await fetch(JXL_DEC_WASM);
+			const wasmArrayBuffer = await wasmFile.arrayBuffer();
+			const wasmModule = new WebAssembly.Module(wasmArrayBuffer);
+
+			await initDecJpg(wasmModule);
+			return decodeJpg(buffer);
+		}
+		case 'png': {
+			const wasmFile = await fetch(PNG_DEC_WASM);
+			const wasmArrayBuffer = await wasmFile.arrayBuffer();
+			const wasmModule = new WebAssembly.Module(wasmArrayBuffer);
+
+			await initDecPng(wasmModule);
+			return decodePng(buffer);
+		}
+
+		default:
+			break;
+	}
+};
+
+const edit: Action = async ({ request, locals, fetch }) => {
 	const sessionUser = locals.user;
 	// Must be a moderator or higher
 	if (!sessionUser) {
@@ -56,27 +130,32 @@ const edit: Action = async ({ request, locals }) => {
 
 	if (image) {
 		// One image per product is enough for now
-
-		// Vercel Blob
-		// try {
-		// 	const fileBuffer = await image.arrayBuffer();
-		// 	const { url } = await put(image.name, fileBuffer, {
-		// 		token: env.BLOB_READ_WRITE_TOKEN,
-		// 		access: 'public'
-		// 	});
-
-		// 	console.log('url', url);
-		// 	imageUrl = url;
-		// } catch (error) {
-		// 	// Unexpected-error
-		// 	console.error('addProductImageError', error);
-		// 	return setError(form, 'Błąd serwera podczas dodawania zdjęcia', { status: 500 });
-		// }
-
 		// Uploadthing
 		try {
-			const fileBuffer = await image.arrayBuffer();
-			const newFile = new File([fileBuffer], image.name);
+			// Resize the image
+			const arrBuffer = await image.arrayBuffer();
+			const jimpImg = await Jimp.read(Buffer.from(arrBuffer));
+			jimpImg.resize(500, 750);
+			const resizedImageBuffer = await jimpImg.getBufferAsync(jimpImg.getMIME());
+			const imageResized = new File([resizedImageBuffer], image.name, { type: jimpImg.getMIME() });
+
+			// Decode the image
+			const imageData = await decode(imageResized, fetch);
+			if (!imageData) {
+				throw new Error('No image data');
+			}
+
+			// Fetch encoding module
+			const responseEnc = await fetch(JPEG_ENC_WASM);
+			const wasmEncArrayBuffer = await responseEnc.arrayBuffer();
+			const wasmEncModule = new WebAssembly.Module(wasmEncArrayBuffer);
+
+			// Encode the image to JPEG
+			await jpegEncInit(wasmEncModule);
+			const compressedImageBuffer = await encode(imageData, { quality: 75 }); // jpeg
+
+			// Create a new File from the compressed image buffer & upload it
+			const newFile = new File([compressedImageBuffer], image.name);
 			const { data, error } = await utapi.uploadFiles(newFile);
 
 			if (error) {
