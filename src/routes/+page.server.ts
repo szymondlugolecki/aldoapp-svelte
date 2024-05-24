@@ -179,12 +179,15 @@ const fetchMostBought = async () => {
 
 // import wasmModuleInit from '$lib/assets/codecs/webp_dec_codec.wasm?init';
 // import wasmModuleURL from '$lib/assets/codecs/webp_enc_codec.wasm?url';
-// import wasmModule from '$lib/assets/codecs/webp_enc_codec.wasm?module';
+// import wasmPath from '@jsquash/jpeg/codec/dec/jpeg_dec.wasm?module';
+// import decodeJpeg, { init } from '@jsquash/jpeg/decode';
 
 // console.log('wasmModuleURL', typeof wasmModuleURL, wasmModuleURL);
-// console.log('wasmModule', typeof wasmModule, wasmModule);
+// console.log('wasmPath', typeof wasmPath, wasmPath);
 
-// console.log(wasmModule.default, Object.keys(wasmModule));
+// console.log(Object.keys(wasmPath));
+
+// import JPEG_DEC_WASM from '@jsquash/jpeg/codec/dec/mozjpeg_dec.wasm?module';
 
 export const load = async ({ fetch }) => {
 	// Hit the redis cache to see if we have these
@@ -192,11 +195,30 @@ export const load = async ({ fetch }) => {
 	// @ Recently ordered
 	// @ Favorite products - No need to cache this
 
+	// const response = await fetch(JPEG_DEC_WASM);
+	// const wasmArrayBuffer = await response.arrayBuffer();
+	// const wasmModule = new WebAssembly.Module(wasmArrayBuffer);
+
+	// await init(wasmModule);
+
+	// const image = await fetch('/pasze/0718.jpg')
+	// 	.then((res) => res.arrayBuffer())
+	// 	.then(decodeJpeg);
+
+	// console.log('image', image);
+
 	// const instance = await wasmModuleInit();
 	// console.log('instance');
 
-	// const { exports } = (await WebAssembly.instantiate(wasmModule)) as any;
+	// const wasmFileBuffer = await wasmFile.arrayBuffer();
+	// const wasmModule = new WebAssembly.Module(wasmFileBuffer);
 
+	// const { module, instance } = await WebAssembly.instantiateStreaming(
+	// 	fetch(wasmPath),
+
+	// );
+	// console.log('instance', instance);
+	// console.log('module', module);
 	// const name = '1780-W25';
 	// const extension = 'jpg';
 	// const type = `image/${extension}`;
