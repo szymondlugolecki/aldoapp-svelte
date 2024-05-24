@@ -100,6 +100,17 @@
 	// 	console.log('Response', json);
 	// }
 
+	// async function compressAllImages() {
+	// 	const response = await fetch('/api/uploadimages', {
+	// 		method: 'POST',
+	// 		headers: {
+	// 			'content-type': 'application/json'
+	// 		}
+	// 	});
+	// 	const json = await response.json();
+	// 	console.log('Response', json);
+	// }
+
 	export let data;
 
 	const categoryToUrl = (category: string) => {
@@ -211,6 +222,10 @@
 <!-- <a href="https://github.com/ciscoheat/sveltekit-rate-limiter">ratelimiter</a>
 <button on:click={removeAllOrders} class="px-3 py-2 text-lg text-white bg-gray-800"
 	>Usun zamowienia</button
+> -->
+
+<!-- <button on:click={compressAllImages} class="px-3 py-2 text-lg text-white bg-gray-800"
+	>Skompresuj zdjecia</button
 > -->
 
 <!-- <button on:click={removeAllProducts} class="px-3 py-2 text-lg text-white bg-gray-800"

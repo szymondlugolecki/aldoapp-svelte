@@ -48,7 +48,7 @@
 	{#each products as product}
 		{#if $delayed && $formId === product.id.toString()}
 			<li class="flex p-6 gap-x-6">
-				<div class="w-16 aspect-3/4">
+				<div class="w-16 aspect-2/3">
 					<Skeleton class="w-full h-full" />
 				</div>
 				<div class="flex flex-col flex-1 text-sm">
@@ -77,7 +77,7 @@
 		{:else}
 			<li class="flex p-6 gap-x-6">
 				<a href="/sklep/{product.encodedURL}">
-					<div class="w-16 overflow-hidden aspect-3/4">
+					<div class="w-16 overflow-hidden aspect-2/3">
 						<img
 							src={product.image}
 							alt={product.name}

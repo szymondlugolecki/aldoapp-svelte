@@ -16,7 +16,7 @@
 					<Carousel.Item class="basis-full min-[500px]:basis-1/2 md:basis-1/3">
 						<a href="/sklep/{product.encodedURL}" class="select-none">
 							<div class="flex flex-col gap-y-1">
-								<div class="overflow-hidden rounded-lg aspect-3/4">
+								<div class="overflow-hidden rounded-lg aspect-2/3">
 									<img
 										src={product.image}
 										alt={product.name}

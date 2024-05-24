@@ -29,7 +29,7 @@ import { productsTable, type InsertProduct } from './schemas/products';
 const client = createClient({ url: DATABASE_URL, authToken: DATABASE_SECRET });
 
 export const db = drizzle(client, {
-	logger: true,
+	// logger: true,
 	schema: {
 		...sessions,
 		...users,

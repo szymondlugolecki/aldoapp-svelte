@@ -78,7 +78,6 @@ const config = {
 	},
 	plugins: [
 		typography,
-		require('daisyui'),
 		require('tailwindcss-animate'),
 		plugin(function ({ addVariant, matchUtilities, theme }) {
 			addVariant('hocus', ['&:hover', '&:focus']);

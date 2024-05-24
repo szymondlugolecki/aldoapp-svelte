@@ -110,7 +110,7 @@
 		</Dialog.Trigger>
 	{:else if product.image}
 		<Dialog.Trigger class="flex items-center justify-center p-0">
-			<div class="h-20 overflow-hidden rounded-lg aspect-3/4">
+			<div class="h-20 overflow-hidden rounded-lg aspect-2/3">
 				<img src={product.image} alt="" class="object-cover object-center w-full h-full" />
 			</div>
 		</Dialog.Trigger>

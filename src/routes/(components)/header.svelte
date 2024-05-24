@@ -40,8 +40,10 @@
 			<nav class="relative flex items-center justify-between w-full">
 				<!-- Logo -->
 				<div class="flex">
-					<a href="/" class="text-lg normal-case btn btn-ghost sm:text-xl"
-						><span class="mr-2">Twoje</span>
+					<a
+						href="/"
+						class="flex items-center h-12 min-h-[3rem] px-4 text-lg font-semibold normal-case duration-100 rounded-md hover:bg-muted gap-x-2 sm:text-xl"
+						><span>Twoje</span>
 						<!-- <Img src={logo} height={40} width={55} alt="Logo ALDO" /> -->
 						<Image meta={logo} alt="ALDO" sizes="55px" />
 					</a>
