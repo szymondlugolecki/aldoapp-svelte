@@ -2,8 +2,8 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
 import { imagetools } from 'vite-imagetools';
 // import fs from 'fs';
-import wasm from 'vite-plugin-wasm';
-import topLevelAwait from 'vite-plugin-top-level-await';
+// import wasm from 'vite-plugin-wasm';
+// import topLevelAwait from 'vite-plugin-top-level-await';
 
 export default defineConfig({
 	define: {
@@ -19,7 +19,7 @@ export default defineConfig({
 	// 			  }
 	// 			: undefined
 	// },
-	assetsInclude: ['**/*.wasm', '**/*.wasm?url'],
+	assetsInclude: ['**/*.wasm', '**/*.wasm?url', '**/*.wasm?module'],
 	optimizeDeps: {
 		exclude: [
 			'@jsquash/png',
@@ -30,8 +30,9 @@ export default defineConfig({
 			'@syntect/wasm'
 		]
 	},
-	plugins: [sveltekit(), wasm(), imagetools(), topLevelAwait()],
+	plugins: [sveltekit(), imagetools()],
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts,wasm}']
 	}
 });
+// wasm() , topLevelAwait()
