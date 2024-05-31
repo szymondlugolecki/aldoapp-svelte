@@ -38,7 +38,7 @@ import WEBP_DEC_WASM from '$lib/assets/codecs/webp_dec_codec.wasm?module';
 // import { env } from '$env/dynamic/private'
 // env.NODE_ENV === 'development'
 
-import encode, { init as jpegEncInit } from '@jsquash/jpeg/encode';
+import encodeJpeg, { init as initEncJpeg } from '@jsquash/jpeg/encode';
 import decodeJpeg, { init as initDecJpeg } from '@jsquash/jpeg/decode';
 import decodeAvif, { init as initDecAvif } from '@jsquash/avif/decode';
 import decodeWebp, { init as initDecWebp } from '@jsquash/webp/decode';
@@ -167,8 +167,8 @@ const edit: Action = async ({ request, locals, fetch }) => {
 			const wasmEncModule = new WebAssembly.Module(wasmEncArrayBuffer);
 
 			// Encode the image to JPEG
-			await jpegEncInit(wasmEncModule);
-			const compressedImageBuffer = await encode(imageData, { quality: 75 }); // jpeg
+			await initEncJpeg(wasmEncModule);
+			const compressedImageBuffer = await encodeJpeg(imageData, { quality: 75 }); // jpeg
 
 			// Create a new File from the compressed image buffer & upload it
 			const newFile = new File([compressedImageBuffer], image.name);

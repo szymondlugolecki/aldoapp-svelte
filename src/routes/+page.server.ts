@@ -180,20 +180,28 @@ const fetchMostBought = async () => {
 // import wasmModuleInit from '$lib/assets/codecs/webp_dec_codec.wasm?init';
 // import wasmModuleURL from '$lib/assets/codecs/webp_enc_codec.wasm?url';
 // import wasmPath from '@jsquash/jpeg/codec/dec/jpeg_dec.wasm?module';
-// import decodeJpeg, { init } from '@jsquash/jpeg/decode';
+// import decodeJpegScript from '@jsquash/jpeg/codec/dec/mozjpeg_dec.js';
 
 // console.log('wasmModuleURL', typeof wasmModuleURL, wasmModuleURL);
 // console.log('wasmPath', typeof wasmPath, wasmPath);
 
 // console.log(Object.keys(wasmPath));
 
-// import JPEG_DEC_WASM from '@jsquash/jpeg/codec/dec/mozjpeg_dec.wasm?module';
+// Hit the redis cache to see if we have these
+// @ Most bought
+// @ Recently ordered
+// @ Favorite products - No need to cache this
+
+// import JPEG_DEC_WASM from '$lib/assets/codecs/mozjpeg_dec_codec.wasm?module';
+
+// console.log('\n\n\nJPEG_DEC_WASM\n\n\n', JPEG_DEC_WASM);
 
 export const load = async ({ fetch }) => {
-	// Hit the redis cache to see if we have these
-	// @ Most bought
-	// @ Recently ordered
-	// @ Favorite products - No need to cache this
+	// const image = await fetch('/pasze/0718.jpg')
+	// 	.then((res) => res.arrayBuffer())
+	// 	.then(instance.exports.decode);
+
+	// console.log('result', result);
 
 	// const response = await fetch(JPEG_DEC_WASM);
 	// const wasmArrayBuffer = await response.arrayBuffer();
