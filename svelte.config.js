@@ -17,7 +17,6 @@ const config = {
 		adapter: adapter({
 			runtime: 'edge',
 			regions: ['fra1'],
-			// external: ['@jsquash/jpeg', '@jsquash/avif', '@jsquash/webp', '@jsquash/jxl', '@jsquash/png']
 		}),
 		alias: {
 			'$components/*': 'src/components/*',

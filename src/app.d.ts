@@ -23,25 +23,8 @@ declare global {
 			session: import('lucia').Session | null;
 		}
 
-		// interface Locals {
-		// 	session?: {
-		// 		user: SessionUser;
-		// 		expires: Date;
-		// 	} | null;
-		// 	updateData?: unknown;
-		// }
-		// interface PageData {
-		// 	user: SessionUser | undefined;
-		// }
-
 		interface WindowEventMap {
 			beforeinstallprompt: BeforeInstallPromptEvent;
-		}
-	}
-
-	declare namespace svelteHTML {
-		interface HTMLAttributes<T> {
-			'on:outside_click'?: CompositionEventHandler<T>;
 		}
 	}
 }

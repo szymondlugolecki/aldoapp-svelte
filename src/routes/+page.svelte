@@ -1,7 +1,4 @@
 <script lang="ts">
-	import toast from 'svelte-french-toast';
-	// import ___ASSET___0 from '$lib/assets/bg1.png';
-	// import { Image } from '@unpic/svelte';
 	import Image from '$components/custom/Util/Image.svelte';
 	// import BackgroundImage from '$lib/assets/bg3.png?w=1500&format=avif;webp;jpg&as=picture';
 	import BackgroundImage from '$lib/assets/farm_animals.png?w=1000&format=avif;webp;jpg&as=picture';
@@ -146,7 +143,7 @@
 				<h1
 					class="flex items-center justify-center text-4xl font-bold tracking-tight sm:text-6xl gap-x-4"
 				>
-					Twoje <Image meta={logo} alt="ALDO" sizes="140px" />
+					Twoje <Image meta={logo} loading="eager" alt="ALDO" sizes="140px" />
 				</h1>
 
 				<p class="text-base font-semibold text-center sm:text-xl">w telefonie i komputerze</p>
@@ -203,7 +200,7 @@
 										class="w-full h-full max-h-screen brightness-[.75] object-cover object-center hover:scale-110 transition-transform"
 										loading="lazy"
 										meta={categoryPictures[category]}
-										alt={label}
+										alt="Zdjęcie kategorii {label}"
 									/>
 								</div>
 							</a>
