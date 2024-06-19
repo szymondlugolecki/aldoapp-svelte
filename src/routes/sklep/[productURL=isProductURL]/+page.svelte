@@ -1,28 +1,15 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { fodderCategories2, fodderNames, producentsList } from '$lib/client/constants';
+	import { fodderNames, producentsList } from '$lib/client/constants';
 	import * as Alert from '$shadcn/alert';
-	// import AlertTitle from '$shadcn/alert/AlertTitle.svelte';
-	// import AlertDescription from '$shadcn/alert/AlertDescription.svelte';
 	import { Button } from '$shadcn/button';
-	import { Separator } from '$shadcn/separator';
-	import {
-		CornerDownLeft,
-		Heart,
-		Package,
-		PlusCircle,
-		ScanBarcode,
-		ShoppingBag,
-		ShoppingCart
-	} from 'lucide-svelte';
+	import { Package, ShoppingBag } from 'lucide-svelte';
 	import toast from 'svelte-french-toast';
 	import type { Subcategory } from '$types';
-	import { newCategoryUrl, newSubcategoryUrl, parsePLN } from '$lib/client/functions/index.js';
-	import { handleFormResponse } from '$lib/client/functions/forms.js';
-	import createLoadingToast from '$lib/client/functions/createLoadingToast.js';
-	import { slide } from 'svelte/transition';
+	import { parsePLN } from '$lib/client/functions/index.js';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { Reload } from 'radix-icons-svelte';
+	// import ErrorMessage from '$components/custom/form/error-message.svelte';
 	import ErrorMessage from '$components/custom/form/error-message.svelte';
 	import Message from '$components/custom/form/message.svelte';
 	import { Image } from '@unpic/svelte';
