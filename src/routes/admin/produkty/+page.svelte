@@ -13,7 +13,6 @@
 	} from '@tanstack/svelte-table';
 	import { writable } from 'svelte/store';
 	import TableHyperlink from '$components/custom/table/table-hyperlink.svelte';
-
 	import AdminAddDialog from './(components)/add-product.svelte';
 
 	import {
