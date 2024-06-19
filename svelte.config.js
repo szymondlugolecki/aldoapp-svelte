@@ -19,9 +19,8 @@ const config = {
 			regions: ['fra1'],
 		}),
 		alias: {
-			'$components/*': 'src/components/*',
-			'$shadcn/*': 'src/components/ui/*',
-			'$lib/*': 'src/lib/*',
+			'$components': 'src/components',
+			'$shadcn': 'src/components/ui',
 			'$types': './src/types',
 			'$routes': './src/routes',
 		},
