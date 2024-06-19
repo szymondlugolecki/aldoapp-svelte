@@ -21,6 +21,7 @@ const config = {
 		alias: {
 			'$components/*': 'src/components/*',
 			'$shadcn/*': 'src/components/ui/*',
+			'$lib/*': 'src/lib/*',
 			'$types': './src/types',
 			'$routes': './src/routes',
 		},
