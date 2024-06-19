@@ -3,6 +3,7 @@
 	import toast from 'svelte-french-toast';
 	import type { DeliveryMethod, OrderStatus, PaymentMethod } from '$lib/client/constants/dbTypes';
 	import { cn, dateParser, flexRender, parseAddress, parsePLN } from '$lib/client/functions';
+
 	import TableHyperlink from '$components/custom/table/table-hyperlink.svelte';
 
 	import {

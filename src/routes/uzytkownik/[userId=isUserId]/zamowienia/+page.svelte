@@ -24,9 +24,9 @@
 		type Updater
 	} from '@tanstack/svelte-table';
 	import { writable } from 'svelte/store';
-	import TableHyperlink from '$components/custom/table/table-hyperlink.svelte';
 	import type { Address } from '$lib/server/db/schemas/orders.js';
 	import * as Sheet from '$shadcn/sheet/index.js';
+	import TableHyperlink from '$components/custom/table/table-hyperlink.svelte';
 
 	import { Filter } from 'lucide-svelte';
 	import { Button, buttonVariants } from '$shadcn/button';
