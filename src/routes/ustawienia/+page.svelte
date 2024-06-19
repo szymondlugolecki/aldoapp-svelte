@@ -2,7 +2,7 @@
 	import * as Form from '$shadcn/form';
 	import { settings$ } from '$lib/client/schemas/index.js';
 	import { Separator } from '$shadcn/separator';
-	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import Spinner from '$components/custom/spinner.svelte';
 
 	// export let data;
 </script>

@@ -23,8 +23,8 @@
 	import { slide } from 'svelte/transition';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { Reload } from 'radix-icons-svelte';
-	import ErrorMessage from '$components/custom/Form/ErrorMessage.svelte';
-	import Message from '$components/custom/Form/Message.svelte';
+	import ErrorMessage from '$components/custom/form/error-message.svelte';
+	import Message from '$components/custom/form/message.svelte';
 	import { Image } from '@unpic/svelte';
 	import { cn } from '$lib/utils.js';
 

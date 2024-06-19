@@ -9,15 +9,15 @@
 	import { buttonVariants } from '$components/ui/button';
 	import { superForm } from 'sveltekit-superforms';
 	import type { EditProductForm } from '$lib/client/schemas/products';
-	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import Spinner from '$components/custom/spinner.svelte';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import * as Select from '$components/ui/select';
 	import SelectCategories from '../../(components)/select-categories-edit.svelte';
 	import SelectProducent from '../../(components)/select-producent.svelte';
 	import { toast } from 'svelte-sonner';
 
-	import EditLayout from '$routes/admin/(components)/edit-layout.svelte';
-	import EditPageNavigationButtons from '$routes/admin/(components)/edit-page-navigation-buttons.svelte';
+	import EditLayout from '../../../(components)/edit-layout.svelte';
+	import EditPageNavigationButtons from '../../../(components)/edit-page-navigation-buttons.svelte';
 	import Separator from '$components/ui/separator/separator.svelte';
 
 	export let data;
@@ -48,6 +48,11 @@
 
 	// const file = fileProxy(form, 'images');
 </script>
+
+<svelte:head>
+	<title>Edytuj produkt • Panel Administracyjny</title>
+	<meta name="description" content="Panel Administracyjny. Edytuj produkt." />
+</svelte:head>
 
 <EditLayout>
 	<h1 class="text-3xl font-extrabold tracking-tight scroll-m-20 lg:text-4xl">Edycja produktu</h1>

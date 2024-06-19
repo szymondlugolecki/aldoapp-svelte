@@ -1,17 +1,10 @@
-// import { db } from '$lib/server/db';
-// import { users } from '$lib/server/db/schemas/users';
-// import { trytm } from '@bdsqqq/try';
-// import { eq } from 'drizzle-orm';
-// import { orders } from '$lib/server/db/schemas/products.js';
-
-// import { isAtLeastModerator } from '$lib/client/functions/index.js';
 import { db } from '$lib/server/db';
 import { trytm } from '@bdsqqq/try';
-// import type { Config } from '@sveltejs/adapter-vercel';
+import type { Config } from '@sveltejs/adapter-vercel';
 
-// export const config: Config = {
-// 	runtime: 'edge'
-// };
+export const config: Config = {
+	runtime: 'edge'
+};
 
 export const load = async ({ locals, url }) => {
 	// depends('session');

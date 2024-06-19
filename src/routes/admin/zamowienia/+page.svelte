@@ -3,7 +3,7 @@
 	import toast from 'svelte-french-toast';
 	import type { DeliveryMethod, OrderStatus, PaymentMethod } from '$lib/client/constants/dbTypes';
 	import { cn, dateParser, flexRender, parseAddress, parsePLN } from '$lib/client/functions';
-	import TableHyperlink from '$components/custom/Table/TableHyperlink.svelte';
+	import TableHyperlink from '$components/custom/table/table-hyperlink.svelte';
 
 	import {
 		createSvelteTable,
@@ -24,7 +24,7 @@
 	import { betterZodParse } from '$lib/client/functions/betterZodParse.js';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import Pagination3 from '$components/custom/Pagination3.svelte';
+	import Pagination from '$components/custom/table/pagination.svelte';
 	import {
 		deliveryMethodsList,
 		orderStatusList,
@@ -158,7 +158,7 @@
 		<Input class="max-w-xl" type="text" placeholder="Wyszukaj..." />
 	</div> -->
 
-	<Pagination3 bind:paginationSettings />
+	<Pagination bind:paginationSettings />
 
 	<Table.Root>
 		<Table.Caption>Lista zamówień</Table.Caption>
@@ -192,5 +192,5 @@
 		</Table.Body>
 	</Table.Root>
 
-	<Pagination3 bind:paginationSettings />
+	<Pagination bind:paginationSettings />
 </section>

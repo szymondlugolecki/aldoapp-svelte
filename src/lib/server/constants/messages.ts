@@ -1,6 +1,5 @@
 import { orderEventsList } from '$lib/client/constants';
 import type { OrderEvent } from '$types';
-import type { PushMessageWithContent } from '../functions/push';
 
 export const pushMessages = {
 	'order-created': {
@@ -24,28 +23,6 @@ export const orderPushMessages: Record<OrderEvent, string> = {
 	PICKED_UP: 'Zamówienie zostało odebrane'
 	// KEEP_WAITING: 'Damy Ci znać, gdy produkty będą dostępne',
 } as const;
-
-export const getPushMessage = (key: keyof typeof pushMessages): PushMessageWithContent => {
-	return {
-		data: pushMessages[key],
-		options: {
-			ttl: 129600
-		}
-	};
-};
-
-export const getOrderStatusPushMessage = (event: OrderEvent): PushMessageWithContent => {
-	const message = orderPushMessages[event];
-	return {
-		data: {
-			title: 'Zamówienie',
-			message
-		},
-		options: {
-			ttl: 129600
-		}
-	};
-};
 
 export const orderStatusEmailDescription = (event: OrderEvent) => {
 	switch (event) {

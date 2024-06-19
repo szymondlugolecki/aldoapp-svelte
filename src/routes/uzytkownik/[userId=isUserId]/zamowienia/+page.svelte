@@ -24,17 +24,17 @@
 		type Updater
 	} from '@tanstack/svelte-table';
 	import { writable } from 'svelte/store';
-	import TableHyperlink from '$components/custom/Table/TableHyperlink.svelte';
+	import TableHyperlink from '$components/custom/table/table-hyperlink.svelte';
 	import type { Address } from '$lib/server/db/schemas/orders.js';
 	import * as Sheet from '$shadcn/sheet/index.js';
 
 	import { Filter } from 'lucide-svelte';
 	import { Button, buttonVariants } from '$shadcn/button';
-	import Filters from './(components)/filters-c.svelte';
+	import Filters from './(components)/filters.svelte';
 	import { builderActions } from 'bits-ui';
 	import { onMount } from 'svelte';
 	import type { mainCategories } from '$lib/client/constants/dbTypes';
-	import Pagination3 from '$components/custom/Pagination3.svelte';
+	import Pagination from '$components/custom/table/pagination.svelte';
 
 	export let data;
 
@@ -250,6 +250,6 @@
 			</Table.Body>
 		</Table.Root>
 
-		<Pagination3 bind:paginationSettings />
+		<Pagination bind:paginationSettings />
 	</div>
 </div>

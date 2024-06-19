@@ -6,7 +6,7 @@
 	import * as Sheet from '$shadcn/sheet/index.js';
 	import { page } from '$app/stores';
 	import { Input } from '$shadcn/input/index.js';
-	import Filters from './(components)/filters-c.svelte';
+	import Filters from './(components)/filters.svelte';
 	import { getSubcategoryName, debounce } from '$lib/client/functions';
 	import { builderActions } from 'bits-ui';
 	import { goto } from '$app/navigation';

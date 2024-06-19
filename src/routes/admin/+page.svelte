@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { BellRing } from 'lucide-svelte';
-	import { pushSubscription$ } from '$lib/client/schemas/index.js';
-	import * as Form from '$shadcn/form';
-	import Spinner from '$components/custom/Util/Spinner.svelte';
+	// import { BellRing } from 'lucide-svelte';
+	// import { pushSubscription$ } from '$lib/client/schemas/index.js';
+	// import * as Form from '$shadcn/form';
+	// import Spinner from '$components/custom/spinner.svelte';
 
-	export let data;
+	// export let data;
 </script>
 
 <svelte:head>

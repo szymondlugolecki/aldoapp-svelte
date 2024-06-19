@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import Spinner from '$components/custom/spinner.svelte';
 	import { Button } from '$components/ui/button';
 	import { Skeleton } from '$shadcn/skeleton';
 	import { ShoppingBasket } from 'lucide-svelte';

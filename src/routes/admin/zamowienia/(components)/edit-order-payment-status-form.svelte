@@ -15,7 +15,7 @@
 
 	import * as Form from '$shadcn/form';
 	import { order$ } from '$lib/client/schemas';
-	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import Spinner from '$components/custom/spinner.svelte';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { Input } from '$components/ui/input';
 	import { toast } from 'svelte-sonner';

@@ -10,12 +10,12 @@
 	import { products$, user$ } from '$lib/client/schemas';
 	import type { AddUserForm } from '$lib/client/schemas/user';
 	import { buttonVariants } from '$shadcn/button';
-	import RequiredAsterisk from '$components/custom/Util/RequiredAsterisk.svelte';
+	import RequiredAsterisk from '$components/custom/required-asterisk.svelte';
 	import { getAvailableRoleNames } from '$lib/client/functions';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { toast } from 'svelte-sonner';
 	import { Input } from '$components/ui/input';
-	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import Spinner from '$components/custom/spinner.svelte';
 
 	const noAdminRoles = userRoles.filter((role) => role !== 'admin');
 

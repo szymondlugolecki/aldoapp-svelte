@@ -1,7 +1,6 @@
 import { relations, type InferSelectModel, type InferInsertModel, sql } from 'drizzle-orm';
 import { sqliteTable, text, integer, uniqueIndex } from 'drizzle-orm/sqlite-core';
 import { usersTable } from './users';
-// import { PushSubscription } from 'web-push-edge';
 
 export interface PushSubscription {
 	endpoint: string;

@@ -19,7 +19,7 @@
 	// import logo from '$lib/assets/logo.png?run&width=110&height=80&format=webp';
 	import { slide } from 'svelte/transition';
 	import { cn } from '$lib/client/functions';
-	import Image from '$components/custom/Util/Image.svelte';
+	import Image from '$components/custom/image.svelte';
 	import logo from '$lib/assets/logo.png?w=110&format=avif;webp;jpg&as=picture';
 
 	import CartPreview from './cart-preview.svelte';

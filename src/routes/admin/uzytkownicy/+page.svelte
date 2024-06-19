@@ -21,7 +21,7 @@
 	import { writable } from 'svelte/store';
 	import AdminEditDialog from './(components)/edit-user.svelte';
 	import AdminAddDialog from './(components)/add-user.svelte';
-	import TableHyperlink from '$components/custom/Table/TableHyperlink.svelte';
+	import TableHyperlink from '$components/custom/table/table-hyperlink.svelte';
 
 	import {
 		Table,
@@ -35,7 +35,7 @@
 	import { Input } from '$shadcn/input';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import Pagination3 from '$components/custom/Pagination3.svelte';
+	import Pagination from '$components/custom/table/pagination.svelte';
 	import { createProps } from '$lib/client/functions/table';
 	// import { superForm } from 'sveltekit-superforms/client';
 
@@ -64,13 +64,6 @@
 			header: 'Profil użytkownika',
 			accessorKey: 'fullName',
 			cell: (info) => flexRender(UserMiniProfile, { info }),
-			footer: (info) => info.column.id
-		},
-		{
-			header: 'Telefon',
-			accessorKey: 'phone',
-			cell: (info) =>
-				typeof info.getValue() === 'string' ? phoneParser(info.getValue() as string) : 'Brak',
 			footer: (info) => info.column.id
 		},
 		{
@@ -197,7 +190,7 @@
 		{/if}
 	</div>
 
-	<Pagination3 bind:paginationSettings />
+	<Pagination bind:paginationSettings />
 
 	<Table>
 		<TableCaption>Lista użytkowników</TableCaption>
@@ -239,5 +232,5 @@
 		</TableBody>
 	</Table>
 
-	<Pagination3 bind:paginationSettings />
+	<Pagination bind:paginationSettings />
 </section>

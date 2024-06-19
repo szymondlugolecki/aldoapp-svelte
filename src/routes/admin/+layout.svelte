@@ -1,10 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	// import * as Tabs from "$shadcn/tabs";
-
-	import TabsList from '$components/custom/Layout/AdminTabs/TabsList.svelte';
-	import Tab from '$components/custom/Layout/AdminTabs/Tab.svelte';
-	import TabsContent from '$components/custom/Layout/AdminTabs/TabsContent.svelte';
+	import Tab from './(components)/tab.svelte';
+	import TabsList from './(components)/tabs-list.svelte';
+	import TabsContent from './(components)/tabs-content.svelte';
 
 	$: pathname = $page.url.pathname;
 

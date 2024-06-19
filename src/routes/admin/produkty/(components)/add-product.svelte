@@ -6,12 +6,12 @@
 	import { products$ } from '$lib/client/schemas';
 	import type { AddProductForm } from '$lib/client/schemas/products';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import RequiredAsterisk from '$components/custom/Util/RequiredAsterisk.svelte';
+	import RequiredAsterisk from '$components/custom/required-asterisk.svelte';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { toast } from 'svelte-sonner';
 	import SelectCategories from './select-categories-add.svelte';
 	import { Input } from '$components/ui/input';
-	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import Spinner from '$components/custom/spinner.svelte';
 	// import SuperDebug from 'sveltekit-superforms/client/SuperDebug.svelte';
 
 	// export let enhance: ReturnType<typeof superForm>['enhance'];

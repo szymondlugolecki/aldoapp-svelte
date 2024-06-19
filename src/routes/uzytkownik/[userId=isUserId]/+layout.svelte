@@ -1,13 +1,16 @@
 <script lang="ts">
-	import Alert from '$components/custom/Alerts/Alert.svelte';
 	import { roleColors, roleNames } from '$lib/client/constants/index.js';
 	import { cn, dateParser, isAtLeastModerator } from '$lib/client/functions/index.js';
 	import { onMount } from 'svelte';
 	import type { Order } from '$types';
 	import { createAvatar, createTabs, melt } from '@melt-ui/svelte';
-	import TabsList from '$components/custom/Layout/AdminTabs/TabsList.svelte';
-	import Tab from '$components/custom/Layout/AdminTabs/Tab.svelte';
-	import TabsContent from '$components/custom/Layout/AdminTabs/TabsContent.svelte';
+
+	// Could fix these import routes:
+	import TabsList from '$routes/admin/(components)/tabs-list.svelte';
+	import Tab from '$routes/admin/(components)/tab.svelte';
+	import TabsContent from '$routes/admin/(components)/tabs-content.svelte';
+	// ^^^
+
 	import { page } from '$app/stores';
 
 	export let data;
@@ -58,9 +61,9 @@
 			<TabsList>
 				<Tab {pathname} href="/uzytkownik/{pathUser}">Informacje</Tab>
 				<Tab {pathname} href="/uzytkownik/{pathUser}/zamowienia">Zamówienia</Tab>
-				{#if data.me && isAtLeastModerator(data.me.role)}
+				<!-- {#if data.me && isAtLeastModerator(data.me.role)}
 					<Tab {pathname} href="/uzytkownik/{pathUser}/inne">Inne</Tab>
-				{/if}
+				{/if} -->
 			</TabsList>
 		</div>
 		<TabsContent class="">

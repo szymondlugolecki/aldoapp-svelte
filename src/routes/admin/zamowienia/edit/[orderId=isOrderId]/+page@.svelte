@@ -14,14 +14,14 @@
 	import { buttonVariants } from '$components/ui/button';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import type { EventForm, PaymentForm, OrderAddressForm } from '$lib/client/schemas/order';
-	import EditLayout from '$routes/admin/(components)/edit-layout.svelte';
-	import EditPageNavigationButtons from '$routes/admin/(components)/edit-page-navigation-buttons.svelte';
+	import EditLayout from '../../../(components)/edit-layout.svelte';
+	import EditPageNavigationButtons from '../../../(components)/edit-page-navigation-buttons.svelte';
 	import Separator from '$components/ui/separator/separator.svelte';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { toast } from 'svelte-sonner';
 	import { order$ } from '$lib/client/schemas/index.js';
 	import { getNextEvents } from '$lib/client/machines/orderStatus.js';
-	import RequiredAsterisk from '$components/custom/Util/RequiredAsterisk.svelte';
+	import RequiredAsterisk from '$components/custom/required-asterisk.svelte';
 
 	export let data;
 
@@ -65,6 +65,14 @@
 		  }
 		: undefined;
 </script>
+
+<svelte:head>
+	<title>Edytuj zamówienie • Panel Administracyjny</title>
+	<meta
+		name="description"
+		content="Panel Administracyjny. Edytuj zamówienie. Zmień status zamówienia, adres dostawy, dane płatności."
+	/>
+</svelte:head>
 
 <EditLayout>
 	<h1 class="text-3xl font-extrabold tracking-tight scroll-m-20 lg:text-4xl">Edycja zamówienia</h1>

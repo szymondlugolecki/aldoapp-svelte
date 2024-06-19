@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import Spinner from '$components/custom/spinner.svelte';
 	import { cart$ } from '$lib/client/schemas/index.js';
 
 	import * as Command from '$shadcn/command';

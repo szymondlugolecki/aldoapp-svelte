@@ -5,9 +5,34 @@
 	import { createPopover, melt } from '@melt-ui/svelte';
 	import { Lock, LogOut, Settings, User, X } from 'lucide-svelte';
 	import { fade } from 'svelte/transition';
-	import logout from '$lib/client/functions/api/logout';
+	import { invalidate, invalidateAll } from '$app/navigation';
+	import { trytm } from '@bdsqqq/try';
+	import { toast } from 'svelte-sonner';
+	import Spinner from '$components/custom/spinner.svelte';
 
 	export let user: SessionUser;
+
+	let loggingOut = false;
+
+	const logout = async () => {
+		console.log('logout');
+		loggingOut = true;
+		const [, logoutError] = await trytm(
+			fetch('/api/logout', {
+				method: 'POST',
+				credentials: 'include'
+			})
+		);
+		loggingOut = false;
+
+		if (logoutError) {
+			toast.error('Błąd podczas wylogowywania');
+			return;
+		}
+
+		await invalidateAll();
+		toast('Wylogowano pomyślnie');
+	};
 
 	const {
 		elements: { trigger, content, arrow, close },
@@ -63,9 +88,16 @@
 			</button>
 
 			<button
+				disabled={loggingOut}
 				class="flex gap-2 items-center hover:bg-muted px-2 py-2.5 rounded-lg text-destructive text-sm"
-				on:click={() => logout()}><LogOut class="square-5" />Wyloguj</button
+				on:click={() => logout()}
 			>
+				{#if loggingOut}
+					<Spinner />
+				{:else}
+					<LogOut class="square-5" />Wyloguj
+				{/if}
+			</button>
 		</div>
 		<button class="absolute right-8 top-8" use:melt={$close}>
 			<X class="square-4" />

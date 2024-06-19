@@ -3,16 +3,16 @@
 	import { parseAddress, parsePLN } from '$lib/client/functions/index.js';
 	import { page } from '$app/stores';
 	import { paymentMethodsList } from '$lib/client/constants/index.js';
-	import HorizontalOrderSteps from '$components/custom/Steps/HorizontalOrderSteps.svelte';
-	import VerticalOrderSteps from '$components/custom/Steps/VerticalOrderSteps.svelte';
+	import HorizontalOrderSteps from './(components)/horizontal-order-steps.svelte';
+	import VerticalOrderSteps from './(components)/vertical-order-steps.svelte';
 	import { Button } from '$shadcn/button';
 	import ProductsTable from './(components)/products-table.svelte';
 	import * as AlertDialog from '$shadcn/alert-dialog';
 	import { CheckCircled } from 'radix-icons-svelte';
 	import { Separator } from '$components/ui/separator';
 	import { superForm } from 'sveltekit-superforms/client';
-	import ErrorMessage from '$components/custom/Form/ErrorMessage.svelte';
-	import Message from '$components/custom/Form/Message.svelte';
+	import ErrorMessage from '$components/custom/form/error-message.svelte';
+	import Message from '$components/custom/form/message.svelte';
 	import StatusLogs from './(components)/status-logs.svelte';
 
 	export let data;

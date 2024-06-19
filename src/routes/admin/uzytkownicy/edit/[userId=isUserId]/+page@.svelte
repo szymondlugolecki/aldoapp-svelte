@@ -9,11 +9,11 @@
 	import { roleNames } from '$lib/client/constants';
 	import { user$ } from '$lib/client/schemas';
 	import { Button, buttonVariants } from '$shadcn/button';
-	import RequiredAsterisk from '$components/custom/Util/RequiredAsterisk.svelte';
+	import RequiredAsterisk from '$components/custom/required-asterisk.svelte';
 	import { cn, getAvailableRoleNames, parseAddress, phoneParser } from '$lib/client/functions';
 	import { browser } from '$app/environment';
 
-	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import Spinner from '$components/custom/spinner.svelte';
 	import { zod } from 'sveltekit-superforms/adapters';
 	import { toast } from 'svelte-sonner';
 	import { Input } from '$components/ui/input';
@@ -22,8 +22,8 @@
 	import { CaretSort } from 'radix-icons-svelte';
 	import SuperDebug from 'sveltekit-superforms';
 	import { Separator } from '$shadcn/separator';
-	import EditLayout from '$routes/admin/(components)/edit-layout.svelte';
-	import EditPageNavigationButtons from '$routes/admin/(components)/edit-page-navigation-buttons.svelte';
+	import EditLayout from '../../../(components)/edit-layout.svelte';
+	import EditPageNavigationButtons from '../../../(components)/edit-page-navigation-buttons.svelte';
 
 	export let data;
 
@@ -72,6 +72,11 @@
 		});
 	}
 </script>
+
+<svelte:head>
+	<title>Edytuj użytkownika • Panel Administracyjny</title>
+	<meta name="description" content="Panel Administracyjny. Edytuj użytkownika." />
+</svelte:head>
 
 <EditLayout>
 	<h1 class="text-3xl font-extrabold tracking-tight scroll-m-20 lg:text-4xl">Edycja użytkownika</h1>

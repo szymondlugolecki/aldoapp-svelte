@@ -6,7 +6,7 @@
 	import { getSubcategories, getSubcategoryName } from '$lib/client/functions';
 	import { type Infer, type SuperForm } from 'sveltekit-superforms';
 	import type { AddProductForm } from '$lib/client/schemas/products';
-	import RequiredAsterisk from '$components/custom/Util/RequiredAsterisk.svelte';
+	import RequiredAsterisk from '$components/custom/required-asterisk.svelte';
 
 	export { product as item };
 	export let required: boolean | undefined = undefined;

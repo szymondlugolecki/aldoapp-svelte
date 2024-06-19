@@ -12,9 +12,9 @@
 		type PaginationState
 	} from '@tanstack/svelte-table';
 	import { writable } from 'svelte/store';
-	import TableHyperlink from '$components/custom/Table/TableHyperlink.svelte';
+	import TableHyperlink from '$components/custom/table/table-hyperlink.svelte';
 
-	import AdminAddDialog from '$routes/admin/produkty/(components)/add-product.svelte';
+	import AdminAddDialog from './(components)/add-product.svelte';
 
 	import {
 		Table,
@@ -31,7 +31,7 @@
 	import { goto } from '$app/navigation';
 	import type { BasicUser, ExtendedSubcategory, PaginationSettings } from '$types';
 
-	import Pagination3 from '$components/custom/Pagination3.svelte';
+	import Pagination from '$components/custom/table/pagination.svelte';
 	import ProductMiniProfile from './(components)/product-mini-profile.svelte';
 	import { fodderNames, producentsList } from '$lib/client/constants';
 	import type { Producent } from '$lib/client/constants/dbTypes';
@@ -187,7 +187,7 @@
 	</div>
 
 	{#key currentPage}
-		<Pagination3 bind:paginationSettings />
+		<Pagination bind:paginationSettings />
 	{/key}
 
 	<Table>
@@ -224,5 +224,5 @@
 		</TableBody>
 	</Table>
 
-	<Pagination3 bind:paginationSettings />
+	<Pagination bind:paginationSettings />
 </section>

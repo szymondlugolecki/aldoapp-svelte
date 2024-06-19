@@ -3,7 +3,7 @@
 
 	import * as Form from '$shadcn/form';
 	import { auth$ } from '$lib/client/schemas/index.js';
-	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import Spinner from '$components/custom/spinner.svelte';
 	import { superForm } from 'sveltekit-superforms';
 	import { toast } from 'svelte-sonner';
 	import { zodClient } from 'sveltekit-superforms/adapters';

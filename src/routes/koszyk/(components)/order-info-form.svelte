@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Input } from '$shadcn/input/index.js';
 	import { Label } from '$shadcn/label/index.js';
-	import RequiredAsterisk from '$components/custom/Util/RequiredAsterisk.svelte';
+	import RequiredAsterisk from '$components/custom/required-asterisk.svelte';
 	import * as Select from '$shadcn/select';
 
 	import type { OrderForm } from '$lib/client/schemas/order.js';

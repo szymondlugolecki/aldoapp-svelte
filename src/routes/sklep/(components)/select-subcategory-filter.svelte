@@ -1,21 +1,29 @@
 <script lang="ts">
 	import { fodderCategories2 } from '$lib/client/constants';
 	import type { MainCategory } from '$lib/client/constants/dbTypes';
-	import type { ExtendedCategory, Subcategory } from '$types';
+	import type { ExtendedCategory, ExtendedSubcategory, Subcategory } from '$types';
 	import { createCombobox, melt, type ComboboxOptionProps } from '@melt-ui/svelte';
 	import { Check, ChevronDown, ChevronUp } from 'lucide-svelte';
 	import { slide } from 'svelte/transition';
-	import RequiredAsterisk from '$components/custom/Util/RequiredAsterisk.svelte';
-	import { cn, getSubcategories, getSubcategoryName } from '$lib/client/functions';
+	import RequiredAsterisk from '$components/custom/required-asterisk.svelte';
+	import { cn, getSubcategoryName } from '$lib/client/functions';
 
-	export let combobox: ReturnType<typeof createCombobox<Subcategory>>;
+	export let combobox: ReturnType<typeof createCombobox<ExtendedSubcategory>>;
 	export let category: ExtendedCategory;
 
 	export let required = false;
+	export let horizontal = false;
 
-	const toOption = (subcategory: Subcategory): ComboboxOptionProps<Subcategory> => ({
+	$: extendedSubcategoriesList =
+		subcategories.length > 0
+			? (['all', ...subcategories] as ExtendedSubcategory[])
+			: ([] as ExtendedSubcategory[]);
+
+	const toOption = (
+		subcategory: ExtendedSubcategory
+	): ComboboxOptionProps<ExtendedSubcategory> => ({
 		value: subcategory,
-		label: getSubcategoryName(category, subcategory)
+		label: subcategory === 'all' ? 'Wszystkie' : getSubcategoryName(category, subcategory)
 	});
 
 	const {
@@ -29,21 +37,28 @@
 	}
 
 	$: filteredSubcategoryList = $touchedInput
-		? subcategories.filter((subcategory) => {
+		? extendedSubcategoriesList.filter((subcategory) => {
 				const normalizedInput = $inputValue.toLowerCase();
 				return (
 					subcategory.toLowerCase().includes(normalizedInput) ||
 					normalizedInput.includes(subcategory.toLowerCase())
 				);
 		  })
-		: subcategories;
+		: extendedSubcategoriesList;
+
+	const getSubcategories = (category?: ExtendedCategory) => {
+		if (!category || category === 'all') {
+			return [];
+		}
+		return Object.keys(fodderCategories2[category]) as Subcategory[];
+	};
 
 	$: subcategories = getSubcategories(category);
 </script>
 
-<fieldset class="flex flex-col gap-1">
+<fieldset class={cn(horizontal ? 'grid grid-cols-6 gap-4 items-center' : 'flex flex-col gap-1')}>
 	<!-- svelte-ignore a11y-label-has-associated-control - $label contains the 'for' attribute -->
-	<label use:melt={$label}>
+	<label use:melt={$label} class={cn('col-span-2', horizontal && 'text-end')}>
 		<span class={cn('font-medium text-right text-sm')}
 			>Podkategoria<RequiredAsterisk {required} /></span
 		>
@@ -76,19 +91,26 @@
 		transition:slide={{ duration: 150 }}
 	>
 		<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-		<div class="flex flex-col max-h-full gap-2 px-2 py-2 overflow-y-auto" tabindex="0">
+		<div
+			class="flex flex-col max-h-full gap-2 px-2 py-2 overflow-y-auto border rounded-md bg-popover"
+			tabindex="0"
+		>
 			{#each filteredSubcategoryList as subcategory, index (index)}
 				<li
 					use:melt={$option(toOption(subcategory))}
-					class="relative cursor-pointer scroll-my-2 rounded-md py-2 pl-4 pr-4 hover:bg-pink-100 data-[highlighted]:bg-pink-200 data-[highlighted]:text-pink-900 data-[disabled]:opacity-50"
+					class="relative cursor-pointer scroll-my-2 text-sm rounded-md py-2 pl-4 pr-4 hover:bg-accent data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground data-[disabled]:opacity-50"
 				>
 					{#if $isSelected(subcategory)}
-						<div class="absolute z-10 text-pink-900 check left-2 top-1/2">
+						<div class="absolute z-10 text-blue-900 check left-2 top-1/2">
 							<Check class="square-4" />
 						</div>
 					{/if}
 					<div class="pl-4">
-						<span class="font-medium">{getSubcategoryName(category, subcategory)}</span>
+						<span class="font-medium"
+							>{subcategory === 'all'
+								? 'Wszystkie'
+								: getSubcategoryName(category, subcategory)}</span
+						>
 					</div>
 				</li>
 			{:else}

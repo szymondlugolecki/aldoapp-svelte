@@ -1,12 +1,9 @@
 <script lang="ts">
-	import SelectCategories from '$components/meltui/Select/SelectCategoriesFilter.svelte';
-	import { cn } from '$lib/utils';
 	import type { OrderStatus } from '$lib/client/constants/dbTypes';
 	import { createSlider, melt, createCombobox, type ComboboxOptionProps } from '@melt-ui/svelte';
-	import Status from '$components/custom/Filters/Order/Status.svelte';
-	import CartOwner from '$components/custom/Filters/Order/CartOwner.svelte';
-	import Customer from '$components/custom/Filters/Order/Customer.svelte';
-	import { Button } from '$components/ui/button';
+	import Status from './filter-status.svelte';
+	import CartOwner from './filter-cart-owner.svelte';
+	import Customer from './filter-customer.svelte';
 	import { page } from '$app/stores';
 	import { uniqueObjectById } from '$lib/client/functions/sorting';
 	import { orderStatusList } from '$lib/client/constants';

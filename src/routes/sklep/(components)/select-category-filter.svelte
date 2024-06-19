@@ -6,8 +6,8 @@
 	import { createCombobox, melt, type ComboboxOptionProps } from '@melt-ui/svelte';
 	import { Check, ChevronDown, ChevronUp } from 'lucide-svelte';
 	import { slide } from 'svelte/transition';
-	import SelectSubcategory from './SelectSubcategoryFilter.svelte';
-	import RequiredAsterisk from '$components/custom/Util/RequiredAsterisk.svelte';
+	import SelectSubcategory from './select-subcategory-filter.svelte';
+	import RequiredAsterisk from '$components/custom/required-asterisk.svelte';
 	import { cn, getSubcategoryName } from '$lib/client/functions';
 
 	export let required = false;

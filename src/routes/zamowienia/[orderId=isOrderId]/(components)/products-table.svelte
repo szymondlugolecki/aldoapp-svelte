@@ -5,7 +5,7 @@
 	import type { OrderTable } from '$types';
 	import { orderStatusList } from '$lib/client/constants';
 	import { addPagination, addResizedColumns } from 'svelte-headless-table/plugins';
-	import TableHyperlink from '$components/custom/Table/TableHyperlink.svelte';
+	import TableHyperlink from '$components/custom/table/table-hyperlink.svelte';
 	import { Button } from '$shadcn/button';
 	import type { PageServerData } from '../$types';
 	import TableImage from './table-image.svelte';

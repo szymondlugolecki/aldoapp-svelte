@@ -21,7 +21,6 @@ const config = {
 		alias: {
 			'$components/*': 'src/components/*',
 			'$shadcn/*': 'src/components/ui/*',
-			'$meltui/*': 'src/components/meltui/*',
 			'$types': './src/types',
 			'$routes': './src/routes',
 		},

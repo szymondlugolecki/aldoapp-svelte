@@ -1,5 +1,5 @@
 <script lang="ts">
-	import RequiredAsterisk from '$components/custom/Util/RequiredAsterisk.svelte';
+	import RequiredAsterisk from '$components/custom/required-asterisk.svelte';
 	import { producentsList } from '$lib/client/constants';
 	import { producents, type Producent } from '$lib/client/constants/dbTypes';
 	import { createCombobox, melt, type ComboboxOptionProps } from '@melt-ui/svelte';

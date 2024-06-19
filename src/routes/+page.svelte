@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Image from '$components/custom/Util/Image.svelte';
+	import Image from '$components/custom/image.svelte';
 	// import BackgroundImage from '$lib/assets/bg3.png?w=1500&format=avif;webp;jpg&as=picture';
 	import BackgroundImage from '$lib/assets/farm_animals.png?w=1000&format=avif;webp;jpg&as=picture';
 	import logo from '$lib/assets/logo.png?w=220&format=avif;webp;jpg&as=picture';

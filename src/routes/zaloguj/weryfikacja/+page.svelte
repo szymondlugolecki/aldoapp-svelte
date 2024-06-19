@@ -5,7 +5,7 @@
 	import { createPinInput, melt } from '@melt-ui/svelte';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { auth$ } from '$lib/client/schemas';
-	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import Spinner from '$components/custom/spinner.svelte';
 	import { derived, writable } from 'svelte/store';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';

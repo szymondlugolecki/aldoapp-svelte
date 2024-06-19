@@ -12,7 +12,7 @@
 	import { buttonVariants } from '$components/ui/button';
 	import { superForm, type SuperValidated, type Infer, fileProxy } from 'sveltekit-superforms';
 	import type { EditProductForm } from '$lib/client/schemas/products';
-	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import Spinner from '$components/custom/spinner.svelte';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import * as Select from '$components/ui/select';
 	import SelectCategories from './select-categories-edit.svelte';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import SelectCategories from '$components/meltui/Select/SelectCategoriesFilter.svelte';
-	import SelectProducent from '$components/meltui/Select/SelectProducentFilter.svelte';
+	import SelectCategories from './select-category-filter.svelte';
+	import SelectProducent from './select-producent-filter.svelte';
 	import { fodderNames, producentsList } from '$lib/client/constants';
 	import { getSubcategoryName } from '$lib/client/functions';
 	import type { ExtendedCategory, ExtendedSubcategory, ExtendedProducent } from '$types';

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button as FormButton } from '$shadcn/form';
-	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import Spinner from '$components/custom/spinner.svelte';
 	import { Button } from '$shadcn/button';
 	import { RotateCcw, Save, Undo2 } from 'lucide-svelte';
 	import { preloadData, goto } from '$app/navigation';
@@ -27,11 +27,12 @@
 </script>
 
 <div class="flex justify-between">
-	<Button
+	<div class="invisible" />
+	<!-- <Button
 		variant="secondary"
 		on:mouseenter={async () => await preloadData(backPathname)}
 		on:click={goBack}>Powrót <Undo2 class="ml-1.5 square-4" /></Button
-	>
+	> -->
 
 	<div class="flex gap-x-2">
 		<Button variant="secondary" on:click={() => reset()}

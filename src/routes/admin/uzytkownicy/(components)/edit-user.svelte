@@ -11,10 +11,10 @@
 	import { user$ } from '$lib/client/schemas';
 	import type { EditUserForm } from '$lib/client/schemas/user';
 	import { Button, buttonVariants } from '$shadcn/button';
-	import RequiredAsterisk from '$components/custom/Util/RequiredAsterisk.svelte';
+	import RequiredAsterisk from '$components/custom/required-asterisk.svelte';
 	import { cn, getAvailableRoleNames, parseAddress, phoneParser } from '$lib/client/functions';
 
-	import Spinner from '$components/custom/Util/Spinner.svelte';
+	import Spinner from '$components/custom/spinner.svelte';
 	import { zod } from 'sveltekit-superforms/adapters';
 	import { toast } from 'svelte-sonner';
 	import { Input } from '$components/ui/input';
