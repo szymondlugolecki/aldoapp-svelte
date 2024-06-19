@@ -3,7 +3,7 @@
 	import ThemeSwitch from '$meltui/Switch/ThemeSwitch.svelte';
 	import SubscribeForm from './(components)/subscribe-form.svelte';
 	import UnsubscribeForm from './(components)/unsubscribe-form.svelte';
-	import { getRegistration } from '$lib/client/functions/api/push';
+	// import { getRegistration } from '$lib/client/functions/api/push';
 	import { cn } from '$lib/utils';
 
 	import { mode } from 'mode-watcher';

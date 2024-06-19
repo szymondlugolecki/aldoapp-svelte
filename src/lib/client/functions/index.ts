@@ -95,13 +95,13 @@ export const parsePLN = (amount: string | number) => {
 	return formatted;
 };
 
+const splitAddress = (address: Address) => {
+	const { street, city, zipCode } = address;
+	return [`${street}\n${city}`, zipCode].join(', ');
+};
+
 export const parseAddress = (address: unknown): string | null => {
 	if (!address || !(typeof address === 'string' || typeof address === 'object')) return null;
-
-	const splitAddress = (address: Address) => {
-		const { street, city, zipCode } = address;
-		return `${street}\n${city}, ${zipCode}`;
-	};
 
 	if (typeof address === 'string') {
 		if (!safeParseJSON(address)) return null;
@@ -110,12 +110,16 @@ export const parseAddress = (address: unknown): string | null => {
 			return null;
 		}
 
+		if (Object.values(parsedAddress).every((val) => !val)) return null;
+
 		return splitAddress(parsedAddress);
 	}
 
 	if (!user$.address.safeParse(address).success) {
 		return null;
 	}
+
+	if (Object.values(address).every((val) => !val)) return null;
 
 	return splitAddress(address as Address);
 };

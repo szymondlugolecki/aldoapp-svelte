@@ -89,11 +89,12 @@ export const createNewOrder = async ({
 		return;
 	}
 
-	try {
-		sendNotifications([subscription], getPushMessage('order-created'));
-	} catch (error) {
-		console.error('sendNotifications error', error);
-	}
+	// Send Push notification
+	// try {
+	// 	sendNotifications([subscription], getPushMessage('order-created'));
+	// } catch (error) {
+	// 	console.error('sendNotifications error', error);
+	// }
 
 	const { createdAt } = batchResponse[0][0];
 	const orderDate = createdAt.toLocaleString('pl-PL', {

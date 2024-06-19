@@ -10,7 +10,7 @@ import type { OrderStatus } from '$lib/client/constants/dbTypes';
 import { ordersTable } from '$lib/server/db/schemas/orders';
 import { eq } from 'drizzle-orm';
 import { order$ } from '$lib/client/schemas';
-import { sendNotifications } from '$lib/server/functions/push2';
+// import { sendNotifications } from '$lib/server/functions/push2';
 import {
 	getOrderStatusPushMessage,
 	orderStatusEmailDescription,
@@ -179,11 +179,11 @@ const changeOrderStatus = (async ({ request, locals }) => {
 	}
 
 	// Send push notifications
-	try {
-		sendNotifications(oldOrder.customer.subscriptions, getOrderStatusPushMessage(event));
-	} catch (error) {
-		console.error('sendNotifications error', error);
-	}
+	// try {
+	// 	sendNotifications(oldOrder.customer.subscriptions, getOrderStatusPushMessage(event));
+	// } catch (error) {
+	// 	console.error('sendNotifications error', error);
+	// }
 
 	// Send emails
 	const orderDate = oldOrder.createdAt.toLocaleString('pl-PL', {

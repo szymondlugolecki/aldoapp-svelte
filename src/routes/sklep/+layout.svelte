@@ -28,7 +28,7 @@
 		const params = new URLSearchParams($page.url.searchParams.toString());
 		params.set('szukaj', queryString);
 		params.set('strona', '1');
-		goto(`?${params.toString()}`, { keepFocus: true });
+		goto(`/sklep?${params.toString()}`, { keepFocus: true });
 	};
 </script>
 
@@ -66,6 +66,10 @@
 							<Filters bind:selectedCategory bind:selectedSubcategory bind:selectedProducent />
 							<Sheet.Footer class="flex flex-col gap-y-3">
 								<Sheet.Close asChild let:builder>
+									<Button builders={[builder]} href={$page.url.pathname} variant="secondary"
+										>Reset filtrów</Button
+									>
+
 									<button
 										type="submit"
 										form="store-filter-form"
@@ -74,10 +78,6 @@
 									>
 										Zastosuj
 									</button>
-
-									<Button builders={[builder]} href={$page.url.pathname} variant="secondary"
-										>Reset filtrów</Button
-									>
 								</Sheet.Close>
 							</Sheet.Footer>
 						</Sheet.Content>

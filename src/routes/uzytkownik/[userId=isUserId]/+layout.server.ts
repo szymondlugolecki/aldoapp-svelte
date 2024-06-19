@@ -239,16 +239,20 @@ export const load = async ({ params, locals, url }) => {
 		};
 	});
 
-	return {
-		profile: user,
-		orders,
-		orderDetails: customersAndCartOwners,
-		count: await db
+	const { count } = (
+		await db
 			.select({
 				count: sql<number>`count(*)`.mapWith(Number)
 			})
 			.from(ordersTable)
-			.where(extendedWhereClause),
+			.where(extendedWhereClause)
+	)[0];
+
+	return {
+		profile: user,
+		orders,
+		orderDetails: customersAndCartOwners,
+		count,
 		filtersApplied,
 		pageLimit
 	};

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import Pagination2 from '$components/custom/Table/Pagination2.svelte';
 	import { orderStatusList } from '$lib/client/constants/index.js';
 	import {
 		parseAddress,
@@ -20,7 +19,9 @@
 		type TableOptions,
 		getCoreRowModel,
 		getPaginationRowModel,
-		createSvelteTable
+		createSvelteTable,
+		type PaginationState,
+		type Updater
 	} from '@tanstack/svelte-table';
 	import { writable } from 'svelte/store';
 	import TableHyperlink from '$components/custom/Table/TableHyperlink.svelte';
@@ -33,6 +34,7 @@
 	import { builderActions } from 'bits-ui';
 	import { onMount } from 'svelte';
 	import type { mainCategories } from '$lib/client/constants/dbTypes';
+	import Pagination3 from '$components/custom/Pagination3.svelte';
 
 	export let data;
 
@@ -51,22 +53,19 @@
 				flexRender(TableHyperlink, {
 					href: `/zamowienia/${info.getValue() as string}`,
 					text: 'Sprawdź'
-				}),
-			enableSorting: false
+				})
 		},
 		{
 			id: 'status',
 			header: 'Status',
 			accessorKey: 'status',
-			cell: (info) => orderStatusList[info.getValue() as keyof typeof orderStatusList],
-			enableSorting: true
+			cell: (info) => orderStatusList[info.getValue() as keyof typeof orderStatusList]
 		},
 		{
 			id: 'price',
 			header: 'Suma',
 			accessorKey: 'price',
-			cell: (info) => parsePLN(info.getValue() as number),
-			enableSorting: true
+			cell: (info) => parsePLN(info.getValue() as number)
 		},
 		{
 			id: 'products',
@@ -76,32 +75,28 @@
 				const products = info.getValue() as (typeof data.orders)[number]['products'];
 				if (!Array.isArray(products)) return '?';
 
-				console.log('products', products);
+				// console.log('products', products);
 
-				return products.map((product) => `${product.name} (x${product.quantity})`).join('\n');
-			},
-			enableSorting: false
+				return products.map((product) => product.name).join('\n');
+			}
 		},
 		{
 			id: 'cartOwner',
 			header: 'Zleceniodawca',
 			accessorKey: 'cartOwner',
-			cell: (info) => (info.getValue() as User)['fullName'],
-			enableSorting: true
+			cell: (info) => (info.getValue() as User)['fullName']
 		},
 		{
 			id: 'customer',
 			header: 'Klient',
 			accessorKey: 'customer',
-			cell: (info) => (info.getValue() as User)['fullName'],
-			enableSorting: true
+			cell: (info) => (info.getValue() as User)['fullName']
 		},
 		{
 			id: 'address',
 			header: 'Adres dostawy',
 			accessorKey: 'address',
-			cell: (info) => parseAddress(info.getValue() as Address),
-			enableSorting: false
+			cell: (info) => parseAddress(info.getValue() as Address) || 'Brak'
 		},
 		{
 			id: 'createdAt',
@@ -111,7 +106,10 @@
 		}
 	];
 
-	let sorting: SortingState = [];
+	let pagination: PaginationState = {
+		pageIndex: 0,
+		pageSize: data.pageLimit
+	};
 
 	const rerender = () => {
 		options.update((options) => ({
@@ -120,33 +118,41 @@
 		}));
 	};
 
-	const setSorting = (updater: any) => {
+	const setPage = (pageIndex: number) => {
+		currentPage = pageIndex + 1;
+		$table.setPageIndex(pageIndex);
+	};
+
+	const setPagination = (updater: Updater<PaginationState>) => {
 		if (updater instanceof Function) {
-			sorting = updater(sorting);
+			pagination = updater(pagination);
 		} else {
-			sorting = updater;
+			pagination = updater;
 		}
 
 		const url = new URLSearchParams($page.url.searchParams);
-		if (sorting && sorting[0]) {
-			url.set('sort', sorting[0].id);
-			url.set('desc', sorting[0].desc.toString());
-			if (url.get('strona')) {
-				url.set('strona', currentPage.toString());
-			}
+		if (pagination) {
+			url.set('strona', (pagination.pageIndex + 1).toString());
+			goto(`?${url.toString()}`).then(() => rerender());
 		}
-
-		goto(`?${url.toString()}`).then(() => {
-			options.update((options) => ({
-				...options,
-				state: {
-					...options.state,
-					data: data.orders,
-					sorting
-				}
-			}));
-		});
 	};
+
+	// $: options = writable<TableOptions<ParsedOrder>>({
+	// 	data: data.orders,
+	// 	columns: defaultColumns,
+	// 	getCoreRowModel: getCoreRowModel(),
+	// 	getPaginationRowModel: getPaginationRowModel(),
+	// 	state: {
+	// 		sorting,
+	// 		columnVisibility: {
+	// 			customer: !!$page.data.me && isAtLeastModerator($page.data.me.role)
+	// 		}
+	// 	},
+	// 	enableSorting: true,
+	// 	onSortingChange: setSorting,
+	// 	manualSorting: true,
+	// 	manualPagination: true
+	// });
 
 	$: options = writable<TableOptions<ParsedOrder>>({
 		data: data.orders,
@@ -154,39 +160,29 @@
 		getCoreRowModel: getCoreRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
 		state: {
-			sorting,
 			columnVisibility: {
 				customer: !!$page.data.me && isAtLeastModerator($page.data.me.role)
 			}
 		},
-		enableSorting: true,
-		onSortingChange: setSorting,
-		manualSorting: true,
+		onPaginationChange: setPagination,
 		manualPagination: true
 	});
 
 	$: table = createSvelteTable(options);
+	$: searchParam = $page.url.searchParams.get('szukaj');
+	$: pageParam = $page.url.searchParams.get('strona');
+	$: currentPage = !isNaN(Number(pageParam)) ? Math.max(Number(pageParam), 1) : 1;
 
-	$: pageParam = Number($page.url.searchParams.get('strona')) || 1;
-	const currentPage = writable(pageParam);
-
-	$: {
-		currentPage.set(pageParam);
-	}
-
-	const paginationSettings: PaginationSettings = {
-		count: data.orders.length || data.count[0].count,
+	$: paginationSettings = {
+		page: currentPage,
+		count: data.count,
 		perPage: data.pageLimit,
-		onPageChange: ({ curr, next }) => {
-			if (next !== curr) {
-				const url = new URLSearchParams($page.url.searchParams);
-				url.set('strona', next.toString());
-				goto(`?${url.toString()}`).then(() => rerender());
-			}
-			return next;
-		},
-		page: currentPage
-	};
+		defaultPage: 1,
+		siblingCount: 1,
+		onPageChange: (page) => {
+			setPage(page);
+		}
+	} satisfies PaginationSettings;
 </script>
 
 <div class="flex flex-col w-full h-full gap-3">
@@ -229,13 +225,7 @@
 					<Table.Row>
 						{#each headerGroup.headers as header}
 							{#if !header.isPlaceholder}
-								<Table.Head
-									class={cn(
-										`w-[100px]`,
-										header.column.getCanSort() &&
-											'cursor-pointer transition-colors hover:bg-muted/10 hover:rounded-md'
-									)}
-								>
+								<Table.Head class="w-[100px]">
 									<svelte:component
 										this={flexRender(header.column.columnDef.header, header.getContext())}
 									/>
@@ -260,6 +250,6 @@
 			</Table.Body>
 		</Table.Root>
 
-		<Pagination2 {paginationSettings} />
+		<Pagination3 bind:paginationSettings />
 	</div>
 </div>

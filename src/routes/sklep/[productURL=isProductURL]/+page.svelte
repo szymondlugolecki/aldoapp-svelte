@@ -26,6 +26,7 @@
 	import ErrorMessage from '$components/custom/Form/ErrorMessage.svelte';
 	import Message from '$components/custom/Form/Message.svelte';
 	import { Image } from '@unpic/svelte';
+	import { cn } from '$lib/utils.js';
 
 	export let data;
 	const { enhance, message, errors, delayed, timeout } = superForm(data.addProductForm, {
@@ -104,15 +105,14 @@
 								<!-- Already in cart -->
 								{#if data.cart?.products.some((p) => p.id === data.product.id)}
 									<Button disabled class="w-full">W koszyku</Button>
+								{:else if $delayed}
+									<Button disabled class="w-full">
+										<Reload class="w-4 h-4 mr-2 animate-spin" />
+										Proszę czekać
+									</Button>
 								{:else}
-									{#if $delayed}
-										<Button disabled class="w-full">
-											<Reload class="w-4 h-4 mr-2 animate-spin" />
-											Proszę czekać
-										</Button>
-									{/if}
 									<Button
-										class="w-full p-2 text-lg font-semibold text-white transition-colors rounded-sm bg-cyan-600 hover:bg-cyan-700/80"
+										class="w-full p-2 text-lg font-semibold transition-colors duration-500 rounded-sm"
 										type="submit">Dodaj do koszyka <ShoppingBag class="w-5 h-5 ml-2" /></Button
 									>
 								{/if}
@@ -146,7 +146,9 @@
 					<ErrorMessage errors={$errors.productId} />
 				{/if}
 
-				<div class="divider" />
+				<div class="py-3">
+					<div class="h-0 border-t border-border" />
+				</div>
 
 				<ul>
 					<li class="flex items-center text-sm font-medium text-left text-gray-600">
