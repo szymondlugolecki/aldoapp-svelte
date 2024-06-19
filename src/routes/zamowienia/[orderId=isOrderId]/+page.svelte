@@ -13,6 +13,7 @@
 	import { superForm } from 'sveltekit-superforms/client';
 	// import ErrorMessage from '$components/custom/form/error-message.svelte';
 	import ErrorMessage from '$components/custom/form/error-message.svelte';
+	// import Message from '$components/custom/form/message.svelte';
 	import Message from '$components/custom/form/message.svelte';
 	import StatusLogs from './(components)/status-logs.svelte';
 
