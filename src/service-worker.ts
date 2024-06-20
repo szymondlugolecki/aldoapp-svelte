@@ -97,4 +97,4 @@ self.addEventListener('message', (event) => {
 	}
 });
 
-console.log('hi');
+console.log('Service worker is active.');

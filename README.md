@@ -1,17 +1,18 @@
-# twoje aldo
+# Twoje ALDO
 
 Fully featured e-commerce platform built with SvelteKit & TailwindCSS.
 
 ## Features
-🤖 Automated notification system (email, push)
-🔐 Self-built passwordless authentication system
-📱 PWA
-💬 Push Messages
-👨‍💼 Feature rich Admin Panel
+🤖 Automatic Notification System (via email)
+🔐 Magic Link Auth
+👨‍💼 Admin Panel
+👨 User Profiles & Order History
 🛒 Server-based cart
-👨 User profiles
 ⚡ Built for the edge
-🥅 Caching & Rate Limiting
+🥅 Caching
+📱 PWA
+🔑 Secure
+
 
 
 ## Tech stack
@@ -36,31 +37,25 @@ xstate
 
 ```
 
+---
+
 # TODO
-Server-side tables:
--    [  ] Sorting
--    [  ] Filtering
--    [  ] Full text search
--    [  ] Pagination
-
-[  ] Product images
-
+[  ] Add product caching with Redis
+[  ] Add SMS notifications
 [  ] Hover cards for users
-
-[  ] ToS & Privacy pages
-
-[  ] Date for each change in order status
-
-[  ] Switch auth system to boron-auth
-
+[  ] Rate limitting
+[  ] Find & fix inconsistencies with permissions
 [  ] Page transitions with new Chrome API
-
 [  ] Analytics
+[  ] Automatic background removal in product images
+[  ] Auto-redirect to previous page after login
+[  ] Make the design more appealing (particularly /sklep)
+[  ] Add error pages
+[  ] Fix inconsistencies in form responses/toast messages
+[  ] Code cleanup
 
-[  ] Automatic background removing in product images
 
-<!-- [ ] Add a secure and httpOnly (with restriced path: '/zaloguj/weryfikacja')
-cookie that would prevent logging in with someone else's verification code. > User wants to login > Enters their email > It's written into the cookie & verification email is sent > Under the verification API route it is checked whether the account email is the same as in the cookie -->
+---
 
 ## Developing
 
