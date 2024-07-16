@@ -1,10 +1,10 @@
 # Twoje ALDO
 
-Fully featured e-commerce platform built with SvelteKit & TailwindCSS.
+Super fast & Fully featured e-commerce platform built with SvelteKit & TailwindCSS.
 
 ## Features
 🤖 Automatic Notification System (via email)
-🔐 Magic Link Auth
+🔐 Passworldless login (Magic Link)
 👨‍💼 Admin Panel
 👨 User Profiles & Order History
 🛒 Server-based cart
@@ -12,7 +12,7 @@ Fully featured e-commerce platform built with SvelteKit & TailwindCSS.
 🥅 Caching
 📱 PWA
 🔑 Secure
-
+♿ a18n optimized
 
 
 ## Tech stack
@@ -34,23 +34,23 @@ sveltekit-superforms
 zod
 @upstash/redis
 xstate
-
 ```
 
 ---
 
 # TODO
-[  ] Add product caching with Redis
-[  ] Add SMS notifications
+[  ] Add error pages
+[  ] Logging (Sentry)
+[  ] Product caching with Redis
+[  ] SMS notifications
 [  ] Hover cards for users
 [  ] Rate limitting
-[  ] Find & fix inconsistencies with permissions
-[  ] Page transitions with new Chrome API
-[  ] Analytics
+[  ] Consider Page transitions with new Chrome API 
+[  ] Analytics page
 [  ] Automatic background removal in product images
 [  ] Auto-redirect to previous page after login
-[  ] Make the design more appealing (particularly /sklep)
-[  ] Add error pages
+[  ] Make the design more appealing (/sklep)
+[  ] Fix inconsistencies with permissions
 [  ] Fix inconsistencies in form responses/toast messages
 [  ] Code cleanup
 
