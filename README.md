@@ -3,16 +3,17 @@
 Super fast & Fully featured e-commerce platform built with SvelteKit & TailwindCSS.
 
 ## Features
-🤖 Automatic Notification System (via email)
-🔐 Passworldless login (Magic Link)
-👨‍💼 Admin Panel
-👨 User Profiles & Order History
-🛒 Server-based cart
-⚡ Built for the edge
-🥅 Caching
-📱 PWA
-🔑 Secure
-♿ a18n optimized
+🤖 Automatic Notification System (via email)  
+🔐 Passworldless login (Magic Link)  
+👨‍💼 Admin Panel  
+👨 User Profiles & Order History  
+🛒 Server-based cart  
+⚡ Built for the edge  
+🥅 Caching  
+📱 PWA  
+🔑 Secure  
+💻 Responsive Design  
+♿ a18n optimized  
 
 
 ## Tech stack
@@ -34,25 +35,26 @@ sveltekit-superforms
 zod
 @upstash/redis
 xstate
+
 ```
 
 ---
 
 # TODO
-[  ] Add error pages
-[  ] Logging (Sentry)
-[  ] Product caching with Redis
-[  ] SMS notifications
-[  ] Hover cards for users
-[  ] Rate limitting
-[  ] Consider Page transitions with new Chrome API 
-[  ] Analytics page
-[  ] Automatic background removal in product images
-[  ] Auto-redirect to previous page after login
-[  ] Make the design more appealing (/sklep)
-[  ] Fix inconsistencies with permissions
-[  ] Fix inconsistencies in form responses/toast messages
-[  ] Code cleanup
+[  ] Add error pages  
+[  ] Logging (Sentry)  
+[  ] Product caching with Redis  
+[  ] SMS notifications  
+[  ] Hover cards for users  
+[  ] Rate limitting  
+[  ] Consider Page transitions with new Chrome API  
+[  ] Analytics page  
+[  ] Automatic background removal in product images  
+[  ] Auto-redirect to previous page after login  
+[  ] Make the design more appealing (/sklep)  
+[  ] Fix inconsistencies with permissions  
+[  ] Fix inconsistencies in form responses/toast messages  
+[  ] Code cleanup  
 
 
 ---
