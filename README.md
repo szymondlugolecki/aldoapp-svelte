@@ -4,11 +4,11 @@ Super fast & Fully featured e-commerce platform built with SvelteKit & TailwindC
 
 ## Features
 🤖 Automatic Notification System (via email)  
-🔐 Passworldless login (Magic Link)  
+🔐 Passwordless login (Magic Link)  
 👨‍💼 Admin Panel  
 👨 User Profiles & Order History  
 🛒 Server-based cart  
-⚡ Built for the edge  
+⚡ Built for the Edge Runtime  
 🥅 Caching  
 📱 PWA  
 🔑 Secure  
