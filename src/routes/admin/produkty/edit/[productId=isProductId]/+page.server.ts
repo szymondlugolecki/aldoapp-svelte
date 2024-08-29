@@ -6,6 +6,11 @@ import { superValidate, fail } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { error } from '@sveltejs/kit';
 import type { Optional } from '$types/UtilityTypes.js';
+import type { Config } from '@sveltejs/adapter-vercel';
+
+export const config: Config = {
+	runtime: 'nodejs20.x'
+};
 
 export const load = async ({ params }) => {
 	const { productId } = params;

@@ -9,8 +9,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { zod } from 'sveltekit-superforms/adapters';
 import { utapi } from '$lib/server/clients/uploadthing';
-
-import Jimp from 'jimp';
+import sharp from 'sharp';
 
 type ImageType = 'avif' | 'jpeg' | 'jpg' | 'png' | 'webp';
 type SvelteKitFetch = (
@@ -57,20 +56,19 @@ const edit: Action = async ({ request, locals, fetch }) => {
 
 	// We're handling only one image at once for now
 	const image = images;
-
 	if (image) {
 		// One image per product is enough for now
-		// Uploadthing
 		try {
-			// Resize the image
-			const arrBuffer = await image.arrayBuffer();
-			const jimpImg = await Jimp.read(Buffer.from(arrBuffer));
-			jimpImg.resize(500, 750);
-			const resizedImageBuffer = await jimpImg.getBufferAsync(jimpImg.getMIME());
-			const imageResized = new File([resizedImageBuffer], image.name, { type: jimpImg.getMIME() });
+			// Load the image
+			const imageBuffer = await image.arrayBuffer();
 
-			// Create a new File from the compressed image buffer & upload it
-			// const newFile = new File([compressedImageBuffer], image.name);
+			// Resize the image
+			const resizedImageBuffer = await sharp(imageBuffer).resize(500).toBuffer();
+
+			// Create a new File from the compressed image buffer
+			const imageResized = new File([resizedImageBuffer], image.name);
+
+			// Upload the image
 			const { data, error } = await utapi.uploadFiles(imageResized);
 
 			if (error) {
